@@ -3,7 +3,7 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.buffer.Buffer;
 import java.util.Optional;
 
-record Piece(Buffer target, int index, int length) implements Comparable<Piece> {
+record Piece(Buffer target, int index, int length) {
 
     record Pair(Piece left, Piece right) { }
 
@@ -33,8 +33,4 @@ record Piece(Buffer target, int index, int length) implements Comparable<Piece> 
         return index + length;
     }
 
-    @Override
-    public int compareTo(Piece other) {
-        return Integer.compare(this.index, other.index);
-    }
 }
