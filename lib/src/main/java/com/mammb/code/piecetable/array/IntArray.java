@@ -1,8 +1,9 @@
 package com.mammb.code.piecetable.array;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class IntArray {
+public class IntArray implements Serializable {
 
     private static final int[] EMPTY = {};
 
@@ -18,8 +19,12 @@ public class IntArray {
         return new IntArray(EMPTY, 0);
     }
 
+    public static IntArray of(int[] ints) {
+        return new IntArray(Arrays.copyOf(ints, ints.length), ints.length);
+    }
+
     public void add(int[] ints) {
-        if (length == values.length) {
+        if (length + ints.length > values.length) {
             values = grow(ints.length);
         }
         System.arraycopy(ints, 0, values, length, ints.length);
@@ -42,6 +47,11 @@ public class IntArray {
 
     public int[] get() {
         return Arrays.copyOf(values, length);
+    }
+
+    public void clear() {
+        values = EMPTY;
+        length = 0;
     }
 
     public int length() {

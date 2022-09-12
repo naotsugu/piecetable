@@ -1,8 +1,9 @@
 package com.mammb.code.piecetable.array;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class ByteArray {
+public class ByteArray implements Serializable {
 
     private static final byte[] EMPTY = {};
 
@@ -18,6 +19,10 @@ public class ByteArray {
         return new ByteArray(EMPTY, 0);
     }
 
+    public static ByteArray of(byte[] bytes) {
+        return new ByteArray(Arrays.copyOf(bytes, bytes.length), bytes.length);
+    }
+
     public void add(byte val) {
         if (length == values.length) {
             values = grow(length + 1);
@@ -26,7 +31,7 @@ public class ByteArray {
     }
 
     public void add(byte[] bytes) {
-        if (length == values.length) {
+        if (length + bytes.length > values.length) {
             values = grow(bytes.length);
         }
         System.arraycopy(bytes, 0, values, length, bytes.length);
@@ -42,6 +47,11 @@ public class ByteArray {
 
     public byte[] get() {
         return Arrays.copyOf(values, length);
+    }
+
+    public void clear() {
+        values = EMPTY;
+        length = 0;
     }
 
     public int length() {
