@@ -6,6 +6,17 @@ Piece table data structure in Java.
 
 ### Initial state
 
+A piece table consists of three columns:
+
+* Which buffer
+* Start index in the buffer
+* Length in the buffer
+
+In addition to the table, two buffers are used to handle edits:
+
+* `read-only` : A buffer to the original text document
+* `append-only` : A buffer to a temporary file
+
 ![piecetable1](docs/images/piecetable1.png)
 
 
