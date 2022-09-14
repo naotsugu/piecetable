@@ -1,3 +1,6 @@
+[![Build](https://github.com/naotsugu/piecetable/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/naotsugu/jpa-fluent-query/actions/workflows/gradle-build.yml)
+
+
 # piecetable
 
 Piece table data structure in Java.
