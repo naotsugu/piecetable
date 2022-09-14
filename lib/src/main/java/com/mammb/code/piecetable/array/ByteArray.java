@@ -3,15 +3,18 @@ package com.mammb.code.piecetable.array;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * Growable byte array.
+ */
 public class ByteArray implements Serializable {
 
     private static final byte[] EMPTY = {};
 
-    private byte[] values;
+    private byte[] bytes;
     private int length;
 
-    private ByteArray(byte[] values, int length) {
-        this.values = values;
+    private ByteArray(byte[] bytes, int length) {
+        this.bytes = bytes;
         this.length = length;
     }
 
@@ -23,34 +26,34 @@ public class ByteArray implements Serializable {
         return new ByteArray(Arrays.copyOf(bytes, bytes.length), bytes.length);
     }
 
-    public void add(byte val) {
-        if (length == values.length) {
-            values = grow(length + 1);
+    public void add(byte value) {
+        if (length == bytes.length) {
+            bytes = grow(length + 1);
         }
-        values[length++] = val;
+        bytes[length++] = value;
     }
 
-    public void add(byte[] bytes) {
-        if (length + bytes.length > values.length) {
-            values = grow(bytes.length);
+    public void add(byte[] values) {
+        if (length + values.length > bytes.length) {
+            this.bytes = grow(values.length);
         }
-        System.arraycopy(bytes, 0, values, length, bytes.length);
-        length += bytes.length;
+        System.arraycopy(values, 0, bytes, length, values.length);
+        length += values.length;
     }
 
     public byte get(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException();
         }
-        return values[index];
+        return bytes[index];
     }
 
     public byte[] get() {
-        return Arrays.copyOf(values, length);
+        return Arrays.copyOf(bytes, length);
     }
 
     public void clear() {
-        values = EMPTY;
+        bytes = EMPTY;
         length = 0;
     }
 
@@ -59,15 +62,15 @@ public class ByteArray implements Serializable {
     }
 
     public int capacity() {
-        return values.length;
+        return bytes.length;
     }
 
     private byte[] grow(int minCapacity) {
-        int oldCapacity = values.length;
-        if (length == 0 || values == EMPTY) {
-            return values = new byte[Math.max(10, minCapacity)];
+        int oldCapacity = bytes.length;
+        if (length == 0 || bytes == EMPTY) {
+            return bytes = new byte[Math.max(10, minCapacity)];
         } else {
-            return values = Arrays.copyOf(values, ArraySupport.newCapacity(oldCapacity,
+            return bytes = Arrays.copyOf(bytes, ArraySupport.newCapacity(oldCapacity,
                     minCapacity - oldCapacity,
                     Math.min(512, oldCapacity >> 1)));
         }

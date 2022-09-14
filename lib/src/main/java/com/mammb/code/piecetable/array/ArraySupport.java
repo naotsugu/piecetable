@@ -1,5 +1,8 @@
 package com.mammb.code.piecetable.array;
 
+/**
+ * Array utility.
+ */
 public class ArraySupport {
 
     private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;

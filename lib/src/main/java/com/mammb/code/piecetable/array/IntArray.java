@@ -3,15 +3,18 @@ package com.mammb.code.piecetable.array;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * Growable int array.
+ */
 public class IntArray implements Serializable {
 
     private static final int[] EMPTY = {};
 
-    private int[] values;
+    private int[] ints;
     private int length;
 
-    private IntArray(int[] values, int length) {
-        this.values = values;
+    private IntArray(int[] ints, int length) {
+        this.ints = ints;
         this.length = length;
     }
 
@@ -19,38 +22,38 @@ public class IntArray implements Serializable {
         return new IntArray(EMPTY, 0);
     }
 
-    public static IntArray of(int[] ints) {
-        return new IntArray(Arrays.copyOf(ints, ints.length), ints.length);
+    public static IntArray of(int[] values) {
+        return new IntArray(Arrays.copyOf(values, values.length), values.length);
     }
 
-    public void add(int[] ints) {
-        if (length + ints.length > values.length) {
-            values = grow(ints.length);
+    public void add(int[] values) {
+        if (length + values.length > ints.length) {
+            ints = grow(values.length);
         }
-        System.arraycopy(ints, 0, values, length, ints.length);
-        length += ints.length;
+        System.arraycopy(values, 0, ints, length, values.length);
+        length += values.length;
     }
 
-    public void add(int val) {
-        if (length == values.length) {
-            values = grow(length + 1);
+    public void add(int value) {
+        if (length == ints.length) {
+            ints = grow(length + 1);
         }
-        values[length++] = val;
+        ints[length++] = value;
     }
 
     public int get(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException();
         }
-        return values[index];
+        return ints[index];
     }
 
     public int[] get() {
-        return Arrays.copyOf(values, length);
+        return Arrays.copyOf(ints, length);
     }
 
     public void clear() {
-        values = EMPTY;
+        ints = EMPTY;
         length = 0;
     }
 
@@ -59,15 +62,15 @@ public class IntArray implements Serializable {
     }
 
     public int capacity() {
-        return values.length;
+        return ints.length;
     }
 
     private int[] grow(int minCapacity) {
-        int oldCapacity = values.length;
-        if (length == 0 || values == EMPTY) {
-            return values = new int[Math.max(10, minCapacity)];
+        int oldCapacity = ints.length;
+        if (length == 0 || ints == EMPTY) {
+            return ints = new int[Math.max(10, minCapacity)];
         } else {
-            return values = Arrays.copyOf(values, ArraySupport.newCapacity(oldCapacity,
+            return ints = Arrays.copyOf(ints, ArraySupport.newCapacity(oldCapacity,
                     minCapacity - oldCapacity,
                     Math.min(64, oldCapacity >> 1)));
         }

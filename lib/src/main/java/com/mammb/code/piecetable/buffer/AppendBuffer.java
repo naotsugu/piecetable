@@ -4,29 +4,36 @@ import com.mammb.code.piecetable.array.ByteArray;
 import com.mammb.code.piecetable.array.IntArray;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Optional;
 
+/**
+ * Appendable UTF-8 bytes array buffer.
+ */
 class AppendBuffer implements AppendableBuffer {
 
-    private static final short DEFAULT_GAP = 200;
+    private static final short DEFAULT_PITCH = 100;
 
-    private final short gap;
-    private final ByteArray values;
-    private final IntArray index;
+    private final ByteArray elements;
     private int length;
 
-    private AppendBuffer(ByteArray values, int length, short gap, IntArray index) {
-        this.gap = gap;
-        this.values = values;
-        this.index = index;
+    private final short pilePitch;
+    private final IntArray piles;
+    private final LruCache cache;
+
+    private AppendBuffer(ByteArray elements, int length, short pilePitch, IntArray piles) {
+        this.elements = elements;
         this.length = length;
+        this.pilePitch = pilePitch;
+        this.piles = piles;
+        this.cache = LruCache.of();
     }
 
     public static AppendBuffer of() {
-        return new AppendBuffer(ByteArray.of(), 0, DEFAULT_GAP, IntArray.of());
+        return new AppendBuffer(ByteArray.of(), 0, DEFAULT_PITCH, IntArray.of());
     }
 
-    static AppendBuffer of(short gap) {
-        return new AppendBuffer(ByteArray.of(), 0, gap, IntArray.of());
+    static AppendBuffer of(short pitch) {
+        return new AppendBuffer(ByteArray.of(), 0, pitch, IntArray.of());
     }
 
     @Override
@@ -41,9 +48,9 @@ class AppendBuffer implements AppendableBuffer {
     @Override
     public void append(Buffer buffer) {
         for (int i = 0; i < buffer.length(); i++) {
-            values.add(buffer.charAt(i));
-            if (length % gap == 0) {
-                index.add(length);
+            elements.add(buffer.charAt(i));
+            if (length % pilePitch == 0) {
+                piles.add(length);
             }
             length++;
         }
@@ -53,10 +60,10 @@ class AppendBuffer implements AppendableBuffer {
     public void append(byte[] bytes) {
         for (int i = 0; i < bytes.length; i++) {
             byte b = bytes[i];
-            values.add(b);
+            elements.add(b);
             if (!Utf8.isSurrogateRetain(b)) {
-                if (length % gap == 0) {
-                    index.add(length);
+                if (length % pilePitch == 0) {
+                    piles.add(length);
                 }
                 length++;
             }
@@ -65,24 +72,33 @@ class AppendBuffer implements AppendableBuffer {
 
     @Override
     public Buffer subBuffer(int start, int end) {
-        return ReadBuffer.of(Arrays.copyOfRange(values.get(), asIndex(start), asIndex(end)));
+        return ReadBuffer.of(Arrays.copyOfRange(elements.get(), asIndex(start), asIndex(end)));
     }
 
     @Override
     public byte[] bytes() {
-        return values.get();
+        return elements.get();
     }
 
     @Override
-    public byte[] charAt(int charIndex) {
-        return Utf8.asCharBytes(values.get(), asIndex(charIndex));
+    public byte[] charAt(int index) {
+        return Utf8.asCharBytes(elements.get(), asIndex(index));
     }
 
-    private int asIndex(int charIndex) {
-        int i = index.get(charIndex / gap);
-        for (int remaining = charIndex % gap; remaining > 0 && i < values.length(); remaining--, i++) {
-            i += (Utf8.surrogateCount(values.get(i)) - 1);
+    private int asIndex(int index) {
+        if (index == length) {
+            return elements.length();
         }
+        var cached = cache.get(index);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+        int i = piles.get(index / pilePitch);
+        int remaining = index % pilePitch;
+        for (; remaining > 0 && i < elements.length(); remaining--, i++) {
+            i += (Utf8.surrogateCount(elements.get(i)) - 1);
+        }
+        cache.put(index, i);
         return i;
     }
 
@@ -92,7 +108,7 @@ class AppendBuffer implements AppendableBuffer {
     }
 
     String dump() {
-        return "values: " + values + "\nsegmentIndexes:" + index;
+        return "values: " + elements + "\nsegmentIndexes:" + piles;
     }
 
     @Override

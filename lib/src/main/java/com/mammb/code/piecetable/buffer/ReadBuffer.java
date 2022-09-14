@@ -3,37 +3,44 @@ package com.mammb.code.piecetable.buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * UTF-8 bytes array buffer.
+ */
 class ReadBuffer implements Buffer {
 
-    private static final short DEFAULT_GAP = 200;
+    private static final short DEFAULT_PITCH = 100;
 
-    private final short gap;
-    private final byte[] values;
-    private final int[] index;
+    private final byte[] elements;
     private final int length;
 
-    private ReadBuffer(byte[] values, int length, short gap, int[] index) {
-        this.values = values;
+    private final short pilePitch;
+    private final int[] piles;
+    private final LruCache cache;
+
+    private ReadBuffer(byte[] elements, int length, short pilePitch, int[] piles) {
+        this.elements = elements;
         this.length = length;
-        this.gap = gap;
-        this.index = index;
+        this.pilePitch = pilePitch;
+        this.piles = piles;
+        this.cache = LruCache.of();
     }
 
-    public static ReadBuffer of(byte[] values) {
-        return of(values, DEFAULT_GAP);
+    public static ReadBuffer of(byte[] elements) {
+        return of(elements, DEFAULT_PITCH);
     }
 
-    static ReadBuffer of(byte[] values, short gap) {
+    static ReadBuffer of(byte[] elements, short pitch) {
         int charCount = 0;
         List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < values.length; i++) {
-            if (charCount++ % gap == 0) {
+        for (int i = 0; i < elements.length; i++) {
+            if (charCount++ % pitch == 0) {
                 list.add(i);
             }
-            i += (Utf8.surrogateCount(values[i]) - 1);
+            i += (Utf8.surrogateCount(elements[i]) - 1);
         }
-        return new ReadBuffer(values, charCount, gap, list.stream().mapToInt(i -> i).toArray());
+        return new ReadBuffer(elements, charCount, pitch, list.stream().mapToInt(i -> i).toArray());
     }
 
     @Override
@@ -43,29 +50,38 @@ class ReadBuffer implements Buffer {
 
     @Override
     public byte[] bytes() {
-        return values;
+        return elements;
     }
 
     @Override
     public Buffer subBuffer(int start, int end) {
-        return of(Arrays.copyOfRange(values, asIndex(start), asIndex(end)));
+        return of(Arrays.copyOfRange(elements, asIndex(start), asIndex(end)));
     }
 
     @Override
-    public byte[] charAt(int charIndex) {
-        return Utf8.asCharBytes(values, asIndex(charIndex));
+    public byte[] charAt(int index) {
+        return Utf8.asCharBytes(elements, asIndex(index));
     }
 
-    private int asIndex(int charIndex) {
-        int i = index[charIndex / gap];
-        for (int remaining = charIndex % gap; remaining > 0 && i < values.length; remaining--, i++) {
-            i += (Utf8.surrogateCount(values[i]) - 1);
+    private int asIndex(int index) {
+        if (index == length) {
+            return elements.length;
         }
+        var cached = cache.get(index);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+        int i = piles[index / pilePitch];
+        int remaining = index % pilePitch;
+        for (; remaining > 0 && i < elements.length; remaining--, i++) {
+            i += (Utf8.surrogateCount(elements[i]) - 1);
+        }
+        cache.put(index, i);
         return i;
     }
 
     String dump() {
-        return "values: " + Arrays.toString(values) + "\nsegmentIndexes:" + Arrays.toString(index);
+        return "values: " + Arrays.toString(elements) + "\nsegmentIndexes:" + Arrays.toString(piles);
     }
 
     @Override
