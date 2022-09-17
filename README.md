@@ -1,9 +1,11 @@
+# piecetable
+
 [![Build](https://github.com/naotsugu/piecetable/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/naotsugu/jpa-fluent-query/actions/workflows/gradle-build.yml)
 
 
-# piecetable
-
 Piece table data structure in Java.
+
+For memory efficiency, Unicode retention is handled as a UTF-8 byte array instead of UTF-16.
 
 ## Operations
 

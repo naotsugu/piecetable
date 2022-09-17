@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 /**
  * Growable byte array.
+ * @author Naotsugu Kobayashi
  */
 public class ByteArray implements Serializable {
 

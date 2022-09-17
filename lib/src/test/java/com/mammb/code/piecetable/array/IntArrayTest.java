@@ -6,6 +6,10 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test of {@link IntArray}.
+ * @author Naotsugu Kobayashi
+ */
 class IntArrayTest {
 
     @Test

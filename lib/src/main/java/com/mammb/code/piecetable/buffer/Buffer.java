@@ -1,5 +1,9 @@
 package com.mammb.code.piecetable.buffer;
 
+/**
+ * The buffer
+ * @author Naotsugu Kobayashi
+ */
 public interface Buffer {
 
     int length();

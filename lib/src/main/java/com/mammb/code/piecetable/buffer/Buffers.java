@@ -1,5 +1,9 @@
 package com.mammb.code.piecetable.buffer;
 
+/**
+ * Utility of buffers.
+ * @author Naotsugu Kobayashi
+ */
 public interface Buffers {
 
     static Buffer of(CharSequence cs) {
@@ -10,8 +14,8 @@ public interface Buffers {
         return ReadBuffer.of(bytes);
     }
 
-    static AppendableBuffer appendableOf() {
-        return AppendBuffer.of();
+    static AppendBuffer appendOf() {
+        return GrowBuffer.of();
     }
 
 }

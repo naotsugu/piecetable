@@ -5,7 +5,8 @@ import java.util.Deque;
 import java.util.Optional;
 
 /**
- * Small cache.
+ * Small LRU cache.
+ * @author Naotsugu Kobayashi
  */
 class LruCache {
 

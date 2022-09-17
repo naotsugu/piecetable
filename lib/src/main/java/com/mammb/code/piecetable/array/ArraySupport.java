@@ -2,6 +2,7 @@ package com.mammb.code.piecetable.array;
 
 /**
  * Array utility.
+ * @author Naotsugu Kobayashi
  */
 public class ArraySupport {
 
@@ -14,8 +15,8 @@ public class ArraySupport {
         } else {
             int minLength = oldLength + minGrowth;
             if (minLength < 0) {
-                throw new OutOfMemoryError("Required array length %d %d is too large"
-                        .formatted(oldLength, minGrowth));
+                throw new OutOfMemoryError(
+                    "Required array length %d %d is too large".formatted(oldLength, minGrowth));
             }
             return Math.max(minLength, SOFT_MAX_ARRAY_LENGTH);
         }

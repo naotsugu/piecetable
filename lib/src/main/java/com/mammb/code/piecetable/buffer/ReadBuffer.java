@@ -7,6 +7,7 @@ import java.util.Optional;
 
 /**
  * UTF-8 bytes array buffer.
+ * @author Naotsugu Kobayashi
  */
 class ReadBuffer implements Buffer {
 

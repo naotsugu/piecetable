@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 /**
  * Growable int array.
+ * @author Naotsugu Kobayashi
  */
 public class IntArray implements Serializable {
 
@@ -20,6 +21,10 @@ public class IntArray implements Serializable {
 
     public static IntArray of() {
         return new IntArray(EMPTY, 0);
+    }
+
+    public static IntArray of(int value) {
+        return new IntArray(new int[]{ value }, 1);
     }
 
     public static IntArray of(int[] values) {
@@ -42,9 +47,6 @@ public class IntArray implements Serializable {
     }
 
     public int get(int index) {
-        if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException();
-        }
         return ints[index];
     }
 
