@@ -1,6 +1,5 @@
 package com.mammb.code.piecetable;
 
-import com.mammb.code.piecetable.piece.CursoredList;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,16 +36,16 @@ class PieceTableTest {
         table.insert(0, "**");
         // |*|*| |a|b| |e|f| |g|h|i|
         // |0|1| |2|3| |4|5| |6|7|8|
-        assertEquals("**abefghi", table.toString());
+        assertEquals("**" + "ab" + "ef" + "ghi", table.toString());
 
         table.insert(9, "**");
         // |*|*| |a|b| |e|f| |g|h|i| |*|*|
         // |0|1| |2|3| |4|5| |6|7|8| |9|A|
-        assertEquals("**abefghi**", table.toString());
+        assertEquals("**" + "ab" + "ef" + "ghi" + "**", table.toString());
 
         table.delete(4, 5);
         // |*|*| |a|b| |*|*|
         // |0|1| |2|3| |4|5|
-        assertEquals("**ab**", table.toString());
+        assertEquals("**" + "ab" + "**", table.toString());
     }
 }
