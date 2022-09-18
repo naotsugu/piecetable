@@ -35,7 +35,8 @@ public class CursoredList {
 
     public Piece get(int index) {
         if (index < 0 || index >= length()) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException(
+                "index[%d], length[%d]".formatted(index, length()));
         }
         moveTo(index);
         return next();
@@ -74,7 +75,8 @@ public class CursoredList {
 
     public void remove(int index) {
         if (index < 0 || index >= length()) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException(
+                "index[%d], length[%d]".formatted(index, length()));
         }
         get(index);
         moveTo(index);

@@ -5,7 +5,10 @@ import com.mammb.code.piecetable.buffer.Buffer;
 import com.mammb.code.piecetable.buffer.Buffers;
 import com.mammb.code.piecetable.piece.CursoredList;
 import com.mammb.code.piecetable.piece.Piece;
+import com.mammb.code.piecetable.piece.PieceEdit;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.stream.Collectors;
 
 /**
@@ -18,11 +21,16 @@ public class PieceTable {
     private final AppendBuffer buffer;
     private int length;
 
+    private final Deque<PieceEdit> undo;
+    private final Deque<PieceEdit> redo;
+
     public PieceTable(Buffer readBuffer, AppendBuffer appendBuffer) {
         this.pieces = CursoredList.of();
         this.pieces.add(0, new Piece(readBuffer, 0, readBuffer.length()));
         this.buffer = appendBuffer;
         this.length = readBuffer.length();
+        this.undo = new ArrayDeque<>();
+        this.redo = new ArrayDeque<>();
     }
 
     public static PieceTable of(Buffer readBuffer) {
@@ -46,18 +54,18 @@ public class PieceTable {
 
         var point = pieces.at(pos);
         if (point.position() == pos) {
-            pieces.add(point.index(), newPiece);
+            var edit = new PieceEdit(point.index(), new Piece[0], new Piece[]{ newPiece });
+            pushToUndo(applyEdit(edit), false);
         } else {
             var piece = pieces.get(point.index());
             var pair = piece.split(pos - point.position());
-            pieces.remove(point.index());
-            pieces.add(point.index(), pair.left(), newPiece, pair.right());
+            var edit = new PieceEdit(point.index(), new Piece[] { piece },
+                    new Piece[] { pair.left(), newPiece, pair.right() });
+            pushToUndo(applyEdit(edit), false);
         }
-
         length += buf.length();
 
     }
-
 
     public void delete(int pos, int len) {
 
@@ -69,26 +77,55 @@ public class PieceTable {
             return;
         }
 
-        Piece[] split = new Piece[2];
+        // derive the pieces to be removed
         var from = pieces.at(pos);
-        if (from.position() != pos) {
-            split[0] = pieces.get(from.index()).split(pos - from.position()).left();
-        }
-
         var to = pieces.at(pos + len - 1);
-        var toPiece = pieces.get(to.index());
-        if ((to.position() + toPiece.length()) != (pos + len)) {
-            split[1] = toPiece.split(pos + len - to.position()).right();
+        var org = new Piece[to.index() - from.index() + 1];
+        for (int i = 0; i < org.length; i++) {
+            org[i] = pieces.get(from.index() + i);
         }
 
-        for (int i = to.index(); i >= from.index(); i--) {
-            pieces.remove(i);
+        // derive the split pieces to be added
+        var fromSplit = from.position() != pos;
+        var toSplit = (to.position() + org[org.length - 1].length()) != (pos + len);
+        var mod = new Piece[btoi(fromSplit) + btoi(toSplit)];
+        if (fromSplit) {
+            mod[0] = pieces.get(from.index()).split(pos - from.position()).left();
         }
-        if (split[1] != null) pieces.add(from.index(), split[1]);
-        if (split[0] != null) pieces.add(from.index(), split[0]);
+        if (toSplit) {
+            mod[btoi(fromSplit)] = org[org.length - 1].split(pos + len - to.position()).right();
+        }
 
+        var edit = new PieceEdit(from.index(), org, mod);
+        pushToUndo(applyEdit(edit), false);
         length -= len;
+    }
 
+    public void undo() {
+        if (!undo.isEmpty()) redo.push(applyEdit(undo.pop()));
+    }
+
+    public void redo() {
+        if (!redo.isEmpty()) pushToUndo(applyEdit(redo.pop()), true);
+    }
+
+    private void pushToUndo(PieceEdit edit, boolean readyForRedo) {
+        undo.push(edit);
+        if (!readyForRedo) redo.clear();
+    }
+
+    private PieceEdit applyEdit(PieceEdit edit) {
+        for (int i = 0; i < edit.org().length; i++) {
+            pieces.remove(edit.index());
+        }
+        if (edit.mod().length > 0) {
+            pieces.add(edit.index(), edit.mod());
+        }
+        return edit.flip();
+    }
+
+    private int btoi(boolean bool) {
+        return bool ? 1 : 0;
     }
 
     @Override

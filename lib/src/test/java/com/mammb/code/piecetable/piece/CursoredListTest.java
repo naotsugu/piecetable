@@ -68,6 +68,5 @@ class CursoredListTest {
         assertEquals(1, list.at(6).index());
         assertEquals(3, list.at(6).position());
 
-
     }
 }
