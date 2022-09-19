@@ -26,7 +26,7 @@ public interface Buffer {
     }
 
     default void write(WritableByteChannel channel, ByteBuffer buf,
-                      int offset, int length) throws IOException {
+            int offset, int length) throws IOException {
 
         int from = asIndex(offset);
         int to   = asIndex(offset + length);

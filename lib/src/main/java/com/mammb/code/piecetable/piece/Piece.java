@@ -1,10 +1,8 @@
 package com.mammb.code.piecetable.piece;
 
 import com.mammb.code.piecetable.buffer.Buffer;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Optional;
 
