@@ -1,12 +1,8 @@
 package com.mammb.code.piecetable.buffer;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * UTF-8 bytes array buffer.

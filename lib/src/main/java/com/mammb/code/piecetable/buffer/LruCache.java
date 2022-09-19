@@ -22,6 +22,10 @@ class LruCache {
         return new LruCache(16);
     }
 
+    static LruCache of(int cacheSize) {
+        return new LruCache(cacheSize);
+    }
+
     void put(int key, int value) {
         var e = new Entry(key, value);
         cache.remove(e);
