@@ -1,5 +1,9 @@
 package com.mammb.code.piecetable.piece;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
+import java.nio.channels.WritableByteChannel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -41,7 +45,6 @@ public class CursoredList {
         moveTo(index);
         return next();
     }
-
 
     public PiecePoint at(int pos) {
         if (point.position() < pos) {
@@ -114,6 +117,13 @@ public class CursoredList {
         }
         if (cursor.nextIndex() != index) {
             throw new IndexOutOfBoundsException();
+        }
+    }
+
+    public void writeTo(WritableByteChannel channel) throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate(1024);
+        for (Piece piece : raw) {
+            piece.writeTo(channel, buf);
         }
     }
 

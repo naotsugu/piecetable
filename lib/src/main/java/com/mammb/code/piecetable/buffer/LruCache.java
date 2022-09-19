@@ -41,6 +41,10 @@ class LruCache {
         return Optional.empty();
     }
 
+    void clear() {
+        cache.clear();
+    }
+
     record Entry(int key, int value) {}
 
 }

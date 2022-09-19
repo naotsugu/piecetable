@@ -1,5 +1,8 @@
 package com.mammb.code.piecetable.buffer;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +67,8 @@ class ReadBuffer implements Buffer {
         return Utf8.asCharBytes(elements, asIndex(index));
     }
 
-    private int asIndex(int index) {
+    @Override
+    public int asIndex(int index) {
         if (index == length) {
             return elements.length;
         }
@@ -82,7 +86,8 @@ class ReadBuffer implements Buffer {
     }
 
     String dump() {
-        return "values: " + Arrays.toString(elements) + "\nsegmentIndexes:" + Arrays.toString(piles);
+        return "elements: %s\npiles: %s"
+            .formatted(Arrays.toString(elements), Arrays.toString(piles));
     }
 
     @Override

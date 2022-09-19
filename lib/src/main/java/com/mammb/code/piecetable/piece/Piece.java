@@ -1,6 +1,11 @@
 package com.mammb.code.piecetable.piece;
 
 import com.mammb.code.piecetable.buffer.Buffer;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Optional;
 
 /**
@@ -35,6 +40,10 @@ public record Piece(Buffer target, int bufIndex, int length) {
             }
         }
         return Optional.empty();
+    }
+
+    void writeTo(WritableByteChannel channel, ByteBuffer buf) throws IOException {
+        target.write(channel, buf, bufIndex, length);
     }
 
     public int end() {

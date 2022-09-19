@@ -6,7 +6,10 @@ import com.mammb.code.piecetable.buffer.Buffers;
 import com.mammb.code.piecetable.piece.CursoredList;
 import com.mammb.code.piecetable.piece.Piece;
 import com.mammb.code.piecetable.piece.PieceEdit;
-
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.stream.Collectors;
@@ -126,6 +129,19 @@ public class PieceTable {
 
     private int btoi(boolean bool) {
         return bool ? 1 : 0;
+    }
+
+    public void write(Path path) {
+        try (FileChannel channel = FileChannel.open(path,
+                StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+            pieces.writeTo(channel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // pieces.join();
+        // buffer.clear();
+        // undo.clear();
+        // redo.clear();
     }
 
     @Override
