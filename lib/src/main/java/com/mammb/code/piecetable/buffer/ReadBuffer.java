@@ -1,5 +1,7 @@
 package com.mammb.code.piecetable.buffer;
 
+import com.mammb.code.piecetable.array.IntArray;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,14 +35,14 @@ class ReadBuffer implements Buffer {
 
     static ReadBuffer of(byte[] elements, short pitch) {
         int charCount = 0;
-        List<Integer> list = new ArrayList<>();
+        IntArray array = IntArray.of();
         for (int i = 0; i < elements.length; i++) {
             if (charCount++ % pitch == 0) {
-                list.add(i);
+                array.add(i);
             }
             i += (Utf8.surrogateCount(elements[i]) - 1);
         }
-        return new ReadBuffer(elements, charCount, pitch, list.stream().mapToInt(i -> i).toArray());
+        return new ReadBuffer(elements, charCount, pitch, array.get());
     }
 
     @Override
