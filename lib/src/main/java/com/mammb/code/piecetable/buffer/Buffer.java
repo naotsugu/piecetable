@@ -31,9 +31,9 @@ public interface Buffer {
         int from = asIndex(offset);
         int to   = asIndex(offset + length);
 
-        for (int i = 0; i < to - from; i++) {
-            int m = Math.min(from + buf.remaining(), to);
-            buf.put(Arrays.copyOfRange(bytes(), from, m));
+        for (int i = from; i < to;) {
+            int m = Math.min(i + buf.remaining(), to);
+            buf.put(Arrays.copyOfRange(bytes(), i, m));
             buf.flip();
             i += channel.write(buf);
             buf.compact();
