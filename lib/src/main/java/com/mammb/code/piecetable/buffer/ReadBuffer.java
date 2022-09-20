@@ -51,8 +51,8 @@ class ReadBuffer implements Buffer {
     }
 
     @Override
-    public byte[] bytes() {
-        return elements;
+    public byte[] bytes(int rawStart, int rawEnd) {
+        return Arrays.copyOfRange(elements, rawStart, rawEnd);
     }
 
     @Override
@@ -90,7 +90,7 @@ class ReadBuffer implements Buffer {
 
     @Override
     public String toString() {
-        return new String(bytes(), Utf8.charset());
+        return new String(bytes(0, elements.length), Utf8.charset());
     }
 
 }

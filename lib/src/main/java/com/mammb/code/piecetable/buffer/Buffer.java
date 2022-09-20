@@ -15,7 +15,7 @@ public interface Buffer {
 
     byte[] charAt(int index);
 
-    byte[] bytes();
+    byte[] bytes(int rawStart, int rawEnd);
 
     Buffer subBuffer(int start, int end);
 
@@ -33,7 +33,7 @@ public interface Buffer {
 
         for (int i = from; i < to;) {
             int m = Math.min(i + buf.remaining(), to);
-            buf.put(Arrays.copyOfRange(bytes(), i, m));
+            buf.put(bytes(i, m));
             buf.flip();
             i += channel.write(buf);
             buf.compact();

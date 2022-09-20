@@ -84,8 +84,8 @@ class GrowBuffer implements AppendBuffer {
     }
 
     @Override
-    public byte[] bytes() {
-        return elements.get();
+    public byte[] bytes(int rawStart, int rawEnd) {
+        return elements.get(rawStart, rawEnd);
     }
 
     @Override
@@ -117,12 +117,12 @@ class GrowBuffer implements AppendBuffer {
     }
 
     String dump() {
-        return "values: " + elements + "\nsegmentIndexes:" + piles;
+        return "elements: %s\npiles: %s".formatted(elements, piles);
     }
 
     @Override
     public String toString() {
-        return new String(bytes(), StandardCharsets.UTF_8);
+        return new String(bytes(0, elements.length()), StandardCharsets.UTF_8);
     }
 
 }

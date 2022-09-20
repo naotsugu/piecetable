@@ -44,13 +44,22 @@ public class ByteArray implements Serializable {
 
     public byte get(int index) {
         if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException(
+                "index[%d], length[%d]".formatted(index, length));
         }
         return bytes[index];
     }
 
     public byte[] get() {
         return Arrays.copyOf(bytes, length);
+    }
+
+    public byte[] get(int from, int to) {
+        if (from < 0 || to > length) {
+            throw new IndexOutOfBoundsException(
+                "from[%d], to[%d], length[%d]".formatted(from, to, length));
+        }
+        return Arrays.copyOfRange(bytes, from, to);
     }
 
     public void clear() {
