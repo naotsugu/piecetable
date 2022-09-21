@@ -35,6 +35,10 @@ public class ChannelArray {
     }
 
     public byte get(int index) {
+        if (index < 0 || index >= chSize) {
+            throw new IndexOutOfBoundsException(
+                "index[%d], length[%d]".formatted(index, chSize));
+        }
         if (buffer == EMPTY || index < offset || index >= offset + buffer.length) {
             fillBuffer(index, Math.addExact(index, PREF_BUF_SIZE));
         }
@@ -42,6 +46,11 @@ public class ChannelArray {
     }
 
     public byte[] get(int from, int to) {
+        if (from < 0 || to > chSize || from > to) {
+            throw new IndexOutOfBoundsException(
+                "from[%d], to[%d], length[%d]".formatted(from, to, chSize));
+        }
+
         if (buffer == EMPTY || from < offset || to > offset + buffer.length) {
             fillBuffer(from, to);
             if (buffer.length > PREF_BUF_SIZE << 8) {

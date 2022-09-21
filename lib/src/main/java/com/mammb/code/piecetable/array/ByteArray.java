@@ -55,7 +55,7 @@ public class ByteArray implements Serializable {
     }
 
     public byte[] get(int from, int to) {
-        if (from < 0 || to > length) {
+        if (from < 0 || to > length || from > to) {
             throw new IndexOutOfBoundsException(
                 "from[%d], to[%d], length[%d]".formatted(from, to, length));
         }

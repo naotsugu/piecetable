@@ -1,13 +1,10 @@
 package com.mammb.code.piecetable.array;
 
-import com.mammb.code.piecetable.buffer.ChannelBuffer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,9 +26,8 @@ class ChannelArrayTest {
         Files.deleteIfExists(path);
     }
 
-
     @Test
-    void get() throws IOException {
+    void testGet() throws IOException {
 
         Files.write(path, "1②3456789ABCDE".getBytes(StandardCharsets.UTF_8));
 
