@@ -1,0 +1,79 @@
+package com.mammb.code.piecetable.buffer;
+
+import com.mammb.code.piecetable.array.ChannelArray;
+import com.mammb.code.piecetable.array.IntArray;
+import java.nio.channels.SeekableByteChannel;
+
+public class ChannelBuffer implements Buffer {
+
+    private static final short PILE_PITCH = 256;
+
+    private final ChannelArray ch;
+    private final int length;
+    private final short pilePitch;
+    private final int[] piles;
+    private final LruCache cache;
+
+    private ChannelBuffer(ChannelArray ch, int length, short pilePitch, int[] piles) {
+        this.ch = ch;
+        this.length = length;
+        this.pilePitch = pilePitch;
+        this.piles = piles;
+        this.cache = LruCache.of();
+    }
+
+    public static ChannelBuffer of(SeekableByteChannel channel) {
+        return of(channel, PILE_PITCH);
+    }
+
+    static ChannelBuffer of(SeekableByteChannel channel, short pitch) {
+        var ch = ChannelArray.of(channel);
+        var charCount = 0;
+        var piles = IntArray.of();
+        for (int i = 0; i < ch.length(); i++) {
+            if (charCount++ % pitch == 0) {
+                piles.add(i);
+            }
+            i += (Utf8.surrogateCount(ch.get(i)) - 1);
+        }
+        return new ChannelBuffer(ch, charCount, pitch, piles.get());
+    }
+
+    @Override
+    public int length() {
+        return length;
+    }
+
+    @Override
+    public byte[] charAt(int index) {
+        return Utf8.asCharBytes(ch.get(index, Math.min(index + 4, ch.length())), asIndex(index));
+    }
+
+    @Override
+    public byte[] bytes(int rawStart, int rawEnd) {
+        return ch.get(rawStart, rawEnd);
+    }
+
+    @Override
+    public Buffer subBuffer(int start, int end) {
+        return ReadBuffer.of(ch.get(asIndex(start), asIndex(end)));
+    }
+
+    @Override
+    public int asIndex(int index) {
+        if (index == length) {
+            return ch.length();
+        }
+        var cached = cache.get(index);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+        int i = piles[index / pilePitch];
+        int remaining = index % pilePitch;
+        for (; remaining > 0 && i < ch.length(); remaining--, i++) {
+            i += (Utf8.surrogateCount(ch.get(i)) - 1);
+        }
+        cache.put(index, i);
+        return i;
+    }
+}

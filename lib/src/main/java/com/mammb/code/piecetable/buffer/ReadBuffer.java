@@ -1,10 +1,7 @@
 package com.mammb.code.piecetable.buffer;
 
 import com.mammb.code.piecetable.array.IntArray;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * UTF-8 bytes array buffer.
