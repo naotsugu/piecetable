@@ -46,7 +46,8 @@ public class ChannelBuffer implements Buffer {
 
     @Override
     public byte[] charAt(int index) {
-        return Utf8.asCharBytes(ch.get(index, Math.min(index + 4, ch.length())), asIndex(index));
+        int rawIndex = asIndex(index);
+        return Utf8.asCharBytes(ch.get(rawIndex, Math.min(rawIndex + 4, ch.length())), 0);
     }
 
     @Override
