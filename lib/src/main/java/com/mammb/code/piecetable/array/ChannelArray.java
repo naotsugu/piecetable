@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 /**
  * Buffered byte channel.
+ * @author Naotsugu Kobayashi
  */
 public class ChannelArray {
 

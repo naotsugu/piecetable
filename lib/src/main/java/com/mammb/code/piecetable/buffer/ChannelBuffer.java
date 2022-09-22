@@ -4,6 +4,10 @@ import com.mammb.code.piecetable.array.ChannelArray;
 import com.mammb.code.piecetable.array.IntArray;
 import java.nio.channels.SeekableByteChannel;
 
+/**
+ * ByteChannel buffer.
+ * @author Naotsugu Kobayashi
+ */
 public class ChannelBuffer implements Buffer {
 
     private static final short PILE_PITCH = 256;

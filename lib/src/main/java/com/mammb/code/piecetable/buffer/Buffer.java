@@ -3,7 +3,6 @@ package com.mammb.code.piecetable.buffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
-import java.util.Arrays;
 
 /**
  * The buffer
