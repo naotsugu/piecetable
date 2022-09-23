@@ -9,7 +9,7 @@ import java.util.Arrays;
  * Appendable UTF-8 bytes array buffer.
  * @author Naotsugu Kobayashi
  */
-class GrowBuffer implements AppendBuffer {
+public class GrowBuffer implements AppendBuffer {
 
     private static final short DEFAULT_PITCH = 100;
 

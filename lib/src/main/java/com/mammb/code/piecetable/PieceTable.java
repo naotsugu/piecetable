@@ -2,7 +2,6 @@ package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.buffer.AppendBuffer;
 import com.mammb.code.piecetable.buffer.Buffer;
-import com.mammb.code.piecetable.buffer.Buffers;
 import com.mammb.code.piecetable.piece.CursoredList;
 import com.mammb.code.piecetable.piece.Piece;
 import com.mammb.code.piecetable.piece.PieceEdit;

@@ -1,4 +1,11 @@
-package com.mammb.code.piecetable.buffer;
+package com.mammb.code.piecetable;
+
+import com.mammb.code.piecetable.buffer.AppendBuffer;
+import com.mammb.code.piecetable.buffer.Buffer;
+import com.mammb.code.piecetable.buffer.ChannelBuffer;
+import com.mammb.code.piecetable.buffer.GrowBuffer;
+import com.mammb.code.piecetable.buffer.ReadBuffer;
+import com.mammb.code.piecetable.buffer.Utf8;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
