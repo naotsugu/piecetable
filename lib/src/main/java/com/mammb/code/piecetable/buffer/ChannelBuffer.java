@@ -2,13 +2,15 @@ package com.mammb.code.piecetable.buffer;
 
 import com.mammb.code.piecetable.array.ChannelArray;
 import com.mammb.code.piecetable.array.IntArray;
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 
 /**
  * ByteChannel buffer.
  * @author Naotsugu Kobayashi
  */
-public class ChannelBuffer implements Buffer {
+public class ChannelBuffer implements Buffer, Closeable {
 
     private static final short PILE_PITCH = 256;
 
@@ -81,4 +83,10 @@ public class ChannelBuffer implements Buffer {
         cache.put(index, i);
         return i;
     }
+
+    @Override
+    public void close() throws IOException {
+        ch.close();
+    }
+
 }

@@ -1,15 +1,17 @@
 package com.mammb.code.piecetable.array;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Buffered byte channel.
  * @author Naotsugu Kobayashi
  */
-public class ChannelArray {
+public class ChannelArray implements Closeable {
 
     private static final short PREF_BUF_SIZE = 1024 * 4;
     private static final byte[] EMPTY = {};
@@ -21,6 +23,7 @@ public class ChannelArray {
     private int offset;
 
     private ChannelArray(SeekableByteChannel ch) {
+        Objects.requireNonNull(ch);
         try {
             this.chSize = Math.toIntExact(ch.size());
         } catch (IOException e) {
@@ -73,12 +76,9 @@ public class ChannelArray {
         this.offset = 0;
     }
 
-    public void close() {
-        try {
-            ch.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public void close() throws IOException {
+        ch.close();
     }
 
     private void fillBuffer(int from, int to) {

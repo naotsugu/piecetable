@@ -142,6 +142,13 @@ public class PieceTable {
         // buffer.clear();
         // undo.clear();
         // redo.clear();
+        // if (buffer instanceof Closeable closeable) {
+        //     try {
+        //         closeable.close();
+        //     } catch (IOException e) {
+        //         throw new RuntimeException(e);
+        //     }
+        // }
     }
 
     @Override
