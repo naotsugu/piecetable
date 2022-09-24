@@ -1,11 +1,4 @@
-package com.mammb.code.piecetable;
-
-import com.mammb.code.piecetable.buffer.AppendBuffer;
-import com.mammb.code.piecetable.buffer.Buffer;
-import com.mammb.code.piecetable.buffer.ChannelBuffer;
-import com.mammb.code.piecetable.buffer.GrowBuffer;
-import com.mammb.code.piecetable.buffer.ReadBuffer;
-import com.mammb.code.piecetable.buffer.Utf8;
+package com.mammb.code.piecetable.buffer;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -18,21 +11,23 @@ import java.nio.file.StandardOpenOption;
  * Utility of buffers.
  * @author Naotsugu Kobayashi
  */
-public interface Buffers {
+public abstract class Buffers {
 
-    static Buffer of(CharSequence cs) {
+    private Buffers() { }
+
+    public static Buffer of(CharSequence cs) {
         return of(cs.toString().getBytes(Utf8.charset()));
     }
 
-    static Buffer of(byte[] bytes) {
+    public static Buffer of(byte[] bytes) {
         return ReadBuffer.of(bytes);
     }
 
-    static Buffer of(SeekableByteChannel channel) {
+    public static Buffer of(SeekableByteChannel channel) {
         return ChannelBuffer.of(channel);
     }
 
-    static Buffer of(Path path) {
+    public static Buffer of(Path path) {
         try {
             return (Files.size(path) >= Runtime.getRuntime().freeMemory() * 0.8)
                 ? ChannelBuffer.of(FileChannel.open(path, StandardOpenOption.READ))
@@ -42,7 +37,7 @@ public interface Buffers {
         }
     }
 
-    static AppendBuffer appendOf() {
+    public static AppendBuffer appendOf() {
         return GrowBuffer.of();
     }
 
