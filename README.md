@@ -7,6 +7,9 @@ Piece table data structure in Java.
 
 For memory efficiency, Unicode retention is handled as a UTF-8 byte array instead of UTF-16.
 
+Supports undo and redo.
+
+
 ## Operations
 
 ### Initial state
