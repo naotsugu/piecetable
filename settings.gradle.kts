@@ -1,2 +1,2 @@
 rootProject.name = "com.mammb.code.piecetable"
-include("lib")
+include("lib", "app")
