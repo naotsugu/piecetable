@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 }
 
 application {
@@ -19,15 +19,8 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = Charsets.UTF_8.name()
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(18))
-    }
-}
+tasks.compileJava.configure { options.encoding = Charsets.UTF_8.name() }
+tasks.compileTestJava.configure { options.encoding = Charsets.UTF_8.name() }
 
 javafx {
     version = "19"
