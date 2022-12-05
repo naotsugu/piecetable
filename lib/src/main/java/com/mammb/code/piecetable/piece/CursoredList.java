@@ -89,6 +89,19 @@ public class CursoredList {
         return raw.size();
     }
 
+    public String substring(int startPos, int endPos) {
+        StringBuilder sb = new StringBuilder(endPos - startPos);
+        PiecePoint from = at(startPos);
+        PiecePoint to   = at(endPos - 1);
+        for (int i = 0; i <= to.index() - from.index(); i++) {
+            Piece piece = get(from.index() + i);
+            int s = (i == 0) ? startPos - from.position() : 0;
+            int e = (i == (to.index() - from.index())) ? endPos - to.position(): piece.length();
+            sb.append(piece.substring(s, e));
+        }
+        return sb.toString();
+    }
+
     private Piece next() {
         if (cursor.hasNext()) {
             var piece = cursor.next();

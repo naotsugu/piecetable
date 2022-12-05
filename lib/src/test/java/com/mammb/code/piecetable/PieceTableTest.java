@@ -1,9 +1,6 @@
 package com.mammb.code.piecetable;
 
 import org.junit.jupiter.api.Test;
-
-import java.nio.file.Path;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -18,7 +15,7 @@ class PieceTableTest {
         var table = PieceTable.of("abc");
         // |a|b|c|
         // |0|1|2|
-        assertEquals("abc", table.toString());
+        assertEquals("abc", table.substring(0, 3));
 
         table.insert(3, "def");
         // |a|b|c| |d|e|f|
@@ -44,6 +41,14 @@ class PieceTableTest {
         // |*|*| |a|b| |e|f| |g|h|i| |*|*|
         // |0|1| |2|3| |4|5| |6|7|8| |9|A|
         assertEquals("**" + "ab" + "ef" + "ghi" + "**", table.toString());
+        assertEquals("b", table.substring(3, 4));
+        assertEquals("be", table.substring(3, 5));
+        assertEquals("bef", table.substring(3, 6));
+        assertEquals("befg", table.substring(3, 7));
+        assertEquals("befgh", table.substring(3, 8));
+        assertEquals("befghi", table.substring(3, 9));
+        assertEquals("befghi*", table.substring(3, 10));
+        assertEquals("befghi**", table.substring(3, 11));
 
         table.delete(4, 5);
         // |*|*| |a|b| |*|*|

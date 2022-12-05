@@ -104,6 +104,12 @@ public class PieceTable {
         length -= len;
     }
 
+
+    public String substring(int startPos, int endPos) {
+        return pieces.substring(startPos, endPos);
+    }
+
+
     public void undo() {
         if (!undo.isEmpty()) redo.push(applyEdit(undo.pop()));
     }
