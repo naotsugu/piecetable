@@ -8,11 +8,14 @@ repositories {
 }
 
 dependencies {
+    //implementation(project(mapOf("path" to ":lib")))
+    implementation(project(":lib"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 }
 
 application {
     mainClass.set("com.mammb.code.editor.App")
+    mainModule.set("com.mammb.code.editor")
 }
 
 tasks.named<Test>("test") {

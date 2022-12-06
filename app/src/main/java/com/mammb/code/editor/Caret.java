@@ -3,10 +3,13 @@ package com.mammb.code.editor;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+
 
 public class Caret extends Path {
 
@@ -14,7 +17,7 @@ public class Caret extends Path {
 
     public Caret(Text text) {
         setStrokeWidth(2);
-        setStroke(Color.WHITESMOKE);
+        setStroke(Color.LIGHTYELLOW);
         setManaged(false);
         text.caretShapeProperty().addListener((o, oldVal, newVal) -> handleShape(newVal));
         setLayoutY(text.getBaselineOffset());
@@ -25,6 +28,12 @@ public class Caret extends Path {
     }
 
     private void handleShape(PathElement... elements) {
+        if (elements[0] instanceof MoveTo e) {
+            e.setY(e.getY() + 1);
+        }
+        if (elements[1] instanceof LineTo e) {
+            e.setY(e.getY() - 1);
+        }
         timeline.stop();
         setVisible(true);
         getElements().setAll(elements);

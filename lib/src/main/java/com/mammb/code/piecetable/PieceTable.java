@@ -44,6 +44,10 @@ public class PieceTable {
         return new PieceTable(Buffers.of(cs), Buffers.appendOf());
     }
 
+    public static PieceTable of(Path path) {
+        return new PieceTable(Buffers.of(path), Buffers.appendOf());
+    }
+
     public void insert(int pos, CharSequence cs) {
 
         if (pos < 0 || pos > length) {
