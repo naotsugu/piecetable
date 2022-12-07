@@ -109,6 +109,9 @@ public class PieceTable {
         length -= len;
     }
 
+    public int length() {
+        return length;
+    }
 
     public String substring(int startPos, int endPos) {
         return new String(pieces.bytes(startPos, endPos), StandardCharsets.UTF_8);
