@@ -1,5 +1,7 @@
 package com.mammb.code.piecetable.piece;
 
+import com.mammb.code.piecetable.array.ByteArray;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
@@ -89,17 +91,17 @@ public class CursoredList {
         return raw.size();
     }
 
-    public String substring(int startPos, int endPos) {
-        StringBuilder sb = new StringBuilder(endPos - startPos);
+    public byte[] bytes(int startPos, int endPos) {
+        ByteArray byteArray = ByteArray.of();
         PiecePoint from = at(startPos);
         PiecePoint to   = at(endPos - 1);
         for (int i = 0; i <= to.index() - from.index(); i++) {
             Piece piece = get(from.index() + i);
             int s = (i == 0) ? startPos - from.position() : 0;
             int e = (i == (to.index() - from.index())) ? endPos - to.position(): piece.length();
-            sb.append(piece.substring(s, e));
+            byteArray.add(piece.bytes(s, e));
         }
-        return sb.toString();
+        return byteArray.get();
     }
 
     private Piece next() {

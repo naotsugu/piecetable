@@ -8,6 +8,7 @@ import com.mammb.code.piecetable.piece.Piece;
 import com.mammb.code.piecetable.piece.PieceEdit;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayDeque;
@@ -110,9 +111,12 @@ public class PieceTable {
 
 
     public String substring(int startPos, int endPos) {
-        return pieces.substring(startPos, endPos);
+        return new String(pieces.bytes(startPos, endPos), StandardCharsets.UTF_8);
     }
 
+    public byte[] bytes(int startPos, int endPos) {
+        return pieces.bytes(startPos, endPos);
+    }
 
     public void undo() {
         if (!undo.isEmpty()) redo.push(applyEdit(undo.pop()));
