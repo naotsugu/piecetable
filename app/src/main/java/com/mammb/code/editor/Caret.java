@@ -15,7 +15,7 @@ public class Caret extends Path {
     public Caret() {
 
         setStrokeWidth(2);
-        setStroke(Color.YELLOW);
+        setStroke(Color.LIGHTYELLOW);
         setManaged(false);
 
         timeline = new Timeline();

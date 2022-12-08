@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -25,11 +26,12 @@ public class TextPane extends Region {
     private static final Color bgColor = Color.web("#303841");
     private static final Color fgColor = Color.web("#d3dee9");
     private static final Font font = Font.font("Consolas", FontWeight.NORMAL, FontPosture.REGULAR, 16);
+    private static final Text emptyText = new Text("0");
+    static { emptyText.setFont(font); }
 
     private ScreenBuffer screenBuffer = new ScreenBuffer();
     private Stage stage;
     private TextFlow textFlow;
-    private Content content;
 
     public TextPane(Stage stage) {
 
@@ -53,6 +55,12 @@ public class TextPane extends Region {
             caret.setShape(textFlow.caretShape(newValue.intValue(), true)));
         getChildren().add(caret);
         caret.setShape(textFlow.caretShape(0, true));
+
+        layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue.getHeight() != newValue.getHeight()) {
+                screenBuffer.setRowSize((int) Math.ceil(newValue.getHeight() / Utils.getTextHeight(emptyText)));
+            }
+        });
 
     }
 

@@ -22,6 +22,8 @@ public class ScreenBuffer {
     private int caretLogicalOffsetOnRow = 0;
     /** Offset on the text flow. */
     private IntegerProperty caretOffset = new SimpleIntegerProperty();
+    /** rowSize. */
+    private IntegerProperty rowSize = new SimpleIntegerProperty();
 
     private final Content content = new PtContent();
     private int headRow = 0;
@@ -176,5 +178,10 @@ public class ScreenBuffer {
     public final int getCaretOffset() { return caretOffset.get(); }
     public final void setCaretOffset(int value) { caretOffset.set(value); }
     public IntegerProperty caretOffsetProperty() { return caretOffset; }
+
+    public final int getRowSize() { return rowSize.get(); }
+    public final void setRowSize(int value) { rowSize.set(value); }
+    public IntegerProperty rowSizeProperty() { return rowSize; }
+
 
 }
