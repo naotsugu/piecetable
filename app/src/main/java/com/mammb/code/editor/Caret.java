@@ -3,6 +3,7 @@ package com.mammb.code.editor;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
@@ -14,7 +15,7 @@ public class Caret extends Path {
     public Caret() {
 
         setStrokeWidth(2);
-        setStroke(Color.WHITESMOKE);
+        setStroke(Color.YELLOW);
         setManaged(false);
 
         timeline = new Timeline();
@@ -24,7 +25,8 @@ public class Caret extends Path {
 
     }
 
-    private void handleShape(PathElement... elements) {
+    void setShape(PathElement... elements) {
+        if (elements[1] instanceof LineTo lineTo) lineTo.setY(lineTo.getY() - 2);
         timeline.stop();
         setVisible(true);
         getElements().setAll(elements);
