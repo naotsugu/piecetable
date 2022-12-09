@@ -62,6 +62,11 @@ public class ChannelBuffer implements Buffer, Closeable {
     }
 
     @Override
+    public byte[] bytes() {
+        return ch.get(0, ch.length());
+    }
+
+    @Override
     public Buffer subBuffer(int start, int end) {
         return ReadBuffer.of(ch.get(asIndex(start), asIndex(end)));
     }

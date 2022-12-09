@@ -89,6 +89,11 @@ public class GrowBuffer implements AppendBuffer {
     }
 
     @Override
+    public byte[] bytes() {
+        return elements.get();
+    }
+
+    @Override
     public byte[] charAt(int index) {
         return Utf8.asCharBytes(elements.get(), asIndex(index));
     }

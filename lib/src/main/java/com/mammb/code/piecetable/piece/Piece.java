@@ -40,12 +40,11 @@ public record Piece(Buffer target, int bufIndex, int length) {
         return Optional.empty();
     }
 
-    public byte[] bytes(int start, int end) {
+    public Buffer bytes(int start, int end) {
         if (start < 0 || end > end() || start >= end) {
             throw new RuntimeException("Illegal index. start[%s], end[%s]".formatted(start, end));
         }
-        Buffer buffer = target.subBuffer(bufIndex + start, bufIndex + end);
-        return buffer.bytes(0, buffer.length());
+        return target.subBuffer(bufIndex + start, bufIndex + end);
     }
 
     void writeTo(WritableByteChannel channel, ByteBuffer buf) throws IOException {

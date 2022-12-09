@@ -91,17 +91,17 @@ public class CursoredList {
         return raw.size();
     }
 
-    public byte[] bytes(int startPos, int endPos) {
+    public ByteArray bytes(int startPos, int endPos) {
         ByteArray byteArray = ByteArray.of();
         PiecePoint from = at(startPos);
         PiecePoint to   = at(endPos - 1);
         for (int i = 0; i <= to.index() - from.index(); i++) {
             Piece piece = get(from.index() + i);
             int s = (i == 0) ? startPos - from.position() : 0;
-            int e = (i == (to.index() - from.index())) ? endPos - to.position(): piece.length();
-            byteArray.add(piece.bytes(s, e));
+            int e = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
+            byteArray.add(piece.bytes(s, e).bytes());
         }
-        return byteArray.get();
+        return byteArray;
     }
 
     private Piece next() {

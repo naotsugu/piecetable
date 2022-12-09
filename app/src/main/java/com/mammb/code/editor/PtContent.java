@@ -9,7 +9,14 @@ import java.util.Arrays;
 
 public class PtContent implements Content {
 
+    private static final int bufferChars = 128;
+
     private PieceTable pt;
+
+    private byte[] readBuffer;
+    private int bufferHeadPos = -1;
+    private int bufferTailPos = -1;
+
 
     public PtContent(PieceTable pt) {
         this.pt = pt;
@@ -27,11 +34,13 @@ public class PtContent implements Content {
     @Override
     public void insert(int pos, String str) {
         pt.insert(pos, str);
+        if (pos < bufferTailPos) clearBuffer();
     }
 
     @Override
     public void delete(int pos, int len) {
         pt.delete(pos, len);
+        if (pos < bufferTailPos) clearBuffer();
     }
 
     @Override
@@ -42,33 +51,67 @@ public class PtContent implements Content {
     @Override
     public void open(Path path) {
         pt = PieceTable.of(path);
+        clearBuffer();
     }
+
 
     @Override
     public String untilEol(int pos) {
 
         var list = new ArrayList<byte[]>();
-        int bufferSize = 128;
 
-        label:for (int i = pos; i < pt.length() + bufferSize; i += bufferSize) {
-            byte[] bytes = pt.bytes(i, Math.min(pt.length(), i + bufferSize));
-            for (int j = 0; j < bytes.length; j++) {
-                if (bytes[j] == '\n') {
-                    list.add(Arrays.copyOf(bytes, j + 1));
+        label:for (int startIndex = asBufferIndex(pos);;startIndex = asBufferIndex(bufferTailPos)) {
+
+            if (startIndex < 0) break;
+
+            for (int i = startIndex; i < readBuffer.length; i++) {
+                if (readBuffer[i] == '\n') {
+                    list.add(Arrays.copyOfRange(readBuffer, startIndex, i + 1));
                     break label;
                 }
             }
-            list.add(bytes);
+            list.add(Arrays.copyOfRange(readBuffer, startIndex, readBuffer.length));
         }
 
-        var byteArray = new ByteArrayOutputStream(bufferSize * list.size());
+        var byteArray = new ByteArrayOutputStream(bufferChars * list.size());
         for (byte[] bytes : list) {
             byteArray.write(bytes, 0, bytes.length);
         }
         return byteArray.toString(StandardCharsets.UTF_8);
-
     }
 
 
+    private int asBufferIndex(int pos) {
+        if (bufferHeadPos > pos || pos >= bufferTailPos) {
+            fillBuffer(pos);
+        }
+        int count = pos - bufferHeadPos;
+        if (count == 0) {
+            return 0;
+        }
+        for (int i = 0; i < readBuffer.length; i++) {
+            if ((readBuffer[i] & 0xC0) == 0x80) {
+                continue;
+            }
+            if ((count--) == 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    private void fillBuffer(int pos) {
+        bufferHeadPos = pos;
+        bufferTailPos = Math.min(pt.length(), pos + bufferChars);
+        readBuffer = pt.bytes(bufferHeadPos, bufferTailPos);
+    }
+
+
+    private void clearBuffer() {
+        bufferHeadPos = -1;
+        bufferTailPos = -1;
+        readBuffer = null;
+    }
 
 }

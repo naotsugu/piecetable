@@ -14,7 +14,7 @@ import javafx.scene.text.Text;
 
 public class ScreenBuffer {
 
-    private final List<String> rows = new LinkedList<>();
+    final List<String> rows = new LinkedList<>();
 
     /** Caret row on the text flow. */
     private int caretRow = 0;
@@ -23,7 +23,7 @@ public class ScreenBuffer {
     /** Offset on the text flow. */
     private IntegerProperty caretOffset = new SimpleIntegerProperty();
     /** rowSize. */
-    private IntegerProperty rowSize = new SimpleIntegerProperty();
+    private int rowSize = 1;
 
     private final Content content = new PtContent();
     private int headRow = 0;
@@ -35,19 +35,14 @@ public class ScreenBuffer {
         rows.add("");
     }
 
-    public void open(Path path) {
 
+    public void open(Path path) {
         content.open(path);
         headRow = headPos = caretRow = caretLogicalOffsetOnRow = 0;
         caretOffset.set(0);
         rows.clear();
         dirty = false;
-
-        for (int i = 0; i < content.length();) {
-            String string = this.content.untilEol(i);
-            i += (string.length() == 0) ? 1 : string.length();
-            rows.add(string);
-        }
+        setRowSize(rowSize);
     }
 
 
@@ -68,20 +63,6 @@ public class ScreenBuffer {
             return string;
         }
         return null;
-    }
-
-    private static final Color bgColor = Color.web("#303841");
-    private static final Color fgColor = Color.web("#d3dee9");
-    private static final Font font = Font.font("Consolas", FontWeight.NORMAL, FontPosture.REGULAR, 16);
-    List<Text> texts() {
-        List<Text> list = new ArrayList<>();
-        for (String string : rows) {
-            Text text = new Text(string);
-            text.setFont(font);
-            text.setFill(fgColor);
-            list.add(text);
-        }
-        return list;
     }
 
 
@@ -138,12 +119,18 @@ public class ScreenBuffer {
         caretOffset(+ remaining);
     }
 
-    public void scrollUp() {
+    public void scrollUp(int delta) {
+        if (headRow == 0) return;
 
     }
 
-    public void scrollDown() {
-
+    public void scrollDown(int delta) {
+        if (rows.size() < (int) Math.ceil(rowSize * 2.0 / 3.0)) return;
+        int removeLineLength = rows.get(caretRow).length();
+        rows.add(content.untilEol(bottomPosOnContent()));
+        rows.remove(0);
+        headRow++;
+        headPos += removeLineLength;
     }
 
     public int caretRowOnContent() {
@@ -174,14 +161,25 @@ public class ScreenBuffer {
         return row.endsWith("\n") ? row.length() - 1 : row.length();
     }
 
+    void setRowSize(int preferenceSize) {
+        rowSize = preferenceSize;
+        if (preferenceSize == rows.size())  return;
+        while (preferenceSize < rows.size()) {
+            rows.remove(rows.size() - 1);
+        }
+        if (preferenceSize > rows.size()) {
+            for (int i = bottomPosOnContent(); i < content.length() && preferenceSize > rows.size();) {
+                String string = this.content.untilEol(i);
+                i += (string.length() == 0) ? 1 : string.length();
+                rows.add(string);
+            }
+        }
+    }
+
     private void caretOffset(int delta) { setCaretOffset(getCaretOffset() + delta); }
     public final int getCaretOffset() { return caretOffset.get(); }
     public final void setCaretOffset(int value) { caretOffset.set(value); }
     public IntegerProperty caretOffsetProperty() { return caretOffset; }
-
-    public final int getRowSize() { return rowSize.get(); }
-    public final void setRowSize(int value) { rowSize.set(value); }
-    public IntegerProperty rowSizeProperty() { return rowSize; }
 
 
 }

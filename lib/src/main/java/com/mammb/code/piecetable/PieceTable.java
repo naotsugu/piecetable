@@ -114,11 +114,11 @@ public class PieceTable {
     }
 
     public String substring(int startPos, int endPos) {
-        return new String(pieces.bytes(startPos, endPos), StandardCharsets.UTF_8);
+        return new String(pieces.bytes(startPos, endPos).get(), StandardCharsets.UTF_8);
     }
 
     public byte[] bytes(int startPos, int endPos) {
-        return pieces.bytes(startPos, endPos);
+        return pieces.bytes(startPos, endPos).get();
     }
 
     public void undo() {

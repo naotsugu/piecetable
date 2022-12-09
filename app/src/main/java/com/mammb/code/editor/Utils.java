@@ -3,6 +3,7 @@ package com.mammb.code.editor;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.util.Arrays;
@@ -12,6 +13,12 @@ public class Utils {
 
     public static double getTextHeight(Text text) {
         return getHeight(text.rangeShape(0, 1));
+    }
+
+    public static double getTextHeight(Font font) {
+        Text sample = new Text("0");
+        sample.setFont(font);
+        return getTextHeight(sample);
     }
 
     private static double getHeight(PathElement... elements) {

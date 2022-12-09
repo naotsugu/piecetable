@@ -16,6 +16,8 @@ public interface Buffer {
 
     byte[] bytes(int rawStart, int rawEnd);
 
+    byte[] bytes();
+
     Buffer subBuffer(int start, int end);
 
     int asIndex(int index);

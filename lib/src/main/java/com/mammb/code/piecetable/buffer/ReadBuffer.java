@@ -53,6 +53,11 @@ public class ReadBuffer implements Buffer {
     }
 
     @Override
+    public byte[] bytes() {
+        return Arrays.copyOf(elements, elements.length);
+    }
+
+    @Override
     public Buffer subBuffer(int start, int end) {
         return of(Arrays.copyOfRange(elements, asIndex(start), asIndex(end)));
     }

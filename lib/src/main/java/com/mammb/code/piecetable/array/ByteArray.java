@@ -54,6 +54,10 @@ public class ByteArray implements Serializable {
         return Arrays.copyOf(bytes, length);
     }
 
+    public void fill(byte[] dest) {
+        System.arraycopy(bytes, 0, dest, 0, Math.min(bytes.length, dest.length));
+    }
+
     public byte[] get(int from, int to) {
         if (from < 0 || to > length || from > to) {
             throw new IndexOutOfBoundsException(
