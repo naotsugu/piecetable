@@ -9,4 +9,5 @@ public interface Content {
     void write(Path path);
     void open(Path path);
     String untilEol(int pos);
+    String untilSol(int pos);
 }

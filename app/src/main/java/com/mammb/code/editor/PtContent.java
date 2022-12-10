@@ -73,11 +73,31 @@ public class PtContent implements Content {
             list.add(Arrays.copyOfRange(readBuffer, startIndex, readBuffer.length));
         }
 
-        var byteArray = new ByteArrayOutputStream(bufferChars * list.size());
-        for (byte[] bytes : list) {
-            byteArray.write(bytes, 0, bytes.length);
+        return toString(list);
+    }
+
+    @Override
+    public String untilSol(int pos) {
+
+        var list = new ArrayList<byte[]>();
+        Boolean skipFirst = null;
+
+        label:for (int startIndex = asBufferIndex(pos);;startIndex = readBuffer.length - 1) {
+
+            if (startIndex < 0) break;
+
+            for (int i = startIndex; i >= 0; i--) {
+                skipFirst = (skipFirst == null && readBuffer[startIndex] == '\n');
+                if (!skipFirst && readBuffer[i] == '\n') {
+                    list.add(0, Arrays.copyOfRange(readBuffer, i + 1, startIndex + 1));
+                    break label;
+                }
+                skipFirst = false;
+            }
+            list.add(0, Arrays.copyOfRange(readBuffer, 0, startIndex + 1));
+            fillBuffer(Math.max(bufferHeadPos - bufferChars, 0));
         }
-        return byteArray.toString(StandardCharsets.UTF_8);
+        return toString(list);
     }
 
 
@@ -87,6 +107,9 @@ public class PtContent implements Content {
      * @return buffer index
      */
     private int asBufferIndex(int pos) {
+        if (pos < 0 || pos > pt.length()) {
+            throw new IllegalArgumentException("pos " + pos);
+        }
         if (bufferHeadPos > pos || pos >= bufferTailPos) {
             fillBuffer(pos);
         }
@@ -107,7 +130,7 @@ public class PtContent implements Content {
 
 
     private void fillBuffer(int pos) {
-        bufferHeadPos = pos;
+        bufferHeadPos = Math.max(pos, 0);
         bufferTailPos = Math.min(pt.length(), pos + bufferChars);
         readBuffer = pt.bytes(bufferHeadPos, bufferTailPos);
     }
@@ -117,6 +140,14 @@ public class PtContent implements Content {
         bufferHeadPos = -1;
         bufferTailPos = -1;
         readBuffer = null;
+    }
+
+    private String toString(ArrayList<byte[]> list) {
+        var byteArray = new ByteArrayOutputStream(bufferChars * list.size());
+        for (byte[] bytes : list) {
+            byteArray.write(bytes, 0, bytes.length);
+        }
+        return byteArray.toString(StandardCharsets.UTF_8);
     }
 
 }

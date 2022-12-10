@@ -119,16 +119,27 @@ public class ScreenBuffer {
         caretOffset(+ remaining);
     }
 
-    public void scrollUp(int delta) {
-        if (headRow == 0) return;
 
+    public void scrollUp(int delta) {
+
+        for (int i = 0; i < delta; i ++) {
+
+            if (headRow == 0) return;
+
+            String firstRow = content.untilSol(headPos - 1);
+            rows.add(0, firstRow);
+            rows.remove(rows.size() - 1);
+            headRow--;
+            headPos -= firstRow.length();
+        }
     }
 
     public void scrollDown(int delta) {
 
-        if (rows.size() < (int) Math.ceil(rowSize * 2.0 / 3.0)) return;
-
         for (int i = 0; i < delta; i ++) {
+
+            if (rows.size() < (int) Math.ceil(rowSize * 2.0 / 3.0)) return;
+
             int removeLineLength = rows.get(0).length();
             rows.add(content.untilEol(bottomPosOnContent()));
             rows.remove(0);
@@ -136,6 +147,7 @@ public class ScreenBuffer {
             headPos += removeLineLength;
         }
     }
+
 
     public int caretRowOnContent() {
         return headRow + caretRow;
