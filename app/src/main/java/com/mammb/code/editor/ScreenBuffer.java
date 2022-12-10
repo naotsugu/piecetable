@@ -125,12 +125,16 @@ public class ScreenBuffer {
     }
 
     public void scrollDown(int delta) {
+
         if (rows.size() < (int) Math.ceil(rowSize * 2.0 / 3.0)) return;
-        int removeLineLength = rows.get(caretRow).length();
-        rows.add(content.untilEol(bottomPosOnContent()));
-        rows.remove(0);
-        headRow++;
-        headPos += removeLineLength;
+
+        for (int i = 0; i < delta; i ++) {
+            int removeLineLength = rows.get(0).length();
+            rows.add(content.untilEol(bottomPosOnContent()));
+            rows.remove(0);
+            headRow++;
+            headPos += removeLineLength;
+        }
     }
 
     public int caretRowOnContent() {

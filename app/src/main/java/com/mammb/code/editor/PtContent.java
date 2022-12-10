@@ -81,6 +81,11 @@ public class PtContent implements Content {
     }
 
 
+    /**
+     * Converts content position to buffer index.
+     * @param pos content position
+     * @return buffer index
+     */
     private int asBufferIndex(int pos) {
         if (bufferHeadPos > pos || pos >= bufferTailPos) {
             fillBuffer(pos);
