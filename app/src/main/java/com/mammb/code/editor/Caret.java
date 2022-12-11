@@ -12,6 +12,7 @@ public class Caret extends Path {
 
     private final Timeline timeline;
 
+
     public Caret() {
 
         setStrokeWidth(2);
@@ -25,8 +26,23 @@ public class Caret extends Path {
 
     }
 
+
+    void disable() {
+        timeline.stop();
+        setVisible(false);
+        getElements().remove(0, getElements().size());
+    }
+
     void setShape(PathElement... elements) {
-        if (elements[1] instanceof LineTo lineTo) lineTo.setY(lineTo.getY() - 2);
+
+        if (elements == null || elements.length == 0) {
+            disable();
+            return;
+        }
+
+        if (elements[1] instanceof LineTo lineTo) {
+            lineTo.setY(lineTo.getY() - 2);
+        }
         timeline.stop();
         setVisible(true);
         getElements().setAll(elements);

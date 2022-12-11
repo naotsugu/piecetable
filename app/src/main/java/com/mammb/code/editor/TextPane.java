@@ -1,5 +1,7 @@
 package com.mammb.code.editor;
 
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.AccessibleRole;
 import javafx.scene.input.KeyCharacterCombination;
@@ -10,6 +12,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -20,11 +23,8 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class TextPane extends Region {
 
@@ -36,6 +36,7 @@ public class TextPane extends Region {
     private ScreenBuffer screenBuffer = new ScreenBuffer();
     private Stage stage;
     private TextFlow textFlow;
+    private Caret caret;
 
     public TextPane(Stage stage) {
 
@@ -53,22 +54,11 @@ public class TextPane extends Region {
         getChildren().add(textFlow);
         textFlow.getChildren().addAll(texts());
 
-        Caret caret = new Caret();
+        caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
         caret.setLayoutY(textFlow.getPadding().getTop());
-        screenBuffer.caretOffsetProperty().addListener((observable, oldValue, newValue) ->
-            caret.setShape(textFlow.caretShape(newValue.intValue(), true)));
-        screenBuffer.addListChangeListener(change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    textFlow.getChildren().addAll(change.getFrom(), change.getAddedSubList().stream().map(this::asText).toList());
-                } else if (change.wasRemoved()) {
-                    textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
-                } else {
-                    System.out.println(change);
-                }
-            }
-        });
+        screenBuffer.caretOffsetProperty().addListener(this::handleCaretMoved);
+        screenBuffer.addListChangeListener(this::handleScreenTextChanged);
         getChildren().add(caret);
         caret.setShape(textFlow.caretShape(0, true));
 
@@ -79,6 +69,27 @@ public class TextPane extends Region {
         });
 
     }
+
+
+    void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
+        while (change.next()) {
+            if (change.wasAdded()) {
+                textFlow.getChildren().addAll(change.getFrom(), change.getAddedSubList().stream().map(this::asText).toList());
+            } else if (change.wasRemoved()) {
+                textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
+            }
+        }
+    }
+
+
+    void handleCaretMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.getTextLengthOnScreen() ) {
+            caret.disable();
+        } else {
+            caret.setShape(textFlow.caretShape(newValue.intValue(), true));
+        }
+    }
+
 
     public void open(File file) {
         screenBuffer.open(file.toPath());

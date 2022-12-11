@@ -71,8 +71,12 @@ public class ScreenBuffer {
 
     public void nextLine() {
 
-        if (caretPosOnContent() + rows.get(caretRowOnScreen).length() > content.length()) {
+        if (caretPosOnContent() + rows.get(caretRowOnScreen).length() >= content.length()) {
             return;
+        }
+
+        if (caretRowOnScreen + 3 > rowSize && bottomPosOnContent() < content.length()) {
+            scrollDown(1);
         }
 
         int remaining = rows.get(caretRowOnScreen).length() - caretOffsetOnRow();
@@ -85,6 +89,10 @@ public class ScreenBuffer {
 
         if (headRowOnContent == 0 && caretRowOnScreen == 0) {
             return;
+        }
+
+        if (caretRowOnScreen - 2 < 0) {
+            scrollUp(1);
         }
 
         int remaining = caretOffsetOnRow();
@@ -120,6 +128,10 @@ public class ScreenBuffer {
             }
             headRowOnContent--;
             headPosOnContent -= firstRow.length();
+
+            caretRowOnScreen++;
+            caretOffset(firstRow.length());
+
         }
     }
 
@@ -138,6 +150,9 @@ public class ScreenBuffer {
             rows.remove(0);
             headRowOnContent++;
             headPosOnContent += removeLineLength;
+
+            caretRowOnScreen--;
+            caretOffset(-removeLineLength);
         }
     }
 
@@ -158,7 +173,7 @@ public class ScreenBuffer {
 
 
     public int bottomPosOnContent() {
-        return headPosOnContent + rows.stream().mapToInt(String::length).sum();
+        return headPosOnContent + getTextLengthOnScreen();
     }
 
     public int caretOffsetOnRow() {
@@ -183,6 +198,10 @@ public class ScreenBuffer {
                 rows.add(string);
             }
         }
+    }
+
+    int getTextLengthOnScreen() {
+        return rows.stream().mapToInt(String::length).sum();
     }
 
     void addListChangeListener(ListChangeListener<String> listener) {
