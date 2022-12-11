@@ -60,7 +60,8 @@ public class PtContent implements Content {
 
         var list = new ArrayList<byte[]>();
 
-        label:for (int startIndex = asBufferIndex(pos);;startIndex = asBufferIndex(bufferTailPos)) {
+        label:for (int startIndex = asBufferIndex(pos);;
+                   startIndex = asBufferIndex(bufferTailPos)) {
 
             if (startIndex < 0) break;
 
@@ -82,7 +83,8 @@ public class PtContent implements Content {
         var list = new ArrayList<byte[]>();
         Boolean skipFirst = null;
 
-        label:for (int startIndex = asBufferIndex(pos);;startIndex = readBuffer.length - 1) {
+        label:for (int startIndex = asBufferIndexBackward(pos);;
+                   startIndex = asBufferIndexBackward(bufferHeadPos - 1)) {
 
             if (startIndex < 0) break;
 
@@ -95,7 +97,9 @@ public class PtContent implements Content {
                 skipFirst = false;
             }
             list.add(0, Arrays.copyOfRange(readBuffer, 0, startIndex + 1));
-            fillBuffer(Math.max(bufferHeadPos - bufferChars, 0));
+            if (bufferHeadPos == 0) {
+                break;
+            }
         }
         return toString(list);
     }
@@ -107,16 +111,59 @@ public class PtContent implements Content {
      * @return buffer index
      */
     private int asBufferIndex(int pos) {
+
         if (pos < 0 || pos > pt.length()) {
             throw new IllegalArgumentException("pos " + pos);
         }
+
         if (bufferHeadPos > pos || pos >= bufferTailPos) {
             fillBuffer(pos);
         }
+
+        return toIndex(pos);
+    }
+
+
+    private int asBufferIndexBackward(int endPos) {
+
+        if (endPos < 0 || endPos > pt.length()) {
+            throw new IllegalArgumentException("endPos " + endPos);
+        }
+
+        if (bufferHeadPos > endPos || endPos >= bufferTailPos) {
+            fillBufferBackward(endPos);
+        }
+
+        return toIndex(endPos);
+    }
+
+
+    private void fillBuffer(int pos) {
+        bufferHeadPos = Math.max(pos, 0);
+        bufferTailPos = Math.min(pt.length(), pos + bufferChars);
+        readBuffer = pt.bytes(bufferHeadPos, bufferTailPos);
+    }
+
+
+    private void fillBufferBackward(int endPos) {
+        bufferHeadPos = Math.max(endPos + 1 - bufferChars, 0);
+        bufferTailPos = Math.min(pt.length(), endPos + 1);
+        readBuffer = pt.bytes(bufferHeadPos, bufferTailPos);
+    }
+
+
+    private int toIndex(int pos) {
+
+        if (bufferHeadPos > pos || pos >= bufferTailPos) {
+            throw new IllegalArgumentException("pos:%d, bufferHeadPos:%d, bufferTailPos:%d"
+                .formatted(pos, bufferHeadPos, bufferTailPos));
+        }
+
         int count = pos - bufferHeadPos;
         if (count == 0) {
             return 0;
         }
+
         for (int i = 0; i < readBuffer.length; i++) {
             if ((readBuffer[i] & 0xC0) == 0x80) {
                 continue;
@@ -126,13 +173,6 @@ public class PtContent implements Content {
             }
         }
         return -1;
-    }
-
-
-    private void fillBuffer(int pos) {
-        bufferHeadPos = Math.max(pos, 0);
-        bufferTailPos = Math.min(pt.length(), pos + bufferChars);
-        readBuffer = pt.bytes(bufferHeadPos, bufferTailPos);
     }
 
 

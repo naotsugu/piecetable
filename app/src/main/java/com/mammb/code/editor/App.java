@@ -10,7 +10,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         TextPane textPane = new TextPane(stage);
-        Scene scene = new Scene(new StackPane(textPane), 640, 480);
+        Scene scene = new Scene(new StackPane(textPane), 800, 480);
         stage.setScene(scene);
         stage.show();
     }

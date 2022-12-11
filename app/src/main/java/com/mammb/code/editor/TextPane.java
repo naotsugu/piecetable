@@ -23,6 +23,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TextPane extends Region {
 
@@ -56,6 +58,17 @@ public class TextPane extends Region {
         caret.setLayoutY(textFlow.getPadding().getTop());
         screenBuffer.caretOffsetProperty().addListener((observable, oldValue, newValue) ->
             caret.setShape(textFlow.caretShape(newValue.intValue(), true)));
+        screenBuffer.addListChangeListener(change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    textFlow.getChildren().addAll(change.getFrom(), change.getAddedSubList().stream().map(this::asText).toList());
+                } else if (change.wasRemoved()) {
+                    textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
+                } else {
+                    System.out.println(change);
+                }
+            }
+        });
         getChildren().add(caret);
         caret.setShape(textFlow.caretShape(0, true));
 
@@ -95,7 +108,6 @@ public class TextPane extends Region {
             else if (e.getDeltaY() > 0)  screenBuffer.scrollUp(1);
             else if (e.getDeltaY() < -2) screenBuffer.scrollDown(2);
             else if (e.getDeltaY() < 0)  screenBuffer.scrollDown(1);
-            textFlow.getChildren().setAll(texts()); // FIXME
         }
 
     }
@@ -110,14 +122,16 @@ public class TextPane extends Region {
 
     private static final KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
 
+
     List<Text> texts() {
-        List<Text> list = new ArrayList<>();
-        for (String string : screenBuffer.rows) {
-            Text text = new Text(string);
-            text.setFont(font);
-            text.setFill(fgColor);
-            list.add(text);
-        }
-        return list;
+        return screenBuffer.rows.stream().map(this::asText).collect(Collectors.toList());
     }
+
+    Text asText(String string) {
+        Text text = new Text(string);
+        text.setFont(font);
+        text.setFill(fgColor);
+        return text;
+    }
+
 }
