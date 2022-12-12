@@ -3,21 +3,14 @@ package com.mammb.code.editor;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
-import javafx.scene.input.KeyCharacterCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -47,6 +40,7 @@ public class TextPane extends Region {
         setAccessibleRole(AccessibleRole.TEXT_AREA);
         setOnKeyPressed(this::handleKeyPressed);
         setOnScroll(this::handleScroll);
+        setOnMouseClicked(this::handleMouseClicked);
 
         textFlow = new TextFlow();
         textFlow.setTabSize(4);
@@ -74,7 +68,8 @@ public class TextPane extends Region {
     void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
         while (change.next()) {
             if (change.wasAdded()) {
-                textFlow.getChildren().addAll(change.getFrom(), change.getAddedSubList().stream().map(this::asText).toList());
+                textFlow.getChildren().addAll(change.getFrom(),
+                    change.getAddedSubList().stream().map(this::asText).toList());
             } else if (change.wasRemoved()) {
                 textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
             }
@@ -83,7 +78,7 @@ public class TextPane extends Region {
 
 
     void handleCaretMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.getTextLengthOnScreen() ) {
+        if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.textLengthOnScreen() ) {
             caret.disable();
         } else {
             caret.setShape(textFlow.caretShape(newValue.intValue(), true));
@@ -93,7 +88,6 @@ public class TextPane extends Region {
 
     public void open(File file) {
         screenBuffer.open(file.toPath());
-        textFlow.getChildren().setAll(texts());
     }
 
     private void handleKeyPressed(KeyEvent e) {
@@ -120,8 +114,17 @@ public class TextPane extends Region {
             else if (e.getDeltaY() < -2) screenBuffer.scrollDown(2);
             else if (e.getDeltaY() < 0)  screenBuffer.scrollDown(1);
         }
-
     }
+
+    private void handleMouseClicked(MouseEvent e) {
+        HitInfo hit = textFlow.hitTest(textFlow.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY())));
+        if (e.getClickCount() == 1) {
+            screenBuffer.moveCaretOffset(hit.getInsertionIndex());
+        } else if (e.getClickCount() == 2) {
+            // word select
+        }
+    }
+
 
     private static File fileChooseOpen(Window owner) {
         FileChooser fc = new FileChooser();
