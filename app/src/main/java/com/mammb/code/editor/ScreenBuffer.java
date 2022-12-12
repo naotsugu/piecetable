@@ -46,6 +46,8 @@ public class ScreenBuffer {
 
     public void next() {
 
+        locateScreenToCaretScope();
+
         if (caretPosOnContent() >= content.length()) {
             return;
         }
@@ -56,7 +58,7 @@ public class ScreenBuffer {
             caretLogicalOffsetOnRow = 0;
             caretRowOnScreen++;
         }
-        moveCaretPositionDelta(+1);
+        setCaretOffset(getCaretOffset() + 1);
 
         if (caretRowOnScreen + 2 > rowSize && bottomLengthOnContent() <= content.length()) {
             scrollDown(1);
@@ -66,6 +68,9 @@ public class ScreenBuffer {
 
 
     public void prev() {
+
+        locateScreenToCaretScope();
+
         if (headRowOnContent == 0 && caretRowOnScreen == 0 && getCaretOffset() == 0) {
             return;
         }
@@ -77,7 +82,7 @@ public class ScreenBuffer {
         } else {
             caretLogicalOffsetOnRow--;
         }
-        moveCaretPositionDelta(-1);
+        setCaretOffset(getCaretOffset() - 1);
 
         if (headRowOnContent > 0 && caretRowOnScreen - 1 < 0) {
             scrollUp(1);
@@ -87,6 +92,8 @@ public class ScreenBuffer {
 
     public void nextLine() {
 
+        locateScreenToCaretScope();
+
         if (caretPosOnContent() + caretRemainingOnRow() >= content.length() - 1) {
             end();
             next();
@@ -95,7 +102,7 @@ public class ScreenBuffer {
 
         int remaining = rows.get(caretRowOnScreen).length() - caretOffsetOnRow();
         caretRowOnScreen++;
-        moveCaretPositionDelta(remaining + caretOffsetOnRow());
+        setCaretOffset(getCaretOffset() + remaining + caretOffsetOnRow());
 
         if (caretRowOnScreen + 2 > rowSize && bottomLengthOnContent() <= content.length()) {
             scrollDown(1);
@@ -105,13 +112,15 @@ public class ScreenBuffer {
 
     public void prevLine() {
 
+        locateScreenToCaretScope();
+
         if (headRowOnContent == 0 && caretRowOnScreen == 0) {
             return;
         }
 
         int remaining = caretOffsetOnRow();
         caretRowOnScreen--;
-        moveCaretPositionDelta(- remaining - (rows.get(caretRowOnScreen).length() - caretOffsetOnRow()));
+        setCaretOffset(getCaretOffset() - remaining - (rows.get(caretRowOnScreen).length() - caretOffsetOnRow()));
 
         if (headRowOnContent > 0 && caretRowOnScreen - 1 < 0) {
             scrollUp(1);
@@ -120,16 +129,18 @@ public class ScreenBuffer {
 
 
     public void home() {
+        locateScreenToCaretScope();
         int remaining = caretOffsetOnRow();
         caretLogicalOffsetOnRow = 0;
-        moveCaretPositionDelta(-remaining);
+        setCaretOffset(getCaretOffset() - remaining);
     }
 
 
     public void end() {
+        locateScreenToCaretScope();
         int remaining = caretRowTextLength() - caretOffsetOnRow();
         caretLogicalOffsetOnRow = caretRowTextLength();
-        moveCaretPositionDelta(+remaining);
+        setCaretOffset(getCaretOffset() + remaining);
     }
 
 
@@ -148,8 +159,7 @@ public class ScreenBuffer {
             headPosOnContent -= firstRow.length();
 
             caretRowOnScreen++;
-            moveCaretPositionDelta(firstRow.length());
-
+            setCaretOffset(getCaretOffset() + firstRow.length());
         }
     }
 
@@ -170,18 +180,24 @@ public class ScreenBuffer {
             headPosOnContent += removeLineLength;
 
             caretRowOnScreen--;
-            moveCaretPositionDelta(-removeLineLength);
+            setCaretOffset(getCaretOffset() - removeLineLength);
         }
     }
 
 
     void locateScreenToCaretScope() {
         if (caretOffset.get() < 0) {
-
-        } else if (headPosOnContent + caretOffset.get() > bottomLengthOnContent()) {
-
+            while (caretOffset.get() < 0) {
+                scrollUp(1);
+            }
+            scrollUp(1);
         }
-
+        if (caretRowOnScreen > rowSize) {
+            while (caretRowOnScreen > rowSize) {
+                scrollDown(1);
+            }
+            scrollDown(3);
+        }
     }
 
 
@@ -285,7 +301,7 @@ public class ScreenBuffer {
      * |a|b|↵  3
      * |c|d|   2
      *       -----
-     *         5 getTextLengthOnScreen
+     *         5 textLengthOnScreen
      * </pre>
      */
     int textLengthOnScreen() {
@@ -324,10 +340,6 @@ public class ScreenBuffer {
 
     void addListChangeListener(ListChangeListener<String> listener) {
         rows.addListener(listener);
-    }
-
-    private void moveCaretPositionDelta(int delta) {
-        setCaretOffset(getCaretOffset() + delta);
     }
 
 
