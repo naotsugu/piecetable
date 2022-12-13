@@ -1,5 +1,6 @@
 package com.mammb.code.editor;
 
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -12,6 +13,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -44,6 +46,7 @@ public class TextPane extends Region {
 
         textFlow = new TextFlow();
         textFlow.setTabSize(4);
+        textFlow.setPrefWidth(Screen.getPrimary().getBounds().getWidth());
         textFlow.setPadding(new Insets(4));
         getChildren().add(textFlow);
         textFlow.getChildren().addAll(texts());
@@ -67,11 +70,12 @@ public class TextPane extends Region {
 
     void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
         while (change.next()) {
+            if (change.wasRemoved()) {
+                textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
+            }
             if (change.wasAdded()) {
                 textFlow.getChildren().addAll(change.getFrom(),
                     change.getAddedSubList().stream().map(this::asText).toList());
-            } else if (change.wasRemoved()) {
-                textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
             }
         }
     }
@@ -97,21 +101,25 @@ public class TextPane extends Region {
         }
 
         switch (e.getCode()) {
-            case LEFT  -> screenBuffer.prev();
-            case RIGHT -> screenBuffer.next();
-            case UP    -> screenBuffer.prevLine();
-            case DOWN  -> screenBuffer.nextLine();
-            case HOME  -> screenBuffer.home();
-            case END   -> screenBuffer.end();
+            case LEFT       -> screenBuffer.prev();
+            case RIGHT      -> screenBuffer.next();
+            case UP         -> screenBuffer.prevLine();
+            case DOWN       -> screenBuffer.nextLine();
+            case HOME       -> screenBuffer.home();
+            case END        -> screenBuffer.end();
+            case PAGE_UP    -> screenBuffer.pageUp();
+            case PAGE_DOWN  -> screenBuffer.pageDown();
+            case DELETE     -> screenBuffer.delete();
+            case BACK_SPACE -> screenBuffer.backSpace();
             default -> { }
         }
     }
 
     private void handleScroll(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
-            if (e.getDeltaY() > 2)  screenBuffer.scrollUp(2);
+            if (e.getDeltaY() > 2)  screenBuffer.scrollUp(1);
             else if (e.getDeltaY() > 0)  screenBuffer.scrollUp(1);
-            else if (e.getDeltaY() < -2) screenBuffer.scrollDown(2);
+            else if (e.getDeltaY() < -2) screenBuffer.scrollDown(1);
             else if (e.getDeltaY() < 0)  screenBuffer.scrollDown(1);
         }
     }

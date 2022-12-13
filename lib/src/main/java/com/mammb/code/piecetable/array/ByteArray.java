@@ -36,7 +36,7 @@ public class ByteArray implements Serializable {
 
     public void add(byte[] values) {
         if (length + values.length > bytes.length) {
-            this.bytes = grow(values.length);
+            this.bytes = grow(length + values.length);
         }
         System.arraycopy(values, 0, bytes, length, values.length);
         length += values.length;

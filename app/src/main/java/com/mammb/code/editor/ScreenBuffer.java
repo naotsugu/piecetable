@@ -23,11 +23,9 @@ public class ScreenBuffer {
     /** rowSize. */
     private int rowSize = 1;
 
-    private final Content content = new PtContent();
+    private final Content content = new EditBufferedContent(new PtContent());
     private int headRowOnContent = 0;
     private int headPosOnContent = 0;
-
-    private boolean dirty = false;
 
 
     public ScreenBuffer() {
@@ -39,7 +37,6 @@ public class ScreenBuffer {
         headRowOnContent = headPosOnContent = caretRowOnScreen = caretLogicalOffsetOnRow = 0;
         caretOffset.set(0);
         rows.clear();
-        dirty = false;
         setRowSize(rowSize);
     }
 
@@ -183,6 +180,36 @@ public class ScreenBuffer {
             setCaretOffset(getCaretOffset() - removeLineLength);
         }
     }
+
+    public void pageUp() {
+        for (int i = 0; i < rowSize; i++) {
+            prevLine();
+        }
+    }
+
+    public void pageDown() {
+        for (int i = 0; i < rowSize; i++) {
+            nextLine();
+        }
+    }
+
+    public void delete() {
+        content.delete(caretPosOnContent(), 1);
+        String edited = rows.get(caretRowOnScreen);
+        rows.set(caretRowOnScreen,
+            edited.substring(0, caretOffsetOnRow()) +
+            edited.substring(caretOffsetOnRow() + 1));
+    }
+
+
+    public void backSpace() {
+        int pos = caretPosOnContent();
+        prev();
+        if (pos != caretPosOnContent()) {
+            delete();
+        }
+    }
+
 
 
     void locateScreenToCaretScope() {
