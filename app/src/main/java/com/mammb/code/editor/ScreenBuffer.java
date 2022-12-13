@@ -194,6 +194,9 @@ public class ScreenBuffer {
     }
 
     public void delete() {
+        if (rows.get(caretRowOnScreen).charAt(caretOffsetOnRow()) == '\n') {
+            System.out.println("TODO");
+        }
         content.delete(caretPosOnContent(), 1);
         String edited = rows.get(caretRowOnScreen);
         rows.set(caretRowOnScreen,
@@ -207,6 +210,20 @@ public class ScreenBuffer {
         prev();
         if (pos != caretPosOnContent()) {
             delete();
+        }
+    }
+
+    public void add(String string) {
+        if (string.contains("\n")) {
+            System.out.println("TODO");
+        } else {
+            content.insert(caretPosOnContent(), string);
+            String edited = rows.get(caretRowOnScreen);
+            rows.set(caretRowOnScreen,
+                edited.substring(0, caretOffsetOnRow()) +
+                string +
+                edited.substring(caretOffsetOnRow()));
+            next();
         }
     }
 

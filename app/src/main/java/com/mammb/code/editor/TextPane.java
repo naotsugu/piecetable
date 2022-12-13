@@ -43,6 +43,7 @@ public class TextPane extends Region {
         setOnKeyPressed(this::handleKeyPressed);
         setOnScroll(this::handleScroll);
         setOnMouseClicked(this::handleMouseClicked);
+        setOnKeyTyped(this::handleInput);
 
         textFlow = new TextFlow();
         textFlow.setTabSize(4);
@@ -92,6 +93,20 @@ public class TextPane extends Region {
 
     public void open(File file) {
         screenBuffer.open(file.toPath());
+    }
+
+    private void handleInput(KeyEvent e) {
+        if (e.getCode().isFunctionKey() || e.getCode().isNavigationKey() ||
+            e.getCode().isArrowKey() || e.getCode().isModifierKey() ||
+            e.getCode().isMediaKey()) {
+            return;
+        }
+        if (e.isControlDown() || e.isAltDown() || e.isMetaDown()) {
+            return;
+        }
+        if (e.getCharacter().length() == 1 && e.getCharacter().getBytes()[0] != 0) {
+            screenBuffer.add(e.getCharacter());
+        }
     }
 
     private void handleKeyPressed(KeyEvent e) {
