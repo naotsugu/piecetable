@@ -214,6 +214,9 @@ public class ScreenBuffer {
     }
 
     public void add(String string) {
+
+        locateScreenToCaretScope();
+
         if (string.contains("\n")) {
             System.out.println("TODO");
         } else {
@@ -223,7 +226,9 @@ public class ScreenBuffer {
                 edited.substring(0, caretOffsetOnRow()) +
                 string +
                 edited.substring(caretOffsetOnRow()));
-            next();
+
+            caretLogicalOffsetOnRow = caretOffsetOnRow() + string.length();
+            setCaretOffset(getCaretOffset() + string.length());
         }
     }
 

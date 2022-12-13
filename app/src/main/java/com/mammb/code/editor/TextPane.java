@@ -28,10 +28,11 @@ public class TextPane extends Region {
     private static final Font font = Font.font("Consolas", FontWeight.NORMAL, FontPosture.REGULAR, 16);
     private static final double lineHeight = Utils.getTextHeight(font);
 
-    private ScreenBuffer screenBuffer = new ScreenBuffer();
-    private Stage stage;
-    private TextFlow textFlow;
-    private Caret caret;
+    private final Clipboard clipboard = Clipboard.getSystemClipboard();
+    private final ScreenBuffer screenBuffer = new ScreenBuffer();
+    private final Stage stage;
+    private final TextFlow textFlow;
+    private final Caret caret;
 
     public TextPane(Stage stage) {
 
@@ -114,6 +115,16 @@ public class TextPane extends Region {
             open(fileChooseOpen(stage));
             return;
         }
+        if (SC_C.match(e)) {
+            return;
+        }
+        if (SC_V.match(e)) {
+            if (clipboard.hasString()) screenBuffer.add(clipboard.getString());
+            return;
+        }
+        if (SC_X.match(e)) {
+            return;
+        }
 
         switch (e.getCode()) {
             case LEFT       -> screenBuffer.prev();
@@ -132,9 +143,9 @@ public class TextPane extends Region {
 
     private void handleScroll(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
-            if (e.getDeltaY() > 2)  screenBuffer.scrollUp(1);
+            if (e.getDeltaY() > 2)  screenBuffer.scrollUp(2);
             else if (e.getDeltaY() > 0)  screenBuffer.scrollUp(1);
-            else if (e.getDeltaY() < -2) screenBuffer.scrollDown(1);
+            else if (e.getDeltaY() < -2) screenBuffer.scrollDown(2);
             else if (e.getDeltaY() < 0)  screenBuffer.scrollDown(1);
         }
     }
@@ -157,8 +168,12 @@ public class TextPane extends Region {
     }
 
 
-    private static final KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCombination SC_C = new KeyCharacterCombination("c", KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCombination SC_V = new KeyCharacterCombination("v", KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCombination SC_X = new KeyCharacterCombination("x", KeyCombination.SHORTCUT_DOWN);
 
+    private static final KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCombination SC_S = new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN);
 
     List<Text> texts() {
         return screenBuffer.rows.stream().map(this::asText).collect(Collectors.toList());
