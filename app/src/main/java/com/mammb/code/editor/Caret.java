@@ -33,6 +33,7 @@ public class Caret extends Path {
         getElements().remove(0, getElements().size());
     }
 
+
     void setShape(PathElement... elements) {
 
         if (elements == null || elements.length == 0) {

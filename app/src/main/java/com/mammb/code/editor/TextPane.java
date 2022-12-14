@@ -19,6 +19,7 @@ import javafx.stage.Window;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class TextPane extends Region {
@@ -99,15 +100,11 @@ public class TextPane extends Region {
     private void handleInput(KeyEvent e) {
         if (e.getCode().isFunctionKey() || e.getCode().isNavigationKey() ||
             e.getCode().isArrowKey() || e.getCode().isModifierKey() ||
-            e.getCode().isMediaKey()) {
+            e.getCode().isMediaKey() || !controlKeysFilter.test(e) ||
+            e.getCharacter().length() == 0) {
             return;
         }
-        if (e.isControlDown() || e.isAltDown() || e.isMetaDown()) {
-            return;
-        }
-        if (e.getCharacter().length() == 1 && e.getCharacter().getBytes()[0] != 0) {
-            screenBuffer.add(e.getCharacter());
-        }
+        screenBuffer.add(e.getCharacter().replace('\r', '\n'));
     }
 
     private void handleKeyPressed(KeyEvent e) {
@@ -174,6 +171,11 @@ public class TextPane extends Region {
 
     private static final KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
     private static final KeyCombination SC_S = new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN);
+
+    private static final Predicate<KeyEvent> controlKeysFilter = e ->
+        System.getProperty("os.name").startsWith("Windows")
+            ? e.isControlDown() && e.isAltDown() && !e.isMetaDown() && e.getCharacter().length() == 1 && e.getCharacter().getBytes()[0] != 0
+            : !e.isControlDown() && !e.isAltDown() && !e.isMetaDown();
 
     List<Text> texts() {
         return screenBuffer.rows.stream().map(this::asText).collect(Collectors.toList());
