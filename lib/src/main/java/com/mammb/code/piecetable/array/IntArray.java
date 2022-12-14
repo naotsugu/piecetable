@@ -33,7 +33,7 @@ public class IntArray implements Serializable {
 
     public void add(int[] values) {
         if (length + values.length > ints.length) {
-            ints = grow(values.length);
+            ints = grow(length + values.length);
         }
         System.arraycopy(values, 0, ints, length, values.length);
         length += values.length;
