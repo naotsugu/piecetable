@@ -26,11 +26,11 @@ public class EditBufferedContent implements Content {
 
     @Override
     public int length() {
-        if (edit instanceof InsertEdit insertEdit) {
-            return peer.length() + insertEdit.str.length();
+        if (edit instanceof InsertEdit) {
+            return peer.length() + edit.len();
         }
-        if (edit instanceof DeleteEdit deleteEdit) {
-            return peer.length() - deleteEdit.len;
+        if (edit instanceof DeleteEdit) {
+            return peer.length() - edit.len();
         }
         return peer.length();
     }
@@ -48,8 +48,26 @@ public class EditBufferedContent implements Content {
     }
 
     @Override
+    public int codePointAt(int pos) {
+        if (pos >= edit.pos()) {
+            edit = edit.flush();
+        }
+        return peer.codePointAt(pos);
+    }
+
+    @Override
+    public String substring(int start, int end) {
+        if (end >= edit.pos()) {
+            edit = edit.flush();
+        }
+        return peer.substring(start, end);
+    }
+
+    @Override
     public String untilEol(int pos) {
-        edit = edit.flush();
+        if (pos >= edit.pos()) {
+            edit = edit.flush();
+        }
         return peer.untilEol(pos);
     }
 
@@ -64,6 +82,8 @@ public class EditBufferedContent implements Content {
         Edit insert(int pos, String cs);
         Edit delete(int pos, int len);
         Edit flush();
+        default int pos() { return -1;}
+        default int len() { return 0;}
     }
 
 
@@ -101,7 +121,14 @@ public class EditBufferedContent implements Content {
             content.insert(pos, str);
             return new NeutralEdit(content);
         }
+
+        @Override
+        public int pos() { return pos; }
+        @Override
+        public int len() { return str.length(); }
+
     }
+
 
     record DeleteEdit(Content content, long occurredOn, int pos, int len) implements Edit {
 
@@ -127,6 +154,11 @@ public class EditBufferedContent implements Content {
             content.delete(pos, len);
             return new NeutralEdit(content);
         }
+
+        @Override
+        public int pos() { return pos; }
+        @Override
+        public int len() { return len;}
     }
 
 }

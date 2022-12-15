@@ -54,6 +54,18 @@ public class PtContent implements Content {
         clearBuffer();
     }
 
+    @Override
+    public int codePointAt(int pos) {
+        // unbuffered
+        // |A|B| -> code point of B
+        return Character.codePointAt(pt.substring(pos, pos + 1), 0);
+    }
+
+    @Override
+    public String substring(int start, int end) {
+        // unbuffered
+        return pt.substring(start, end);
+    }
 
     @Override
     public String untilEol(int pos) {

@@ -194,23 +194,28 @@ public class ScreenBuffer {
         }
     }
 
-    public void delete() {
-        if (rows.get(caretRowOnScreen).charAt(caretOffsetOnRow()) == '\n') {
-            content.delete(caretPosOnContent(), 1);
-            fillRows(rowSize + 1);
-            String edited = rows.get(caretRowOnScreen);
-            String nextLine = "";
-            if ((rows.size() > caretRowOnScreen + 1)) {
-                nextLine = rows.get(caretRowOnScreen + 1);
-                rows.remove(caretRowOnScreen + 1);
-            }
-            rows.set(caretRowOnScreen, edited.substring(0, caretOffsetOnRow()) + nextLine);
-        } else {
+    public void delete(int len) {
+        if (len == 1 && getCaretCodePoint() != '\n') {
+            // simple delete
             content.delete(caretPosOnContent(), 1);
             String edited = rows.get(caretRowOnScreen);
             rows.set(caretRowOnScreen,
                 edited.substring(0, caretOffsetOnRow()) +
                     edited.substring(caretOffsetOnRow() + 1));
+        } else {
+            int caretIndexOnContent = caretPosOnContent();
+            String delText = peekString(caretIndexOnContent, caretIndexOnContent + len);
+            List<String> lines = Strings.splitLine(delText);
+            int delLines = lines.size() - 1;
+            fillRows(rowSize + delLines);
+
+            int caretOffsetOnRow = caretOffsetOnRow();
+            String prefix = rows.get(caretRowOnScreen).substring(0, caretOffsetOnRow);
+            String suffix = rows.get(caretRowOnScreen + delLines).substring(lines.get(lines.size() - 1).length());
+            rows.set(caretRowOnScreen, prefix + suffix);
+            for (int i = 0; i < delLines; i++) {
+                rows.remove(caretRowOnScreen + 1);
+            }
         }
     }
 
@@ -219,7 +224,7 @@ public class ScreenBuffer {
         int pos = caretPosOnContent();
         prev();
         if (pos != caretPosOnContent()) {
-            delete();
+            delete(1);
         }
     }
 
@@ -235,7 +240,7 @@ public class ScreenBuffer {
         String suffix = current.substring(caretOffsetOnRow);
         List<String> lines = Strings.splitLine(prefix + string + suffix);
         rows.set(caretRowOnScreen, lines.get(0));
-        caretLogicalOffsetOnRow = caretOffsetOnRow + lines.get(0).length();
+        caretLogicalOffsetOnRow = caretOffsetOnRow + string.length();
         for (int i = 1; i < lines.size(); i++) {
             rows.add(caretRowOnScreen + i, lines.get(i));
             caretLogicalOffsetOnRow = lines.get(i).length() - suffix.length();
@@ -249,6 +254,10 @@ public class ScreenBuffer {
 
 
     void locateToCaretScope() {
+
+        if (isCaretVisibleOnScreen()) {
+            return;
+        }
         if (caretOffset.get() < 0) {
             while (caretOffset.get() < 0) {
                 scrollUp(1);
@@ -403,8 +412,19 @@ public class ScreenBuffer {
     }
 
 
-    private String getScreenString(int beginIndexOnScreen, int endIndexOnscreen) {
-        return String.join("", rows).substring(beginIndexOnScreen, endIndexOnscreen);
+    private int getCaretCodePoint() {
+        return isCaretVisibleOnScreen()
+            ? rows.get(caretRowOnScreen).codePointAt(caretOffsetOnRow())
+            : content.codePointAt(caretPosOnContent());
+    }
+
+    private boolean isCaretVisibleOnScreen() {
+        return caretOffset.get() >= 0 && caretRowOnScreen <= rowSize;
+    }
+
+
+    private String peekString(int beginIndexOnContent, int endIndexOnContent) {
+        return content.substring(beginIndexOnContent, endIndexOnContent);
     }
 
 

@@ -1,6 +1,5 @@
 package com.mammb.code.editor;
 
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -98,12 +97,20 @@ public class TextPane extends Region {
     }
 
     private void handleInput(KeyEvent e) {
+
         if (e.getCode().isFunctionKey() || e.getCode().isNavigationKey() ||
             e.getCode().isArrowKey() || e.getCode().isModifierKey() ||
             e.getCode().isMediaKey() || !controlKeysFilter.test(e) ||
             e.getCharacter().length() == 0) {
             return;
         }
+        int ascii = e.getCharacter().getBytes()[0];
+        if (ascii < 32 || ascii == 127) { // 127:DEL
+            if (ascii != 10 && ascii != 13) { // 10:LF 13:CR
+                return;
+            }
+        }
+        // Enter key : 13:CR -> replace to 10:LF
         screenBuffer.add(e.getCharacter().replace('\r', '\n'));
     }
 
@@ -132,7 +139,7 @@ public class TextPane extends Region {
             case END        -> screenBuffer.end();
             case PAGE_UP    -> screenBuffer.pageUp();
             case PAGE_DOWN  -> screenBuffer.pageDown();
-            case DELETE     -> screenBuffer.delete();
+            case DELETE     -> screenBuffer.delete(1);
             case BACK_SPACE -> screenBuffer.backSpace();
             default -> { }
         }
@@ -174,7 +181,7 @@ public class TextPane extends Region {
 
     private static final Predicate<KeyEvent> controlKeysFilter = e ->
         System.getProperty("os.name").startsWith("Windows")
-            ? e.isControlDown() && e.isAltDown() && !e.isMetaDown() && e.getCharacter().length() == 1 && e.getCharacter().getBytes()[0] != 0
+            ? !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() && e.getCharacter().length() == 1 && e.getCharacter().getBytes()[0] != 0
             : !e.isControlDown() && !e.isAltDown() && !e.isMetaDown();
 
     List<Text> texts() {
