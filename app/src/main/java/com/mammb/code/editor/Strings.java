@@ -22,29 +22,42 @@ public class Strings {
     }
 
 
-
-
     /**
      * <pre>
-     * aa\nbb -> aa\n
-     *           bb
+     * |a|a|\n|b|b| -> |a|a|\n|
+     *                 |b|b|
+     * </pre>
+     * <pre>
+     * |a|a|\n| -> |a|a|\n|
+     *             ||
+     * </pre>
+     * <pre>
+     * |\n|b|b| -> |\n|
+     *             |b|b|
      * </pre>
      * @param str
      * @return
      */
-    public static List<String> splitLine(String str) {
-        List<String> list = new ArrayList<>();
+    public static String[] splitLine(String str) {
+        String[] lines = new String[countLf(str) + 1];
+        int line = 0;
         int n = 0;
         for (int i = 0; i < str.length(); i++) {
             if (str.charAt(i) == LF) {
-                list.add(str.substring(n, i + 1));
+                lines[line++] = str.substring(n, i + 1);
                 n = i + 1;
+            } else if (i == str.length() - 1) {
+                lines[line++] = str.substring(n);
             }
         }
-        if (n < str.length()) {
-            list.add(str.substring(n));
+        if (line < lines.length) {
+            lines[line] = "";
         }
-        return list;
+        return lines;
+    }
+
+    public static int countLf(String str) {
+        return (int) str.chars().filter(c -> c == LF).count();
     }
 
 }

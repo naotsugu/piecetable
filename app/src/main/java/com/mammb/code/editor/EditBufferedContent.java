@@ -77,6 +77,9 @@ public class EditBufferedContent implements Content {
         return peer.untilSol(pos);
     }
 
+    Edit getEdit() {
+        return edit;
+    }
 
     interface Edit {
         Edit insert(int pos, String cs);

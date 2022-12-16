@@ -63,7 +63,7 @@ public class TextPane extends Region {
 
         layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue.getHeight() != newValue.getHeight()) {
-                screenBuffer.setRowSize((int) Math.ceil(newValue.getHeight() / lineHeight));
+                screenBuffer.setScreenRowSize((int) Math.ceil(newValue.getHeight() / lineHeight));
             }
         });
 
@@ -84,7 +84,7 @@ public class TextPane extends Region {
 
 
     void handleCaretMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.textLengthOnScreen() ) {
+        if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.charCountOnScreen() ) {
             caret.disable();
         } else {
             caret.setShape(textFlow.caretShape(newValue.intValue(), true));
@@ -141,23 +141,25 @@ public class TextPane extends Region {
             case PAGE_DOWN  -> screenBuffer.pageDown();
             case DELETE     -> screenBuffer.delete(1);
             case BACK_SPACE -> screenBuffer.backSpace();
+            case F1         -> screenBuffer.inspect();
+            case ESCAPE     -> screenBuffer.reset();
             default -> { }
         }
     }
 
     private void handleScroll(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
-            if (e.getDeltaY() > 2)  screenBuffer.scrollUp(2);
-            else if (e.getDeltaY() > 0)  screenBuffer.scrollUp(1);
-            else if (e.getDeltaY() < -2) screenBuffer.scrollDown(2);
-            else if (e.getDeltaY() < 0)  screenBuffer.scrollDown(1);
+            if (e.getDeltaY() > 2)  screenBuffer.scrollPrev(2);
+            else if (e.getDeltaY() > 0)  screenBuffer.scrollPrev(1);
+            else if (e.getDeltaY() < -2) screenBuffer.scrollNext(2);
+            else if (e.getDeltaY() < 0)  screenBuffer.scrollNext(1);
         }
     }
 
     private void handleMouseClicked(MouseEvent e) {
         HitInfo hit = textFlow.hitTest(textFlow.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY())));
         if (e.getClickCount() == 1) {
-            screenBuffer.moveCaretOffset(hit.getInsertionIndex());
+            screenBuffer.moveCaret(hit.getInsertionIndex());
         } else if (e.getClickCount() == 2) {
             // word select
         }

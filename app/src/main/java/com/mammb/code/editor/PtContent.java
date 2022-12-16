@@ -166,7 +166,7 @@ public class PtContent implements Content {
 
     private int toIndex(int pos) {
 
-        if (bufferHeadPos > pos || pos >= bufferTailPos) {
+        if (bufferHeadPos > pos || pos > bufferTailPos) {
             throw new IllegalArgumentException("pos:%d, bufferHeadPos:%d, bufferTailPos:%d"
                 .formatted(pos, bufferHeadPos, bufferTailPos));
         }
