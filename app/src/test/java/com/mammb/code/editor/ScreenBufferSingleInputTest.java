@@ -4,10 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ScreenBufferTest {
+class ScreenBufferSingleInputTest {
 
-    @Test
-    void testSingle() {
+    @Test void test() {
 
         var sb = new ScreenBuffer();
         sb.setScreenRowSize(5);
@@ -162,5 +161,52 @@ class ScreenBufferTest {
 
     }
 
+    @Test void tests() {
 
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(5);
+
+        sb.add("aa\nb");
+        // 0: aa\n
+        // 1: b│
+        // 2:
+        assertEquals(1, sb.getCaretOffsetY());
+        assertEquals(1, sb.getCaretOffsetX());
+
+        sb.prev();
+        // 0: aa\n
+        // 1:│b
+        // 2:
+        assertEquals(1, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+
+        sb.add("\n");
+        // 0: aa\n
+        // 1: \n
+        // 2:│b
+        assertEquals(2, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+
+        sb.prev();
+        // 0: aa\n
+        // 1:│\n
+        // 2: b
+        assertEquals(1, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+
+        sb.add("b");
+        // 0: aa\n
+        // 1: b│\n
+        // 2: b
+        assertEquals(1, sb.getCaretOffsetY());
+        assertEquals(1, sb.getCaretOffsetX());
+
+        sb.add("b");
+        // 0: aa\n
+        // 1: bb│\n
+        // 2: b
+        assertEquals(1, sb.getCaretOffsetY());
+        assertEquals(2, sb.getCaretOffsetX());
+
+    }
 }

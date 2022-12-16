@@ -56,6 +56,33 @@ public class Strings {
         return lines;
     }
 
+
+    /**
+     * <pre>
+     * |a|a|\n|b|b| -> |a|a|\n|
+     *                 |b|b|
+     * </pre>
+     * <pre>
+     * |a|a|\n| -> |a|a|\n|
+     * </pre>
+     * @param str
+     * @return
+     */
+    public static String[] splitLf(String str) {
+        List<String> list = new ArrayList<>();
+        int n = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == LF) {
+                list.add(str.substring(n, i + 1));
+                n = i + 1;
+            }
+        }
+        if (n < str.length()) {
+            list.add(str.substring(n));
+        }
+        return list.toArray(new String[0]);
+    }
+
     public static int countLf(String str) {
         return (int) str.chars().filter(c -> c == LF).count();
     }

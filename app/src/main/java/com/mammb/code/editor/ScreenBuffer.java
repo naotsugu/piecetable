@@ -249,7 +249,9 @@ public class ScreenBuffer {
         String current = rows.get(caretOffsetY);
         String prefix = current.substring(0, caretLineCharOffset);
         String suffix = current.substring(caretLineCharOffset);
-        String[] lines = Strings.splitLine(prefix + string + suffix);
+        String[] lines = (Strings.countLf(string) > 0)
+            ? Strings.splitLine(prefix + string + suffix)
+            : Strings.splitLf(prefix + string + suffix);
         rows.set(caretOffsetY, lines[0]);
         caretOffsetX = caretLineCharOffset + string.length();
         for (int i = 1; i < lines.length; i++) {
