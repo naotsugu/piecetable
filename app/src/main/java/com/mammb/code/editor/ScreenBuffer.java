@@ -245,6 +245,7 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
+        boolean caretTailed = caretIndex() == content.length();
         content.insert(caretIndex(), string);
 
         int caretLineCharOffset = caretLineCharOffset();
@@ -259,7 +260,9 @@ public class ScreenBuffer {
             caretOffsetX = caretLineCharOffset + string.length();
             setCaretOffset(getCaretOffset() + string.length());
         } else {
-            String[] lines = Strings.splitLine(prefix + string + suffix);
+            String[] lines = caretTailed
+                ? Strings.splitLine(prefix + string + suffix)
+                : Strings.splitLf(prefix + string + suffix);
             rows.set(caretOffsetY, lines[0]);
             for (int i = 1; i < lines.length; i++) {
                 rows.add(caretOffsetY + i, lines[i]);

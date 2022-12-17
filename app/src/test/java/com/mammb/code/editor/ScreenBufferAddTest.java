@@ -324,4 +324,45 @@ public class ScreenBufferAddTest {
         assertEquals(500, sb.getCaretOffset());
     }
 
+    @Test void testAddMany2() {
+
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(25);
+
+        sb.add("""
+            public class ScreenBuffer {
+
+                /** Caret row on the text flow. */
+                private int caretOffsetY = 0;
+                /** Caret offset on the row. May be larger than the number of characters in a row. */
+                private int caretOffsetX = 0;
+                /** Offset on the text flow. */
+                private IntegerProperty caretOffset = new SimpleIntegerProperty();
+                /** screenRowSize. */
+                private int screenRowSize = 1;
+            """);
+        sb.prevLine(); sb.prevLine(); sb.prevLine(); sb.prevLine(); sb.prevLine(); sb.prevLine();
+        assertEquals(4, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+
+        sb.add("\n");
+        assertEquals(5, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+        assertEquals(103, sb.getCaretOffset());
+
+        sb.nextLine(); sb.nextLine();
+        sb.add("\n");
+        assertEquals(8, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+        assertEquals(228, sb.getCaretOffset());
+
+        sb.nextLine(); sb.nextLine();
+        sb.add("\n");
+        assertEquals(11, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+        assertEquals(336, sb.getCaretOffset());
+
+    }
+
+
 }
