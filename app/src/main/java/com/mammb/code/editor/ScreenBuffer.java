@@ -1,7 +1,6 @@
 package com.mammb.code.editor;
 
 import java.nio.file.Path;
-import java.util.List;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -96,9 +95,12 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (caretIndex() + caretLineCharRemaining() >= content.length() - 1) {
-            end();
-            next();
+        if (caretIndex() + caretLineRemaining() >= content.length()) {
+            if (rows.get(caretOffsetY).endsWith("\n")) {
+                // if last line is end of LF, caret can down
+                caretOffsetY++;
+                setCaretOffset(getCaretOffset() + 1);
+            }
             return;
         }
 
@@ -217,7 +219,7 @@ public class ScreenBuffer {
                 line.substring(0, index) + line.substring(index + 1));
         } else {
             int deleteLineCount = deleteLines.length - 1;
-            fillRows(screenRowSize + deleteLineCount);
+            fitRows(screenRowSize + deleteLineCount);
             String prefix = rows.get(caretOffsetY).substring(0, caretLineCharOffset());
             String suffix = "";
             if (caretOffsetY + deleteLineCount < rows.size()) {
@@ -249,20 +251,26 @@ public class ScreenBuffer {
         String current = rows.get(caretOffsetY);
         String prefix = current.substring(0, caretLineCharOffset);
         String suffix = current.substring(caretLineCharOffset);
-        String[] lines = (Strings.countLf(string) > 0)
-            ? Strings.splitLine(prefix + string + suffix)
-            : Strings.splitLf(prefix + string + suffix);
-        rows.set(caretOffsetY, lines[0]);
-        caretOffsetX = caretLineCharOffset + string.length();
-        for (int i = 1; i < lines.length; i++) {
-            rows.add(caretOffsetY + i, lines[i]);
-            caretOffsetX = lines[i].length() - suffix.length();
-        }
-        caretOffsetY += lines.length - 1;
-        setCaretOffset(getCaretOffset() + string.length());
 
-        fillRows(screenRowSize);
-        scrollToCaret();
+        if (Strings.countLf(string) == 0) {
+            // simple inline add
+            String line = prefix + string + suffix;
+            rows.set(caretOffsetY, line);
+            caretOffsetX = caretLineCharOffset + string.length();
+            setCaretOffset(getCaretOffset() + string.length());
+        } else {
+            String[] lines = Strings.splitLine(prefix + string + suffix);
+            rows.set(caretOffsetY, lines[0]);
+            for (int i = 1; i < lines.length; i++) {
+                rows.add(caretOffsetY + i, lines[i]);
+            }
+            caretOffsetX = lines[lines.length - 1].length() - suffix.length();
+            caretOffsetY += lines.length - 1;
+            setCaretOffset(getCaretOffset() + string.length());
+            fitRows(screenRowSize);
+            scrollToCaret();
+        }
+
     }
 
 
@@ -352,7 +360,7 @@ public class ScreenBuffer {
      * <pre>
      * |c|o|n|t|e|n|t|↵
      *         ↑     ↑ caretLineCharLength
-     *         └ caretOffsetOnRow
+     *         └ caretLineCharOffset
      *         │← 3 →│ caretLineCharRemaining
      * </pre>
      */
@@ -360,6 +368,17 @@ public class ScreenBuffer {
         return caretLineCharLength() - caretLineCharOffset();
     }
 
+    /**
+     * <pre>
+     * |c|o|n|t|e|n|t|↵
+     *         ↑       ↑
+     *         └ caretLineCharOffset
+     *         │←  4  →│ caretLineRemaining
+     * </pre>
+     */
+    public int caretLineRemaining() {
+        return rows.get(caretOffsetY).length() - caretLineCharOffset();
+    }
 
     /**
      * <pre>
@@ -396,13 +415,13 @@ public class ScreenBuffer {
 
 
     void setScreenRowSize(int preferenceSize) {
-        fillRows(preferenceSize);
+        fitRows(preferenceSize);
         screenRowSize = preferenceSize;
     }
 
 
 
-    private void fillRows(int preferenceSize) {
+    private void fitRows(int preferenceSize) {
 
         if (preferenceSize == rows.size()) {
             // just
