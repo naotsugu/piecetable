@@ -148,7 +148,7 @@ public class CursoredList {
     @Override
     public String toString() {
         var sb = new StringBuilder();
-        sb.append("point:" + point.toString() + "\n");
+        sb.append("point:").append(point.toString()).append("\n");
         raw.forEach(sb::append);
         return sb.toString();
     }

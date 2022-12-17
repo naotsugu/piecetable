@@ -29,7 +29,7 @@ public class GrowBuffer implements AppendBuffer {
     }
 
     public static GrowBuffer of() {
-        return new GrowBuffer(ByteArray.of(), 0, DEFAULT_PITCH, IntArray.of(0));
+        return new GrowBuffer(ByteArray.of(), 0, DEFAULT_PITCH, IntArray.of());
     }
 
     static GrowBuffer of(short pitch) {

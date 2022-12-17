@@ -518,11 +518,19 @@ public class ScreenBuffer {
     public void inspect() {
         logger.log(INFO, "========================================");
         logger.log(INFO, "rows.size[{0}], rowSize[{1}]", rows.size(), screenRowSize);
-        logger.log(INFO, "headRowOnContent[{0}], headPosOnContent[{1}]", originRowIndex, originIndex);
+        logger.log(INFO, "originRowIndex[{0}], originIndex[{1}]", originRowIndex, originIndex);
         logger.log(INFO, "caretOffsetY[{0}], caretOffsetX[{1}], caretOffset[{2}]", caretOffsetY, caretOffsetX, caretOffset.get());
         if (content instanceof EditBufferedContent editBuffered) {
             logger.log(INFO, "editBuffered.getEdit() : {0}", editBuffered.getEdit());
         }
+    }
+
+    public String inspectText() {
+        var sb = new StringBuilder('\n');
+        for (int i = 0; i < rows.size(); i++) {
+            sb.append(originRowIndex + i).append(": ").append(rows.get(i).replace('\n', '$')).append('\n');
+        }
+        return sb.toString();
     }
 
     public void reset() {

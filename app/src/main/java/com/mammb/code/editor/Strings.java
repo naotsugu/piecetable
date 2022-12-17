@@ -9,19 +9,6 @@ public class Strings {
     public static char LF = '\n';
 
 
-    public static boolean hasLF(String str) {
-        return str.indexOf(LF) > 0;
-    }
-
-    public static boolean hasMultiLF(String str) {
-        int i = str.indexOf(LF);
-        if (++i > 0 && i < str.length()) {
-            return str.indexOf(LF, i) > 0;
-        }
-        return false;
-    }
-
-
     /**
      * <pre>
      * |a|a|\n|b|b| -> |a|a|\n|
@@ -85,6 +72,10 @@ public class Strings {
 
     public static int countLf(String str) {
         return (int) str.chars().filter(c -> c == LF).count();
+    }
+
+    public static boolean hasLF(String str) {
+        return str.indexOf(LF) > 0;
     }
 
 }

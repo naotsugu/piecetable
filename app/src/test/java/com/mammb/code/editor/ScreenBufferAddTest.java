@@ -312,4 +312,16 @@ public class ScreenBufferAddTest {
             ddd""", sb.peekString(0, 10));
     }
 
+    @Test void testAddMany() {
+
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(100);
+
+        sb.add("123456789\n".repeat(50));
+        assertEquals(51, sb.rows.size());
+        assertEquals(50, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+        assertEquals(500, sb.getCaretOffset());
+    }
+
 }
