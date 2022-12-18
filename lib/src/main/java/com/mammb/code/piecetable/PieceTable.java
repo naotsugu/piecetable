@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.stream.Collectors;
 
@@ -121,12 +122,22 @@ public class PieceTable {
         return pieces.bytes(startPos, endPos).get();
     }
 
-    public void undo() {
-        if (!undo.isEmpty()) redo.push(applyEdit(undo.pop()));
+    public int[] undo() {
+        if (!undo.isEmpty()) {
+            PieceEdit edit = undo.pop();
+            redo.push(applyEdit(edit));
+            return asRange(edit);
+        }
+        return new int[0];
     }
 
-    public void redo() {
-        if (!redo.isEmpty()) pushToUndo(applyEdit(redo.pop()), true);
+    public int[] redo() {
+        if (!redo.isEmpty()) {
+            PieceEdit edit = redo.pop();
+            pushToUndo(applyEdit(edit), true);
+            return asRange(edit);
+        }
+        return new int[0];
     }
 
     private void pushToUndo(PieceEdit edit, boolean readyForRedo) {
@@ -166,6 +177,18 @@ public class PieceTable {
         //         throw new RuntimeException(e);
         //     }
         // }
+    }
+
+    private int[] asRange(PieceEdit edit) {
+        int from = 0;
+        for (int i = 0; i < edit.index(); i++) {
+            Piece p = pieces.get(i);
+            from += p.length();
+        }
+        int to = from + Math.max(
+            Arrays.stream(edit.org()).mapToInt(Piece::length).sum(),
+            Arrays.stream(edit.mod()).mapToInt(Piece::length).sum());
+        return new int[] { from, to };
     }
 
     @Override

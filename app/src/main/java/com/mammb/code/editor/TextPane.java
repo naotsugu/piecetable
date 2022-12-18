@@ -129,6 +129,14 @@ public class TextPane extends Region {
         if (SC_X.match(e)) {
             return;
         }
+        if (SC_Z.match(e)) {
+            screenBuffer.undo();
+            return;
+        }
+        if (SC_SZ.match(e)) {
+            screenBuffer.redo();
+            return;
+        }
 
         switch (e.getCode()) {
             case LEFT       -> screenBuffer.prev();
@@ -180,6 +188,9 @@ public class TextPane extends Region {
 
     private static final KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
     private static final KeyCombination SC_S = new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN);
+
+    private static final KeyCombination SC_Z = new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCombination SC_SZ= new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     private static final Predicate<KeyEvent> controlKeysFilter = e ->
         System.getProperty("os.name").startsWith("Windows")

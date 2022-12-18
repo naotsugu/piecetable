@@ -116,6 +116,16 @@ public class PtContent implements Content {
         return toString(list);
     }
 
+    @Override
+    public int[] undo() {
+        return pt.undo();
+    }
+
+    @Override
+    public int[] redo() {
+        return pt.redo();
+    }
+
 
     /**
      * Converts content position to buffer index.

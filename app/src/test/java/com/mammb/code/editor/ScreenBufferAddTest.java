@@ -312,7 +312,40 @@ public class ScreenBufferAddTest {
             ddd""", sb.peekString(0, 10));
     }
 
-    @Test void testAddMany() {
+    @Test void testAddMany1() {
+
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(26);
+
+        sb.add("""
+            aaa
+            bbb
+            ccc""");
+
+        assertEquals(3, sb.rows.size());
+        assertEquals(2, sb.getCaretOffsetY());
+        assertEquals(3, sb.getCaretOffsetX());
+        assertEquals(11, sb.getCaretOffset());
+    }
+
+    @Test void testAddMany2() {
+
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(26);
+
+        sb.add("""
+            aaa
+            bbb
+            ccc
+            """);
+
+        assertEquals(4, sb.rows.size());
+        assertEquals(3, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+        assertEquals(12, sb.getCaretOffset());
+    }
+
+    @Test void testAddMany3() {
 
         var sb = new ScreenBuffer();
         sb.setScreenRowSize(100);
@@ -324,7 +357,7 @@ public class ScreenBufferAddTest {
         assertEquals(500, sb.getCaretOffset());
     }
 
-    @Test void testAddMany2() {
+    @Test void testAddMany4() {
 
         var sb = new ScreenBuffer();
         sb.setScreenRowSize(25);
@@ -361,6 +394,45 @@ public class ScreenBufferAddTest {
         assertEquals(11, sb.getCaretOffsetY());
         assertEquals(0, sb.getCaretOffsetX());
         assertEquals(336, sb.getCaretOffset());
+
+    }
+
+    @Test void testAddMany5() {
+
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(20);
+
+        sb.add("""
+            package com.mammb.code.editor;
+
+            import java.nio.file.Path;
+            import java.util.Arrays;
+
+            import javafx.beans.property.IntegerProperty;
+            import javafx.beans.property.SimpleIntegerProperty;
+            import javafx.collections.FXCollections;
+            import javafx.collections.ListChangeListener;
+            import javafx.collections.ObservableList;
+
+            import static java.lang.System.Logger.Level.*;
+
+            public class ScreenBuffer {
+
+                private static final System.Logger logger = System.getLogger(ScreenBuffer.class.getName());
+
+                final ObservableList<String> rows = FXCollections.observableArrayList("");
+
+                /** Caret row on the text flow. */
+                private int caretOffsetY = 0;
+                /** Caret offset on the row. May be larger than the number of characters in a row. */
+                private int caretOffsetX = 0;
+                /** Offset on the text flow. */
+                private IntegerProperty caretOffset = new SimpleIntegerProperty();
+                /** screenRowSize. */
+                private int screenRowSize = 1;
+            """);
+
+        assertEquals(17, sb.getCaretOffsetY());
 
     }
 

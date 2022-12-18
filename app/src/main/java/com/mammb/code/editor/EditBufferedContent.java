@@ -37,20 +37,20 @@ public class EditBufferedContent implements Content {
 
     @Override
     public void write(Path path) {
-        edit = edit.flush();
+        flush();
         peer.write(path);
     }
 
     @Override
     public void open(Path path) {
-        edit = edit.flush();
+        flush();
         peer.open(path);
     }
 
     @Override
     public int codePointAt(int pos) {
         if (pos >= edit.pos()) {
-            edit = edit.flush();
+            flush();
         }
         return peer.codePointAt(pos);
     }
@@ -58,7 +58,7 @@ public class EditBufferedContent implements Content {
     @Override
     public String substring(int start, int end) {
         if (end >= edit.pos()) {
-            edit = edit.flush();
+            flush();
         }
         return peer.substring(start, end);
     }
@@ -66,16 +66,33 @@ public class EditBufferedContent implements Content {
     @Override
     public String untilEol(int pos) {
         if (pos >= edit.pos()) {
-            edit = edit.flush();
+            flush();
         }
         return peer.untilEol(pos);
     }
 
     @Override
     public String untilSol(int pos) {
-        edit = edit.flush();
+        flush();
         return peer.untilSol(pos);
     }
+
+    @Override
+    public int[] undo() {
+        flush();
+        return peer.undo();
+    }
+
+    @Override
+    public int[] redo() {
+        flush();
+        return peer.redo();
+    }
+
+    void flush() {
+        edit = edit.flush();
+    }
+
 
     Edit getEdit() {
         return edit;

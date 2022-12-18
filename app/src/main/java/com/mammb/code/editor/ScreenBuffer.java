@@ -1,6 +1,7 @@
 package com.mammb.code.editor;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -95,12 +96,11 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        int remaining = caretLineRemaining();
-
-        if (!rows.get(caretOffsetY).endsWith("\n")) {
+        if (caretIndex() >= content.length() || !rows.get(caretOffsetY).endsWith("\n")) {
             return;
         }
 
+        int remaining = caretLineRemaining();
         caretOffsetY++;
         setCaretOffset(getCaretOffset() + remaining + caretLineCharOffset());
 
@@ -266,6 +266,8 @@ public class ScreenBuffer {
             caretOffsetX = lines[lines.length - 1].length() - suffix.length();
             caretOffsetY += lines.length - 1;
             setCaretOffset(getCaretOffset() + string.length());
+
+            if (content instanceof EditBufferedContent buffer) buffer.flush();
             fitRows(screenRowSize);
             scrollToCaret();
         }
@@ -290,6 +292,17 @@ public class ScreenBuffer {
             }
             scrollNext(3);
         }
+    }
+
+    void undo() {
+        int[] range = content.undo();
+
+System.out.println("undo" + Arrays.toString(range));
+    }
+
+    void redo() {
+        int[] range = content.redo();
+System.out.println("redo" + Arrays.toString(range));
     }
 
 
@@ -467,6 +480,13 @@ public class ScreenBuffer {
 
 
     public final void moveCaret(int offset) {
+        int charCountOnScreen = charCountOnScreen();
+        if (offset > charCountOnScreen) {
+            caretOffsetY = rows.size() - 1;
+            caretOffsetX = rows.get(caretOffsetY).length();
+            caretOffset.set(charCountOnScreen);
+            return;
+        }
         int index = 0;
         for (int i = 0; i < rows.size(); i++) {
             int len = rows.get(i).length();
@@ -474,10 +494,10 @@ public class ScreenBuffer {
             if (index > offset) {
                 caretOffsetY = i;
                 caretOffsetX = len - (index - offset);
+                caretOffset.set(offset);
                 break;
             }
         }
-        caretOffset.set(offset);
     }
 
 
@@ -534,7 +554,11 @@ public class ScreenBuffer {
 
     public void reset() {
         logger.log(INFO, "== reset");
+        if (content instanceof EditBufferedContent buffer) buffer.flush();
         originRowIndex = originIndex = caretOffsetY = caretOffsetX = 0;
         caretOffset.set(0);
+        if (content instanceof EditBufferedContent buffer) buffer.flush();
+        rows.clear();
+        fitRows(screenRowSize);
     }
 }
