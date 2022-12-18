@@ -95,16 +95,12 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (caretIndex() + caretLineRemaining() >= content.length()) {
-            if (rows.get(caretOffsetY).endsWith("\n")) {
-                // if last line is end of LF, caret can down
-                caretOffsetY++;
-                setCaretOffset(getCaretOffset() + 1);
-            }
+        int remaining = caretLineRemaining();
+
+        if (!rows.get(caretOffsetY).endsWith("\n")) {
             return;
         }
 
-        int remaining = rows.get(caretOffsetY).length() - caretLineCharOffset();
         caretOffsetY++;
         setCaretOffset(getCaretOffset() + remaining + caretLineCharOffset());
 
@@ -346,7 +342,7 @@ public class ScreenBuffer {
     /**
      * <pre>
      * |c|o|n|t|e|n|t|↵
-     *       ↑ caretLogicalOffsetOnRow
+     *       ↑ caretOffsetX
      *       ↑ caretLineCharOffset
      * </pre>
      * <pre>
