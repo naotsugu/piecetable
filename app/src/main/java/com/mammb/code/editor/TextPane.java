@@ -112,7 +112,7 @@ public class TextPane extends Region {
         }
         int ascii = e.getCharacter().getBytes()[0];
         if (ascii < 32 || ascii == 127) { // 127:DEL
-            if (ascii != 10 && ascii != 13) { // 10:LF 13:CR
+            if (ascii != 9 && ascii != 10 && ascii != 13) { // 9:HT 10:LF 13:CR
                 return;
             }
         }
