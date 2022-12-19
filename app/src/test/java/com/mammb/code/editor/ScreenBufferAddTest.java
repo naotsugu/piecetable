@@ -400,40 +400,13 @@ public class ScreenBufferAddTest {
     @Test void testAddMany5() {
 
         var sb = new ScreenBuffer();
-        sb.setScreenRowSize(20);
+        sb.setScreenRowSize(10);
 
-        sb.add("""
-            package com.mammb.code.editor;
-
-            import java.nio.file.Path;
-            import java.util.Arrays;
-
-            import javafx.beans.property.IntegerProperty;
-            import javafx.beans.property.SimpleIntegerProperty;
-            import javafx.collections.FXCollections;
-            import javafx.collections.ListChangeListener;
-            import javafx.collections.ObservableList;
-
-            import static java.lang.System.Logger.Level.*;
-
-            public class ScreenBuffer {
-
-                private static final System.Logger logger = System.getLogger(ScreenBuffer.class.getName());
-
-                final ObservableList<String> rows = FXCollections.observableArrayList("");
-
-                /** Caret row on the text flow. */
-                private int caretOffsetY = 0;
-                /** Caret offset on the row. May be larger than the number of characters in a row. */
-                private int caretOffsetX = 0;
-                /** Offset on the text flow. */
-                private IntegerProperty caretOffset = new SimpleIntegerProperty();
-                /** screenRowSize. */
-                private int screenRowSize = 1;
-            """);
-
-        assertEquals(17, sb.getCaretOffsetY());
-
+        sb.add("aa\n".repeat(20) + "aa");
+        // scroll to caret
+        assertEquals(7, sb.getCaretOffsetY());
+        assertEquals(2, sb.getCaretOffsetX());
+        assertEquals(23, sb.getCaretOffset());
     }
 
 

@@ -8,6 +8,8 @@ import javafx.scene.AccessibleRole;
 import javafx.scene.input.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
@@ -50,7 +52,7 @@ public class TextPane extends Region {
         textFlow.setTabSize(4);
         textFlow.setPrefWidth(Screen.getPrimary().getBounds().getWidth());
         textFlow.setPadding(new Insets(4));
-        getChildren().add(textFlow);
+        //getChildren().add(textFlow);
         textFlow.getChildren().addAll(texts());
 
         caret = new Caret();
@@ -58,12 +60,21 @@ public class TextPane extends Region {
         caret.setLayoutY(textFlow.getPadding().getTop());
         screenBuffer.caretOffsetProperty().addListener(this::handleCaretMoved);
         screenBuffer.addListChangeListener(this::handleScreenTextChanged);
-        getChildren().add(caret);
+        //getChildren().add(caret);
         caret.setShape(textFlow.caretShape(0, true));
+
+
+        BorderPane pane = new BorderPane();
+        Pane main = new Pane(textFlow, caret);
+        Pane left = new SidePanel(screenBuffer);
+        left.setPadding(new Insets(4));
+        pane.setLeft(left);
+        pane.setCenter(main);
+        getChildren().add(pane);
 
         layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue.getHeight() != newValue.getHeight()) {
-                screenBuffer.setScreenRowSize((int) Math.ceil(newValue.getHeight() / lineHeight));
+                screenBuffer.setupScreenRowSize((int) Math.ceil(newValue.getHeight() / lineHeight));
             }
         });
 
@@ -91,11 +102,6 @@ public class TextPane extends Region {
         }
     }
 
-
-    public void open(File file) {
-        screenBuffer.open(file.toPath());
-    }
-
     private void handleInput(KeyEvent e) {
 
         if (e.getCode().isFunctionKey() || e.getCode().isNavigationKey() ||
@@ -116,7 +122,22 @@ public class TextPane extends Region {
 
     private void handleKeyPressed(KeyEvent e) {
         if (SC_O.match(e)) {
-            open(fileChooseOpen(stage));
+            File file = fileChooseOpen(stage);
+            if (file != null) screenBuffer.open(file.toPath());
+            return;
+        }
+        if (SC_S.match(e)) {
+            if (screenBuffer.getPath() != null) {
+                screenBuffer.save();
+            } else {
+                File file = fileChooseOpen(stage);
+                if (file != null) screenBuffer.saveAs(file.toPath());
+            }
+            return;
+        }
+        if (SC_SA.match(e)) {
+            File file = fileChooseOpen(stage);
+            if (file != null) screenBuffer.saveAs(file.toPath());
             return;
         }
         if (SC_C.match(e)) {
@@ -188,6 +209,7 @@ public class TextPane extends Region {
 
     private static final KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
     private static final KeyCombination SC_S = new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCombination SC_SA= new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     private static final KeyCombination SC_Z = new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN);
     private static final KeyCombination SC_SZ= new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);

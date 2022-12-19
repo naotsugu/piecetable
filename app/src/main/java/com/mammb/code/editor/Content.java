@@ -6,6 +6,7 @@ public interface Content {
     int length();
     void insert(int pos, String cs);
     void delete(int pos, int len);
+    Path path();
     void write(Path path);
     void open(Path path);
     int codePointAt(int pos);
@@ -14,4 +15,9 @@ public interface Content {
     String untilSol(int pos);
     int[] undo();
     int[] redo();
+
+    default void write() {
+        write(path());
+    }
+
 }

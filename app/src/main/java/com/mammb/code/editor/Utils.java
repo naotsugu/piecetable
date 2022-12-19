@@ -15,10 +15,24 @@ public class Utils {
         return getHeight(text.rangeShape(0, 1));
     }
 
+    public static double getTextWidth(Text text) {
+        return getWidth(text.rangeShape(0, text.getText().length()));
+    }
+
     public static double getTextHeight(Font font) {
         Text sample = new Text("0");
         sample.setFont(font);
         return getTextHeight(sample);
+    }
+
+    public static double getTextWidth(Font font, int n) {
+        Text sample = new Text("0".repeat(n));
+        sample.setFont(font);
+        return getTextWidth(sample);
+    }
+
+    private static double getWidth(PathElement... elements) {
+        return getPathMaxX(elements) - getPathMinX(elements);
     }
 
     private static double getHeight(PathElement... elements) {
@@ -27,6 +41,9 @@ public class Utils {
 
     private static double getPathMinX(PathElement... elements) {
         return Arrays.stream(elements).map(Utils::getPathX).min(Comparator.naturalOrder()).orElse(0.0);
+    }
+    private static double getPathMaxX(PathElement... elements) {
+        return Arrays.stream(elements).map(Utils::getPathX).max(Comparator.naturalOrder()).orElse(0.0);
     }
 
     private static double getPathMinY(PathElement... elements) {

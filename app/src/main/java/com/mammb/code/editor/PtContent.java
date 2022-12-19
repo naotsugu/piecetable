@@ -12,6 +12,7 @@ public class PtContent implements Content {
     private static final int bufferChars = 128;
 
     private PieceTable pt;
+    private Path path;
 
     private byte[] readBuffer;
     private int bufferHeadPos = -1;
@@ -26,6 +27,8 @@ public class PtContent implements Content {
         this(PieceTable.of(""));
     }
 
+    @Override
+    public Path path() { return path; }
     @Override
     public int length() {
         return pt.length();
@@ -45,12 +48,14 @@ public class PtContent implements Content {
 
     @Override
     public void write(Path path) {
-        pt.write(path);
+        this.pt.write(path);
+        this.pt = PieceTable.of(path);
     }
 
     @Override
     public void open(Path path) {
-        pt = PieceTable.of(path);
+        this.pt = PieceTable.of(path);
+        this.path = path;
         clearBuffer();
     }
 
@@ -84,6 +89,10 @@ public class PtContent implements Content {
                 }
             }
             list.add(Arrays.copyOfRange(readBuffer, startIndex, readBuffer.length));
+
+            if (bufferTailPos >= pt.length()) {
+                break;
+            }
         }
 
         return toString(list);
@@ -138,7 +147,10 @@ public class PtContent implements Content {
             throw new IllegalArgumentException("pos " + pos);
         }
 
-        if (bufferHeadPos > pos || pos >= bufferTailPos) {
+        if (pos < bufferHeadPos || pos >= bufferTailPos) {
+            //  + pos               + pos
+            // |x|x|x|x|x|x|x|x|x|x|x|x|x|
+            //    L bufferHeadPos   L bufferTailPos
             fillBuffer(pos);
         }
 
@@ -152,7 +164,7 @@ public class PtContent implements Content {
             throw new IllegalArgumentException("endPos " + endPos);
         }
 
-        if (bufferHeadPos > endPos || endPos >= bufferTailPos) {
+        if (endPos < bufferHeadPos || endPos >= bufferTailPos) {
             fillBufferBackward(endPos);
         }
 
@@ -174,19 +186,25 @@ public class PtContent implements Content {
     }
 
 
-    private int toIndex(int pos) {
+    int toIndex(int pos) {
 
-        if (bufferHeadPos > pos || pos > bufferTailPos) {
+        if (pos < bufferHeadPos || pos > bufferTailPos) {
             throw new IllegalArgumentException("pos:%d, bufferHeadPos:%d, bufferTailPos:%d"
                 .formatted(pos, bufferHeadPos, bufferTailPos));
         }
 
+        //            + pos
+        // |0|1|2|3|4|5|6|7|8|9|
+        //      + bufferHeadPos
+        //      |<-3->| <- char count
         int count = pos - bufferHeadPos;
         if (count == 0) {
             return 0;
         }
 
         for (int i = 0; i < readBuffer.length; i++) {
+            // |x|.|.|x|.|x|.|.|x|.|x|
+            //  +3    +2  +1    +0
             if ((readBuffer[i] & 0xC0) == 0x80) {
                 continue;
             }

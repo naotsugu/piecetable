@@ -34,7 +34,10 @@ public class EditBufferedContent implements Content {
         }
         return peer.length();
     }
-
+    @Override
+    public Path path() {
+        return peer.path();
+    }
     @Override
     public void write(Path path) {
         flush();
