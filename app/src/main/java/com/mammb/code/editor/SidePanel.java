@@ -18,16 +18,16 @@ import java.util.stream.IntStream;
 public class SidePanel extends StackPane {
 
     private static final Color bgColor = Color.web("#303841");
-    private static final Color fgColor = Color.web("#d3dee9");
+    private static final Color fgColor = Color.web("#939ea9");
     private static final Font font = Font.font("Consolas", FontWeight.NORMAL, FontPosture.REGULAR, 16);
 
-    private Text text;
+    private final Text text;
     private final ScreenBuffer screenBuffer;
 
     public SidePanel(ScreenBuffer screenBuffer) {
 
         this.screenBuffer = screenBuffer;
-        double width = Utils.getTextWidth(font, 5);
+        double width = Utils.getTextWidth(font, 6);
 
         setBackground(new Background(new BackgroundFill(bgColor, null, null)));
         setStyle("-fx-border-width: 0 1 0 0; -fx-border-color: #4d4d4d;");
