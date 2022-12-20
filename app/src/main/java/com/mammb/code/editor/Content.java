@@ -17,6 +17,9 @@ public interface Content {
     int[] redo();
 
     default void write() {
+        if (path() == null) {
+            throw new IllegalStateException("path is null");
+        }
         write(path());
     }
 

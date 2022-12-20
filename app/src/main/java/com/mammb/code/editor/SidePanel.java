@@ -48,12 +48,12 @@ public class SidePanel extends StackPane {
 
 
     void handleLineMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        fill(screenBuffer.getOriginIndex(), screenBuffer.getScreenRowSize());
+        fill(screenBuffer.getOriginRowIndex(), screenBuffer.getScreenRowSize());
     }
 
 
-    private void fill(int start, int end) {
-        text.setText(IntStream.range(start + 1, end + 1)
+    private void fill(int start, int length) {
+        text.setText(IntStream.range(start + 1, start + 1 + length)
             .mapToObj(String::valueOf).collect(Collectors.joining("\n")));
     }
 

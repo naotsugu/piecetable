@@ -77,7 +77,25 @@ public class TextPane extends Region {
                 screenBuffer.setupScreenRowSize((int) Math.ceil(newValue.getHeight() / lineHeight));
             }
         });
+        initDropTarget();
+    }
 
+    private void initDropTarget() {
+        setOnDragOver(event -> {
+            Dragboard board = event.getDragboard();
+            if (board.hasFiles()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+        });
+        setOnDragDropped(event -> {
+            Dragboard board = event.getDragboard();
+            if (board.hasFiles()) {
+                board.getFiles().stream().findFirst().map(File::toPath).ifPresent(screenBuffer::open);
+                event.setDropCompleted(true);
+            } else {
+                event.setDropCompleted(false);
+            }
+        });
     }
 
 
