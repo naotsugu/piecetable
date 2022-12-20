@@ -23,7 +23,7 @@ public class ScreenBuffer {
     /** Offset on the text flow. */
     private IntegerProperty caretOffset = new SimpleIntegerProperty();
     /** screenRowSize. */
-    private IntegerProperty screenRowSize = new SimpleIntegerProperty();
+    private IntegerProperty screenRowSize = new SimpleIntegerProperty(1);
 
     private final Content content = new EditBufferedContent(new PtContent());
     private IntegerProperty originRowIndex = new SimpleIntegerProperty();
@@ -36,12 +36,15 @@ public class ScreenBuffer {
     public void open(Path path) {
         content.open(path);
         caretOffsetY = caretOffsetX = 0;
-        screenRowSize.set(1);
         caretOffset.set(0);
         originRowIndex.set(0);
         originIndex.set(0);
         rows.clear();
         setupScreenRowSize(getScreenRowSize());
+
+        originRowIndex.set(-1);
+        originRowIndex.set(0);
+
     }
 
     public void save() {
@@ -568,15 +571,15 @@ public class ScreenBuffer {
 
 
     public final int getOriginRowIndex() { return originRowIndex.get(); }
-    private void setOriginRowIndex(int value) { originRowIndex.set(value); }
+    void setOriginRowIndex(int value) { originRowIndex.set(value); }
     public IntegerProperty originRowIndexProperty() { return originRowIndex; }
 
     public final int getOriginIndex() { return originIndex.get(); }
-    private void setOriginIndex(int value) { originIndex.set(value); }
+    void setOriginIndex(int value) { originIndex.set(value); }
     public IntegerProperty originIndexProperty() { return originIndex; }
 
     public final int getScreenRowSize() { return screenRowSize.get(); }
-    private void setScreenRowSize(int value) { screenRowSize.set(value); }
+    void setScreenRowSize(int value) { screenRowSize.set(value); }
     public IntegerProperty screenRowSizeProperty() { return screenRowSize; }
 
 

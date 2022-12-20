@@ -41,20 +41,22 @@ public class SidePanel extends StackPane {
         flow.setTextAlignment(TextAlignment.RIGHT);
         getChildren().add(flow);
 
-        screenBuffer.originIndexProperty().addListener(this::handleLineMoved);
+        screenBuffer.originRowIndexProperty().addListener(this::handleLineMoved);
         screenBuffer.screenRowSizeProperty().addListener(this::handleLineMoved);
         fill(0, 1);
     }
 
 
     void handleLineMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        fill(screenBuffer.getOriginRowIndex(), screenBuffer.getScreenRowSize());
+        fill(screenBuffer.getOriginRowIndex(), screenBuffer.rows.size());
     }
 
 
     private void fill(int start, int length) {
         text.setText(IntStream.range(start + 1, start + 1 + length)
-            .mapToObj(String::valueOf).collect(Collectors.joining("\n")));
+            .mapToObj(String::valueOf)
+            .map(str -> str + ' ')
+            .collect(Collectors.joining("\n")));
     }
 
 

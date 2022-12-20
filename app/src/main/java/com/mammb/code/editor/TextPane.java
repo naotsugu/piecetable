@@ -35,6 +35,7 @@ public class TextPane extends Region {
     private final Stage stage;
     private final TextFlow textFlow;
     private final Caret caret;
+    private final Selection selection;
 
     public TextPane(Stage stage) {
 
@@ -63,9 +64,11 @@ public class TextPane extends Region {
         //getChildren().add(caret);
         caret.setShape(textFlow.caretShape(0, true));
 
+        selection = new Selection();
+
 
         BorderPane pane = new BorderPane();
-        Pane main = new Pane(textFlow, caret);
+        Pane main = new Pane(textFlow, caret, selection);
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
         pane.setLeft(left);
@@ -208,6 +211,8 @@ public class TextPane extends Region {
         if (e.getClickCount() == 1) {
             screenBuffer.moveCaret(hit.getInsertionIndex());
         } else if (e.getClickCount() == 2) {
+            selection.setShape(textFlow.rangeShape(hit.getInsertionIndex(), hit.getInsertionIndex() + 20));
+
             // word select
         }
     }
