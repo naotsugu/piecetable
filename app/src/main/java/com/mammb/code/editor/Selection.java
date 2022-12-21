@@ -75,4 +75,11 @@ public class Selection extends Path {
         return on;
     }
 
+    public int getOpen() {
+        return open;
+    }
+
+    public int getClose() {
+        return close;
+    }
 }

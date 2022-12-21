@@ -251,6 +251,12 @@ public class ScreenBuffer {
         }
     }
 
+    public void backSpace(int n) {
+        for (int i = 0; i < n; i++) {
+            backSpace();
+        }
+    }
+
     public void add(String string) {
 
         scrollToCaret();

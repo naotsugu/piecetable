@@ -19,7 +19,9 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -176,13 +178,15 @@ public class TextPane extends Region {
             return;
         }
         if (SC_C.match(e)) {
+            copyToClipboard();
             return;
         }
         if (SC_V.match(e)) {
-            if (clipboard.hasString()) screenBuffer.add(clipboard.getString());
+            pasteFromClipboard();
             return;
         }
         if (SC_X.match(e)) {
+            cutToClipboard();
             return;
         }
         if (SC_Z.match(e)) {
@@ -221,6 +225,15 @@ public class TextPane extends Region {
     }
 
     private void handleMouseClicked(MouseEvent e) {
+
+        if (selection.on()) {
+            if (selection.isDragging()) {
+                selection.releaseDragging();
+            } else {
+                selection.clear();
+            }
+        }
+
         HitInfo hit = textFlow.hitTest(textFlow.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY())));
         if (e.getClickCount() == 1) {
             screenBuffer.moveCaret(hit.getInsertionIndex());
@@ -237,6 +250,48 @@ public class TextPane extends Region {
             selection.startDrag(hit.getInsertionIndex());
         }
     }
+
+    private void pasteFromClipboard() {
+        if (clipboard.hasString()) {
+            screenBuffer.add(clipboard.getString());
+        }
+    }
+
+    public void copyToClipboard() {
+        if (!selection.on()) {
+            return;
+        }
+        String text = "";
+        if (selection.getOpen() < selection.getClose()) {
+            text = screenBuffer.peekString(
+                screenBuffer.getOriginIndex() + selection.getOpen(),
+                screenBuffer.getOriginIndex() + selection.getClose());
+        } else if (selection.getOpen() > selection.getClose()) {
+            text = screenBuffer.peekString(
+                screenBuffer.getOriginIndex() + selection.getClose(),
+                screenBuffer.getOriginIndex() + selection.getOpen());
+        }
+        if (text != null && !text.isBlank()) {
+            Map<DataFormat, Object> content = new HashMap<>();
+            content.put(DataFormat.PLAIN_TEXT, text);
+            clipboard.setContent(content);
+        }
+    }
+
+    public void cutToClipboard() {
+        if (!selection.on()) {
+            return;
+        }
+        copyToClipboard();
+        if (selection.getOpen() < selection.getClose()) {
+            screenBuffer.backSpace(selection.getClose() - selection.getOpen());
+        } else if (selection.getOpen() > selection.getClose()) {
+            screenBuffer.delete(selection.getOpen() - selection.getClose());
+        }
+        selection.clear();
+    }
+
+
 
     private void selectOr(KeyEvent e, Consumer<KeyEvent> consumer) {
         if (e.isShiftDown() && !selection.on()) {
