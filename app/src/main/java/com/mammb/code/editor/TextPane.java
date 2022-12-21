@@ -20,6 +20,7 @@ import javafx.stage.Window;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,7 @@ public class TextPane extends Region {
         setOnKeyPressed(this::handleKeyPressed);
         setOnScroll(this::handleScroll);
         setOnMouseClicked(this::handleMouseClicked);
+        setOnMouseDragged(this::handleMouseDragged);
         setOnKeyTyped(this::handleInput);
 
         textFlow = new TextFlow();
@@ -59,8 +61,11 @@ public class TextPane extends Region {
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
         caret.setLayoutY(textFlow.getPadding().getTop());
+
         screenBuffer.caretOffsetProperty().addListener(this::handleCaretMoved);
         screenBuffer.addListChangeListener(this::handleScreenTextChanged);
+        screenBuffer.originIndexProperty().addListener(this::handleOriginMoved);
+
         //getChildren().add(caret);
         caret.setShape(textFlow.caretShape(0, true));
 
@@ -120,6 +125,15 @@ public class TextPane extends Region {
             caret.disable();
         } else {
             caret.setShape(textFlow.caretShape(newValue.intValue(), true));
+        }
+        if (selection.on()) {
+            selection.handleCaretMoved(newValue.intValue(), textFlow::rangeShape);
+        }
+    }
+
+    void handleOriginMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        if (selection.on()) {
+            selection.handleOriginMoved(oldValue.intValue(), newValue.intValue());
         }
     }
 
@@ -181,14 +195,14 @@ public class TextPane extends Region {
         }
 
         switch (e.getCode()) {
-            case LEFT       -> screenBuffer.prev();
-            case RIGHT      -> screenBuffer.next();
-            case UP         -> screenBuffer.prevLine();
-            case DOWN       -> screenBuffer.nextLine();
-            case HOME       -> screenBuffer.home();
-            case END        -> screenBuffer.end();
-            case PAGE_UP    -> screenBuffer.pageUp();
-            case PAGE_DOWN  -> screenBuffer.pageDown();
+            case LEFT       -> selectOr(e, ke -> screenBuffer.prev());
+            case RIGHT      -> selectOr(e, ke -> screenBuffer.next());
+            case UP         -> selectOr(e, ke -> screenBuffer.prevLine());
+            case DOWN       -> selectOr(e, ke -> screenBuffer.nextLine());
+            case HOME       -> selectOr(e, ke -> screenBuffer.home());
+            case END        -> selectOr(e, ke -> screenBuffer.end());
+            case PAGE_UP    -> selectOr(e, ke -> screenBuffer.pageUp());
+            case PAGE_DOWN  -> selectOr(e, ke -> screenBuffer.pageDown());
             case DELETE     -> screenBuffer.delete(1);
             case BACK_SPACE -> screenBuffer.backSpace();
             case F1         -> screenBuffer.inspect();
@@ -211,10 +225,26 @@ public class TextPane extends Region {
         if (e.getClickCount() == 1) {
             screenBuffer.moveCaret(hit.getInsertionIndex());
         } else if (e.getClickCount() == 2) {
-            selection.setShape(textFlow.rangeShape(hit.getInsertionIndex(), hit.getInsertionIndex() + 20));
-
             // word select
         }
+    }
+
+    private void handleMouseDragged(MouseEvent e) {
+        if (!e.getButton().equals(MouseButton.PRIMARY)) return;
+        HitInfo hit = textFlow.hitTest(textFlow.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY())));
+        screenBuffer.moveCaret(hit.getInsertionIndex());
+        if (!selection.isDragging()) {
+            selection.startDrag(hit.getInsertionIndex());
+        }
+    }
+
+    private void selectOr(KeyEvent e, Consumer<KeyEvent> consumer) {
+        if (e.isShiftDown() && !selection.on()) {
+            selection.start(screenBuffer.getCaretOffset());
+        } else if (!e.isShiftDown() && selection.on()) {
+            selection.clear();
+        }
+        consumer.accept(e);
     }
 
 
