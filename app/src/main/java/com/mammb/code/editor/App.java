@@ -2,8 +2,11 @@ package com.mammb.code.editor;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 public class App extends Application {
 
@@ -11,6 +14,9 @@ public class App extends Application {
     public void start(Stage stage) {
         TextPane textPane = new TextPane(stage);
         Scene scene = new Scene(new StackPane(textPane), 800, 480);
+
+        stage.getIcons().add(new Image(Objects.requireNonNull(
+            App.class.getResourceAsStream("/icon/icon256.png"))));
         stage.setScene(scene);
         stage.show();
     }
