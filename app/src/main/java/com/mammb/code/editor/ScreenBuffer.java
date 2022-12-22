@@ -444,6 +444,16 @@ public class ScreenBuffer {
     }
 
 
+    private int toOffsetY(int offset) {
+        for (int i = 0, count = 0; i < rows.size(); i++) {
+            count += rows.get(i).length();
+            if (count > offset) {
+                return i;
+            }
+        }
+        return rows.size();
+    }
+
 
     void setupScreenRowSize(int preferenceSize) {
         fitRows(preferenceSize);
@@ -517,6 +527,29 @@ public class ScreenBuffer {
                 break;
             }
         }
+    }
+
+
+    public int[] wordRange(int offset) {
+
+        int[] ret = new int[] { offset, offset };
+
+        int[] left  = content.untilSol(getOriginIndex() + offset).toLowerCase().codePoints().toArray();
+        int[] right = content.untilEol(getOriginIndex() + offset).toLowerCase().codePoints().toArray();
+
+        for (int i = left.length - 1; i >= 0; i--) {
+            if (Character.getType(left[left.length - 1]) != Character.getType(left[i])) {
+                ret[0] -= (left.length - i - 2);
+                break;
+            }
+        }
+        for (int i = 0; i < right.length; i++) {
+            if (Character.getType(right[0]) != Character.getType(right[i])) {
+                ret[1] += i;
+                break;
+            }
+        }
+        return ret;
     }
 
 

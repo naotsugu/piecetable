@@ -239,6 +239,9 @@ public class TextPane extends Region {
             screenBuffer.moveCaret(hit.getInsertionIndex());
         } else if (e.getClickCount() == 2) {
             // word select
+            int[] range = screenBuffer.wordRange(hit.getInsertionIndex());
+            selection.start(range[0]);
+            screenBuffer.moveCaret(range[1]);
         }
     }
 
