@@ -207,11 +207,27 @@ public class TextPane extends Region {
             case END        -> selectOr(e, ke -> screenBuffer.end());
             case PAGE_UP    -> selectOr(e, ke -> screenBuffer.pageUp());
             case PAGE_DOWN  -> selectOr(e, ke -> screenBuffer.pageDown());
-            case DELETE     -> screenBuffer.delete(1);
-            case BACK_SPACE -> screenBuffer.backSpace();
+            case DELETE     -> delete();
+            case BACK_SPACE -> backSpace();
             case F1         -> screenBuffer.inspect();
             case ESCAPE     -> screenBuffer.reset();
             default -> { }
+        }
+    }
+
+    private void delete() {
+        if (selection.on()) {
+            selectionDelete();
+        } else {
+            screenBuffer.delete(1);
+        }
+    }
+
+    private void backSpace() {
+        if (selection.on()) {
+            selectionDelete();
+        } else {
+            screenBuffer.backSpace();
         }
     }
 
@@ -286,6 +302,13 @@ public class TextPane extends Region {
             return;
         }
         copyToClipboard();
+        selectionDelete();
+    }
+
+    public void selectionDelete() {
+        if (!selection.on()) {
+            return;
+        }
         if (selection.getOpen() < selection.getClose()) {
             screenBuffer.backSpace(selection.getClose() - selection.getOpen());
         } else if (selection.getOpen() > selection.getClose()) {
@@ -293,7 +316,6 @@ public class TextPane extends Region {
         }
         selection.clear();
     }
-
 
 
     private void selectOr(KeyEvent e, Consumer<KeyEvent> consumer) {

@@ -23,4 +23,9 @@ public interface Content {
         write(path());
     }
 
+    default String lineAt(int pos) {
+        String right = untilEol(pos);
+        return untilSol(pos) + (right.length() > 0 ? right.substring(1) : "");
+    }
+
 }

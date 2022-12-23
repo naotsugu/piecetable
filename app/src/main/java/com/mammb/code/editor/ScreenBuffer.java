@@ -316,12 +316,30 @@ public class ScreenBuffer {
 
     void undo() {
         int[] range = content.undo();
-        logger.log(INFO, "undo" + Arrays.toString(range));
+        if (range.length > 1) {
+            redraw(range[0], range[1]);
+        }
     }
 
     void redo() {
         int[] range = content.redo();
-        logger.log(INFO, "redo" + Arrays.toString(range));
+        if (range.length > 1) {
+            redraw(range[0], range[1]);
+        }
+    }
+
+    private void redraw(int startIndex, int endIndex) {
+        while (startIndex < originIndex.get()) {
+            scrollPrev(3);
+        }
+        while (startIndex < originIndex.get()) {
+            scrollNext(3);
+        }
+        moveCaret(startIndex - originIndex.get());
+        while (rows.size() >= caretOffsetY) {
+            rows.remove(rows.size() - 1);
+        }
+        fitRows(screenRowSize.get());
     }
 
 
