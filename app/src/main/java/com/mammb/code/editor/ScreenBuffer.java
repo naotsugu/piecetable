@@ -335,8 +335,9 @@ public class ScreenBuffer {
         while (startIndex < originIndex.get()) {
             scrollNext(3);
         }
+
         moveCaret(startIndex - originIndex.get());
-        while (rows.size() >= caretOffsetY) {
+        while (rows.size() > caretOffsetY) {
             rows.remove(rows.size() - 1);
         }
         fitRows(screenRowSize.get());
