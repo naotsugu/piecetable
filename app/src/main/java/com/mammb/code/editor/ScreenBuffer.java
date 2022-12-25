@@ -332,7 +332,7 @@ public class ScreenBuffer {
         while (startIndex < originIndex.get()) {
             scrollPrev(3);
         }
-        while (startIndex < originIndex.get()) {
+        while (startIndex > originIndex.get() + charCountOnScreen()) {
             scrollNext(3);
         }
 
