@@ -66,16 +66,21 @@ public class ScreenBuffer {
             return;
         }
 
-        caretOffsetX = caretLineCharOffset(); // reset logical position
-        caretOffsetX++;
+        // reset logical position
+        caretOffsetX = caretLineCharOffset();
+
+        int n = getNextIndexSize();
+        caretOffsetX += n;
+
         if (caretOffsetX > caretLineCharLength()) {
             // move caret to the next line head
             caretOffsetX = 0;
             caretOffsetY++;
         }
-        setCaretOffset(getCaretOffset() + 1);
+        setCaretOffset(getCaretOffset() + n);
 
         if (caretOffsetY + 2 > getScreenRowSize() && lastIndexOnScreen() <= content.length()) {
+            // scroll if the caret comes to the bottom of the screen.
             scrollNext(1);
         }
 
@@ -89,16 +94,18 @@ public class ScreenBuffer {
         if (getOriginRowIndex() == 0 && caretOffsetY == 0 && getCaretOffset() == 0) {
             return;
         }
-        caretOffsetX = caretLineCharOffset(); // reset logical position
 
+        // reset logical position
+        caretOffsetX = caretLineCharOffset();
+        int n = getPrevIndexSize();
         if (caretOffsetY > 0 && caretOffsetX == 0) {
             // move caret to the prev line tail
             caretOffsetY--;
             caretOffsetX = caretLineCharLength();
         } else {
-            caretOffsetX--;
+            caretOffsetX -= n;
         }
-        setCaretOffset(getCaretOffset() - 1);
+        setCaretOffset(getCaretOffset() - n);
 
         if (getOriginRowIndex() > 0 && caretOffsetY - 1 < 0) {
             scrollPrev(1);
@@ -110,7 +117,8 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (caretIndex() >= content.length() || !rows.get(caretOffsetY).endsWith("\n")) {
+        if (caretIndex() >= content.length() ||
+                !rows.get(caretOffsetY).endsWith("\n")) {
             return;
         }
 
@@ -516,6 +524,35 @@ public class ScreenBuffer {
             ? rows.get(caretOffsetY).codePointAt(caretLineCharOffset())
             : content.codePointAt(caretPosOnContent);
     }
+
+
+    private int getCaretPrevCodePoint() {
+        int caretPosOnContent = caretIndex() - 1;
+        if (caretPosOnContent <= 0) {
+            return 0;
+        }
+        if (isCaretVisibleOnScreen() && caretOffset.get() > 1) {
+            if (caretOffsetX == 0) {
+                return '\n';
+            } else {
+                char ch = rows.get(caretOffsetY).charAt(caretLineCharOffset() - 1);
+                return Character.isLowSurrogate(ch)
+                    ? rows.get(caretOffsetY).codePointAt(caretLineCharOffset() - 2)
+                    : rows.get(caretOffsetY).codePointAt(caretLineCharOffset() - 1);
+            }
+        } else {
+            return content.codePointAt(caretPosOnContent);
+        }
+    }
+
+    private int getNextIndexSize() {
+        return Character.charCount(getCaretCodePoint());
+    }
+
+    private int getPrevIndexSize() {
+        return Character.charCount(getCaretPrevCodePoint());
+    }
+
 
     private boolean isCaretVisibleOnScreen() {
         return caretOffset.get() >= 0 && caretOffsetY <= getScreenRowSize();

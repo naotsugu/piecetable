@@ -12,6 +12,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
@@ -68,11 +70,9 @@ public class TextPane extends Region {
         screenBuffer.addListChangeListener(this::handleScreenTextChanged);
         screenBuffer.originIndexProperty().addListener(this::handleOriginMoved);
 
-        //getChildren().add(caret);
         caret.setShape(textFlow.caretShape(0, true));
 
         selection = new Selection();
-
 
         BorderPane pane = new BorderPane();
         Pane main = new Pane(textFlow, caret, selection);
