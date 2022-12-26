@@ -61,7 +61,11 @@ public class Selection extends Path {
     public void handleCaretMoved(int newValue, BiFunction<Integer, Integer, PathElement[]> paths) {
         if (on) {
             close = newValue;
-            setShape(paths.apply(open, close));
+            if (open < close) {
+                setShape(paths.apply(open, close));
+            } else if (open > close)  {
+                setShape(paths.apply(close, open));
+            }
         }
     }
 

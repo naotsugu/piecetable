@@ -21,13 +21,14 @@ public class ScreenBuffer {
     /** Caret offset on the row. May be larger than the number of characters in a row. */
     private int caretOffsetX = 0;
     /** Offset on the text flow. */
-    private IntegerProperty caretOffset = new SimpleIntegerProperty();
+    private final IntegerProperty caretOffset = new SimpleIntegerProperty();
     /** screenRowSize. */
-    private IntegerProperty screenRowSize = new SimpleIntegerProperty(1);
+    private final IntegerProperty screenRowSize = new SimpleIntegerProperty(1);
 
     private final Content content = new EditBufferedContent(new PtContent());
-    private IntegerProperty originRowIndex = new SimpleIntegerProperty();
-    private IntegerProperty originIndex    = new SimpleIntegerProperty();
+    private final IntegerProperty originRowIndex = new SimpleIntegerProperty();
+    private final IntegerProperty originIndex    = new SimpleIntegerProperty();
+
 
     public ScreenBuffer() {
     }
@@ -80,7 +81,7 @@ public class ScreenBuffer {
         setCaretOffset(getCaretOffset() + n);
 
         if (caretOffsetY + 2 > getScreenRowSize() && lastIndexOnScreen() <= content.length()) {
-            // scroll if the caret comes to the bottom of the screen.
+            // scroll if the caret comes to the bottom of the screen
             scrollNext(1);
         }
 
@@ -97,6 +98,7 @@ public class ScreenBuffer {
 
         // reset logical position
         caretOffsetX = caretLineCharOffset();
+
         int n = getPrevIndexSize();
         if (caretOffsetY > 0 && caretOffsetX == 0) {
             // move caret to the prev line tail
@@ -108,6 +110,7 @@ public class ScreenBuffer {
         setCaretOffset(getCaretOffset() - n);
 
         if (getOriginRowIndex() > 0 && caretOffsetY - 1 < 0) {
+            // scroll if the caret comes to the head of the screen.
             scrollPrev(1);
         }
     }
@@ -124,9 +127,15 @@ public class ScreenBuffer {
 
         int remaining = caretLineRemaining();
         caretOffsetY++;
+
+        //     +-------+ remaining
+        //  x x|x x x $ ->  x x x x x $
+        //  x x x x         x x|x x
+        //                  +--+ caretLineCharOffset
         setCaretOffset(getCaretOffset() + remaining + caretLineCharOffset());
 
         if (caretOffsetY + 2 > getScreenRowSize() && lastIndexOnScreen() <= content.length()) {
+            // scroll if the caret comes to the bottom of the screen
             scrollNext(1);
         }
     }
@@ -142,7 +151,14 @@ public class ScreenBuffer {
 
         int remaining = caretLineCharOffset();
         caretOffsetY--;
-        setCaretOffset(getCaretOffset() - remaining - (rows.get(caretOffsetY).length() - caretLineCharOffset()));
+
+        //                 +---+ caretLineCharOffset
+        //                 +-----------+ rows.get(caretOffsetY).length()
+        //  x x x x x $ ->  x x|x x x $
+        //  x x|x x         x x x x
+        // +---+ remaining
+        setCaretOffset(getCaretOffset() - remaining - rows.get(caretOffsetY).length() + caretLineCharOffset());
+
         if (getOriginRowIndex() > 0 && caretOffsetY - 1 < 0) {
             scrollPrev(1);
         }
@@ -219,6 +235,8 @@ public class ScreenBuffer {
 
     public void delete(int len) {
 
+        if (len <= 0) return;
+
         int caretIndex = caretIndex();
         if (caretIndex + len > content.length()) return;
 
@@ -231,13 +249,23 @@ public class ScreenBuffer {
 
         if (deleteLines.length == 1) {
             // simple inline delete
+            //  a|b c d $  ->  del:[b c]  ->  a|d $
             String line = rows.get(caretOffsetY);
             int index = caretLineCharOffset();
             rows.set(caretOffsetY,
-                line.substring(0, index) + line.substring(index + 1));
+                line.substring(0, index) + line.substring(index + deleteString.length()));
+
         } else {
+            // multi rows delete
             int deleteLineCount = deleteLines.length - 1;
+            // Pre-supply the number of rows to be deleted
             fitRows(getScreenRowSize() + deleteLineCount);
+
+            // +-------+ prefix
+            //  x x x x|- -          ->    x x x x|x x x
+            //  - - - - - -
+            //  - - x x x
+            //     +-----+ suffix
             String prefix = rows.get(caretOffsetY).substring(0, caretLineCharOffset());
             String suffix = "";
             if (caretOffsetY + deleteLineCount < rows.size()) {
@@ -267,6 +295,8 @@ public class ScreenBuffer {
 
     public void add(String string) {
 
+        if (string == null) return;
+
         scrollToCaret();
 
         boolean caretTailed = caretIndex() == content.length();
@@ -284,6 +314,7 @@ public class ScreenBuffer {
             caretOffsetX = caretLineCharOffset + string.length();
             setCaretOffset(getCaretOffset() + string.length());
         } else {
+            // multi rows add
             String[] lines = caretTailed
                 ? Strings.splitLine(prefix + string + suffix)
                 : Strings.splitLf(prefix + string + suffix);
@@ -676,7 +707,6 @@ public class ScreenBuffer {
     public final int getScreenRowSize() { return screenRowSize.get(); }
     void setScreenRowSize(int value) { screenRowSize.set(value); }
     public IntegerProperty screenRowSizeProperty() { return screenRowSize; }
-
 
 }
 

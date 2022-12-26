@@ -12,14 +12,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.PathElement;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +41,7 @@ public class TextPane extends Region {
     private final TextFlow textFlow;
     private final Caret caret;
     private final Selection selection;
+    private final ImePalette imePalette;
 
     public TextPane(Stage stage) {
 
@@ -49,6 +50,7 @@ public class TextPane extends Region {
         setBackground(new Background(new BackgroundFill(bgColor, null, null)));
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
+
         setOnKeyPressed(this::handleKeyPressed);
         setOnScroll(this::handleScroll);
         setOnMouseClicked(this::handleMouseClicked);
@@ -74,8 +76,12 @@ public class TextPane extends Region {
 
         selection = new Selection();
 
+        imePalette = new ImePalette(textFlow, () -> textFlow.caretShape(screenBuffer.getCaretOffset(), true));
+        setInputMethodRequests(imePalette.createInputMethodRequests());
+        setOnInputMethodTextChanged(this::handleInputMethod);
+
         BorderPane pane = new BorderPane();
-        Pane main = new Pane(textFlow, caret, selection);
+        Pane main = new Pane(textFlow, caret, selection, imePalette);
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
         pane.setLeft(left);
@@ -106,6 +112,20 @@ public class TextPane extends Region {
                 event.setDropCompleted(false);
             }
         });
+    }
+
+    private void handleInputMethod(InputMethodEvent e) {
+        imePalette.setImeOn(true);
+        if (e.getCommitted().length() > 0) {
+            imePalette.setImeOn(false);
+            screenBuffer.add(e.getCommitted());
+        } else if (!e.getComposed().isEmpty()) {
+            imePalette.setText(e.getComposed().stream()
+                .map(InputMethodTextRun::getText).collect(Collectors.joining()));
+        }
+        if (e.getCommitted().length() == 0 && e.getComposed().isEmpty()) {
+            imePalette.setImeOn(false);
+        }
     }
 
 
@@ -158,6 +178,14 @@ public class TextPane extends Region {
     }
 
     private void handleKeyPressed(KeyEvent e) {
+
+        if (imePalette.getImeOn()) {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                imePalette.setImeOn(false);
+            }
+            return;
+        }
+
         if (SC_O.match(e)) {
             File file = fileChooseOpen(stage);
             if (file != null) screenBuffer.open(file.toPath());
@@ -242,6 +270,10 @@ public class TextPane extends Region {
 
     private void handleMouseClicked(MouseEvent e) {
 
+        if (imePalette.getImeOn()) {
+            return;
+        }
+
         if (selection.on()) {
             if (selection.isDragging()) {
                 selection.releaseDragging();
@@ -262,6 +294,9 @@ public class TextPane extends Region {
     }
 
     private void handleMouseDragged(MouseEvent e) {
+        if (imePalette.getImeOn()) {
+            return;
+        }
         if (!e.getButton().equals(MouseButton.PRIMARY)) return;
         HitInfo hit = textFlow.hitTest(textFlow.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY())));
         screenBuffer.moveCaret(hit.getInsertionIndex());
