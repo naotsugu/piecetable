@@ -1,13 +1,10 @@
 package com.mammb.code.editor;
 
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -17,25 +14,21 @@ import java.util.stream.IntStream;
 
 public class SidePanel extends StackPane {
 
-    private static final Color bgColor = Color.web("#303841");
-    private static final Color fgColor = Color.web("#939ea9");
-    private static final Font font = Font.font("Consolas", FontWeight.NORMAL, FontPosture.REGULAR, 16);
-
     private final Text text;
     private final ScreenBuffer screenBuffer;
 
     public SidePanel(ScreenBuffer screenBuffer) {
 
         this.screenBuffer = screenBuffer;
-        double width = Utils.getTextWidth(font, 6);
+        double width = Utils.getTextWidth(Fonts.main, 6);
 
-        setBackground(new Background(new BackgroundFill(bgColor, null, null)));
+        setBackground(new Background(new BackgroundFill(Colors.bgColor, null, null)));
         setStyle("-fx-border-width: 0 1 0 0; -fx-border-color: #4d4d4d;");
         setPrefWidth(width);
 
         text = new Text();
-        text.setFont(font);
-        text.setFill(fgColor);
+        text.setFont(Fonts.main);
+        text.setFill(Colors.fgColor);
 
         TextFlow flow = new TextFlow(text);
         flow.setTextAlignment(TextAlignment.RIGHT);
@@ -43,12 +36,21 @@ public class SidePanel extends StackPane {
 
         screenBuffer.originRowIndexProperty().addListener(this::handleLineMoved);
         screenBuffer.screenRowSizeProperty().addListener(this::handleLineMoved);
+        screenBuffer.addListChangeListener(this::handleScreenTextChanged);
         fill(0, 1);
     }
 
 
     void handleLineMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         fill(screenBuffer.getOriginRowIndex(), screenBuffer.rows.size());
+    }
+
+    void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
+        while (change.next()) {
+            if (change.wasRemoved() || change.wasAdded()) {
+                fill(screenBuffer.getOriginRowIndex(), screenBuffer.rows.size());
+            }
+        }
     }
 
 

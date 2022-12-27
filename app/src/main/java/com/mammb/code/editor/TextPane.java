@@ -3,18 +3,12 @@ package com.mammb.code.editor;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.input.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.PathElement;
+import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
@@ -30,10 +24,7 @@ import java.util.stream.Collectors;
 
 public class TextPane extends Region {
 
-    private static final Color bgColor = Color.web("#303841");
-    private static final Color fgColor = Color.web("#d3dee9");
-    private static final Font font = Font.font("Consolas", FontWeight.NORMAL, FontPosture.REGULAR, 16);
-    private static final double lineHeight = Utils.getTextHeight(font);
+    private static final double lineHeight = Utils.getTextHeight(Fonts.main);
 
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
     private final ScreenBuffer screenBuffer = new ScreenBuffer();
@@ -47,7 +38,7 @@ public class TextPane extends Region {
 
         this.stage = stage;
 
-        setBackground(new Background(new BackgroundFill(bgColor, null, null)));
+        setBackground(new Background(new BackgroundFill(Colors.bgColor, null, null)));
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
 
@@ -76,9 +67,9 @@ public class TextPane extends Region {
 
         selection = new Selection();
 
-        imePalette = new ImePalette(textFlow, () -> textFlow.caretShape(screenBuffer.getCaretOffset(), true));
+        imePalette = new ImePalette(textFlow, screenBuffer);
         setInputMethodRequests(imePalette.createInputMethodRequests());
-        setOnInputMethodTextChanged(this::handleInputMethod);
+        setOnInputMethodTextChanged(imePalette::handleInputMethod);
 
         BorderPane pane = new BorderPane();
         Pane main = new Pane(textFlow, caret, selection, imePalette);
@@ -90,10 +81,15 @@ public class TextPane extends Region {
 
         layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue.getHeight() != newValue.getHeight()) {
-                screenBuffer.setupScreenRowSize((int) Math.ceil(newValue.getHeight() / lineHeight));
+                initScreenRowSize(newValue.getHeight());
             }
         });
+        initScreenRowSize(getLayoutBounds().getHeight());
         initDropTarget();
+    }
+
+    private void initScreenRowSize(double height) {
+        screenBuffer.setScreenRowSize((int) Math.ceil(height / lineHeight));
     }
 
     private void initDropTarget() {
@@ -112,20 +108,6 @@ public class TextPane extends Region {
                 event.setDropCompleted(false);
             }
         });
-    }
-
-    private void handleInputMethod(InputMethodEvent e) {
-        imePalette.setImeOn(true);
-        if (e.getCommitted().length() > 0) {
-            imePalette.setImeOn(false);
-            screenBuffer.add(e.getCommitted());
-        } else if (!e.getComposed().isEmpty()) {
-            imePalette.setText(e.getComposed().stream()
-                .map(InputMethodTextRun::getText).collect(Collectors.joining()));
-        }
-        if (e.getCommitted().length() == 0 && e.getComposed().isEmpty()) {
-            imePalette.setImeOn(false);
-        }
     }
 
 
@@ -393,8 +375,8 @@ public class TextPane extends Region {
 
     Text asText(String string) {
         Text text = new Text(string);
-        text.setFont(font);
-        text.setFill(fgColor);
+        text.setFont(Fonts.main);
+        text.setFill(Colors.fgColor);
         return text;
     }
 
