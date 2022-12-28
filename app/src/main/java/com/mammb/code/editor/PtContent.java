@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class PtContent implements Content {
 
-    private static final int bufferChars = 128;
+    private static final int bufferChars = 256;
 
     private PieceTable pt;
     private Path path;

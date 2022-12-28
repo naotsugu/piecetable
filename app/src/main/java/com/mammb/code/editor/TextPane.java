@@ -3,15 +3,12 @@ package com.mammb.code.editor;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import java.io.File;
@@ -50,9 +47,8 @@ public class TextPane extends Region {
 
         textFlow = new TextFlow();
         textFlow.setTabSize(4);
-        textFlow.setPrefWidth(Screen.getPrimary().getBounds().getWidth());
+        textFlow.setPrefWidth(200);
         textFlow.setPadding(new Insets(4));
-        //getChildren().add(textFlow);
         textFlow.getChildren().addAll(texts());
 
         caret = new Caret();
@@ -111,14 +107,18 @@ public class TextPane extends Region {
     }
 
 
-    void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
+    private void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
         while (change.next()) {
             if (change.wasRemoved()) {
                 textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
             }
             if (change.wasAdded()) {
-                textFlow.getChildren().addAll(change.getFrom(),
-                    change.getAddedSubList().stream().map(this::asText).toList());
+                List<Text> texts = change.getAddedSubList().stream().map(this::asText).toList();
+                double width = texts.stream().mapToDouble(Utils::getTextWidth).max().orElse(0);
+                if (width > textFlow.getPrefWidth()) {
+                    textFlow.setPrefWidth(width + 20);
+                }
+                textFlow.getChildren().addAll(change.getFrom(), texts);
             }
         }
     }
