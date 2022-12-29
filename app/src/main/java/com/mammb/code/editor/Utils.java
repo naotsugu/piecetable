@@ -5,9 +5,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class Utils {
 
@@ -40,17 +38,17 @@ public class Utils {
     }
 
     private static double getPathMinX(PathElement... elements) {
-        return Arrays.stream(elements).map(Utils::getPathX).min(Comparator.naturalOrder()).orElse(0.0);
+        return Arrays.stream(elements).mapToDouble(Utils::getPathX).min().orElse(0.0);
     }
     private static double getPathMaxX(PathElement... elements) {
-        return Arrays.stream(elements).map(Utils::getPathX).max(Comparator.naturalOrder()).orElse(0.0);
+        return Arrays.stream(elements).mapToDouble(Utils::getPathX).max().orElse(0.0);
     }
 
     private static double getPathMinY(PathElement... elements) {
-        return Arrays.stream(elements).map(Utils::getPathY).min(Comparator.naturalOrder()).orElse(0.0);
+        return Arrays.stream(elements).mapToDouble(Utils::getPathY).min().orElse(0.0);
     }
     private static double getPathMaxY(PathElement... elements) {
-        return Arrays.stream(elements).map(Utils::getPathY).max(Comparator.naturalOrder()).orElse(0.0);
+        return Arrays.stream(elements).mapToDouble(Utils::getPathY).max().orElse(0.0);
     }
 
     private static double getPathX(PathElement element) {
