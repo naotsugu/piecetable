@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class TextPane extends Region {
@@ -47,7 +46,6 @@ public class TextPane extends Region {
 
         textFlow = new TextFlow();
         textFlow.setTabSize(4);
-        textFlow.setPrefWidth(200);
         textFlow.setPadding(new Insets(4));
         textFlow.getChildren().addAll(texts());
 
@@ -78,6 +76,9 @@ public class TextPane extends Region {
         layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue.getHeight() != newValue.getHeight()) {
                 initScreenRowSize(newValue.getHeight());
+            }
+            if (oldValue.getWidth() != newValue.getWidth()) {
+                textFlow.setPrefWidth(newValue.getWidth() - left.getWidth());
             }
         });
         initScreenRowSize(getLayoutBounds().getHeight());
@@ -116,7 +117,7 @@ public class TextPane extends Region {
                 List<Text> texts = change.getAddedSubList().stream().map(this::asText).toList();
                 double width = texts.stream().mapToDouble(Utils::getTextWidth).max().orElse(0);
                 if (width > textFlow.getPrefWidth()) {
-                    textFlow.setPrefWidth(width + 20);
+                    textFlow.setPrefWidth(width + 8);
                 }
                 textFlow.getChildren().addAll(change.getFrom(), texts);
             }
@@ -145,19 +146,22 @@ public class TextPane extends Region {
 
         if (e.getCode().isFunctionKey() || e.getCode().isNavigationKey() ||
             e.getCode().isArrowKey() || e.getCode().isModifierKey() ||
-            e.getCode().isMediaKey() || !controlKeysFilter.test(e) ||
+            e.getCode().isMediaKey() || !Keys.controlKeysFilter.test(e) ||
             e.getCharacter().length() == 0) {
             return;
         }
         int ascii = e.getCharacter().getBytes()[0];
-        if (ascii < 32 || ascii == 127) { // 127:DEL
-            if (ascii != 9 && ascii != 10 && ascii != 13) { // 9:HT 10:LF 13:CR
+        if (ascii < 32 || ascii == 127) {
+            // 127:DEL
+            if (ascii != 9 && ascii != 10 && ascii != 13) {
+                // 9:HT 10:LF 13:CR
                 return;
             }
         }
         // Enter key : 13:CR -> replace to 10:LF
         screenBuffer.add(e.getCharacter().replace('\r', '\n'));
     }
+
 
     private void handleKeyPressed(KeyEvent e) {
 
@@ -168,12 +172,12 @@ public class TextPane extends Region {
             return;
         }
 
-        if (SC_O.match(e)) {
+        if (Keys.SC_O.match(e)) {
             File file = fileChooseOpen(stage);
             if (file != null) screenBuffer.open(file.toPath());
             return;
         }
-        if (SC_S.match(e)) {
+        if (Keys.SC_S.match(e)) {
             if (screenBuffer.getPath() != null) {
                 screenBuffer.save();
             } else {
@@ -182,28 +186,28 @@ public class TextPane extends Region {
             }
             return;
         }
-        if (SC_SA.match(e)) {
+        if (Keys.SC_SA.match(e)) {
             File file = fileChooseOpen(stage);
             if (file != null) screenBuffer.saveAs(file.toPath());
             return;
         }
-        if (SC_C.match(e)) {
+        if (Keys.SC_C.match(e)) {
             copyToClipboard();
             return;
         }
-        if (SC_V.match(e)) {
+        if (Keys.SC_V.match(e)) {
             pasteFromClipboard();
             return;
         }
-        if (SC_X.match(e)) {
+        if (Keys.SC_X.match(e)) {
             cutToClipboard();
             return;
         }
-        if (SC_Z.match(e)) {
+        if (Keys.SC_Z.match(e)) {
             screenBuffer.undo();
             return;
         }
-        if (SC_SZ.match(e)) {
+        if (Keys.SC_Y.match(e) || Keys.SC_SZ.match(e)) {
             screenBuffer.redo();
             return;
         }
@@ -352,22 +356,6 @@ public class TextPane extends Region {
         return fc.showOpenDialog(owner);
     }
 
-
-    private static final KeyCombination SC_C = new KeyCharacterCombination("c", KeyCombination.SHORTCUT_DOWN);
-    private static final KeyCombination SC_V = new KeyCharacterCombination("v", KeyCombination.SHORTCUT_DOWN);
-    private static final KeyCombination SC_X = new KeyCharacterCombination("x", KeyCombination.SHORTCUT_DOWN);
-
-    private static final KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
-    private static final KeyCombination SC_S = new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN);
-    private static final KeyCombination SC_SA= new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
-
-    private static final KeyCombination SC_Z = new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN);
-    private static final KeyCombination SC_SZ= new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
-
-    private static final Predicate<KeyEvent> controlKeysFilter = e ->
-        System.getProperty("os.name").startsWith("Windows")
-            ? !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() && e.getCharacter().length() == 1 && e.getCharacter().getBytes()[0] != 0
-            : !e.isControlDown() && !e.isAltDown() && !e.isMetaDown();
 
     List<Text> texts() {
         return screenBuffer.rows.stream().map(this::asText).collect(Collectors.toList());
