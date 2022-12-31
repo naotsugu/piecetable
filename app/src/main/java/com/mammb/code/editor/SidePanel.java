@@ -28,7 +28,7 @@ public class SidePanel extends StackPane {
 
         text = new Text();
         text.setFont(Fonts.main);
-        text.setFill(Colors.fgColor);
+        text.setFill(Colors.darkColor);
 
         TextFlow flow = new TextFlow(text);
         flow.setTextAlignment(TextAlignment.RIGHT);

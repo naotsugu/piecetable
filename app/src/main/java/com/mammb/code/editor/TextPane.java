@@ -29,6 +29,7 @@ public class TextPane extends Region {
     private final Caret caret;
     private final Selection selection;
     private final ImePalette imePalette;
+    private final ScrollBar vScroll;
 
     public TextPane(Stage stage) {
 
@@ -78,9 +79,15 @@ public class TextPane extends Region {
                 initScreenRowSize(newValue.getHeight());
             }
             if (oldValue.getWidth() != newValue.getWidth()) {
-                textFlow.setPrefWidth(newValue.getWidth() - left.getWidth());
+                textFlow.setPrefWidth(newValue.getWidth() - left.getPrefWidth());
             }
         });
+
+        vScroll = new ScrollBar();
+        vScroll.layoutXProperty().bind(widthProperty().subtract(vScroll.getWidth()));
+        vScroll.prefHeightProperty().bind(heightProperty());
+        getChildren().add(vScroll);
+
         initScreenRowSize(getLayoutBounds().getHeight());
         initDropTarget();
     }
