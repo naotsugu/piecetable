@@ -30,12 +30,16 @@ public class ScreenBuffer {
     private final IntegerProperty originIndex    = new SimpleIntegerProperty();
 
 
+    private final IntegerProperty totalLines = new SimpleIntegerProperty(1);
+
+
     public ScreenBuffer() {
     }
 
 
     public void open(Path path) {
         content.open(path);
+        setTotalLines(content.lineCount());
         caretOffsetY = caretOffsetX = 0;
         caretOffset.set(0);
         originRowIndex.set(0);
@@ -246,6 +250,7 @@ public class ScreenBuffer {
         String[] deleteLines = Strings.splitLine(deleteString);
 
         content.delete(caretIndex, len);
+        setTotalLines(getTotalLines() + 1 - deleteLines.length);
 
         if (deleteLines.length == 1) {
             // simple inline delete
@@ -301,6 +306,7 @@ public class ScreenBuffer {
 
         boolean caretTailed = caretIndex() == content.length();
         content.insert(caretIndex(), string);
+        setTotalLines(getTotalLines() + Strings.countLf(string));
 
         int caretLineCharOffset = caretLineCharOffset();
         String current = rows.get(caretOffsetY);
@@ -380,6 +386,7 @@ public class ScreenBuffer {
             rows.remove(rows.size() - 1);
         }
         fitRows(screenRowSize.get());
+        setTotalLines(content.lineCount());
     }
 
 
@@ -698,6 +705,7 @@ public class ScreenBuffer {
         originIndex.set(0);
         if (content instanceof EditBufferedContent buffer) buffer.flush();
         rows.clear();
+        totalLines.set(1);
         fitRows(getScreenRowSize());
     }
 
@@ -713,6 +721,10 @@ public class ScreenBuffer {
     public final int getScreenRowSize() { return screenRowSize.get(); }
     void setScreenRowSize(int value) { screenRowSize.set(value); }
     public IntegerProperty screenRowSizeProperty() { return screenRowSize; }
+
+    public final int getTotalLines() { return totalLines.get(); }
+    void setTotalLines(int value) { totalLines.set(value); }
+    public IntegerProperty totalLinesProperty() { return totalLines; }
 
 }
 

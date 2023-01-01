@@ -86,6 +86,10 @@ public class TextPane extends Region {
         vScroll = new ScrollBar();
         vScroll.layoutXProperty().bind(widthProperty().subtract(vScroll.getWidth()));
         vScroll.prefHeightProperty().bind(heightProperty());
+        vScroll.thumbLengthProperty().bind(screenBuffer.screenRowSizeProperty());
+        vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
+        vScroll.maxProperty().bind(screenBuffer.totalLinesProperty());
+
         getChildren().add(vScroll);
 
         initScreenRowSize(getLayoutBounds().getHeight());

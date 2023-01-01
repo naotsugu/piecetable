@@ -3,6 +3,7 @@ package com.mammb.code.editor;
 import java.nio.file.Path;
 
 public interface Content {
+
     int length();
     void insert(int pos, String cs);
     void delete(int pos, int len);
@@ -16,6 +17,7 @@ public interface Content {
     int[] undo();
     int[] redo();
 
+
     default void write() {
         if (path() == null) {
             throw new IllegalStateException("path is null");
@@ -23,9 +25,21 @@ public interface Content {
         write(path());
     }
 
+
     default String lineAt(int pos) {
         String right = untilEol(pos);
         return untilSol(pos) + (right.length() > 0 ? right.substring(1) : "");
+    }
+
+
+    default int lineCount() {
+        int count = 0;
+        for (int i = 0; i < length();) {
+            int end = Math.min(i + 128, length());
+            count += substring(i, end).chars().filter(c -> c == '\n').count();
+            i = end;
+        }
+        return count;
     }
 
 }
