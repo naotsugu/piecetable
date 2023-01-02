@@ -1,7 +1,6 @@
 package com.mammb.code.editor;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
@@ -52,10 +51,12 @@ public class ScreenBuffer {
 
     }
 
+
     public void save() {
         content.write();
         logger.log(INFO, "== saved :" + content.path());
     }
+
 
     public void saveAs(Path path) {
         content.write(path);
@@ -225,17 +226,20 @@ public class ScreenBuffer {
         }
     }
 
+
     public void pageUp() {
         for (int i = 0; i < getScreenRowSize(); i++) {
             prevLine();
         }
     }
 
+
     public void pageDown() {
         for (int i = 0; i < getScreenRowSize(); i++) {
             nextLine();
         }
     }
+
 
     public void delete(int len) {
 
@@ -298,6 +302,7 @@ public class ScreenBuffer {
         }
     }
 
+
     public void add(String string) {
 
         if (string == null) return;
@@ -359,6 +364,7 @@ public class ScreenBuffer {
         }
     }
 
+
     void undo() {
         int[] range = content.undo();
         if (range.length > 1) {
@@ -366,12 +372,14 @@ public class ScreenBuffer {
         }
     }
 
+
     void redo() {
         int[] range = content.redo();
         if (range.length > 1) {
             redraw(range[0], range[1]);
         }
     }
+
 
     private void redraw(int startIndex, int endIndex) {
         while (startIndex < originIndex.get()) {
@@ -709,6 +717,7 @@ public class ScreenBuffer {
         fitRows(getScreenRowSize());
     }
 
+    // <editor-fold desc="properties">
 
     public final int getOriginRowIndex() { return originRowIndex.get(); }
     void setOriginRowIndex(int value) { originRowIndex.set(value); }
@@ -725,6 +734,8 @@ public class ScreenBuffer {
     public final int getTotalLines() { return totalLines.get(); }
     void setTotalLines(int value) { totalLines.set(value); }
     public IntegerProperty totalLinesProperty() { return totalLines; }
+
+    // </editor-fold>
 
 }
 

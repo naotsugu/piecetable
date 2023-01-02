@@ -8,7 +8,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -16,6 +15,7 @@ public class SidePanel extends StackPane {
 
     private final Text text;
     private final ScreenBuffer screenBuffer;
+
 
     public SidePanel(ScreenBuffer screenBuffer) {
 
@@ -45,6 +45,7 @@ public class SidePanel extends StackPane {
         fill(screenBuffer.getOriginRowIndex(), screenBuffer.rows.size());
     }
 
+
     void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
         while (change.next()) {
             if (change.wasRemoved() || change.wasAdded()) {
@@ -60,6 +61,5 @@ public class SidePanel extends StackPane {
             .map(str -> str + ' ')
             .collect(Collectors.joining("\n")));
     }
-
 
 }

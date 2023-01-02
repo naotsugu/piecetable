@@ -11,38 +11,50 @@ import javafx.scene.shape.Rectangle;
 
 public class ScrollBar extends StackPane {
 
+    private static final Color color = Color.web("#626465", 0.2);
+    private static final Color thumbColor = Color.web("#626465", 0.5);
+    private static final Color thumbActiveColor = Color.web("#626465", 0.9);
+
     private final double WIDTH = 8;
     private final Rectangle thumb;
 
     private final DoubleProperty min = new SimpleDoubleProperty(0);
-    private final DoubleProperty max = new SimpleDoubleProperty();
-    private final DoubleProperty value = new SimpleDoubleProperty();
-    private final DoubleProperty thumbLength = new SimpleDoubleProperty();
+    private final DoubleProperty max = new SimpleDoubleProperty(0);
+    private final DoubleProperty value = new SimpleDoubleProperty(0);
+    private final DoubleProperty thumbLength = new SimpleDoubleProperty(0);
     private final DoubleProperty blockIncrement = new SimpleDoubleProperty(0);
 
 
     public ScrollBar() {
 
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
-        setBackground(new Background(new BackgroundFill(Color.web("#626465", 0.1), null, null)));
+        setBackground(new Background(new BackgroundFill(color, null, null)));
         setWidth(WIDTH);
 
-        this.thumb = new Rectangle(WIDTH, getBlockIncrement());
-        this.thumb.setArcHeight(4);
-        this.thumb.setArcWidth(4);
-        this.thumb.setFill(Color.web("#626465", 0.5));
+        this.thumb = new Rectangle(WIDTH, 0);
+        this.thumb.setArcHeight(8);
+        this.thumb.setArcWidth(8);
+        this.thumb.setFill(thumbColor);
         this.thumb.setY(0);
         this.thumb.setManaged(false);
         getChildren().add(thumb);
 
+        setOnMouseEntered(e -> thumb.setFill(thumbActiveColor));
+        setOnMouseExited(e  -> thumb.setFill(thumbColor));
+
         value.addListener((observable, oldValue, newValue) -> {
             double len = getMax() - getMin();
             double y = getHeight() * clamp(getMin(), newValue.doubleValue(), getMax()) / len;
-            thumb.setY(clamp(0, y, getHeight() - getThumbLength()));
+            thumb.setY(clamp(0, y, getHeight() - thumb.getHeight()));
         });
 
-        this.thumb.heightProperty().bind(thumbLength);
+        thumbLength.addListener((observable, oldValue, newValue) -> applyThumbHeight());
+        max.addListener((observable, oldValue, newValue) -> applyThumbHeight());
+    }
 
+
+    private void applyThumbHeight() {
+        thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
     }
 
 
@@ -63,9 +75,7 @@ public class ScrollBar extends StackPane {
 
 
     public static double clamp(double min, double value, double max) {
-        if (value < min) return min;
-        if (value > max) return max;
-        return value;
+        return Math.min(Math.max(value, min), max);
     }
 
     // <editor-fold desc="properties">

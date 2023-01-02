@@ -35,7 +35,7 @@ public interface Content {
     default int lineCount() {
         int count = 0;
         for (int i = 0; i < length();) {
-            int end = Math.min(i + 128, length());
+            int end = Math.min(i + 512, length());
             count += substring(i, end).chars().filter(c -> c == '\n').count();
             i = end;
         }

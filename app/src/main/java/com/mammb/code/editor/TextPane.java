@@ -122,7 +122,7 @@ public class TextPane extends Region {
     private void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
         while (change.next()) {
             if (change.wasRemoved()) {
-                textFlow.getChildren().remove(change.getFrom(), Math.max(change.getTo(), change.getFrom() + 1));
+                textFlow.getChildren().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
             }
             if (change.wasAdded()) {
                 List<Text> texts = change.getAddedSubList().stream().map(this::asText).toList();

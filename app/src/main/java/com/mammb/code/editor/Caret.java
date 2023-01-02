@@ -10,7 +10,7 @@ import javafx.util.Duration;
 
 public class Caret extends Path {
 
-    private final Timeline timeline;
+    private final Timeline timeline = new Timeline();
 
 
     public Caret() {
@@ -19,7 +19,6 @@ public class Caret extends Path {
         setStroke(Color.LIGHTYELLOW);
         setManaged(false);
 
-        timeline = new Timeline();
         timeline.setCycleCount(-1);
         timeline.getKeyFrames().add(new KeyFrame(Duration.millis(500), e -> setVisible(!isVisible())));
         timeline.play();
