@@ -20,6 +20,7 @@ public class Keys {
     public static final KeyCombination SC_Y = new KeyCharacterCombination("y", KeyCombination.SHORTCUT_DOWN);
     public static final KeyCombination SC_SZ= new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
+    public static final KeyCombination SC_A = new KeyCharacterCombination("a", KeyCombination.SHORTCUT_DOWN);
 
     public static final Predicate<KeyEvent> controlKeysFilter = e ->
         System.getProperty("os.name").startsWith("Windows")

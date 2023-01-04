@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 public class ImePalette extends Region {
 
     private final BooleanProperty imeOn = new SimpleBooleanProperty(false);
-    private Text palette;
-    private Text original;
-    private final TextFlow paletteFlow;
+    private final Text palette = new Text();
+    private final Text original = new Text();
+    private final TextFlow paletteFlow = new TextFlow(palette, original);
 
     private final TextFlow parent;
     private final ScreenBuffer screenBuffer;
@@ -39,16 +39,13 @@ public class ImePalette extends Region {
         this.parent = parent;
         this.screenBuffer = screenBuffer;
 
-        this.palette = new Text();
         this.palette.setFont(Fonts.main);
         this.palette.setFill(Colors.fgColor);
         this.palette.setUnderline(true);
 
-        this.original = new Text();
         this.original.setFont(Fonts.main);
         this.original.setFill(Colors.fgColor);
 
-        this.paletteFlow = new TextFlow(palette, original);
         this.paletteFlow.setTabSize(4);
         this.paletteFlow.setBackground(new Background(new BackgroundFill(Colors.bgColor, null, null)));
 
@@ -58,10 +55,12 @@ public class ImePalette extends Region {
 
 
     void handleInputMethod(InputMethodEvent e) {
+
         if (!getImeOn()) {
             setImeOn(true);
             original.setText(screenBuffer.caretLineText().substring(screenBuffer.caretLineCharOffset()));
         }
+
         if (e.getCommitted().length() > 0) {
             screenBuffer.add(e.getCommitted());
             clear();
@@ -73,9 +72,11 @@ public class ImePalette extends Region {
             palette.setText(e.getComposed().stream()
                 .map(InputMethodTextRun::getText).collect(Collectors.joining()));
         }
-        if (e.getCommitted().length() == 0 && e.getComposed().isEmpty()) {
+
+        if (e.getCommitted().isEmpty() && e.getComposed().isEmpty()) {
             clear();
         }
+
     }
 
 

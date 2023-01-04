@@ -34,10 +34,12 @@ public class EditBufferedContent implements Content {
         }
         return peer.length();
     }
+
     @Override
     public Path path() {
         return peer.path();
     }
+
     @Override
     public void write(Path path) {
         flush();
@@ -114,8 +116,10 @@ public class EditBufferedContent implements Content {
 
         @Override
         public Edit insert(int pos, String cs) { return new InsertEdit(content, System.currentTimeMillis(), pos, cs); }
+
         @Override
         public Edit delete(int pos, int len) { return new DeleteEdit(content, System.currentTimeMillis(), pos, len); }
+
         @Override
         public Edit flush() { return this; }
 
@@ -147,6 +151,7 @@ public class EditBufferedContent implements Content {
 
         @Override
         public int pos() { return pos; }
+
         @Override
         public int len() { return str.length(); }
 
@@ -180,6 +185,7 @@ public class EditBufferedContent implements Content {
 
         @Override
         public int pos() { return pos; }
+
         @Override
         public int len() { return len;}
     }

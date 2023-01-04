@@ -148,9 +148,9 @@ public class PtContent implements Content {
         }
 
         if (pos < bufferHeadPos || pos >= bufferTailPos) {
-            //  + pos               + pos
-            // |x|x|x|x|x|x|x|x|x|x|x|x|x|
-            //    L bufferHeadPos   L bufferTailPos
+            //    + pos               + pos
+            // |x|x|-|-|-|-|-|-|-|-|-|x|x|x|
+            //      L bufferHeadPos   L bufferTailPos
             fillBuffer(pos);
         }
 

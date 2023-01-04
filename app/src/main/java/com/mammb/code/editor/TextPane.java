@@ -83,8 +83,8 @@ public class TextPane extends Region {
             }
         });
 
-        vScroll = new ScrollBar();
-        vScroll.layoutXProperty().bind(widthProperty().subtract(vScroll.getWidth()));
+        vScroll = new ScrollBar(screenBuffer);
+        vScroll.layoutXProperty().bind(widthProperty().subtract(vScroll.getWidth() + 2));
         vScroll.prefHeightProperty().bind(heightProperty());
         vScroll.thumbLengthProperty().bind(screenBuffer.screenRowSizeProperty());
         vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
@@ -267,7 +267,7 @@ public class TextPane extends Region {
 
     private void handleMouseClicked(MouseEvent e) {
 
-        if (imePalette.getImeOn()) {
+        if (!e.getSource().equals(textFlow) || imePalette.getImeOn()) {
             return;
         }
 
@@ -280,9 +280,9 @@ public class TextPane extends Region {
         }
 
         HitInfo hit = textFlow.hitTest(textFlow.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY())));
-        if (e.getClickCount() == 1) {
+        if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 1) {
             screenBuffer.moveCaret(hit.getInsertionIndex());
-        } else if (e.getClickCount() == 2) {
+        } else if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
             // word select
             int[] range = screenBuffer.wordRange(hit.getInsertionIndex());
             selection.start(range[0]);
@@ -309,7 +309,7 @@ public class TextPane extends Region {
     }
 
     public void copyToClipboard() {
-        if (!selection.on()) {
+        if (selection.off()) {
             return;
         }
         String text = "";
@@ -330,7 +330,7 @@ public class TextPane extends Region {
     }
 
     public void cutToClipboard() {
-        if (!selection.on()) {
+        if (selection.off()) {
             return;
         }
         copyToClipboard();
@@ -338,7 +338,7 @@ public class TextPane extends Region {
     }
 
     public void selectionDelete() {
-        if (!selection.on()) {
+        if (selection.off()) {
             return;
         }
         if (selection.getOpen() < selection.getClose()) {
@@ -351,7 +351,7 @@ public class TextPane extends Region {
 
 
     private void selectOr(KeyEvent e, Consumer<KeyEvent> consumer) {
-        if (e.isShiftDown() && !selection.on()) {
+        if (e.isShiftDown() && selection.off()) {
             selection.start(screenBuffer.getCaretOffset());
         } else if (!e.isShiftDown() && selection.on()) {
             selection.clear();

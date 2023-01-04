@@ -79,6 +79,11 @@ public class Selection extends Path {
         return on;
     }
 
+    public boolean off() {
+        return !on;
+    }
+
+
     public int getOpen() {
         return open;
     }

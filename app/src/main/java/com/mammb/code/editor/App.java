@@ -5,24 +5,27 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
 import java.util.Objects;
 
 public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+
         TextPane textPane = new TextPane(stage);
         Scene scene = new Scene(new StackPane(textPane), 800, 480);
 
-        stage.getIcons().add(new Image(Objects.requireNonNull(
-            App.class.getResourceAsStream("/icon/icon256.png"))));
+        Image image = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icon/icon256.png")));
+        stage.getIcons().add(image);
         stage.setScene(scene);
         stage.show();
+
     }
 
+
     public static void main(String[] args) {
-        System.setProperty("java.util.logging.SimpleFormatter.format",
+        System.setProperty(
+            "java.util.logging.SimpleFormatter.format",
             "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %4$s %2$s %5$s%6$s%n");
         launch();
     }

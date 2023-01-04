@@ -233,10 +233,26 @@ public class ScreenBuffer {
         }
     }
 
+    public void pageScrollUp() {
+        scrollPrev(getScreenRowSize());
+    }
 
     public void pageDown() {
         for (int i = 0; i < getScreenRowSize(); i++) {
             nextLine();
+        }
+    }
+
+    public void pageScrollDown() {
+        scrollNext(getScreenRowSize());
+    }
+
+
+    public void scrollTo(int rowIndex) {
+        if (rowIndex < getOriginRowIndex()) {
+            scrollPrev(getOriginRowIndex() - rowIndex);
+        } else if (rowIndex > getOriginRowIndex()) {
+            scrollNext(rowIndex - getOriginRowIndex());
         }
     }
 
@@ -552,12 +568,17 @@ public class ScreenBuffer {
             for (int i = lastIndexOnScreen(); i < content.length() && preferenceSize > rows.size();) {
                 String string = content.untilEol(i);
                 if (string == null || string.isEmpty()) {
-                    return;
+                    break;
                 }
                 i += string.length();
                 rows.add(string);
             }
         }
+
+        if (rows.isEmpty()) {
+            rows.add("");
+        }
+
     }
 
 
