@@ -134,11 +134,13 @@ public class CursoredList {
         }
     }
 
-    public void writeTo(WritableByteChannel channel) throws IOException {
+    public int writeTo(WritableByteChannel channel) throws IOException {
+        int size = 0;
         ByteBuffer buf = ByteBuffer.allocate(1024);
         for (Piece piece : raw) {
-            piece.writeTo(channel, buf);
+            size += piece.writeTo(channel, buf);
         }
+        return size;
     }
 
     public Stream<Piece> stream() {

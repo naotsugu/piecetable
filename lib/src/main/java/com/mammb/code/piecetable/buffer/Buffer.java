@@ -26,7 +26,7 @@ public interface Buffer {
         return this.length() == 0;
     }
 
-    default void write(WritableByteChannel channel, ByteBuffer buf,
+    default int write(WritableByteChannel channel, ByteBuffer buf,
             int offset, int length) throws IOException {
 
         int from = asIndex(offset);
@@ -39,6 +39,8 @@ public interface Buffer {
             i += channel.write(buf);
             buf.compact();
         }
+
+        return to - from;
     }
 
 }

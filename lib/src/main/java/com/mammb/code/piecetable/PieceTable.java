@@ -178,7 +178,8 @@ public class PieceTable {
     public void write(Path path) {
         try (FileChannel channel = FileChannel.open(path,
                 StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-            pieces.writeTo(channel);
+            int size = pieces.writeTo(channel);
+            channel.truncate(size);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
