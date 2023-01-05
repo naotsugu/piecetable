@@ -15,6 +15,7 @@ public interface Content {
     String untilEol(int pos);
     String untilSol(int pos);
     int[] undo();
+    int undoSize();
     int[] redo();
 
 

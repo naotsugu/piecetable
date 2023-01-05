@@ -5,6 +5,7 @@ import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
+import javafx.scene.Cursor;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
@@ -12,6 +13,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,7 @@ public class TextPane extends Region {
     public TextPane(Stage stage) {
 
         this.stage = stage;
+        setupStageTitle();
 
         setBackground(new Background(new BackgroundFill(Colors.bgColor, null, null)));
         setFocusTraversable(true);
@@ -68,6 +71,7 @@ public class TextPane extends Region {
 
         BorderPane pane = new BorderPane();
         Pane main = new Pane(textFlow, caret, selection, imePalette);
+        main.setCursor(Cursor.TEXT);
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
         pane.setLeft(left);
@@ -96,6 +100,12 @@ public class TextPane extends Region {
         initDropTarget();
     }
 
+    private void setupStageTitle() {
+        Path path = screenBuffer.getPath();
+        String title = (path == null) ? "untitled" : path.toString();
+        stage.setTitle(title);
+    }
+
     private void initScreenRowSize(double height) {
         screenBuffer.setupScreenRowSize((int) Math.ceil(height / lineHeight));
     }
@@ -111,6 +121,7 @@ public class TextPane extends Region {
             Dragboard board = event.getDragboard();
             if (board.hasFiles()) {
                 board.getFiles().stream().findFirst().map(File::toPath).ifPresent(screenBuffer::open);
+                setupStageTitle();
                 event.setDropCompleted(true);
             } else {
                 event.setDropCompleted(false);
@@ -169,6 +180,9 @@ public class TextPane extends Region {
                 return;
             }
         }
+        if (selection.on()) {
+            selectionDelete();
+        }
         // Enter key : 13:CR -> replace to 10:LF
         screenBuffer.add(e.getCharacter().replace('\r', '\n'));
     }
@@ -184,22 +198,25 @@ public class TextPane extends Region {
         }
 
         if (Keys.SC_O.match(e)) {
-            File file = fileChooseOpen(stage);
+            File file = Utils.fileChooseOpen(stage, screenBuffer.getPath());
             if (file != null) screenBuffer.open(file.toPath());
+            setupStageTitle();
             return;
         }
         if (Keys.SC_S.match(e)) {
             if (screenBuffer.getPath() != null) {
                 screenBuffer.save();
             } else {
-                File file = fileChooseOpen(stage);
+                File file = Utils.fileChooseSave(stage, screenBuffer.getPath());
                 if (file != null) screenBuffer.saveAs(file.toPath());
+                setupStageTitle();
             }
             return;
         }
         if (Keys.SC_SA.match(e)) {
-            File file = fileChooseOpen(stage);
+            File file = Utils.fileChooseSave(stage, screenBuffer.getPath());
             if (file != null) screenBuffer.saveAs(file.toPath());
+            setupStageTitle();
             return;
         }
         if (Keys.SC_C.match(e)) {
@@ -267,7 +284,7 @@ public class TextPane extends Region {
 
     private void handleMouseClicked(MouseEvent e) {
 
-        if (!e.getSource().equals(textFlow) || imePalette.getImeOn()) {
+        if (imePalette.getImeOn()) {
             return;
         }
 
@@ -303,6 +320,9 @@ public class TextPane extends Region {
     }
 
     private void pasteFromClipboard() {
+        if (selection.on()) {
+            selectionDelete();
+        }
         if (clipboard.hasString()) {
             screenBuffer.add(clipboard.getString());
         }
@@ -358,15 +378,6 @@ public class TextPane extends Region {
         }
         consumer.accept(e);
     }
-
-
-    private static File fileChooseOpen(Window owner) {
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Select file...");
-        fc.setInitialDirectory(new File(System.getProperty("user.home")));
-        return fc.showOpenDialog(owner);
-    }
-
 
     List<Text> texts() {
         return screenBuffer.rows.stream().map(this::asText).collect(Collectors.toList());

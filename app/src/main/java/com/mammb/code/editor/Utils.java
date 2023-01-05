@@ -5,6 +5,11 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 public class Utils {
@@ -61,5 +66,32 @@ public class Utils {
         if (element instanceof MoveTo moveTo) return moveTo.getY();
         else if (element instanceof LineTo lineTo) return lineTo.getY();
         else throw new UnsupportedOperationException(element.toString());
+    }
+
+    public static File fileChooseOpen(Window owner, Path path) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Select file...");
+        if (path == null) {
+            fc.setInitialDirectory(new File(System.getProperty("user.home")));
+        } else if (path.toFile().isDirectory()) {
+            fc.setInitialDirectory(path.toFile());
+        } else {
+            fc.setInitialDirectory(path.getParent().toFile());
+        }
+        return fc.showOpenDialog(owner);
+    }
+
+    public static File fileChooseSave(Window owner, Path path) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Save As...");
+        if (path == null) {
+            fc.setInitialDirectory(new File(System.getProperty("user.home")));
+        } else if (path.toFile().isDirectory()) {
+            fc.setInitialDirectory(path.toFile());
+        } else {
+            fc.setInitialDirectory(path.getParent().toFile());
+        }
+        fc.setInitialDirectory(new File(System.getProperty("user.home")));
+        return fc.showSaveDialog(owner);
     }
 }

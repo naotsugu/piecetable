@@ -89,6 +89,11 @@ public class EditBufferedContent implements Content {
     }
 
     @Override
+    public int undoSize() {
+        return peer.undoSize();
+    }
+
+    @Override
     public int[] redo() {
         flush();
         return peer.redo();

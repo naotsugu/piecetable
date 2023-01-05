@@ -50,6 +50,7 @@ public class PtContent implements Content {
     public void write(Path path) {
         this.pt.write(path);
         this.pt = PieceTable.of(path);
+        this.path = path;
     }
 
     @Override
@@ -127,12 +128,21 @@ public class PtContent implements Content {
 
     @Override
     public int[] undo() {
-        return pt.undo();
+        int[] ret = pt.undo();
+        if (ret.length > 1 && ret[0] < bufferTailPos) clearBuffer();
+        return ret;
+    }
+
+    @Override
+    public int undoSize() {
+        return pt.undoSize();
     }
 
     @Override
     public int[] redo() {
-        return pt.redo();
+        int[] ret = pt.redo();
+        if (ret.length > 1 && ret[0] < bufferTailPos) clearBuffer();
+        return ret;
     }
 
 

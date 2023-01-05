@@ -136,15 +136,21 @@ public class PieceTable {
         if (!undo.isEmpty()) {
             PieceEdit edit = undo.pop();
             redo.push(applyEdit(edit));
+            length += edit.totalModLength() - edit.totalOrgLength();
             return asRange(edit);
         }
         return new int[0];
+    }
+
+    public int undoSize() {
+        return undo.size();
     }
 
     public int[] redo() {
         if (!redo.isEmpty()) {
             PieceEdit edit = redo.pop();
             pushToUndo(applyEdit(edit), true);
+            length += edit.totalModLength() - edit.totalOrgLength();
             return asRange(edit);
         }
         return new int[0];

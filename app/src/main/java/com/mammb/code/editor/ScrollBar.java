@@ -22,7 +22,7 @@ public class ScrollBar extends StackPane {
     private final ScreenBuffer screenBuffer;
     private final double WIDTH = 8;
     private final Rectangle thumb;
-    private Point2D dragStart;
+    private double dragStart;
 
     private final DoubleProperty min = new SimpleDoubleProperty(0);
     private final DoubleProperty max = new SimpleDoubleProperty(0);
@@ -78,6 +78,7 @@ public class ScrollBar extends StackPane {
         } else if (e.getY() > thumb.getY() + thumb.getHeight()) {
             screenBuffer.pageScrollDown();
         }
+        e.consume();
     }
 
 
@@ -88,11 +89,8 @@ public class ScrollBar extends StackPane {
             return;
         }
         Point2D cur = thumb.localToParent(e.getX(), e.getY());
-        if (dragStart == null) {
-            dragStart = thumb.localToParent(e.getX(), e.getY());
-        }
         double len = getMax() - getMin();
-        double y = getMin() + len * (cur.getY() - dragStart.getY()) / getHeight();
+        double y = getMin() + len * (dragStart + cur.getY()) / getHeight();
         screenBuffer.scrollTo((int) Math.round(clamp(getMin(), y, getMax())));
         e.consume();
     }
@@ -104,7 +102,8 @@ public class ScrollBar extends StackPane {
             e.consume();
             return;
         }
-        dragStart = thumb.localToParent(e.getX(), e.getY());
+        dragStart = thumb.getY() - thumb.localToParent(e.getX(), e.getY()).getY();
+        e.consume();
     }
 
 

@@ -707,6 +707,10 @@ public class ScreenBuffer {
         return content.path();
     }
 
+    public boolean isDirty() {
+        return content.undoSize() > 0;
+    }
+
     public void inspect() {
         logger.log(INFO, "========================================");
         logger.log(INFO, "rows.size[{0}], rowSize[{1}]", rows.size(), getScreenRowSize());
