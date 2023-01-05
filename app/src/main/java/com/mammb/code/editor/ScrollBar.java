@@ -22,7 +22,8 @@ public class ScrollBar extends StackPane {
     private final ScreenBuffer screenBuffer;
     private final double WIDTH = 8;
     private final Rectangle thumb;
-    private double dragStart;
+    private Point2D dragStart;
+    private int dragStartRowIndex;
 
     private final DoubleProperty min = new SimpleDoubleProperty(0);
     private final DoubleProperty max = new SimpleDoubleProperty(0);
@@ -67,6 +68,7 @@ public class ScrollBar extends StackPane {
         thumb.setY(clamp(0, y, range));
     }
 
+
     private void handleTruckClicked(MouseEvent e) {
 
         if (!e.getSource().equals(this) || e.getButton() != MouseButton.PRIMARY) {
@@ -83,15 +85,21 @@ public class ScrollBar extends StackPane {
 
 
     private void handleThumbDragged(MouseEvent e) {
+
         if (e.isSynthesized()) {
             // touch-screen events handled by Scroll handler
             e.consume();
             return;
         }
+
         Point2D cur = thumb.localToParent(e.getX(), e.getY());
+        if (dragStart == null) {
+            dragStart = cur;
+        }
         double len = getMax() - getMin();
-        double y = getMin() + len * (dragStart + cur.getY()) / getHeight();
-        screenBuffer.scrollTo((int) Math.round(clamp(getMin(), y, getMax())));
+        double y = getMin() + len * (cur.getY() - dragStart.getY()) / (getHeight() - thumb.getHeight());
+
+        screenBuffer.scrollTo(dragStartRowIndex + (int) Math.floor(y));
         e.consume();
     }
 
@@ -102,7 +110,8 @@ public class ScrollBar extends StackPane {
             e.consume();
             return;
         }
-        dragStart = thumb.getY() - thumb.localToParent(e.getX(), e.getY()).getY();
+        dragStart = thumb.localToParent(e.getX(), e.getY());
+        dragStartRowIndex = screenBuffer.getOriginRowIndex();
         e.consume();
     }
 
@@ -110,6 +119,7 @@ public class ScrollBar extends StackPane {
     private void applyThumbHeight() {
         thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
     }
+
 
     private static double clamp(double min, double value, double max) {
         return Math.min(Math.max(value, min), max);
