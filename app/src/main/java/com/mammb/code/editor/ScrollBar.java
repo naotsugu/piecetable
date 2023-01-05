@@ -17,7 +17,7 @@ public class ScrollBar extends StackPane {
 
     private static final Color color = Color.web("#626465", 0.2);
     private static final Color thumbColor = Color.web("#626465", 0.5);
-    private static final Color thumbActiveColor = Color.web("#626465", 0.9);
+    private static final Color thumbActiveColor = Color.web("#828485", 0.9);
 
     private final ScreenBuffer screenBuffer;
     private final double WIDTH = 8;
@@ -94,7 +94,7 @@ public class ScrollBar extends StackPane {
 
         Point2D cur = thumb.localToParent(e.getX(), e.getY());
         if (dragStart == null) {
-            dragStart = cur;
+            markThumbStart(e);
         }
         double len = getMax() - getMin();
         double y = getMin() + len * (cur.getY() - dragStart.getY()) / (getHeight() - thumb.getHeight());
@@ -110,9 +110,14 @@ public class ScrollBar extends StackPane {
             e.consume();
             return;
         }
+        markThumbStart(e);
+        e.consume();
+    }
+
+
+    private void markThumbStart(MouseEvent e) {
         dragStart = thumb.localToParent(e.getX(), e.getY());
         dragStartRowIndex = screenBuffer.getOriginRowIndex();
-        e.consume();
     }
 
 

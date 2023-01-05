@@ -41,6 +41,7 @@ public class TextPane extends Region {
         setBackground(new Background(new BackgroundFill(Colors.bgColor, null, null)));
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
+        setCursor(Cursor.DEFAULT);
 
         setOnKeyPressed(this::handleKeyPressed);
         setOnScroll(this::handleScroll);
