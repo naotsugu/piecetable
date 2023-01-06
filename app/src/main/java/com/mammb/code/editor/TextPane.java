@@ -97,7 +97,7 @@ public class TextPane extends Region {
         vScroll.prefHeightProperty().bind(heightProperty());
         vScroll.thumbLengthProperty().bind(screenBuffer.screenRowSizeProperty());
         vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
-        vScroll.maxProperty().bind(screenBuffer.totalLinesProperty());
+        vScroll.maxProperty().bind(screenBuffer.scrollMaxLinesProperty());
         getChildren().add(vScroll);
 
     }

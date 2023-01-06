@@ -2,7 +2,10 @@ package com.mammb.code.editor;
 
 import java.nio.file.Path;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -28,23 +31,25 @@ public class ScreenBuffer {
     private final IntegerProperty originRowIndex = new SimpleIntegerProperty();
     private final IntegerProperty originIndex    = new SimpleIntegerProperty();
 
-
-    private final IntegerProperty totalLines = new SimpleIntegerProperty(1);
+    private final ReadOnlyIntegerWrapper totalLines = new ReadOnlyIntegerWrapper(1);
+    private final ReadOnlyIntegerWrapper scrollMaxLines = new ReadOnlyIntegerWrapper(1);
 
 
     public ScreenBuffer() {
+        totalLines.addListener(this::updateScrollMaxLines);
+        screenRowSize.addListener(this::updateScrollMaxLines);
     }
-
 
     public void open(Path path) {
         content.open(path);
         totalLines.set(content.lineCount());
+
         caretOffsetY = caretOffsetX = 0;
         caretOffset.set(0);
         originRowIndex.set(0);
         originIndex.set(0);
         rows.clear();
-        setupScreenRowSize(getScreenRowSize());
+        fitRows(getScreenRowSize());
 
         originRowIndex.set(-1);
         originRowIndex.set(0);
@@ -682,11 +687,16 @@ public class ScreenBuffer {
         return ret;
     }
 
+
+    private void updateScrollMaxLines(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        scrollMaxLines.set(totalLines.get() - prefRowRemaining());
+    }
+
     /**
      * Number of lines to remain when scrolling.
      * @return the number of lines to remain when scrolling
      */
-    int prefRowRemaining() {
+    private int prefRowRemaining() {
         return (int) Math.ceil(getScreenRowSize() * 2.0 / 3.0);
     }
 
@@ -766,8 +776,10 @@ public class ScreenBuffer {
     public IntegerProperty screenRowSizeProperty() { return screenRowSize; }
 
     public final int getTotalLines() { return totalLines.get(); }
-    void setTotalLines(int value) { totalLines.set(value); }
-    public IntegerProperty totalLinesProperty() { return totalLines; }
+    public ReadOnlyIntegerProperty totalLinesProperty() { return totalLines; }
+
+    public final int getScrollMaxLines() { return scrollMaxLines.get(); }
+    public ReadOnlyIntegerProperty scrollMaxLinesProperty() { return scrollMaxLines; }
 
     // </editor-fold>
 
