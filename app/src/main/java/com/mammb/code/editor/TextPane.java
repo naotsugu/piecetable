@@ -53,6 +53,7 @@ public class TextPane extends Region {
         textFlow.setTabSize(4);
         textFlow.setPadding(new Insets(4));
         textFlow.getChildren().addAll(texts());
+        textFlow.setMaxWidth(Double.MAX_VALUE);
 
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
@@ -88,17 +89,17 @@ public class TextPane extends Region {
             }
         });
 
+        initScreenRowSize(getLayoutBounds().getHeight());
+        initDropTarget();
+
         vScroll = new ScrollBar(screenBuffer);
         vScroll.layoutXProperty().bind(widthProperty().subtract(vScroll.getWidth() + 2));
         vScroll.prefHeightProperty().bind(heightProperty());
         vScroll.thumbLengthProperty().bind(screenBuffer.screenRowSizeProperty());
         vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
         vScroll.maxProperty().bind(screenBuffer.totalLinesProperty());
-
         getChildren().add(vScroll);
 
-        initScreenRowSize(getLayoutBounds().getHeight());
-        initDropTarget();
     }
 
     private void setupStageTitle() {

@@ -38,7 +38,7 @@ public class ScreenBuffer {
 
     public void open(Path path) {
         content.open(path);
-        setTotalLines(content.lineCount());
+        totalLines.set(content.lineCount());
         caretOffsetY = caretOffsetX = 0;
         caretOffset.set(0);
         originRowIndex.set(0);
@@ -210,7 +210,7 @@ public class ScreenBuffer {
 
         for (int i = 0; i < delta; i ++) {
 
-            if (rows.size() < (int) Math.ceil(getScreenRowSize() * 2.0 / 3.0)) return;
+            if (rows.size() < prefRowRemaining()) return;
 
             int removeLineLength = rows.get(0).length();
             int bottomLengthOnContent = lastIndexOnScreen();
@@ -270,7 +270,7 @@ public class ScreenBuffer {
         String[] deleteLines = Strings.splitLine(deleteString);
 
         content.delete(caretIndex, len);
-        setTotalLines(getTotalLines() + 1 - deleteLines.length);
+        totalLines.set(getTotalLines() + 1 - deleteLines.length);
 
         if (deleteLines.length == 1) {
             // simple inline delete
@@ -327,7 +327,7 @@ public class ScreenBuffer {
 
         boolean caretTailed = caretIndex() == content.length();
         content.insert(caretIndex(), string);
-        setTotalLines(getTotalLines() + Strings.countLf(string));
+        totalLines.set(getTotalLines() + Strings.countLf(string));
 
         int caretLineCharOffset = caretLineCharOffset();
         String current = rows.get(caretOffsetY);
@@ -410,7 +410,8 @@ public class ScreenBuffer {
             rows.remove(rows.size() - 1);
         }
         fitRows(screenRowSize.get());
-        setTotalLines(content.lineCount());
+        totalLines.set(content.lineCount());
+
     }
 
 
@@ -679,6 +680,14 @@ public class ScreenBuffer {
             }
         }
         return ret;
+    }
+
+    /**
+     * Number of lines to remain when scrolling.
+     * @return the number of lines to remain when scrolling
+     */
+    int prefRowRemaining() {
+        return (int) Math.ceil(getScreenRowSize() * 2.0 / 3.0);
     }
 
 

@@ -10,20 +10,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class ScrollBar extends StackPane {
 
-    private static final Color color = Color.web("#626465", 0.2);
-    private static final Color thumbColor = Color.web("#626465", 0.5);
-    private static final Color thumbActiveColor = Color.web("#828485", 0.9);
 
     private final ScreenBuffer screenBuffer;
     private final double WIDTH = 8;
     private final Rectangle thumb;
     private Point2D dragStart;
-    private int dragStartRowIndex;
+    private int dragStartRowIndex = -1;
 
     private final DoubleProperty min = new SimpleDoubleProperty(0);
     private final DoubleProperty max = new SimpleDoubleProperty(0);
@@ -36,21 +32,23 @@ public class ScrollBar extends StackPane {
         this.screenBuffer = screenBuffer;
 
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
-        setBackground(new Background(new BackgroundFill(color, null, null)));
+        setBackground(new Background(new BackgroundFill(Colors.trackColor, null, null)));
         setWidth(WIDTH);
 
         this.thumb = new Rectangle(WIDTH, 0);
         this.thumb.setArcHeight(4);
         this.thumb.setArcWidth(4);
-        this.thumb.setFill(thumbColor);
+        this.thumb.setFill(Colors.thumbColor);
         this.thumb.setY(0);
         this.thumb.setManaged(false);
         getChildren().add(thumb);
 
-        setOnMouseEntered(e -> thumb.setFill(thumbActiveColor));
-        setOnMouseExited(e  -> thumb.setFill(thumbColor));
+        setOnMouseEntered(e -> thumb.setFill(Colors.thumbActiveColor));
+        setOnMouseExited(e  -> { if(dragStart == null) thumb.setFill(Colors.thumbColor); });
 
         thumb.setOnMousePressed(this::handleThumbMousePressed);
+        thumb.setOnMouseReleased(this::handleThumbMouseReleased);
+
         thumb.setOnMouseDragged(this::handleThumbDragged);
         setOnMouseClicked(this::handleTruckClicked);
 
@@ -106,7 +104,6 @@ public class ScrollBar extends StackPane {
 
     private void handleThumbMousePressed(MouseEvent e) {
         if (e.isSynthesized()) {
-            // touch-screen events handled by Scroll handler
             e.consume();
             return;
         }
@@ -114,15 +111,31 @@ public class ScrollBar extends StackPane {
         e.consume();
     }
 
+    private void handleThumbMouseReleased(MouseEvent e) {
+        if (e.isSynthesized()) {
+            e.consume();
+            return;
+        }
+        markThumbEnd(e);
+    }
+
 
     private void markThumbStart(MouseEvent e) {
         dragStart = thumb.localToParent(e.getX(), e.getY());
         dragStartRowIndex = screenBuffer.getOriginRowIndex();
+        thumb.setFill(Colors.thumbActiveColor);
+    }
+
+    private void markThumbEnd(MouseEvent e) {
+        dragStart = null;
+        dragStartRowIndex = -1;
+        thumb.setFill(Colors.thumbColor);
     }
 
 
     private void applyThumbHeight() {
         thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
+        setVisible(thumb.getHeight() * 1.1 < getHeight());
     }
 
 
