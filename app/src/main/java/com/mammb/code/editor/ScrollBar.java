@@ -135,7 +135,7 @@ public class ScrollBar extends StackPane {
 
     private void applyThumbHeight() {
         thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
-        setVisible(thumb.getHeight() * 1.1 < getHeight());
+        setVisible(thumb.getHeight() * 1.05 < getHeight());
     }
 
 

@@ -47,6 +47,10 @@ public record Piece(Buffer target, int bufIndex, int length) {
         return target.subBuffer(bufIndex + start, bufIndex + end);
     }
 
+    public Buffer bytes() {
+        return bytes(0, length);
+    }
+
     int writeTo(WritableByteChannel channel, ByteBuffer buf) throws IOException {
         return target.write(channel, buf, bufIndex, length);
     }

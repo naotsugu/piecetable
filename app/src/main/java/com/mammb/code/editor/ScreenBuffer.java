@@ -1,6 +1,8 @@
 package com.mammb.code.editor;
 
 import java.nio.file.Path;
+
+import com.mammb.code.piecetable.Edited;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
@@ -27,7 +29,7 @@ public class ScreenBuffer {
     /** screenRowSize. */
     private final IntegerProperty screenRowSize = new SimpleIntegerProperty(1);
 
-    private final Content content = new EditBufferedContent(new PtContent());
+    private final Content content = new EditBufferedContent(new ContentImpl());
     private final IntegerProperty originRowIndex = new SimpleIntegerProperty();
     private final IntegerProperty originIndex    = new SimpleIntegerProperty();
 
@@ -387,17 +389,17 @@ public class ScreenBuffer {
 
 
     void undo() {
-        int[] range = content.undo();
-        if (range.length > 1) {
-            redraw(range[0], range[1]);
+        Edited edited = content.undo();
+        if (!edited.isEmpty()) {
+            redraw(edited.pos(), edited.pos() + edited.len());
         }
     }
 
 
     void redo() {
-        int[] range = content.redo();
-        if (range.length > 1) {
-            redraw(range[0], range[1]);
+        Edited edited = content.redo();
+        if (!edited.isEmpty()) {
+            redraw(edited.pos(), edited.pos() + edited.len());
         }
     }
 
@@ -416,7 +418,6 @@ public class ScreenBuffer {
         }
         fitRows(screenRowSize.get());
         totalLines.set(content.lineCount());
-
     }
 
 

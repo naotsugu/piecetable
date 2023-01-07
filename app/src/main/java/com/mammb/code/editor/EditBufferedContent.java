@@ -1,26 +1,32 @@
 package com.mammb.code.editor;
 
+import com.mammb.code.piecetable.Edited;
+
 import java.nio.file.Path;
 
 public class EditBufferedContent implements Content {
 
     private final Content peer;
     private Edit edit;
+    private int lineCount;
 
 
     public EditBufferedContent(Content peer) {
         this.peer = peer;
         this.edit = new NeutralEdit(peer);
+        this.lineCount = 0;
     }
 
 
     @Override
     public void insert(int pos, String cs) {
+        lineCount += Strings.countLf(cs);
         edit = edit.insert(pos, cs);
     }
 
     @Override
     public void delete(int pos, int len) {
+        lineCount -= Strings.countLf(substring(pos, pos + len));
         edit = edit.delete(pos, len);
     }
 
@@ -50,6 +56,7 @@ public class EditBufferedContent implements Content {
     public void open(Path path) {
         flush();
         peer.open(path);
+        lineCount = peer.lineCount();
     }
 
     @Override
@@ -83,9 +90,15 @@ public class EditBufferedContent implements Content {
     }
 
     @Override
-    public int[] undo() {
+    public Edited undo() {
         flush();
-        return peer.undo();
+        Edited edited = peer.undo();
+        if (edited.isInserted()) {
+            lineCount += Strings.countLf(edited.bytes());
+        } else if (edited.isDeleted()) {
+            lineCount -= Strings.countLf(edited.bytes());
+        }
+        return edited;
     }
 
     @Override
@@ -94,10 +107,22 @@ public class EditBufferedContent implements Content {
     }
 
     @Override
-    public int[] redo() {
+    public Edited redo() {
         flush();
-        return peer.redo();
+        Edited edited = peer.redo();
+        if (edited.isInserted()) {
+            lineCount += Strings.countLf(edited.bytes());
+        } else if (edited.isDeleted()) {
+            lineCount -= Strings.countLf(edited.bytes());
+        }
+        return edited;
     }
+
+    @Override
+    public int lineCount() {
+        return lineCount;
+    }
+
 
     void flush() {
         edit = edit.flush();

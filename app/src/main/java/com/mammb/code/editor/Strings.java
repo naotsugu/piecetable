@@ -1,6 +1,7 @@
 package com.mammb.code.editor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Strings {
@@ -72,6 +73,14 @@ public class Strings {
 
     public static int countLf(String str) {
         return (int) str.chars().filter(c -> c == LF).count();
+    }
+
+    public static int countLf(byte[] bytes) {
+        int count = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] == LF) count++;
+        }
+        return count;
     }
 
     public static boolean hasLF(String str) {

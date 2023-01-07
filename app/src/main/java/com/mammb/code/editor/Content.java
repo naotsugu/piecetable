@@ -1,5 +1,7 @@
 package com.mammb.code.editor;
 
+import com.mammb.code.piecetable.Edited;
+
 import java.nio.file.Path;
 
 public interface Content {
@@ -14,9 +16,9 @@ public interface Content {
     String substring(int start, int end);
     String untilEol(int pos);
     String untilSol(int pos);
-    int[] undo();
+    Edited undo();
     int undoSize();
-    int[] redo();
+    Edited redo();
 
 
     default void write() {

@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.stream.Collectors;
 
@@ -66,6 +65,7 @@ public class PieceTable {
         PiecePoint point = pieces.at(pos);
         if (point.position() == pos) {
             PieceEdit edit = new PieceEdit(
+                    EditType.INS,
                     point.index(),
                     new Piece[0],
                     new Piece[] { newPiece },
@@ -75,6 +75,7 @@ public class PieceTable {
             Piece piece = pieces.get(point.index());
             Piece.Pair pair = piece.split(pos - point.position());
             PieceEdit edit = new PieceEdit(
+                    EditType.INS,
                     point.index(),
                     new Piece[] { piece },
                     new Piece[] { pair.left(), newPiece, pair.right() },
@@ -114,8 +115,10 @@ public class PieceTable {
             mod[btoi(fromSplit)] = org[org.length - 1].split(pos + len - to.position()).right();
         }
 
-        PieceEdit edit = new PieceEdit(from.index(), org, mod,
-            (fromSplit && toSplit) ? PieceEdit.Place.MID : fromSplit ? PieceEdit.Place.TAIL : PieceEdit.Place.HEAD);
+        PieceEdit edit = new PieceEdit(EditType.DEL, from.index(), org, mod,
+            (fromSplit && toSplit) ? PieceEdit.Place.MID
+                                   : fromSplit ? PieceEdit.Place.TAIL
+                                               : PieceEdit.Place.HEAD);
         pushToUndo(applyEdit(edit), false);
         length -= len;
     }
@@ -132,28 +135,31 @@ public class PieceTable {
         return pieces.bytes(startPos, endPos).get();
     }
 
-    public int[] undo() {
+
+    public Edited undo() {
+        Edited edited = Edited.empty;
         if (!undo.isEmpty()) {
-            PieceEdit edit = undo.pop();
-            redo.push(applyEdit(edit));
-            length += edit.totalModLength() - edit.totalOrgLength();
-            return asRange(edit);
+            PieceEdit pieceEdit = undo.pop();
+            redo.push(applyEdit(pieceEdit));
+            length += pieceEdit.totalModLength() - pieceEdit.totalOrgLength();
+            return asEdited(pieceEdit);
         }
-        return new int[0];
+        return edited;
     }
 
     public int undoSize() {
         return undo.size();
     }
 
-    public int[] redo() {
+
+    public Edited redo() {
         if (!redo.isEmpty()) {
-            PieceEdit edit = redo.pop();
-            pushToUndo(applyEdit(edit), true);
-            length += edit.totalModLength() - edit.totalOrgLength();
-            return asRange(edit);
+            PieceEdit pieceEdit = redo.pop();
+            pushToUndo(applyEdit(pieceEdit), true);
+            length += pieceEdit.totalModLength() - pieceEdit.totalOrgLength();
+            return asEdited(pieceEdit);
         }
-        return new int[0];
+        return Edited.empty;
     }
 
     private void pushToUndo(PieceEdit edit, boolean readyForRedo) {
@@ -171,13 +177,24 @@ public class PieceTable {
         return edit.flip();
     }
 
+    private Edited asEdited(PieceEdit edit) {
+
+        int from = 0;
+        for (int i = 0; i < edit.index(); i++) {
+            Piece p = pieces.get(i);
+            from += p.length();
+        }
+        return edit.asEdited(from);
+    }
+
     private int btoi(boolean bool) {
         return bool ? 1 : 0;
     }
 
+
     public void write(Path path) {
         try (FileChannel channel = FileChannel.open(path,
-                StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+            StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
             int size = pieces.writeTo(channel);
             channel.truncate(size);
         } catch (IOException e) {
@@ -195,102 +212,6 @@ public class PieceTable {
         //     }
         // }
     }
-
-    // -- just insert
-    //  org     mod
-    //         |+++|
-    //
-    // -- split insert
-    //  org     mod
-    // |---|   |---|
-    //         |+++|
-    //         |---|
-    //
-    // -- just delete
-    //  org     mod
-    // |---|
-    //
-    // -- head delete
-    //  org     mod
-    // |---|   |+++|
-    // |+++|
-    //
-    // -- tail delete
-    //  org     mod
-    // |+++|   |+++|
-    // |---|
-    //
-    // -- split delete
-    //  org     mod
-    // |+++|   |+++|
-    // |---|
-    // |+++|   |+++|
-    //
-    private int[] asRange(PieceEdit edit) {
-
-        int from = 0;
-        for (int i = 0; i < edit.index(); i++) {
-            Piece p = pieces.get(i);
-            from += p.length();
-        }
-
-        if (edit.totalOrgLength() < edit.totalModLength()) {
-            // insert
-            int len = edit.totalModLength() - edit.totalOrgLength();
-            if (edit.orgSize() == 0) {
-                // just insert or revert just delete
-                return new int[] { from, from + len };
-            }
-            if (edit.orgSize() == 1 && edit.modSize() == 3 && edit.place() == PieceEdit.Place.MID) {
-                // split insert
-                from += edit.mod()[0].length();
-                return new int[] { from, from + len };
-            }
-            if (edit.orgSize() == 1 && edit.place() == PieceEdit.Place.HEAD) {
-                // revert head delete
-                return new int[] { from, from + len };
-            }
-            if (edit.orgSize() == 1 && edit.place() == PieceEdit.Place.TAIL) {
-                // revert tail delete
-                from += edit.org()[0].length();
-                return new int[] { from, from + len };
-            }
-            if (edit.orgSize() == 2 && edit.place() == PieceEdit.Place.MID) {
-                // revert split delete
-                from += edit.org()[0].length();
-                return new int[] { from, from + len };
-            }
-        }
-
-        if (edit.totalOrgLength() > edit.totalModLength()) {
-            int len = edit.totalOrgLength() - edit.totalModLength();
-            if (edit.modSize() == 0) {
-                // revert just insert or just delete
-                return new int[] { from, from + edit.totalOrgLength() };
-            }
-            if (edit.modSize() == 1 && edit.orgSize() == 3 && edit.place() == PieceEdit.Place.MID) {
-                // revert split insert
-                from += edit.org()[0].length();
-                return new int[] { from, from + edit.totalOrgLength() };
-            }
-            if (edit.modSize() == 1 && edit.place() == PieceEdit.Place.HEAD) {
-                // head delete
-                return new int[] { from, from + len };
-            }
-            if (edit.modSize() == 1 && edit.place() == PieceEdit.Place.TAIL) {
-                // tail delete
-                from += edit.mod()[0].length();
-                return new int[] { from, from + len };
-            }
-            if (edit.modSize() == 2 && edit.place() == PieceEdit.Place.MID) {
-                // split delete
-                from += edit.mod()[0].length();
-                return new int[] { from, from + len };
-            }
-        }
-        return new int[0];
-    }
-
 
     @Override
     public String toString() {

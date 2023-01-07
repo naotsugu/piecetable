@@ -1,5 +1,6 @@
 package com.mammb.code.editor;
 
+import com.mammb.code.piecetable.Edited;
 import com.mammb.code.piecetable.PieceTable;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -7,7 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class PtContent implements Content {
+public class ContentImpl implements Content {
 
     private static final int bufferChars = 256;
 
@@ -19,11 +20,11 @@ public class PtContent implements Content {
     private int bufferTailPos = -1;
 
 
-    public PtContent(PieceTable pt) {
+    public ContentImpl(PieceTable pt) {
         this.pt = pt;
     }
 
-    public PtContent() {
+    public ContentImpl() {
         this(PieceTable.of(""));
     }
 
@@ -127,10 +128,10 @@ public class PtContent implements Content {
     }
 
     @Override
-    public int[] undo() {
-        int[] ret = pt.undo();
-        if (ret.length > 1 && ret[0] < bufferTailPos) clearBuffer();
-        return ret;
+    public Edited undo() {
+        Edited edited = pt.undo();
+        if (!edited.isEmpty() && edited.pos() < bufferTailPos) clearBuffer();
+        return edited;
     }
 
     @Override
@@ -139,10 +140,10 @@ public class PtContent implements Content {
     }
 
     @Override
-    public int[] redo() {
-        int[] ret = pt.redo();
-        if (ret.length > 1 && ret[0] < bufferTailPos) clearBuffer();
-        return ret;
+    public Edited redo() {
+        Edited edited = pt.redo();
+        if (!edited.isEmpty() && edited.pos() < bufferTailPos) clearBuffer();
+        return edited;
     }
 
 
