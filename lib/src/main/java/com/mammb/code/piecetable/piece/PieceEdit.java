@@ -15,19 +15,18 @@ import java.util.Objects;
  * @param mod The modified pieces
  * @param place
  */
-public record PieceEdit(EditType type, int index, Piece[] org, Piece[] mod, Place place) {
+public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
 
     public enum Place { HEAD, MID, TAIL }
 
     public PieceEdit {
-        Objects.requireNonNull(type);
         Objects.requireNonNull(org);
         Objects.requireNonNull(mod);
         Objects.requireNonNull(place);
     }
 
     public PieceEdit flip() {
-        return new PieceEdit(type.flip(), index, mod, org, place);
+        return new PieceEdit(index, mod, org, place);
     }
 
     public int totalOrgLength() {

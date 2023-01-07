@@ -85,7 +85,6 @@ public class ScrollBar extends StackPane {
     private void handleThumbDragged(MouseEvent e) {
 
         if (e.isSynthesized()) {
-            // touch-screen events handled by Scroll handler
             e.consume();
             return;
         }
@@ -126,6 +125,7 @@ public class ScrollBar extends StackPane {
         thumb.setFill(Colors.thumbActiveColor);
     }
 
+
     private void markThumbEnd(MouseEvent e) {
         dragStart = null;
         dragStartRowIndex = -1;
@@ -135,7 +135,6 @@ public class ScrollBar extends StackPane {
 
     private void applyThumbHeight() {
         thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
-        setVisible(thumb.getHeight() * 1.05 < getHeight());
     }
 
 

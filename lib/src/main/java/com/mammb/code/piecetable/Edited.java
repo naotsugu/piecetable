@@ -31,12 +31,4 @@ public record Edited(EditType type, int pos, int len, byte[] bytes) {
         return type.isNil();
     }
 
-    public byte[] insertedContent() {
-        return isInserted() ? bytes : new byte[0];
-    }
-
-    public byte[] deletedContent() {
-        return isDeleted() ? bytes : new byte[0];
-    }
-
 }

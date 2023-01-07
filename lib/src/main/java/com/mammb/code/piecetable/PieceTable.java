@@ -65,7 +65,6 @@ public class PieceTable {
         PiecePoint point = pieces.at(pos);
         if (point.position() == pos) {
             PieceEdit edit = new PieceEdit(
-                    EditType.INS,
                     point.index(),
                     new Piece[0],
                     new Piece[] { newPiece },
@@ -75,7 +74,6 @@ public class PieceTable {
             Piece piece = pieces.get(point.index());
             Piece.Pair pair = piece.split(pos - point.position());
             PieceEdit edit = new PieceEdit(
-                    EditType.INS,
                     point.index(),
                     new Piece[] { piece },
                     new Piece[] { pair.left(), newPiece, pair.right() },
@@ -115,7 +113,7 @@ public class PieceTable {
             mod[btoi(fromSplit)] = org[org.length - 1].split(pos + len - to.position()).right();
         }
 
-        PieceEdit edit = new PieceEdit(EditType.DEL, from.index(), org, mod,
+        PieceEdit edit = new PieceEdit(from.index(), org, mod,
             (fromSplit && toSplit) ? PieceEdit.Place.MID
                                    : fromSplit ? PieceEdit.Place.TAIL
                                                : PieceEdit.Place.HEAD);

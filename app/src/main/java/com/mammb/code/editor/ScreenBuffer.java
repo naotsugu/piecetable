@@ -42,6 +42,7 @@ public class ScreenBuffer {
         screenRowSize.addListener(this::updateScrollMaxLines);
     }
 
+
     public void open(Path path) {
         content.open(path);
         totalLines.set(content.lineCount());
@@ -488,7 +489,7 @@ public class ScreenBuffer {
      * |c|o|n|t|e|n|t|$
      *         |     L caretLineCharLength
      *         └ caretLineCharOffset
-     *         │<-3->│ caretLineCharRemaining
+     *         |<-3->| caretLineCharRemaining
      * </pre>
      */
     public int caretLineCharRemaining() {
@@ -500,7 +501,7 @@ public class ScreenBuffer {
      * |c|o|n|t|e|n|t|$
      *         |       |
      *         └ caretLineCharOffset
-     *         │<- 4 ->│ caretLineRemaining
+     *         |<- 4 ->| caretLineRemaining
      * </pre>
      */
     public int caretLineRemaining() {
@@ -510,12 +511,12 @@ public class ScreenBuffer {
     /**
      * <pre>
      * |c|o|n|t|e|n|t|$
-     * │<-    7    ->│ caretLineCharLength
+     * |<-    7    ->| caretLineCharLength
      *                 ignore LF
      * </pre>
      * <pre>
      * |c|o|n|t|e|n|t|
-     * │<-    7    ->│ caretLineCharLength
+     * |<-    7    ->| caretLineCharLength
      * </pre>
      */
     public int caretLineCharLength() {

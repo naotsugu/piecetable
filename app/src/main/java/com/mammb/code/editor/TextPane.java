@@ -9,9 +9,7 @@ import javafx.scene.Cursor;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -150,7 +148,7 @@ public class TextPane extends Region {
 
 
     void handleCaretMoved(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.charCountOnScreen() ) {
+        if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.charCountOnScreen()) {
             caret.disable();
         } else {
             caret.setShape(textFlow.caretShape(newValue.intValue(), true));
