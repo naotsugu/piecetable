@@ -12,4 +12,6 @@ public class Colors {
     public static final Color thumbColor = Color.web("#626465", 0.5);
     public static final Color thumbActiveColor = Color.web("#828485", 0.9);
 
+    public static final Color hTtrackColor = Color.web("#3c3f41");
+
 }

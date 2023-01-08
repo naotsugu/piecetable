@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
@@ -30,6 +31,7 @@ public class TextPane extends Region {
     private final Selection selection;
     private final ImePalette imePalette;
     private final ScrollBar vScroll;
+    private final HScrollBar hScroll;
 
     public TextPane(Stage stage) {
 
@@ -70,10 +72,14 @@ public class TextPane extends Region {
         setOnInputMethodTextChanged(imePalette::handleInputMethod);
 
         BorderPane pane = new BorderPane();
+        pane.prefHeightProperty().bind(heightProperty());
+        pane.prefWidthProperty().bind(widthProperty());
+
         Pane main = new Pane(textFlow, caret, selection, imePalette);
         main.setCursor(Cursor.TEXT);
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
+
         pane.setLeft(left);
         pane.setCenter(main);
         getChildren().add(pane);
@@ -82,21 +88,26 @@ public class TextPane extends Region {
             if (oldValue.getHeight() != newValue.getHeight()) {
                 initScreenRowSize(newValue.getHeight());
             }
-            if (oldValue.getWidth() != newValue.getWidth()) {
-                textFlow.setPrefWidth(newValue.getWidth() - left.getPrefWidth());
-            }
         });
-
         initScreenRowSize(getLayoutBounds().getHeight());
         initDropTarget();
 
+        hScroll = new HScrollBar(screenBuffer);
+        hScroll.layoutYProperty().bind(heightProperty().subtract(hScroll.getHeight() + 2));
+        hScroll.prefWidthProperty().bind(widthProperty());
+        hScroll.thumbLengthProperty().bind(widthProperty());
+        hScroll.maxProperty().bind(textFlow.widthProperty());
+        hScroll.visibleProperty().bind(widthProperty().lessThan(textFlow.widthProperty()));
+        getChildren().add(hScroll);
+
         vScroll = new ScrollBar(screenBuffer);
         vScroll.layoutXProperty().bind(widthProperty().subtract(vScroll.getWidth() + 2));
-        vScroll.prefHeightProperty().bind(heightProperty());
+        vScroll.prefHeightProperty().bind(main.heightProperty().subtract(hScroll.getHeight()));
         vScroll.thumbLengthProperty().bind(screenBuffer.screenRowSizeProperty());
         vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
         vScroll.maxProperty().bind(screenBuffer.scrollMaxLinesProperty());
         getChildren().add(vScroll);
+
 
     }
 
@@ -107,7 +118,8 @@ public class TextPane extends Region {
     }
 
     private void initScreenRowSize(double height) {
-        screenBuffer.setupScreenRowSize((int) Math.ceil(height / lineHeight));
+
+        screenBuffer.setupScreenRowSize(Math.max((int) Math.ceil(height / lineHeight), 1));
     }
 
     private void initDropTarget() {
