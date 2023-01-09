@@ -277,10 +277,15 @@ public class ScreenBuffer {
         String deleteString = peekString(caretIndex, caretIndex + len);
         String[] deleteLines = Strings.splitLine(deleteString);
 
+        int deleteLineCount = deleteLines.length - 1;
+        if (deleteLineCount > 0) {
+            // Pre-supply the number of rows to be deleted
+            fitRows(getScreenRowSize() + deleteLineCount);
+        }
         content.delete(caretIndex, len);
-        totalLines.set(getTotalLines() + 1 - deleteLines.length);
+        totalLines.set(getTotalLines() - deleteLineCount);
 
-        if (deleteLines.length == 1) {
+        if (deleteLineCount == 0) {
             // simple inline delete
             //  a|b c d $  ->  del:[b c]  ->  a|d $
             String line = rows.get(caretOffsetY);
@@ -290,10 +295,6 @@ public class ScreenBuffer {
 
         } else {
             // multi rows delete
-            int deleteLineCount = deleteLines.length - 1;
-            // Pre-supply the number of rows to be deleted
-            fitRows(getScreenRowSize() + deleteLineCount);
-
             // +-------+ prefix
             //  x x x x|- -          ->    x x x x|x x x
             //  - - - - - -
