@@ -71,15 +71,13 @@ public class TextPane extends Region {
         setOnInputMethodTextChanged(imePalette::handleInputMethod);
 
         BorderPane pane = new BorderPane();
+        pane.prefHeightProperty().bind(heightProperty());
+        pane.prefWidthProperty().bind(widthProperty());
 
         StackPane textStack = new StackPane(textFlow, caret, selection, imePalette);
         textStack.setFocusTraversable(true);
         textStack.setCursor(Cursor.TEXT);
-        textStack.prefHeightProperty().bind(heightProperty());
-        textStack.prefWidthProperty().bind(widthProperty());
-
         Pane main = new Pane(textStack);
-
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
 
@@ -98,12 +96,10 @@ public class TextPane extends Region {
         hScroll = new HScrollBar(screenBuffer);
         hScroll.layoutYProperty().bind(heightProperty().subtract(hScroll.getHeight()));
         hScroll.prefWidthProperty().bind(widthProperty());
-        hScroll.thumbLengthProperty().bind(widthProperty());
+        hScroll.thumbLengthProperty().bind(widthProperty().subtract(left.widthProperty()));
         hScroll.maxProperty().bind(textFlow.widthProperty());
-        hScroll.visibleProperty().bind(widthProperty().lessThan(textFlow.widthProperty()));
+        hScroll.visibleProperty().bind(widthProperty().subtract(left.widthProperty()).lessThan(textFlow.widthProperty()));
         textStack.layoutXProperty().bind(hScroll.valueProperty().multiply(-1));
-
-
         getChildren().add(hScroll);
 
         vScroll = new ScrollBar(screenBuffer);
@@ -380,11 +376,17 @@ public class TextPane extends Region {
             return;
         }
         if (selection.getOpen() < selection.getClose()) {
-            screenBuffer.backSpace(selection.getClose() - selection.getOpen());
+            int len = selection.getClose() - selection.getOpen();
+            int open = selection.getOpen();
+            selection.clear();
+            screenBuffer.moveCaret(open);
+            screenBuffer.delete(len);
+
         } else if (selection.getOpen() > selection.getClose()) {
-            screenBuffer.delete(selection.getOpen() - selection.getClose());
+            int len = selection.getOpen() - selection.getClose();
+            selection.clear();
+            screenBuffer.delete(len);
         }
-        selection.clear();
     }
 
 
