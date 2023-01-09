@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -52,6 +53,7 @@ public class HScrollBar extends Region {
         thumbLength.addListener((observable, oldValue, newValue) -> applyThumbWidth());
         max.addListener((observable, oldValue, newValue) -> applyThumbWidth());
 
+        setOnMouseClicked(this::handleTruckClicked);
     }
 
     private void applyThumbWidth() {
@@ -112,6 +114,22 @@ public class HScrollBar extends Region {
         dragStart = null;
         thumb.setFill(Colors.thumbColor);
     }
+
+    private void handleTruckClicked(MouseEvent e) {
+
+        if (e.isSynthesized()) {
+            e.consume();
+            return;
+        }
+
+        if (e.getX() < thumb.getX() ) {
+            value.setValue(clamp(getMin(), value.getValue() - thumbLength.get(), getMax()));
+        } else if (e.getX() > thumb.getX() + thumb.getWidth()) {
+            value.setValue(clamp(getMin(), value.getValue() + thumbLength.get(), getMax()));
+        }
+        e.consume();
+    }
+
 
     private static double clamp(double min, double value, double max) {
         return Math.min(Math.max(value, min), max);

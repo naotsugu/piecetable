@@ -6,10 +6,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 import java.io.File;
@@ -73,12 +71,15 @@ public class TextPane extends Region {
         setOnInputMethodTextChanged(imePalette::handleInputMethod);
 
         BorderPane pane = new BorderPane();
-        pane.prefHeightProperty().bind(heightProperty());
-        pane.prefWidthProperty().bind(widthProperty());
 
         StackPane textStack = new StackPane(textFlow, caret, selection, imePalette);
+        textStack.setFocusTraversable(true);
+        textStack.setCursor(Cursor.TEXT);
+        textStack.prefHeightProperty().bind(heightProperty());
+        textStack.prefWidthProperty().bind(widthProperty());
+
         Pane main = new Pane(textStack);
-        main.setCursor(Cursor.TEXT);
+
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
 
@@ -108,7 +109,7 @@ public class TextPane extends Region {
         vScroll = new ScrollBar(screenBuffer);
         vScroll.layoutXProperty().bind(widthProperty().subtract(vScroll.getWidth() + 2));
         vScroll.prefHeightProperty().bind(main.heightProperty().subtract(hScroll.getHeight()));
-        vScroll.thumbLengthProperty().bind(screenBuffer.screenRowSizeProperty());
+        vScroll.thumbLengthProperty().bind(screenBuffer.screenRowSizeProperty().subtract(hScroll.getHeight()));
         vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
         vScroll.maxProperty().bind(screenBuffer.scrollMaxLinesProperty());
         getChildren().add(vScroll);
