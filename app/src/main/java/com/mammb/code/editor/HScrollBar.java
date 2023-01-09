@@ -2,7 +2,10 @@ package com.mammb.code.editor;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Region;
@@ -13,6 +16,7 @@ public class HScrollBar extends Region {
     private final ScreenBuffer screenBuffer;
     private final double HEIGHT = 8;
     private final Rectangle thumb;
+    private Point2D dragStart;
 
     private final DoubleProperty min = new SimpleDoubleProperty(0);
     private final DoubleProperty max = new SimpleDoubleProperty(0);
@@ -27,6 +31,7 @@ public class HScrollBar extends Region {
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
         setBackground(new Background(new BackgroundFill(Colors.hTtrackColor, null, null)));
         setHeight(HEIGHT + 4);
+        setPrefHeight(HEIGHT + 4);
 
         this.thumb = new Rectangle(0, HEIGHT);
         this.thumb.setY(2);
@@ -36,6 +41,14 @@ public class HScrollBar extends Region {
         this.thumb.setManaged(false);
         getChildren().add(thumb);
 
+        setOnMouseEntered(e -> thumb.setFill(Colors.thumbActiveColor));
+        setOnMouseExited(e  -> { if(dragStart == null) thumb.setFill(Colors.thumbColor); });
+
+        thumb.setOnMousePressed(this::handleThumbMousePressed);
+        thumb.setOnMouseReleased(this::handleThumbMouseReleased);
+        thumb.setOnMouseDragged(this::handleThumbDragged);
+
+        value.addListener(this::handleValueChanged);
         thumbLength.addListener((observable, oldValue, newValue) -> applyThumbWidth());
         max.addListener((observable, oldValue, newValue) -> applyThumbWidth());
 
@@ -46,6 +59,63 @@ public class HScrollBar extends Region {
         thumb.setWidth(getWidth() * thumbLength.get() / Math.max(len, thumbLength.get()));
     }
 
+    private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        double len = getMax() - getMin();
+        double range = getWidth() - thumb.getWidth();
+        double x = range * clamp(getMin(), newValue.doubleValue(), getMax()) / len;
+        thumb.setX(clamp(0, x, range));
+    }
+
+    private void handleThumbDragged(MouseEvent e) {
+        if (e.isSynthesized()) {
+            e.consume();
+            return;
+        }
+
+        Point2D cur = thumb.localToParent(e.getX(), e.getY());
+        if (dragStart == null) {
+            markThumbStart(e);
+        }
+        double len = getMax() - getMin();
+        double x = getMin() + len * (cur.getX() - dragStart.getX()) / (getWidth() - thumb.getWidth());
+        value.setValue(clamp(getMin(), x, getMax()));
+        e.consume();
+    }
+
+
+    private void handleThumbMousePressed(MouseEvent e) {
+        if (e.isSynthesized()) {
+            e.consume();
+            return;
+        }
+        markThumbStart(e);
+        e.consume();
+    }
+
+
+    private void handleThumbMouseReleased(MouseEvent e) {
+        if (e.isSynthesized()) {
+            e.consume();
+            return;
+        }
+        markThumbEnd(e);
+    }
+
+
+    private void markThumbStart(MouseEvent e) {
+        dragStart = thumb.localToParent(e.getX(), e.getY());
+        thumb.setFill(Colors.thumbActiveColor);
+    }
+
+
+    private void markThumbEnd(MouseEvent e) {
+        dragStart = null;
+        thumb.setFill(Colors.thumbColor);
+    }
+
+    private static double clamp(double min, double value, double max) {
+        return Math.min(Math.max(value, min), max);
+    }
 
     // <editor-fold desc="properties">
 

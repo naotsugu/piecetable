@@ -9,6 +9,7 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 import java.io.File;
@@ -75,13 +76,14 @@ public class TextPane extends Region {
         pane.prefHeightProperty().bind(heightProperty());
         pane.prefWidthProperty().bind(widthProperty());
 
-        Pane main = new Pane(textFlow, caret, selection, imePalette);
+        StackPane textStack = new StackPane(textFlow, caret, selection, imePalette);
+        Pane main = new Pane(textStack);
         main.setCursor(Cursor.TEXT);
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
 
-        pane.setLeft(left);
         pane.setCenter(main);
+        pane.setLeft(left);
         getChildren().add(pane);
 
         layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
@@ -93,11 +95,14 @@ public class TextPane extends Region {
         initDropTarget();
 
         hScroll = new HScrollBar(screenBuffer);
-        hScroll.layoutYProperty().bind(heightProperty().subtract(hScroll.getHeight() + 2));
+        hScroll.layoutYProperty().bind(heightProperty().subtract(hScroll.getHeight()));
         hScroll.prefWidthProperty().bind(widthProperty());
         hScroll.thumbLengthProperty().bind(widthProperty());
         hScroll.maxProperty().bind(textFlow.widthProperty());
         hScroll.visibleProperty().bind(widthProperty().lessThan(textFlow.widthProperty()));
+        textStack.layoutXProperty().bind(hScroll.valueProperty().multiply(-1));
+
+
         getChildren().add(hScroll);
 
         vScroll = new ScrollBar(screenBuffer);
