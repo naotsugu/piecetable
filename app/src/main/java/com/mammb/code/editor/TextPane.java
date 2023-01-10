@@ -25,7 +25,7 @@ public class TextPane extends Region {
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
     private final ScreenBuffer screenBuffer = new ScreenBuffer();
     private final Stage stage;
-    private final TextFlow textFlow;
+    private final TextLine textFlow;
     private final Caret caret;
     private final Selection selection;
     private final ImePalette imePalette;
@@ -48,11 +48,8 @@ public class TextPane extends Region {
         setOnMouseDragged(this::handleMouseDragged);
         setOnKeyTyped(this::handleInput);
 
-        textFlow = new TextFlow();
-        textFlow.setTabSize(4);
+        textFlow = new TextLine();
         textFlow.setPadding(new Insets(4));
-        textFlow.getChildren().addAll(texts());
-        textFlow.setMaxWidth(Double.MAX_VALUE);
 
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
@@ -147,15 +144,10 @@ public class TextPane extends Region {
     private void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
         while (change.next()) {
             if (change.wasRemoved()) {
-                textFlow.getChildren().remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
+                textFlow.remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
             }
             if (change.wasAdded()) {
-                List<Text> texts = change.getAddedSubList().stream().map(this::asText).toList();
-                double width = texts.stream().mapToDouble(Utils::getTextWidth).max().orElse(0);
-                if (width > textFlow.getPrefWidth()) {
-                    textFlow.setPrefWidth(width + 8);
-                }
-                textFlow.getChildren().addAll(change.getFrom(), texts);
+                textFlow.addAll(change.getFrom(), change.getAddedSubList());
             }
         }
     }
