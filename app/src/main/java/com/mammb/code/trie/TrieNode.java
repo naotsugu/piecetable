@@ -1,19 +1,28 @@
 package com.mammb.code.trie;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TrieNode {
 
     private final TrieNode parent;
     private final Map<Character, TrieNode> children;
-
     private List<String> tails;
-    private boolean leaf;
     private boolean endOfWord;
 
-    public TrieNode(TrieNode parent) {
-        this.parent = parent;
+
+    private TrieNode() {
+        parent = null;
+        children = new HashMap<>();
+    }
+
+    TrieNode(TrieNode parent) {
+        this.parent = Objects.requireNonNull(parent);
         this.children = new HashMap<>();
+    }
+
+    public static TrieNode root() {
+        return new TrieNode();
     }
 
     public TrieNode put(String text) {
@@ -28,6 +37,7 @@ public class TrieNode {
         if (depth > Trie.MAX_DEPTH) {
             tails = (tails == null) ? new ArrayList<>() : tails;
             tails.add(text.substring(depth));
+            endOfWord = true;
         } else {
             char ch = text.charAt(depth());
             TrieNode node = children.computeIfAbsent(ch, c -> new TrieNode(this));
@@ -47,14 +57,13 @@ public class TrieNode {
                     return this;
                 }
             }
-            return null;
         } else {
             char ch = text.charAt(depth());
             if (children.containsKey(ch)) {
                 return children.get(ch).search(text);
             }
-            return null;
         }
+        return null;
     }
 
     public boolean isRoot() {
@@ -62,7 +71,7 @@ public class TrieNode {
     }
 
     public boolean isLeaf() {
-        return tails != null;
+        return children.isEmpty();
     }
 
     public boolean isEndOfWord() {
@@ -112,7 +121,9 @@ public class TrieNode {
         char[] chars = new char[len];
         TrieNode node = this;
         while (!node.isRoot()) {
-            chars[--len] = node.key();
+            Character ch = node.key();
+            if (ch == null) throw new IllegalStateException();
+            chars[--len] = ch;
             node = node.parent;
         }
         return chars;
@@ -120,12 +131,9 @@ public class TrieNode {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("children=" + children);
-        sb.append(",tails=" + tails);
-        sb.append(",leaf=" + leaf);
-        sb.append(",endOfWord=" + endOfWord);
-        return sb.toString();
+        return isLeaf() ? text() : children.values().stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(", "));
     }
 
 }

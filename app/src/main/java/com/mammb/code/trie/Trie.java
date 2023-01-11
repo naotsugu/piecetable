@@ -1,29 +1,39 @@
 package com.mammb.code.trie;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Trie {
 
-    static final int MAX_DEPTH = 4;
+    static final int MAX_DEPTH = 5;
 
     private final TrieNode root;
 
     public Trie() {
-        this.root = new TrieNode(null);
+        this.root = TrieNode.root();
     }
 
     public void put(String text) {
         root.put(text);
     }
 
-    public TrieNode search(String text) {
-        TrieNode current = root;
-        return root.search(text);
+    public List<Range> search(String text) {
+        return new ArrayList<>();
+    }
+
+    public boolean match(String text) {
+        TrieNode ret = root.search(text);
+        return ret != null;
+    }
+
+    public boolean fullMatch(String text) {
+        TrieNode ret = root.search(text);
+        return ret != null && ret.isEndOfWord();
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("root=" + root);
-        return sb.toString();
+        return root.toString();
     }
 
 }

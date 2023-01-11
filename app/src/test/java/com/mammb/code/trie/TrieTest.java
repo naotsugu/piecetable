@@ -7,16 +7,27 @@ import static org.junit.jupiter.api.Assertions.*;
 class TrieTest {
 
     @Test
-    void test() {
+    void testMatch() {
 
         var trie = new Trie();
         trie.put("public");
         trie.put("private");
         trie.put("protected");
 
-        assertEquals("public", trie.search("public").text());
-        assertEquals("private", trie.search("private").text());
-        assertEquals("protected", trie.search("protected").text());
+        assertEquals(true, trie.match("public"));
+        assertEquals(true, trie.fullMatch("public"));
+
+        assertEquals(true, trie.match("private"));
+        assertEquals(true, trie.fullMatch("private"));
+
+        assertEquals(true, trie.match("protected"));
+        assertEquals(true, trie.fullMatch("private"));
+
+        assertEquals(true, trie.match("publi"));
+        assertEquals(false, trie.fullMatch("publi"));
+
+        assertEquals(false, trie.match("publix"));
+
     }
 
 }
