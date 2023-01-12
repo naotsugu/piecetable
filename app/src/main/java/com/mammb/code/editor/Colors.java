@@ -14,6 +14,7 @@ public class Colors {
 
     public static final Color hTtrackColor = Color.web("#3c3f41");
 
-    public static final Color kwColor = Color.ORANGE;
+    public static final Color kwColor = Color.web("#cc7832");
+
 
 }

@@ -5,8 +5,6 @@ import java.util.List;
 
 public class Trie {
 
-    static final int MAX_DEPTH = 5;
-
     private final TrieNode root;
 
     public Trie() {
@@ -17,18 +15,34 @@ public class Trie {
         root.put(text);
     }
 
-    public List<Range> search(String text) {
-        return new ArrayList<>();
-    }
-
-    public boolean match(String text) {
-        TrieNode ret = root.search(text);
+    public boolean partialMatch(String word) {
+        TrieNode ret = root.search(word);
         return ret != null;
     }
 
-    public boolean fullMatch(String text) {
-        TrieNode ret = root.search(text);
-        return ret != null && ret.isEndOfWord();
+    public boolean match(String word) {
+        TrieNode ret = root.search(word);
+        return ret != null && (ret.isEndOfWord() || ret.length() == word.length());
+    }
+
+    public List<Range> matchWords(String text) {
+        List<Range> ranges = new ArrayList<>();
+        int offset = 0;
+        boolean skip = false;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            boolean isLetterOrDigit = Character.isLetterOrDigit(ch);
+            if (i != 0 && !isLetterOrDigit && !skip) {
+                if (match(text.substring(offset, i))) {
+                    ranges.add(new Range(offset, i));
+                }
+            }
+            if (!isLetterOrDigit) {
+                offset = i + 1;
+            }
+            skip = !isLetterOrDigit;
+        }
+        return ranges;
     }
 
     @Override

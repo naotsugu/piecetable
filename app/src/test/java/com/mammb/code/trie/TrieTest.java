@@ -2,9 +2,46 @@ package com.mammb.code.trie;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TrieTest {
+
+    @Test
+    void testPartialMatch() {
+
+        var trie = new Trie();
+        trie.put("public");
+        trie.put("private");
+        trie.put("protected");
+
+        assertEquals(true, trie.partialMatch("public"));
+        assertEquals(true, trie.partialMatch("private"));
+        assertEquals(true, trie.partialMatch("protected"));
+
+        assertEquals(false, trie.partialMatch("apublic"));
+        assertEquals(false, trie.partialMatch("pubalic"));
+        assertEquals(false, trie.partialMatch("publica"));
+        assertEquals(false, trie.partialMatch("ublic"));
+        assertEquals(false, trie.partialMatch("pubic"));
+        assertEquals(true,  trie.partialMatch("publi"));
+
+        assertEquals(false, trie.partialMatch("aprotected"));
+        assertEquals(false, trie.partialMatch("protaected"));
+        assertEquals(false, trie.partialMatch("protecteda"));
+        assertEquals(false, trie.partialMatch("rotected"));
+        assertEquals(false, trie.partialMatch("proected"));
+        assertEquals(true,  trie.partialMatch("protecte"));
+
+        assertEquals(true, trie.partialMatch("publi"));
+        assertEquals(true, trie.partialMatch("publ"));
+        assertEquals(true, trie.partialMatch("pub"));
+        assertEquals(true, trie.partialMatch("pu"));
+        assertEquals(true, trie.partialMatch("p"));
+        assertEquals(true, trie.partialMatch(""));
+
+    }
 
     @Test
     void testMatch() {
@@ -15,18 +52,58 @@ class TrieTest {
         trie.put("protected");
 
         assertEquals(true, trie.match("public"));
-        assertEquals(true, trie.fullMatch("public"));
-
         assertEquals(true, trie.match("private"));
-        assertEquals(true, trie.fullMatch("private"));
-
         assertEquals(true, trie.match("protected"));
-        assertEquals(true, trie.fullMatch("private"));
 
-        assertEquals(true, trie.match("publi"));
-        assertEquals(false, trie.fullMatch("publi"));
+        assertEquals(false, trie.match("apublic"));
+        assertEquals(false, trie.match("pubalic"));
+        assertEquals(false, trie.match("publica"));
+        assertEquals(false, trie.match("ublic"));
+        assertEquals(false, trie.match("pubic"));
+        assertEquals(false,  trie.match("publi"));
 
-        assertEquals(false, trie.match("publix"));
+        assertEquals(false, trie.match("aprotected"));
+        assertEquals(false, trie.match("protaected"));
+        assertEquals(false, trie.match("protecteda"));
+        assertEquals(false, trie.match("rotected"));
+        assertEquals(false, trie.match("proected"));
+        assertEquals(false,  trie.match("protecte"));
+
+        assertEquals(false, trie.match("publi"));
+        assertEquals(false, trie.match("publ"));
+        assertEquals(false, trie.match("pub"));
+        assertEquals(false, trie.match("pu"));
+        assertEquals(false, trie.match("p"));
+        assertEquals(false, trie.match(""));
+
+    }
+
+    @Test
+    void testMatchWords() {
+        var trie = new Trie();
+        trie.put("public");
+        trie.put("private");
+        trie.put("protected");
+        trie.put("static");
+        trie.put("void");
+
+        List<Range> ranges = trie.matchWords("public static void main(String.. args) {");
+
+        // public static void main(String.. args) {
+        // 0123456789
+        //           0123456789
+        //                     0123456789
+
+        assertEquals(3, ranges.size());
+
+        assertEquals(0, ranges.get(0).start());
+        assertEquals(6, ranges.get(0).endExclusive());
+
+        assertEquals(7, ranges.get(1).start());
+        assertEquals(13, ranges.get(1).endExclusive());
+
+        assertEquals(14, ranges.get(2).start());
+        assertEquals(18, ranges.get(2).endExclusive());
 
     }
 

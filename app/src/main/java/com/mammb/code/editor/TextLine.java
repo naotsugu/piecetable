@@ -1,5 +1,7 @@
 package com.mammb.code.editor;
 
+import com.mammb.code.syntax.Java;
+import com.mammb.code.trie.Range;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -15,7 +17,7 @@ public class TextLine extends TextFlow {
     public TextLine() {
         setTabSize(4);
         setMaxWidth(Double.MAX_VALUE);
-        add("");
+        add(" ");
     }
 
     public void add(String text) {
@@ -56,19 +58,18 @@ public class TextLine extends TextFlow {
 
 
     private List<Text> asTexts(String string) {
-        // temp
+
         List<Text> list = new ArrayList<>();
-        int index = string.indexOf("public");
-        if (index >= 0) {
-            if (index > 0) {
-                list.add(asText(string.substring(0, index)));
+        int offset = 0;
+        for (Range range : Java.keywordRangeOf(string)) {
+            if (offset != range.start()) {
+                list.add(asText(string.substring(offset, range.start())));
             }
-            list.add(asText(string.substring(index, index + "public".length()), Colors.kwColor));
-            if (index + "public".length() < string.length()) {
-                list.add(asText(string.substring(index + "public".length())));
-            }
-        } else {
-            list.add(asText(string));
+            list.add(asText(string.substring(range.start(), range.endExclusive()), Colors.kwColor));
+            offset = range.endExclusive();
+        }
+        if (offset < string.length()) {
+            list.add(asText(string.substring(offset)));
         }
         return list;
     }
@@ -83,10 +84,14 @@ public class TextLine extends TextFlow {
     }
 
     private void fitPrefWidth(List<Text> texts) {
-        double width = texts.stream().mapToDouble(Utils::getTextWidth).sum();
+        double width = Fonts.main.getSize() * texts.stream().mapToInt(text -> text.getText().length()).sum();
         if (width > getPrefWidth()) {
-            setPrefWidth(width + 8);
+            setPrefWidth(width + Fonts.main.getSize());
         }
+//        double width = texts.stream().mapToDouble(Utils::getTextWidth).sum();
+//        if (width > getPrefWidth()) {
+//            setPrefWidth(width + 8);
+//        }
     }
 
 }
