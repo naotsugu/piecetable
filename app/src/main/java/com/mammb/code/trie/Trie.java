@@ -45,6 +45,15 @@ public class Trie {
         return ranges;
     }
 
+    public void delete(String word) {
+        TrieNode find = root.search(word);
+        if (find == null ||
+            !(find.isEndOfWord() || find.length() == word.length())) {
+            return;
+        }
+        find.delete();
+    }
+
     @Override
     public String toString() {
         return root.toString();

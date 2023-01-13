@@ -107,4 +107,39 @@ class TrieTest {
 
     }
 
+    @Test
+    void testDelete() {
+        var trie = new Trie();
+        trie.put("public");
+        trie.put("protected");
+        trie.put("void");
+
+        assertEquals(true, trie.match("public"));
+        assertEquals(true, trie.match("protected"));
+        assertEquals(true, trie.match("void"));
+
+        trie.delete("protected");
+        assertEquals(true, trie.match("public"));
+        assertEquals(false, trie.match("protected"));
+        assertEquals(true, trie.match("void"));
+
+        trie.delete("public");
+        assertEquals(false, trie.match("public"));
+        assertEquals(false, trie.match("protected"));
+        assertEquals(true, trie.match("void"));
+
+        trie.delete("void");
+        assertEquals(false, trie.match("public"));
+        assertEquals(false, trie.match("protected"));
+        assertEquals(false, trie.match("void"));
+
+        trie.put("public");
+        trie.put("protected");
+        trie.put("void");
+        assertEquals(true, trie.match("public"));
+        assertEquals(true, trie.match("protected"));
+        assertEquals(true, trie.match("void"));
+
+    }
+
 }

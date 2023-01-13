@@ -76,6 +76,29 @@ public class TrieNode {
         return null;
     }
 
+
+    void delete() {
+        if (isRoot()) {
+            return;
+        }
+        if (children.isEmpty()) {
+            parent.delete(key());
+        } else {
+            endOfWord = false;
+        }
+    }
+
+    private void delete(Character key) {
+        if (key == null) {
+            return;
+        }
+        children.remove(key);
+        if (!isRoot() && children.isEmpty()) {
+            parent.delete(key());
+
+        }
+    }
+
     public boolean isRoot() {
         return parent == null;
     }
