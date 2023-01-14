@@ -1,7 +1,6 @@
 package com.mammb.code.editor;
 
-import com.mammb.code.syntax.Java;
-import com.mammb.code.trie.Range;
+import com.mammb.code.syntax.Highlighter;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
@@ -12,15 +11,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 public class TextLine extends TextFlow {
 
     private List<List<Text>> lines = new ArrayList<>();
     private double textWidth = Utils.getTextWidth(Fonts.main, 1);
+    private Highlighter highlighter;
 
     public TextLine() {
+
+        highlighter = Highlighter.of("");
+
         setTabSize(4);
-        setBackground(new Background(new BackgroundFill(Color.BROWN, null, null)));
         setMaxWidth(Double.MAX_VALUE);
         add(" ");
     }
@@ -62,21 +63,8 @@ public class TextLine extends TextFlow {
     }
 
 
-    private List<Text> asTexts(String string) {
-
-        List<Text> list = new ArrayList<>();
-        int offset = 0;
-        for (Range range : Java.keywordRangeOf(string)) {
-            if (offset != range.start()) {
-                list.add(asText(string.substring(offset, range.start())));
-            }
-            list.add(asText(string.substring(range.start(), range.endExclusive()), Colors.kwColor));
-            offset = range.endExclusive();
-        }
-        if (offset < string.length()) {
-            list.add(asText(string.substring(offset)));
-        }
-        return list;
+    private List<Text> asTexts(String text) {
+        return highlighter.asPaintRange(text).stream().map(p -> asText(p.text(), p.paint())).toList();
     }
 
 
