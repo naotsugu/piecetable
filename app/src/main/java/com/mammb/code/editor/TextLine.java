@@ -2,6 +2,9 @@ package com.mammb.code.editor;
 
 import com.mammb.code.syntax.Java;
 import com.mammb.code.trie.Range;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -13,9 +16,11 @@ import java.util.List;
 public class TextLine extends TextFlow {
 
     private List<List<Text>> lines = new ArrayList<>();
+    private double textWidth = Utils.getTextWidth(Fonts.main, 1);
 
     public TextLine() {
         setTabSize(4);
+        setBackground(new Background(new BackgroundFill(Color.BROWN, null, null)));
         setMaxWidth(Double.MAX_VALUE);
         add(" ");
     }
@@ -84,14 +89,10 @@ public class TextLine extends TextFlow {
     }
 
     private void fitPrefWidth(List<Text> texts) {
-        double width = Fonts.main.getSize() * texts.stream().mapToInt(text -> text.getText().length()).sum();
+        double width = textWidth * (texts.stream().mapToInt(text -> text.getText().length()).sum() + 2);
         if (width > getPrefWidth()) {
-            setPrefWidth(width + Fonts.main.getSize());
+            setPrefWidth(width);
         }
-//        double width = texts.stream().mapToDouble(Utils::getTextWidth).sum();
-//        if (width > getPrefWidth()) {
-//            setPrefWidth(width + 8);
-//        }
     }
 
 }

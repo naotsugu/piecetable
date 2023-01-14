@@ -1,5 +1,6 @@
 package com.mammb.code.editor;
 
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -54,12 +55,11 @@ public class TextPane extends Region {
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
         caret.setLayoutY(textFlow.getPadding().getTop());
+        caret.setShape(textFlow.caretShape(0, true));
 
         screenBuffer.caretOffsetProperty().addListener(this::handleCaretMoved);
         screenBuffer.addListChangeListener(this::handleScreenTextChanged);
         screenBuffer.originIndexProperty().addListener(this::handleOriginMoved);
-
-        caret.setShape(textFlow.caretShape(0, true));
 
         selection = new Selection();
 
@@ -106,7 +106,6 @@ public class TextPane extends Region {
         vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
         vScroll.maxProperty().bind(screenBuffer.scrollMaxLinesProperty());
         getChildren().add(vScroll);
-
 
     }
 
