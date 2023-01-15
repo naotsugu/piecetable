@@ -11,18 +11,52 @@ import java.util.stream.Stream;
 class Java implements Highlighter {
 
     private static final String keyword = """
-    abstract continue for new switch assert default goto package synchronized boolean do if private
-    this break double implements protected throw byte else import public throws case enum instanceof
-    return transient catch extends int short try char final interface static void class finally long
-    strictfp volatile const float native super while var record sealed with yield to transitive uses""";
+    abstract,continue,for,new,switch,assert,default,goto,package,synchronized,boolean,do,if,private,
+    this,break,double,implements,protected,throw,byte,else,import,public,throws,case,enum,instanceof,
+    return,transient,catch,extends,int,short,try,char,final,interface,static,void,class,finally,long,
+    strictfp,volatile,const,float,native,super,while,var,record,sealed,with,yield,to,transitive,uses""";
 
     private static final Trie trie = new Trie();
     static {
-        Stream.of(keyword.split("\s")).forEach(trie::put);
+        Stream.of(keyword.split(",")).forEach(trie::put);
+    }
+
+    private Tags tags = new Tags();
+
+
+
+    @Override
+    public List<PaintText> apply(int line, String text) {
+
+        List<PaintText> list = new ArrayList<>();
+
+        int blockCommentStartIndex = text.indexOf("/*");
+        int blockCommentEndIndex = text.indexOf("*/");
+        if (blockCommentStartIndex > 0) {
+            tags.add(line, Tag.startOf(blockCommentStartIndex, "blockComment"));
+        }
+        if (blockCommentEndIndex > 0) {
+            tags.add(line, Tag.endOf(blockCommentEndIndex, "blockComment"));
+        }
+
+        int lineCommentIndex = text.indexOf("//");
+        if (lineCommentIndex > 0) {
+            list.addAll(applyKeyword(text.substring(0, lineCommentIndex)));
+            list.add(new PaintText(text.substring(lineCommentIndex), Colors.lineCommentColor));
+        } else {
+            list.addAll(applyKeyword(text));
+        }
+
+        return list;
     }
 
     @Override
-    public List<PaintText> asPaintRange(String text) {
+    public void remove(int line) {
+        tags.remove(line);
+    }
+
+
+    private List<PaintText> applyKeyword(String text) {
         List<PaintText> list = new ArrayList<>();
         int offset = 0;
         for (Range range : trie.matchWords(text)) {
@@ -37,4 +71,5 @@ class Java implements Highlighter {
         }
         return list;
     }
+
 }

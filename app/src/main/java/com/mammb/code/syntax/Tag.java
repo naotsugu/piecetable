@@ -7,16 +7,15 @@ public interface Tag {
     int position();
     String name();
     Tag pair();
-    void forward(int n);
-    void backward(int n);
     void link(Tag that);
     void unlink();
+    boolean isLinked();
 
-    default Tag startOf(int position, String name) {
+    static Tag startOf(int position, String name) {
         return new Start(position, name);
     }
 
-    default Tag endOf(int position, String name) {
+    static Tag endOf(int position, String name) {
         return new End(position, name);
     }
 
@@ -44,12 +43,6 @@ public interface Tag {
         public Tag pair() { return pair; }
 
         @Override
-        public void forward(int n) { position += n; }
-
-        @Override
-        public void backward(int n) { position -= n; }
-
-        @Override
         public void link(Tag that) {
             pair = that;
             if (that.pair() != this) {
@@ -64,6 +57,11 @@ public interface Tag {
                 pair = null;
                 tmp.unlink();
             }
+        }
+
+        @Override
+        public boolean isLinked() {
+            return pair != null;
         }
     }
 

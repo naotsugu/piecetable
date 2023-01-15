@@ -8,6 +8,7 @@ import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class TextLine extends TextFlow {
 
@@ -32,7 +33,7 @@ public class TextLine extends TextFlow {
 
     public void addAll(int lineNumber, int index, Collection<? extends String> texts) {
         int nodeIndex = asNodeIndex(index);
-        List<List<Text>> adding = texts.stream().map(this::asTexts).toList();
+        List<List<Text>> adding = texts.stream().map(text -> asTexts(lineNumber, text)).toList();
         lines.addAll(index, adding);
         fitPrefWidth(texts.stream().mapToInt(String::length).max().getAsInt());
         getChildren().addAll(nodeIndex, adding.stream().flatMap(Collection::stream).toList());
@@ -43,7 +44,13 @@ public class TextLine extends TextFlow {
         List<List<Text>> removing = lines.subList(from, to);
         List<Text> nodes = removing.stream().flatMap(Collection::stream).toList();
         lines.removeAll(removing);
+        IntStream.range(lineNumber, lineNumber + (to - from)).forEach(highlighter::remove);
         getChildren().removeAll(nodes);
+    }
+
+
+    private List<Text> asTexts(int line, String text) {
+        return highlighter.apply(line, text).stream().map(p -> asText(p.text(), p.paint())).toList();
     }
 
 
@@ -52,11 +59,6 @@ public class TextLine extends TextFlow {
         text.setFont(Fonts.main);
         text.setFill(paint);
         return text;
-    }
-
-
-    private List<Text> asTexts(String text) {
-        return highlighter.asPaintRange(text).stream().map(p -> asText(p.text(), p.paint())).toList();
     }
 
 

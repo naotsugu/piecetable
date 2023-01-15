@@ -15,6 +15,9 @@ public class Colors {
     public static final Color hTtrackColor = Color.web("#3c3f41");
 
     public static final Color kwColor = Color.web("#cc7832");
+    public static final Color functionColor = Color.web("#FFc66d");
+    public static final Color blockCommentColor = Color.web("#629755");
+    public static final Color lineCommentColor = Color.web("#808080");
 
 
 }

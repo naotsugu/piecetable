@@ -5,7 +5,12 @@ import java.util.List;
 
 class PassThrough implements Highlighter {
     @Override
-    public List<PaintText> asPaintRange(String text) {
+    public List<PaintText> apply(int line, String text) {
         return List.of(new PaintText(text, Colors.fgColor));
+    }
+
+    @Override
+    public void remove(int line) {
+
     }
 }
