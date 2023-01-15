@@ -1,9 +1,7 @@
 package com.mammb.code.editor;
 
 import com.mammb.code.syntax.Highlighter;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.paint.Color;
+import javafx.geometry.Insets;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -21,39 +19,33 @@ public class TextLine extends TextFlow {
 
         highlighter = Highlighter.of("");
 
+        setPadding(new Insets(4));
         setTabSize(4);
         setMaxWidth(Double.MAX_VALUE);
-        add(" ");
+        addAll(0, 0, List.of(" "));
     }
 
-    public void add(String text) {
-        List<Text> texts = asTexts(text);
-        lines.add(texts);
-        fitPrefWidth(texts);
-        getChildren().addAll(texts);
+    public void init(String contentName) {
+        highlighter = Highlighter.of(contentName);
     }
 
 
-    public void addAll(int index, Collection<? extends String> collection) {
+    public void addAll(int lineNumber, int index, Collection<? extends String> texts) {
         int nodeIndex = asNodeIndex(index);
-        List<List<Text>> adding = collection.stream().map(this::asTexts).toList();
+        List<List<Text>> adding = texts.stream().map(this::asTexts).toList();
         lines.addAll(index, adding);
-        adding.forEach(this::fitPrefWidth);
+        fitPrefWidth(texts.stream().mapToInt(String::length).max().getAsInt());
         getChildren().addAll(nodeIndex, adding.stream().flatMap(Collection::stream).toList());
     }
 
 
-    public void remove(int from, int to) {
+    public void remove(int lineNumber, int from, int to) {
         List<List<Text>> removing = lines.subList(from, to);
         List<Text> nodes = removing.stream().flatMap(Collection::stream).toList();
         lines.removeAll(removing);
         getChildren().removeAll(nodes);
     }
 
-
-    private Text asText(String string) {
-        return asText(string, Colors.fgColor);
-    }
 
     private Text asText(String string, Paint paint) {
         Text text = new Text(string);
@@ -76,8 +68,9 @@ public class TextLine extends TextFlow {
         return nodeIndex;
     }
 
-    private void fitPrefWidth(List<Text> texts) {
-        double width = textWidth * (texts.stream().mapToInt(text -> text.getText().length()).sum() + 2);
+
+    private void fitPrefWidth(int length) {
+        double width = textWidth * length + 2;
         if (width > getPrefWidth()) {
             setPrefWidth(width);
         }

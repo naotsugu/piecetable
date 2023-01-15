@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,6 @@ public class TextPane extends Region {
         setOnKeyTyped(this::handleInput);
 
         textFlow = new TextLine();
-        textFlow.setPadding(new Insets(4));
 
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
@@ -130,8 +130,13 @@ public class TextPane extends Region {
         setOnDragDropped(event -> {
             Dragboard board = event.getDragboard();
             if (board.hasFiles()) {
-                board.getFiles().stream().findFirst().map(File::toPath).ifPresent(screenBuffer::open);
-                setupStageTitle();
+                Optional<Path> maybePath = board.getFiles().stream().findFirst().map(File::toPath);
+                if (maybePath.isPresent()) {
+                    Path path = maybePath.get();
+                    textFlow.init(getExtension(path));
+                    screenBuffer.open(path);
+                    setupStageTitle();
+                }
                 event.setDropCompleted(true);
             } else {
                 event.setDropCompleted(false);
@@ -143,10 +148,16 @@ public class TextPane extends Region {
     private void handleScreenTextChanged(ListChangeListener.Change<? extends String> change) {
         while (change.next()) {
             if (change.wasRemoved()) {
-                textFlow.remove(change.getFrom(), change.getFrom() + change.getRemovedSize());
+                textFlow.remove(
+                    screenBuffer.getOriginRowIndex() + change.getFrom(),
+                    change.getFrom(),
+                    change.getFrom() + change.getRemovedSize());
             }
             if (change.wasAdded()) {
-                textFlow.addAll(change.getFrom(), change.getAddedSubList());
+                textFlow.addAll(
+                    screenBuffer.getOriginRowIndex() + change.getFrom(),
+                    change.getFrom(),
+                    change.getAddedSubList());
             }
         }
     }
@@ -390,15 +401,12 @@ public class TextPane extends Region {
         consumer.accept(e);
     }
 
-    List<Text> texts() {
-        return screenBuffer.rows.stream().map(this::asText).collect(Collectors.toList());
-    }
-
-    Text asText(String string) {
-        Text text = new Text(string);
-        text.setFont(Fonts.main);
-        text.setFill(Colors.fgColor);
-        return text;
+    private static String getExtension(Path path) {
+        if (path == null) {
+            return "";
+        }
+        String fileName = path.getFileName().toString();
+        return fileName.substring(fileName.lastIndexOf('.'));
     }
 
 }
