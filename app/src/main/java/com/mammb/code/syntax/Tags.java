@@ -16,7 +16,7 @@ public class Tags {
         map.computeIfAbsent(line, k -> new ArrayList<>()).add(tag);
 
         if (tag instanceof Tag.Start) {
-            for (Integer i = map.ceilingKey(line); i != null; i = map.ceilingKey(i)) {
+            for (Integer i = map.ceilingKey(line); i != null; i = map.higherKey(i)) {
 
                 Predicate<Tag> predicate = (i == line)
                     ? t -> t.position() > tag.position()
@@ -37,7 +37,7 @@ public class Tags {
         }
 
         if (tag instanceof Tag.End) {
-            for (Integer i = map.floorKey(line); i != null; i = map.floorKey(i)) {
+            for (Integer i = map.floorKey(line); i != null; i = map.lowerKey(i)) {
 
                 Predicate<Tag> predicate = (i == line)
                     ? t -> t.position() < tag.position()
