@@ -1,6 +1,5 @@
 package com.mammb.code.editor;
 
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -14,11 +13,9 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class TextPane extends Region {
 
@@ -51,6 +48,7 @@ public class TextPane extends Region {
         setOnKeyTyped(this::handleInput);
 
         textFlow = new TextLine();
+        screenBuffer.addDirtyListener(textFlow::dirtyHigher);
 
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());

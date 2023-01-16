@@ -2,13 +2,15 @@ package com.mammb.code.editor;
 
 import com.mammb.code.syntax.Highlighter;
 import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class TextLine extends TextFlow {
 
@@ -17,9 +19,7 @@ public class TextLine extends TextFlow {
     private Highlighter highlighter;
 
     public TextLine() {
-
         highlighter = Highlighter.of("");
-
         setPadding(new Insets(4));
         setTabSize(4);
         setMaxWidth(Double.MAX_VALUE);
@@ -44,8 +44,12 @@ public class TextLine extends TextFlow {
         List<List<Text>> removing = lines.subList(from, to);
         List<Text> nodes = removing.stream().flatMap(Collection::stream).toList();
         lines.removeAll(removing);
-        IntStream.range(lineNumber, lineNumber + (to - from)).forEach(highlighter::remove);
         getChildren().removeAll(nodes);
+    }
+
+
+    public int dirtyHigher(int lineNumber) {
+        return highlighter.removeHigher(lineNumber);
     }
 
 
@@ -72,7 +76,7 @@ public class TextLine extends TextFlow {
 
 
     private void fitPrefWidth(int length) {
-        double width = textWidth * length + 2;
+        double width = textWidth * (length + 2);
         if (width > getPrefWidth()) {
             setPrefWidth(width);
         }

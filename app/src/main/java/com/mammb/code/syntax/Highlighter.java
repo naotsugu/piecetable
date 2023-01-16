@@ -10,7 +10,7 @@ public interface Highlighter {
 
     List<PaintText> apply(int line, String text);
 
-    void remove(int line);
+    int removeHigher(int line);
 
     static Highlighter of(String name) {
         return switch (name) {
