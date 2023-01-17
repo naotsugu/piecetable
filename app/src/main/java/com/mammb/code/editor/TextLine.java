@@ -2,9 +2,6 @@ package com.mammb.code.editor;
 
 import com.mammb.code.syntax.Highlighter;
 import javafx.geometry.Insets;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -25,6 +22,7 @@ public class TextLine extends TextFlow {
         setMaxWidth(Double.MAX_VALUE);
         addAll(0, 0, List.of(" "));
     }
+
 
     public void init(String contentName) {
         highlighter = Highlighter.of(contentName);
@@ -48,13 +46,14 @@ public class TextLine extends TextFlow {
     }
 
 
-    public int dirtyHigher(int lineNumber) {
-        return highlighter.removeHigher(lineNumber);
+    public void handleDirty(LineEvent event) {
+        highlighter.removeAfter(event.line());
     }
 
 
     private List<Text> asTexts(int line, String text) {
-        return highlighter.apply(line, text).stream().map(p -> asText(p.text(), p.paint())).toList();
+        return highlighter.apply(line, text).stream()
+            .map(p -> asText(p.text(), p.paint())).toList();
     }
 
 

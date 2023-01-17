@@ -10,15 +10,17 @@ public class Mark {
     private final Type type;
     private final LinePoint linePoint;
     private Mark pair;
+    private int markSize;
 
-    public Mark(String name, Type type, LinePoint linePoint) {
+    public Mark(String name, Type type, LinePoint linePoint, int markSize) {
         this.name = Objects.requireNonNull(name);
         this.type = Objects.requireNonNull(type);
         this.linePoint = Objects.requireNonNull(linePoint);
+        this.markSize = markSize;
     }
 
-    public Mark(String name, Type type, int line, int position) {
-        this(name, type, new LinePoint(line, position));
+    public Mark(String name, Type type, int line, int position, int markSize) {
+        this(name, type, new LinePoint(line, position), markSize);
     }
 
     public void linkTo(Mark other) {
@@ -42,9 +44,11 @@ public class Mark {
     public boolean hasPair() { return pair != null; }
     public boolean isStart() { return type == Type.START; }
     public boolean isEnd() { return type == Type.END; }
+    public int edgePosition() { return (type == Type.END) ? linePoint.position() + markSize : linePoint.position(); }
 
     public String name() { return name; }
     public LinePoint linePoint() { return linePoint; }
     public Mark pair() { return pair; }
+    public int markSize() { return markSize; }
 
 }

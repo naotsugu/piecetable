@@ -3,8 +3,7 @@ package com.mammb.code.editor;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import com.mammb.code.piecetable.Edited;
 import javafx.beans.property.IntegerProperty;
@@ -40,7 +39,7 @@ public class ScreenBuffer {
     private final ReadOnlyIntegerWrapper totalLines = new ReadOnlyIntegerWrapper(1);
     private final ReadOnlyIntegerWrapper scrollMaxLines = new ReadOnlyIntegerWrapper(1);
 
-    private final List<Function<Integer, Integer>> dirtyListener = new ArrayList<>();
+    private final List<Consumer<LineEvent>> dirtyListeners = new ArrayList<>();
 
 
     public ScreenBuffer() {
@@ -57,7 +56,6 @@ public class ScreenBuffer {
         caretOffset.set(0);
         originRowIndex.set(0);
         originIndex.set(0);
-        dirtyListener.forEach(l -> l.apply(0));
         rows.clear();
         fitRows(getScreenRowSize());
 
@@ -66,9 +64,11 @@ public class ScreenBuffer {
 
     }
 
-    public void addDirtyListener(Function<Integer, Integer> listener) {
-        dirtyListener.add(listener);
+
+    public void addDirtyListener(Consumer<LineEvent> consumer) {
+        dirtyListeners.add(consumer);
     }
+
 
     public void save() {
         content.write();
@@ -211,15 +211,15 @@ public class ScreenBuffer {
             if (getOriginRowIndex() == 0) return;
 
             String firstRow = content.untilSol(getOriginIndex() - 1);
+            originRowIndex.set(getOriginRowIndex() - 1);
+            originIndex.set(getOriginIndex() - firstRow.length());
             rows.add(0, firstRow);
             if (rows.size() > getScreenRowSize()) {
                 rows.remove(rows.size() - 1);
             }
-            setOriginRowIndex(getOriginRowIndex() - 1);
-            setOriginIndex(getOriginIndex() - firstRow.length());
 
             caretOffsetY++;
-            setCaretOffset(getCaretOffset() + firstRow.length());
+            caretOffset.set(getCaretOffset() + firstRow.length());
         }
     }
 
@@ -236,11 +236,11 @@ public class ScreenBuffer {
                 rows.add(content.untilEol(bottomLengthOnContent));
             }
             rows.remove(0);
-            setOriginRowIndex(getOriginRowIndex() + 1);
-            setOriginIndex(getOriginIndex() + removeLineLength);
+            originRowIndex.set(getOriginRowIndex() + 1);
+            originIndex.set(getOriginIndex() + removeLineLength);
 
             caretOffsetY--;
-            setCaretOffset(getCaretOffset() - removeLineLength);
+            caretOffset.set(getCaretOffset() - removeLineLength);
         }
     }
 
@@ -296,15 +296,16 @@ public class ScreenBuffer {
         totalLines.set(getTotalLines() - deleteLineCount);
 
         if (deleteLineCount == 0) {
+            dirtyListeners.forEach(c -> c.accept(LineEvent.removed(caretIndex(), 1)));
             // simple inline delete
             //  a|b c d $  ->  del:[b c]  ->  a|d $
             String line = rows.get(caretOffsetY);
             int index = caretLineCharOffset();
-            dirtyListener.forEach(l -> l.apply(caretRowIndex()));
             rows.set(caretOffsetY,
                 line.substring(0, index) + line.substring(index + deleteString.length()));
 
         } else {
+            dirtyListeners.forEach(c -> c.accept(LineEvent.removed(caretIndex(), deleteLineCount + 1)));
             // multi rows delete
             // +-------+ prefix
             //  x x x x|- -          ->    x x x x|x x x
@@ -316,7 +317,6 @@ public class ScreenBuffer {
             if (caretOffsetY + deleteLineCount < rows.size()) {
                 suffix = rows.get(caretOffsetY + deleteLineCount).substring(deleteLines[deleteLineCount].length());
             }
-            dirtyListener.forEach(l -> l.apply(caretRowIndex()));
             rows.set(caretOffsetY, prefix + suffix);
             for (int i = 0; i < deleteLineCount; i++) {
                 rows.remove(caretOffsetY + 1);
@@ -350,8 +350,8 @@ public class ScreenBuffer {
 
         if (Strings.countLf(string) == 0) {
             // simple inline add
+            dirtyListeners.forEach(c -> c.accept(LineEvent.added(caretIndex(), 1)));
             String line = prefix + string + suffix;
-            dirtyListener.forEach(l -> l.apply(caretRowIndex()));
             rows.set(caretOffsetY, line);
             caretOffsetX = caretLineCharOffset + string.length();
             setCaretOffset(getCaretOffset() + string.length());
@@ -360,7 +360,7 @@ public class ScreenBuffer {
             String[] lines = caretTailed
                 ? Strings.splitLine(prefix + string + suffix)
                 : Strings.splitLf(prefix + string + suffix);
-            dirtyListener.forEach(l -> l.apply(caretRowIndex()));
+            dirtyListeners.forEach(c -> c.accept(LineEvent.added(caretIndex(), lines.length)));
             rows.set(caretOffsetY, lines[0]);
             for (int i = 1; i < lines.length; i++) {
                 rows.add(caretOffsetY + i, lines[i]);
@@ -404,14 +404,11 @@ public class ScreenBuffer {
 
 
     private void redraw(Edited edited) {
-        if (!edited.isEmpty())  {
-            dirtyListener.forEach(l -> l.apply(edited.pos()));
-            redraw(edited.pos(), edited.pos() + edited.len());
-        }
-    }
+        if (edited.isEmpty()) return;
 
+        int startIndex = edited.pos();
+        int endIndex = edited.pos() + edited.len();
 
-    private void redraw(int startIndex, int endIndex) {
         while (startIndex < originIndex.get()) {
             scrollPrev(3);
         }
@@ -420,6 +417,11 @@ public class ScreenBuffer {
         }
 
         moveCaret(startIndex - originIndex.get());
+
+        LineEvent dirty = edited.isInserted()
+            ? LineEvent.added(caretIndex(), edited.lineCount())
+            : LineEvent.removed(caretIndex(), edited.lineCount());
+        dirtyListeners.forEach(c -> c.accept(dirty));
 
         while (rows.size() > caretOffsetY) {
             rows.remove(rows.size() - 1);

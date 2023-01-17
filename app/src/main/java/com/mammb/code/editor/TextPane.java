@@ -48,7 +48,7 @@ public class TextPane extends Region {
         setOnKeyTyped(this::handleInput);
 
         textFlow = new TextLine();
-        screenBuffer.addDirtyListener(textFlow::dirtyHigher);
+        screenBuffer.addDirtyListener(textFlow::handleDirty);
 
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());

@@ -4,11 +4,13 @@ import com.mammb.code.editor.Colors;
 import java.util.List;
 
 class PassThrough implements Highlighter {
+
     @Override
     public List<PaintText> apply(int line, String text) {
         return List.of(new PaintText(text, Colors.fgColor));
     }
 
     @Override
-    public int removeHigher(int line) { return -1; }
+    public int removeAfter(int line) { return -1; }
+
 }

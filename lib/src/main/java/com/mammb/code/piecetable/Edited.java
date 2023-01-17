@@ -1,5 +1,6 @@
 package com.mammb.code.piecetable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -31,4 +32,12 @@ public record Edited(EditType type, int pos, int len, byte[] bytes) {
         return type.isNil();
     }
 
+    public int lineCount() {
+        if (bytes.length == 0) return 0;
+        int count = 1;
+        for (byte b : bytes) {
+            if (b == '\n') count++;
+        }
+        return count;
+    }
 }

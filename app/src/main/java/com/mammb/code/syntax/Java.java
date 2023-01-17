@@ -9,15 +9,14 @@ import java.util.stream.Stream;
 
 class Java implements Highlighter {
 
-    private static final String keyword = """
-    abstract,continue,for,new,switch,assert,default,goto,package,synchronized,boolean,do,if,private,
-    this,break,double,implements,protected,throw,byte,else,import,public,throws,case,enum,instanceof,
-    return,transient,catch,extends,int,short,try,char,final,interface,static,void,class,finally,long,
-    strictfp,volatile,const,float,native,super,while,var,record,sealed,with,yield,to,transitive,uses""";
-
     private static final Trie trie = new Trie();
     static {
-        Stream.of(keyword.split(",")).forEach(trie::put);
+        Stream.of("""
+        abstract,continue,for,new,switch,assert,default,goto,package,synchronized,boolean,do,if,private,
+        this,break,double,implements,protected,throw,byte,else,import,public,throws,case,enum,instanceof,
+        return,transient,catch,extends,int,short,try,char,final,interface,static,void,class,finally,long,
+        strictfp,volatile,const,float,native,super,while,var,record,sealed,with,yield,to,transitive,uses"""
+            .split(",")).forEach(trie::put);
     }
 
     private MarkTree marks = new MarkTree();
@@ -28,7 +27,7 @@ class Java implements Highlighter {
     }
 
     @Override
-    public int removeHigher(int line) {
+    public int removeAfter(int line) {
         return marks.removeHigher(line);
     }
 
@@ -38,10 +37,10 @@ class Java implements Highlighter {
         List<PaintText> list = new ArrayList<>();
 
         int start = text.indexOf("/*");
-        if (start > -1) marks.addStart(line, start, "blockComment");
+        if (start > -1) marks.addStart(line, start, "blockComment", 2);
 
         int end = text.indexOf("*/");
-        if (end > -1) marks.addEnd(line, end, "blockComment");
+        if (end > -1) marks.addEnd(line, end, "blockComment", 2);
 
         boolean startInScope = marks.isInScope(line, 0, "blockComment");
         if (start < 0 && end < 0 && startInScope) {
@@ -54,24 +53,26 @@ class Java implements Highlighter {
         for (int i = 0; i < text.length(); i++) {
             boolean scope = marks.isInScope(line, i, "blockComment");
             if (prevInScope != scope) {
-                if (prevInScope) {
-                    String str = text.substring(offset, i + 2);  // '*/' 2 length
-                    list.add(new PaintText(str, Colors.blockCommentColor));
-                    i++;
-                    offset = i + 1;
-                } else {
-                    String str = text.substring(offset, i);
-                    list.addAll(applyLineComment(str));
-                    offset = i;
+                if (text.substring(i).isBlank()) {
+                    i = text.length(); // optimize
                 }
+                String str = text.substring(offset, i);
+                if (prevInScope) {
+                    list.add(new PaintText(str, Colors.blockCommentColor));
+                } else {
+                    list.addAll(applyLineComment(str));
+                }
+                offset = i;
             }
             prevInScope = scope;
         }
-        if (offset == 0 || offset < text.length()) {
+
+        if (offset < text.length()) {
+            String str = text.substring(offset);
             if (prevInScope) {
-                list.add(new PaintText(text.substring(offset), Colors.blockCommentColor));
+                list.add(new PaintText(str, Colors.blockCommentColor));
             } else {
-                list.addAll(applyLineComment(text.substring(offset)));
+                list.addAll(applyLineComment(str));
             }
         }
         return list;
