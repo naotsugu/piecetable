@@ -10,12 +10,13 @@ public interface Highlighter {
 
     List<PaintText> apply(int line, String text);
 
-    int removeAfter(int line);
+    void invalidAfter(int line);
 
     static Highlighter of(String name) {
         return switch (name) {
             case ".java" -> new Java();
-            default -> new PassThrough();
+            case ".md"   -> new Markdown();
+            default      -> new PassThrough();
         };
     }
 

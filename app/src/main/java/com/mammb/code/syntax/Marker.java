@@ -2,28 +2,28 @@ package com.mammb.code.syntax;
 
 import java.util.Objects;
 
-public class Mark {
+public class Marker {
 
     enum Type { START, END, NEUTRAL }
 
     private final String name;
     private final Type type;
     private final LinePoint linePoint;
-    private Mark pair;
+    private Marker pair;
     private int markSize;
 
-    public Mark(String name, Type type, LinePoint linePoint, int markSize) {
+    public Marker(String name, Type type, LinePoint linePoint, int markSize) {
         this.name = Objects.requireNonNull(name);
         this.type = Objects.requireNonNull(type);
         this.linePoint = Objects.requireNonNull(linePoint);
         this.markSize = markSize;
     }
 
-    public Mark(String name, Type type, int line, int position, int markSize) {
+    public Marker(String name, Type type, int line, int position, int markSize) {
         this(name, type, new LinePoint(line, position), markSize);
     }
 
-    public void linkTo(Mark other) {
+    public void linkTo(Marker other) {
         this.pair = other;
         other.pair = this;
     }
@@ -35,12 +35,6 @@ public class Mark {
         }
     }
 
-    public void forwardLine(int n) { linePoint.forwardLine(n); }
-    public void backForwardLine(int n) { linePoint.backForwardLine(n); }
-
-    public void forwardPosition(int n) { linePoint.forwardPosition(n); }
-    public void backForwardPosition(int n) { linePoint.backForwardPosition(n); }
-
     public boolean hasPair() { return pair != null; }
     public boolean isStart() { return type == Type.START; }
     public boolean isEnd() { return type == Type.END; }
@@ -48,7 +42,7 @@ public class Mark {
 
     public String name() { return name; }
     public LinePoint linePoint() { return linePoint; }
-    public Mark pair() { return pair; }
+    public Marker pair() { return pair; }
     public int markSize() { return markSize; }
 
 }

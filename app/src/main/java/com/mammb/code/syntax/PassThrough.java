@@ -11,6 +11,6 @@ class PassThrough implements Highlighter {
     }
 
     @Override
-    public int removeAfter(int line) { return -1; }
+    public void invalidAfter(int line) { }
 
 }

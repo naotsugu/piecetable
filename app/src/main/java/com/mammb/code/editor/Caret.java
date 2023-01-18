@@ -44,8 +44,8 @@ public class Caret extends Path {
             lineTo.setY(lineTo.getY() - 2);
         }
         timeline.stop();
-        setVisible(true);
         getElements().setAll(elements);
+        setVisible(true);
         timeline.play();
     }
 

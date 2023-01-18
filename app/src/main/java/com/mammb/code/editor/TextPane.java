@@ -1,5 +1,6 @@
 package com.mammb.code.editor;
 
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TextPane extends Region {
@@ -30,25 +32,33 @@ public class TextPane extends Region {
     private final ImePalette imePalette;
     private final ScrollBar vScroll;
     private final HScrollBar hScroll;
+    private BiConsumer<String, String> newWindowConsumer;
 
     public TextPane(Stage stage) {
+        this(stage, "", "");
+    }
+
+    public TextPane(Stage stage, String syntax, String initText) {
 
         this.stage = stage;
         setupStageTitle();
 
         setBackground(new Background(new BackgroundFill(Colors.bgColor, null, null)));
-        setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
         setCursor(Cursor.DEFAULT);
 
         setOnKeyPressed(this::handleKeyPressed);
+        setOnKeyTyped(this::handleInput);
         setOnScroll(this::handleScroll);
         setOnMouseClicked(this::handleMouseClicked);
         setOnMouseDragged(this::handleMouseDragged);
-        setOnKeyTyped(this::handleInput);
 
         textFlow = new TextLine();
-        screenBuffer.addDirtyListener(textFlow::handleDirty);
+        textFlow.setFocusTraversable(true);
+        screenBuffer.addDirtyListener(line -> {
+            setupStageTitle();
+            textFlow.handleDirty(line);
+        });
 
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
@@ -62,20 +72,18 @@ public class TextPane extends Region {
         selection = new Selection();
 
         imePalette = new ImePalette(textFlow, screenBuffer);
-        setInputMethodRequests(imePalette.createInputMethodRequests());
-        setOnInputMethodTextChanged(imePalette::handleInputMethod);
+        textFlow.setInputMethodRequests(imePalette.createInputMethodRequests());
+        textFlow.setOnInputMethodTextChanged(imePalette::handleInputMethod);
 
         BorderPane pane = new BorderPane();
         pane.prefHeightProperty().bind(heightProperty());
         pane.prefWidthProperty().bind(widthProperty());
 
         StackPane textStack = new StackPane(textFlow, caret, selection, imePalette);
-        textStack.setFocusTraversable(true);
         textStack.setCursor(Cursor.TEXT);
         Pane main = new Pane(textStack);
         Pane left = new SidePanel(screenBuffer);
         left.setPadding(new Insets(4));
-
         pane.setCenter(main);
         pane.setLeft(left);
         getChildren().add(pane);
@@ -105,11 +113,18 @@ public class TextPane extends Region {
         vScroll.maxProperty().bind(screenBuffer.scrollMaxLinesProperty());
         getChildren().add(vScroll);
 
+        if (!initText.isBlank()) {
+            Platform.runLater(() -> {
+                screenBuffer.add(initText);
+                screenBuffer.moveCaret(0);
+            });
+        }
     }
 
     private void setupStageTitle() {
         Path path = screenBuffer.getPath();
         String title = (path == null) ? "untitled" : path.toString();
+        title += screenBuffer.isDirty() ? " *" : "";
         stage.setTitle(title);
     }
 
@@ -165,7 +180,7 @@ public class TextPane extends Region {
         if (newValue.intValue() < 0 || newValue.intValue() > screenBuffer.charCountOnScreen()) {
             caret.disable();
         } else {
-            caret.setShape(textFlow.caretShape(newValue.intValue(), true));
+            Platform.runLater(() -> caret.setShape(textFlow.caretShape(newValue.intValue(), true)));
         }
         if (selection.on()) {
             selection.handleCaretMoved(newValue.intValue(), textFlow::rangeShape);
@@ -203,7 +218,6 @@ public class TextPane extends Region {
 
 
     private void handleKeyPressed(KeyEvent e) {
-
         if (imePalette.getImeOn()) {
             if (e.getCode() == KeyCode.ESCAPE) {
                 imePalette.setImeOn(false);
@@ -223,8 +237,8 @@ public class TextPane extends Region {
             } else {
                 File file = Utils.fileChooseSave(stage, screenBuffer.getPath());
                 if (file != null) screenBuffer.saveAs(file.toPath());
-                setupStageTitle();
             }
+            setupStageTitle();
             return;
         }
         if (Keys.SC_SA.match(e)) {
@@ -253,6 +267,10 @@ public class TextPane extends Region {
             screenBuffer.redo();
             return;
         }
+        if (Keys.SC_N.match(e)) {
+            if (newWindowConsumer != null) newWindowConsumer.accept("", "");
+            return;
+        }
 
         switch (e.getCode()) {
             case LEFT       -> selectOr(e, ke -> screenBuffer.prev());
@@ -265,7 +283,7 @@ public class TextPane extends Region {
             case PAGE_DOWN  -> selectOr(e, ke -> screenBuffer.pageDown());
             case DELETE     -> delete();
             case BACK_SPACE -> backSpace();
-            case F1         -> screenBuffer.inspect();
+            case F1         -> newWindowConsumer.accept("", App.banner + screenBuffer.inspect());
             case ESCAPE     -> screenBuffer.reset();
             default -> { }
         }
@@ -338,7 +356,7 @@ public class TextPane extends Region {
             selectionDelete();
         }
         if (clipboard.hasString()) {
-            screenBuffer.add(clipboard.getString());
+            screenBuffer.add(clipboard.getString().replace("\r", ""));
         }
     }
 
@@ -389,6 +407,9 @@ public class TextPane extends Region {
         }
     }
 
+    void setNewWindowConsumer(BiConsumer<String, String> consumer) {
+        this.newWindowConsumer = consumer;
+    }
 
     private void selectOr(KeyEvent e, Consumer<KeyEvent> consumer) {
         if (e.isShiftDown() && selection.off()) {
@@ -400,7 +421,7 @@ public class TextPane extends Region {
     }
 
     private static String getExtension(Path path) {
-        if (path == null) {
+        if (path == null || !path.toFile().isFile()) {
             return "";
         }
         String fileName = path.getFileName().toString();

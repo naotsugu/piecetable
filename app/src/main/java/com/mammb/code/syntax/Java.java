@@ -16,9 +16,8 @@ class Java implements Highlighter {
         this,break,double,implements,protected,throw,byte,else,import,public,throws,case,enum,instanceof,
         return,transient,catch,extends,int,short,try,char,final,interface,static,void,class,finally,long,
         strictfp,volatile,const,float,native,super,while,var,record,sealed,with,yield,to,transitive,uses"""
-            .split(",")).forEach(trie::put);
+            .split("[,\\s]")).forEach(trie::put);
     }
-
     private MarkTree marks = new MarkTree();
 
     @Override
@@ -26,23 +25,24 @@ class Java implements Highlighter {
         return applyBlockComment(line, text);
     }
 
+
     @Override
-    public int removeAfter(int line) {
-        return marks.removeHigher(line);
-    }
+    public void invalidAfter(int line) { marks.sluice(line); }
 
 
     private List<PaintText> applyBlockComment(int line, String text) {
 
-        List<PaintText> list = new ArrayList<>();
+        final String name = "blockComment";
 
         int start = text.indexOf("/*");
-        if (start > -1) marks.addStart(line, start, "blockComment", 2);
-
         int end = text.indexOf("*/");
-        if (end > -1) marks.addEnd(line, end, "blockComment", 2);
+        if (line > marks.highWaterMark()) {
+            if (start > -1) marks.addStart(line, start, name, 2);
+            if (end > -1) marks.addEnd(line, end, name, 2);
+        }
 
-        boolean startInScope = marks.isInScope(line, 0, "blockComment");
+        List<PaintText> list = new ArrayList<>();
+        boolean startInScope = marks.isInScope(line, 0, name);
         if (start < 0 && end < 0 && startInScope) {
             list.add(new PaintText(text, Colors.blockCommentColor));
             return list;
@@ -51,7 +51,7 @@ class Java implements Highlighter {
         boolean prevInScope = startInScope;
         int offset = 0;
         for (int i = 0; i < text.length(); i++) {
-            boolean scope = marks.isInScope(line, i, "blockComment");
+            boolean scope = marks.isInScope(line, i, name);
             if (prevInScope != scope) {
                 if (text.substring(i).isBlank()) {
                     i = text.length(); // optimize
@@ -68,11 +68,10 @@ class Java implements Highlighter {
         }
 
         if (offset < text.length()) {
-            String str = text.substring(offset);
             if (prevInScope) {
-                list.add(new PaintText(str, Colors.blockCommentColor));
+                list.add(new PaintText(text.substring(offset), Colors.blockCommentColor));
             } else {
-                list.addAll(applyLineComment(str));
+                list.addAll(applyLineComment(text.substring(offset)));
             }
         }
         return list;
@@ -82,7 +81,7 @@ class Java implements Highlighter {
     private List<PaintText> applyLineComment(String text) {
         List<PaintText> list = new ArrayList<>();
         int lineCommentIndex = text.indexOf("//");
-        if (lineCommentIndex > 0) {
+        if (lineCommentIndex >= 0) {
             list.addAll(applyStringLiteral(text.substring(0, lineCommentIndex)));
             list.add(new PaintText(text.substring(lineCommentIndex), Colors.lineCommentColor));
         } else {

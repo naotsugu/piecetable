@@ -3,7 +3,6 @@ package com.mammb.code.editor;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.InputMethodTextRun;
@@ -16,9 +15,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ImePalette extends Region {
@@ -67,8 +63,8 @@ public class ImePalette extends Region {
         } else if (!e.getComposed().isEmpty()) {
             setVisible(true);
             Point2D point = top();
-            setLayoutX(point.getX() + 4);
-            setLayoutY(point.getY() + 4);
+            setTranslateX(point.getX() + 4);
+            setTranslateY(point.getY() + 4);
             palette.setText(e.getComposed().stream()
                 .map(InputMethodTextRun::getText).collect(Collectors.joining()));
         }
@@ -84,8 +80,9 @@ public class ImePalette extends Region {
         return new InputMethodRequests() {
             @Override
             public Point2D getTextLocation(int offset) {
-                Bounds bounds = localToScreen(getParent().getParent().getBoundsInParent());
-                return bottom().add(bounds.getMinX(), bounds.getMinY());
+                Bounds bounds = localToScreen(getParent().getParent().getBoundsInLocal());
+                return new Point2D(bounds.getMinX(),
+                    bounds.getMinY() + palette.getBoundsInLocal().getHeight());
             }
             @Override
             public int getLocationOffset(int x, int y) {

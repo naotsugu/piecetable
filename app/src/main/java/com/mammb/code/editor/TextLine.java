@@ -1,13 +1,19 @@
 package com.mammb.code.editor;
 
 import com.mammb.code.syntax.Highlighter;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TextLine extends TextFlow {
 
@@ -33,7 +39,7 @@ public class TextLine extends TextFlow {
         int nodeIndex = asNodeIndex(index);
         List<List<Text>> adding = texts.stream().map(text -> asTexts(lineNumber, text)).toList();
         lines.addAll(index, adding);
-        fitPrefWidth(texts.stream().mapToInt(String::length).max().getAsInt());
+        adding.forEach(this::fitPrefWidth);
         getChildren().addAll(nodeIndex, adding.stream().flatMap(Collection::stream).toList());
     }
 
@@ -46,8 +52,8 @@ public class TextLine extends TextFlow {
     }
 
 
-    public void handleDirty(LineEvent event) {
-        highlighter.removeAfter(event.line());
+    public void handleDirty(int line) {
+        highlighter.invalidAfter(line);
     }
 
 
@@ -74,11 +80,29 @@ public class TextLine extends TextFlow {
     }
 
 
-    private void fitPrefWidth(int length) {
-        double width = textWidth * (length + 2);
-        if (width > getPrefWidth()) {
+    private void fitPrefWidth(List<Text> texts) {
+        double width = texts.stream().mapToDouble(Utils::getTextWidth).sum() + textWidth * 2;
+        if (width > getWidth()) {
             setPrefWidth(width);
+            setWidth(width);
         }
+    }
+
+
+    public String linesText() {
+        return lines.stream().map(this::asText).collect(Collectors.joining());
+    }
+
+    public String lineText(int n) {
+        if (n < 0 || n > lines.size() - 1) {
+            return "";
+        }
+        return asText(lines.get(n));
+    }
+
+
+    private String asText(List<Text> line) {
+        return line.stream().map(Text::getText).collect(Collectors.joining());
     }
 
 }
