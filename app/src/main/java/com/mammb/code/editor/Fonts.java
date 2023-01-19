@@ -5,5 +5,9 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
 public class Fonts {
-    public static final Font main = Font.font("Consolas", FontWeight.NORMAL, FontPosture.REGULAR, 15);
+
+    private static final String fontName = System.getProperty("os.name").startsWith("Windows") ? "MS Gothic" : "Consolas";
+    public static final int fontSize = 15;
+    public static final Font main = Font.font(fontName, FontWeight.NORMAL, FontPosture.REGULAR, fontSize);
+
 }

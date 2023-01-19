@@ -644,10 +644,10 @@ public class ScreenBuffer {
         return rows.get(caretOffsetY);
     }
 
+
     String peekString(int beginIndex, int endIndex) {
         return content.substring(beginIndex, endIndex);
     }
-
 
 
     public final void moveCaret(int offset) {

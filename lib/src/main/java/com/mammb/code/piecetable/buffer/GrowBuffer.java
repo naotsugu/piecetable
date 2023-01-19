@@ -48,11 +48,11 @@ public class GrowBuffer implements AppendBuffer {
     @Override
     public void append(Buffer buffer) {
         for (int i = 0; i < buffer.length(); i++) {
+            byte[] bytes = buffer.charAt(i);
             elements.add(buffer.charAt(i));
-            if (length % pilePitch == 0) {
-                piles.add(length);
+            if (length++ % pilePitch == 0) {
+                piles.add(elements.length() - bytes.length);
             }
-            length++;
         }
     }
 
@@ -62,10 +62,9 @@ public class GrowBuffer implements AppendBuffer {
             byte b = bytes[i];
             elements.add(b);
             if (!Utf8.isSurrogateRetain(b)) {
-                if (length % pilePitch == 0) {
-                    piles.add(length);
+                if (length++ % pilePitch == 0) {
+                    piles.add(elements.length() - 1);
                 }
-                length++;
             }
         }
     }

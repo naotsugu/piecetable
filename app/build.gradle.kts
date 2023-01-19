@@ -29,3 +29,9 @@ javafx {
     version = "19"
     modules("javafx.controls")
 }
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}

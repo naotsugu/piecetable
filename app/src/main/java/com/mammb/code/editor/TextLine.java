@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -67,6 +68,7 @@ public class TextLine extends TextFlow {
         Text text = new Text(string);
         text.setFont(Fonts.main);
         text.setFill(paint);
+        //text.setFontSmoothingType(FontSmoothingType.GRAY);
         return text;
     }
 

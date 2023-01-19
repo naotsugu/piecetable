@@ -41,7 +41,7 @@ public class Caret extends Path {
         }
 
         if (elements[1] instanceof LineTo lineTo) {
-            lineTo.setY(lineTo.getY() - 2);
+            lineTo.setY(lineTo.getY() - Fonts.fontSize / 8);
         }
         timeline.stop();
         getElements().setAll(elements);

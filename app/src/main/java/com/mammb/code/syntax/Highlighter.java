@@ -15,6 +15,7 @@ public interface Highlighter {
     static Highlighter of(String name) {
         return switch (name) {
             case ".java" -> new Java();
+            case ".json" -> new Json();
             case ".md"   -> new Markdown();
             default      -> new PassThrough();
         };
