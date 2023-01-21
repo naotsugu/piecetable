@@ -16,9 +16,10 @@ public class Colors {
 
     public static final Color kwColor = Color.web("#cc7832");
     public static final Color functionColor = Color.web("#FFc66d");
-    public static final Color numColor = Color.web("#6897bb");
     public static final Color blockCommentColor = Color.web("#629755");
     public static final Color lineCommentColor = Color.web("#808080");
-
+    public static final Color numberLiteralColor = Color.web("#6897bb");
+    public static final Color strLiteralColor = Color.web("#6A8759");
+    public static final Color yellowColor = Color.web("#bbb529");
 
 }

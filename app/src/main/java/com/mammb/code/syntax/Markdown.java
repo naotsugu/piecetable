@@ -19,6 +19,11 @@ public class Markdown implements Highlighter {
     }
 
     @Override
+    public Tokenizer tokenizer() {
+        return null;
+    }
+
+    @Override
     public void invalidAfter(int line) {
 
     }

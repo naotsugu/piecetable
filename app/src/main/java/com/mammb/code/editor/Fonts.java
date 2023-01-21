@@ -7,7 +7,7 @@ import javafx.scene.text.FontWeight;
 public class Fonts {
 
     private static final String fontName = System.getProperty("os.name").startsWith("Windows") ? "MS Gothic" : "Consolas";
-    public static final int fontSize = 15;
+    public static final int fontSize = 16;
     public static final Font main = Font.font(fontName, FontWeight.NORMAL, FontPosture.REGULAR, fontSize);
 
 }

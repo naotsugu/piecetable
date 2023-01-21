@@ -425,7 +425,7 @@ public class TextPane extends Region {
             return "";
         }
         String fileName = path.getFileName().toString();
-        return fileName.substring(fileName.lastIndexOf('.'));
+        return fileName.substring(fileName.lastIndexOf('.') + 1);
     }
 
 }

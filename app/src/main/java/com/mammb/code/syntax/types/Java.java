@@ -1,13 +1,16 @@
-package com.mammb.code.syntax;
+package com.mammb.code.syntax.types;
 
 import com.mammb.code.editor.Colors;
+import com.mammb.code.syntax.Highlighter;
+import com.mammb.code.syntax.MarkTree;
+import com.mammb.code.syntax.Tokenizer;
 import com.mammb.code.trie.Range;
 import com.mammb.code.trie.Trie;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-class Java implements Highlighter {
+public class Java implements Highlighter {
 
     private static final Trie trie = new Trie();
     static {
@@ -25,6 +28,11 @@ class Java implements Highlighter {
         return applyBlockComment(line, text);
     }
 
+
+    @Override
+    public Tokenizer tokenizer() {
+        return null;
+    }
 
     @Override
     public void invalidAfter(int line) { marks.sluice(line); }
