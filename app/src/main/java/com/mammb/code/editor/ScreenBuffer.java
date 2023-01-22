@@ -30,14 +30,14 @@ public class ScreenBuffer {
     /** screenRowSize. */
     private final IntegerProperty screenRowSize = new SimpleIntegerProperty(1);
 
-    private final Content content = new EditBufferedContent(new ContentImpl());
+    private final Content content = new EditContent(new ContentImpl());
     private final IntegerProperty originRowIndex = new SimpleIntegerProperty();
     private final IntegerProperty originIndex    = new SimpleIntegerProperty();
 
     private final ReadOnlyIntegerWrapper totalLines = new ReadOnlyIntegerWrapper(1);
     private final ReadOnlyIntegerWrapper scrollMaxLines = new ReadOnlyIntegerWrapper(1);
 
-    private final List<Consumer<Integer>> dirtyListeners = new ArrayList<>();
+    private final List<EditListener> editListeners = new ArrayList<>();
 
 
     public ScreenBuffer() {
@@ -63,8 +63,8 @@ public class ScreenBuffer {
     }
 
 
-    public void addDirtyListener(Consumer<Integer> consumer) {
-        dirtyListeners.add(consumer);
+    public void addEditListener(EditListener listener) {
+        editListeners.add(listener);
     }
 
 
@@ -294,16 +294,16 @@ public class ScreenBuffer {
         totalLines.set(getTotalLines() - deleteLineCount);
 
         if (deleteLineCount == 0) {
-            dirtyListeners.forEach(c -> c.accept(caretIndex()));
             // simple inline delete
             //  a|b c d $  ->  del:[b c]  ->  a|d $
             String line = rows.get(caretOffsetY);
             int index = caretLineCharOffset();
+            editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, 1));
             rows.set(caretOffsetY,
                 line.substring(0, index) + line.substring(index + deleteString.length()));
-
+            editListeners.forEach(EditListener::postEdit);
         } else {
-            dirtyListeners.forEach(c -> c.accept(caretIndex()));
+
             // multi rows delete
             // +-------+ prefix
             //  x x x x|- -          ->    x x x x|x x x
@@ -315,11 +315,14 @@ public class ScreenBuffer {
             if (caretOffsetY + deleteLineCount < rows.size()) {
                 suffix = rows.get(caretOffsetY + deleteLineCount).substring(deleteLines[deleteLineCount].length());
             }
+            editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, deleteLineCount + 1));
             rows.set(caretOffsetY, prefix + suffix);
             for (int i = 0; i < deleteLineCount; i++) {
                 rows.remove(caretOffsetY + 1);
             }
+            editListeners.forEach(EditListener::postEdit);
         }
+
     }
 
 
@@ -348,9 +351,10 @@ public class ScreenBuffer {
 
         if (Strings.countLf(string) == 0) {
             // simple inline add
-            dirtyListeners.forEach(c -> c.accept(caretIndex()));
             String line = prefix + string + suffix;
+            editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, 1));
             rows.set(caretOffsetY, line);
+            editListeners.forEach(EditListener::postEdit);
             caretOffsetX = caretLineCharOffset + string.length();
             caretOffset.set(getCaretOffset() + string.length());
         } else {
@@ -358,16 +362,17 @@ public class ScreenBuffer {
             String[] lines = caretTailed
                 ? Strings.splitLine(prefix + string + suffix)
                 : Strings.splitLf(prefix + string + suffix);
-            dirtyListeners.forEach(c -> c.accept(caretIndex()));
+            editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, lines.length));
             rows.set(caretOffsetY, lines[0]);
             for (int i = 1; i < lines.length; i++) {
                 rows.add(caretOffsetY + i, lines[i]);
             }
+            editListeners.forEach(EditListener::postEdit);
             caretOffsetX = lines[lines.length - 1].length() - suffix.length();
             caretOffsetY += lines.length - 1;
             setCaretOffset(getCaretOffset() + string.length());
 
-            if (content instanceof EditBufferedContent buffer) buffer.flush();
+            if (content instanceof EditContent buffer) buffer.flush();
             fitRows(getScreenRowSize());
             scrollToCaret();
         }
@@ -394,7 +399,9 @@ public class ScreenBuffer {
     }
 
 
-    void undo() { redraw(content.undo()); }
+    void undo() {
+        redraw(content.undo());
+    }
 
 
     void redo() { redraw(content.redo()); }
@@ -414,8 +421,6 @@ public class ScreenBuffer {
         }
 
         moveCaret(startIndex - originIndex.get());
-
-        dirtyListeners.forEach(c -> c.accept(caretIndex()));
 
         while (rows.size() > caretOffsetY) {
             rows.remove(rows.size() - 1);
@@ -743,7 +748,7 @@ public class ScreenBuffer {
         sb.append("rows.size[%d], rowSize[%d]\n".formatted(rows.size(), getScreenRowSize()));
         sb.append("originRowIndex[%d], originIndex[%d]\n".formatted(getOriginRowIndex(), getOriginIndex()));
         sb.append("caretOffsetY[%d], caretOffsetX[%d], caretOffset[%d]\n".formatted(caretOffsetY, caretOffsetX, caretOffset.get()));
-        if (content instanceof EditBufferedContent editBuffered) {
+        if (content instanceof EditContent editBuffered) {
             sb.append("editBuffered.getEdit() : [%s]\n".formatted(editBuffered.getEdit()));
         }
         return sb.toString();
@@ -751,12 +756,12 @@ public class ScreenBuffer {
 
     public void reset() {
         logger.log(INFO, "== reset");
-        if (content instanceof EditBufferedContent buffer) buffer.flush();
+        if (content instanceof EditContent buffer) buffer.flush();
         caretOffsetY = caretOffsetX = 0;
         caretOffset.set(0);
         originRowIndex.set(0);
         originIndex.set(0);
-        if (content instanceof EditBufferedContent buffer) buffer.flush();
+        if (content instanceof EditContent buffer) buffer.flush();
         rows.clear();
         totalLines.set(1);
         fitRows(getScreenRowSize());

@@ -4,14 +4,14 @@ import com.mammb.code.piecetable.Edited;
 
 import java.nio.file.Path;
 
-public class EditBufferedContent implements Content {
+public class EditContent implements Content {
 
     private final Content peer;
     private Edit edit;
     private int lineCount;
 
 
-    public EditBufferedContent(Content peer) {
+    public EditContent(Content peer) {
         this.peer = peer;
         this.edit = new NeutralEdit(peer);
         this.lineCount = 0;

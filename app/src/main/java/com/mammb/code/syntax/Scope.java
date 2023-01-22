@@ -42,6 +42,17 @@ public class Scope {
         return false;
     }
 
+    public boolean containsEdge(int line, int length) {
+        if (tree.isEmpty()) {
+            return false;
+        }
+        LinePoint next = tree.ceilingKey(new LinePoint(line, 0));
+        if (next == null) {
+            return false;
+        }
+        return next.line() <= line + length;
+    }
+
 
     private void pairing(String name) {
         Deque<ScopeMark> stack = new ArrayDeque<>();
@@ -79,6 +90,10 @@ public class Scope {
         if (tree.isEmpty()) return -1;
         LinePoint last = tree.lastKey();
         return (last == null) ? -1 : last.line();
+    }
+
+    public int size() {
+        return tree.size();
     }
 
 }

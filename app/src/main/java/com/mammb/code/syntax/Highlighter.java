@@ -15,7 +15,7 @@ public interface Highlighter {
 
     static Highlighter of(String name) {
         return switch (name) {
-            case "java" -> new Javax();
+            case "java" -> new Java();
             case "json" -> new Json();
             case "md"   -> new Markdown();
             default     -> new PassThrough();
@@ -23,11 +23,14 @@ public interface Highlighter {
     }
 
     default Paint colorOf(Token token) { return Colors.fgColor; }
+
     default boolean canMarge(Token token, Token next) {
         return token.adjoining(next) && (next.name().equals("sp")
             || colorOf(token) == colorOf(next));
     }
-    default void invalidAfter(int line) { }
+
+    default boolean invalidate(int line, int length) { return false; }
+    default boolean blockEdgeContains(int line, int length) { return false; }
 
     default List<PaintText> apply(int line, String text) {
         List<PaintText> list = new ArrayList<>();

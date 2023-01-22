@@ -55,9 +55,17 @@ public class TextPane extends Region {
 
         textFlow = new TextLine();
         textFlow.setFocusTraversable(true);
-        screenBuffer.addDirtyListener(line -> {
-            setupStageTitle();
-            textFlow.handleDirty(line);
+
+        screenBuffer.addEditListener(new EditListener() {
+            @Override
+            public void preEdit(int lineNumber, int index, int length) {
+                textFlow.markDirty(lineNumber, index, length);
+            }
+            @Override
+            public void postEdit() {
+                setupStageTitle();
+                textFlow.cleanDirty();
+            }
         });
 
         caret = new Caret();
@@ -164,7 +172,7 @@ public class TextPane extends Region {
                 textFlow.remove(
                     screenBuffer.getOriginRowIndex() + change.getFrom(),
                     change.getFrom(),
-                    change.getFrom() + change.getRemovedSize());
+                    change.getRemovedSize());
             }
             if (change.wasAdded()) {
                 textFlow.addAll(

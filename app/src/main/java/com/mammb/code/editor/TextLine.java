@@ -1,26 +1,26 @@
 package com.mammb.code.editor;
 
 import com.mammb.code.syntax.Highlighter;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 public class TextLine extends TextFlow {
 
-    private List<List<Text>> lines = new ArrayList<>();
+    private static final System.Logger logger = System.getLogger(TextLine.class.getName());
+
+    private final List<List<Text>> lines = new ArrayList<>();
     private double textWidth = Utils.getTextWidth(Fonts.main, 1);
     private Highlighter highlighter;
+    private Dirty dirty;
 
     public TextLine() {
         highlighter = Highlighter.of("");
@@ -37,6 +37,9 @@ public class TextLine extends TextFlow {
 
 
     public void addAll(int lineNumber, int index, Collection<? extends String> texts) {
+        if (dirty != null && dirty.originLineNumber() != lineNumber - index) {
+            logger.log(ERROR, "originLineNumber:{}, lineNumber{}, index{}", dirty.originLineNumber(), lineNumber, index);
+        }
         int nodeIndex = asNodeIndex(index);
         List<List<Text>> adding = texts.stream().map(text -> asTexts(lineNumber, text)).toList();
         lines.addAll(index, adding);
@@ -45,16 +48,44 @@ public class TextLine extends TextFlow {
     }
 
 
-    public void remove(int lineNumber, int from, int to) {
-        List<List<Text>> removing = lines.subList(from, to);
+    public void remove(int lineNumber, int index, int length) {
+        if (dirty != null && dirty.originLineNumber() != lineNumber - index) {
+            logger.log(ERROR, "originLineNumber:{}, lineNumber{}, index{}", dirty.originLineNumber(), lineNumber, index);
+        }
+        List<List<Text>> removing = new ArrayList<>(lines.subList(index, index + length));
         List<Text> nodes = removing.stream().flatMap(Collection::stream).toList();
         lines.removeAll(removing);
+        if (dirty != null) dirty.removeAll(removing);
         getChildren().removeAll(nodes);
     }
 
 
-    public void handleDirty(int line) {
-        highlighter.invalidAfter(line);
+    public void markDirty(int lineNumber, int index, int length) {
+        boolean requiredDirty = highlighter.invalidate(lineNumber, length);
+        List<List<Text>> dirtyLines = new ArrayList<>(lines.subList(index, lines.size()));
+        dirty = new Dirty(dirtyLines, requiredDirty, lineNumber, index);
+    }
+
+
+    public void cleanDirty() {
+
+        final Dirty target = dirty;
+        dirty = null;
+
+        if (target.dirtyLines().isEmpty()) return;
+        if (!target.invalidated() &&
+            !highlighter.blockEdgeContains(target.lineNumber, 1)) return;
+
+        for (List<Text> lineText : target.dirtyLines()) {
+            int index = lines.indexOf(lineText);
+            if (index > -1) {
+                getChildren().removeAll(lines.get(index));
+                List<Text> replacing = asTexts(target.originLineNumber() + index, lineString(index));
+                lines.set(index, replacing);
+                int nodeIndex = asNodeIndex(index);
+                getChildren().addAll(nodeIndex, replacing);
+            }
+        }
     }
 
 
@@ -92,19 +123,26 @@ public class TextLine extends TextFlow {
 
 
     public String linesText() {
-        return lines.stream().map(this::asText).collect(Collectors.joining());
+        return lines.stream().map(this::asString).collect(Collectors.joining());
     }
 
-    public String lineText(int n) {
+    public String lineString(int n) {
         if (n < 0 || n > lines.size() - 1) {
             return "";
         }
-        return asText(lines.get(n));
+        return asString(lines.get(n));
     }
 
 
-    private String asText(List<Text> line) {
+    private String asString(List<Text> line) {
         return line.stream().map(Text::getText).collect(Collectors.joining());
+    }
+
+    record Dirty(List<List<Text>> dirtyLines, boolean invalidated, int lineNumber, int index) {
+        int originLineNumber() { return lineNumber - index; }
+        void removeAll(List<List<Text>> removing) {
+            dirtyLines.removeAll(removing);
+        }
     }
 
 }
