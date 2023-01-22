@@ -83,18 +83,4 @@ public class Strings {
         return count;
     }
 
-    public static boolean hasLF(String str) {
-        return str.indexOf(LF) > 0;
-    }
-
-
-    public static int countToken(char ch, String str) {
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (c == ch) continue;
-            if (c == ' ') return i;
-            else return 0;
-        }
-        return 0;
-    }
 }

@@ -4,14 +4,14 @@ import com.mammb.code.piecetable.Edited;
 
 import java.nio.file.Path;
 
-public class EditContent implements Content {
+public class BufferedContent implements Content {
 
     private final Content peer;
     private Edit edit;
     private int lineCount;
 
 
-    public EditContent(Content peer) {
+    public BufferedContent(Content peer) {
         this.peer = peer;
         this.edit = new NeutralEdit(peer);
         this.lineCount = 0;
@@ -90,6 +90,23 @@ public class EditContent implements Content {
     }
 
     @Override
+    public int undoSize() {
+        return peer.undoSize();
+    }
+
+    @Override
+    public Edited undoFuture() {
+        flush();
+        return peer.undoFuture();
+    }
+
+    @Override
+    public Edited redoFuture() {
+        flush();
+        return peer.redoFuture();
+    }
+
+    @Override
     public Edited undo() {
         flush();
         Edited edited = peer.undo();
@@ -99,11 +116,6 @@ public class EditContent implements Content {
             lineCount -= Strings.countLf(edited.bytes());
         }
         return edited;
-    }
-
-    @Override
-    public int undoSize() {
-        return peer.undoSize();
     }
 
     @Override

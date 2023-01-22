@@ -51,6 +51,7 @@ public class PieceTable {
         return new PieceTable(Buffers.of(path), Buffers.appendOf());
     }
 
+
     public void insert(int pos, CharSequence cs) {
 
         if (pos < 0 || pos > length) {
@@ -133,31 +134,35 @@ public class PieceTable {
         return pieces.bytes(startPos, endPos).get();
     }
 
-
-    public Edited undo() {
-        Edited edited = Edited.empty;
-        if (!undo.isEmpty()) {
-            PieceEdit pieceEdit = undo.pop();
-            redo.push(applyEdit(pieceEdit));
-            length += pieceEdit.totalModLength() - pieceEdit.totalOrgLength();
-            return asEdited(pieceEdit);
-        }
-        return edited;
-    }
-
     public int undoSize() {
         return undo.size();
     }
 
 
+    public Edited undoFuture() {
+        if (undo.isEmpty()) return Edited.empty;
+        return asEdited(undo.peek());
+    }
+
+    public Edited redoFuture() {
+        if (redo.isEmpty()) return Edited.empty;
+        return asEdited(redo.peek());
+    }
+
+    public Edited undo() {
+        if (undo.isEmpty()) return Edited.empty;
+        PieceEdit pieceEdit = undo.pop();
+        redo.push(applyEdit(pieceEdit));
+        length += pieceEdit.totalModLength() - pieceEdit.totalOrgLength();
+        return asEdited(pieceEdit);
+    }
+
     public Edited redo() {
-        if (!redo.isEmpty()) {
-            PieceEdit pieceEdit = redo.pop();
-            pushToUndo(applyEdit(pieceEdit), true);
-            length += pieceEdit.totalModLength() - pieceEdit.totalOrgLength();
-            return asEdited(pieceEdit);
-        }
-        return Edited.empty;
+        if (redo.isEmpty()) return Edited.empty;
+        PieceEdit pieceEdit = redo.pop();
+        pushToUndo(applyEdit(pieceEdit), true);
+        length += pieceEdit.totalModLength() - pieceEdit.totalOrgLength();
+        return asEdited(pieceEdit);
     }
 
     private void pushToUndo(PieceEdit edit, boolean readyForRedo) {

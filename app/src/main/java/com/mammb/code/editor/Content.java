@@ -16,8 +16,10 @@ public interface Content {
     String substring(int start, int end);
     String untilEol(int pos);
     String untilSol(int pos);
-    Edited undo();
     int undoSize();
+    Edited undoFuture();
+    Edited redoFuture();
+    Edited undo();
     Edited redo();
 
 

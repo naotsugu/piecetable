@@ -206,9 +206,10 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
         for (int i = 0; i < pieces.length; i++) {
             Buffer buf = pieces[i].bytes();
             if (count + buf.length() > startPos) {
-                byteArray.add(buf.bytes(
+                byteArray.add(buf.subBuffer(
                     Math.max(startPos - count, 0),
-                    Math.min(endPos - count, buf.length())));
+                    Math.min(endPos - count, buf.length())
+                ).bytes());
             }
             count += buf.length();
             if (count >= endPos) {

@@ -7,7 +7,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +17,7 @@ public class TextLine extends TextFlow {
     private static final System.Logger logger = System.getLogger(TextLine.class.getName());
 
     private final List<List<Text>> lines = new ArrayList<>();
-    private double textWidth = Utils.getTextWidth(Fonts.main, 1);
+    private final double textWidth = Utils.getTextWidth(Fonts.main, 1);
     private Highlighter highlighter;
     private Dirty dirty;
 
@@ -99,7 +98,6 @@ public class TextLine extends TextFlow {
         Text text = new Text(string);
         text.setFont(Fonts.main);
         text.setFill(paint);
-        //text.setFontSmoothingType(FontSmoothingType.GRAY);
         return text;
     }
 
@@ -122,7 +120,7 @@ public class TextLine extends TextFlow {
     }
 
 
-    public String linesText() {
+    public String linesString() {
         return lines.stream().map(this::asString).collect(Collectors.joining());
     }
 

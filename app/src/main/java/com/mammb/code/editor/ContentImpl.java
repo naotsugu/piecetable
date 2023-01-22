@@ -127,6 +127,22 @@ public class ContentImpl implements Content {
         return toString(list);
     }
 
+
+    @Override
+    public int undoSize() {
+        return pt.undoSize();
+    }
+
+    @Override
+    public Edited undoFuture() {
+        return pt.undoFuture();
+    }
+
+    @Override
+    public Edited redoFuture() {
+        return pt.redoFuture();
+    }
+
     @Override
     public Edited undo() {
         Edited edited = pt.undo();
@@ -134,10 +150,6 @@ public class ContentImpl implements Content {
         return edited;
     }
 
-    @Override
-    public int undoSize() {
-        return pt.undoSize();
-    }
 
     @Override
     public Edited redo() {
