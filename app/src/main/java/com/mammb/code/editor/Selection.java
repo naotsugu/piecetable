@@ -15,7 +15,7 @@ public class Selection extends Path {
 
     public Selection() {
         setLayoutX(4);
-        setLayoutY(Fonts.fontSize / 4);
+        setLayoutY(4);
         setFill(Color.DODGERBLUE);
         setStrokeWidth(0);
         setOpacity(0.4);

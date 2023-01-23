@@ -83,4 +83,67 @@ public class Strings {
         return count;
     }
 
+
+    public static int lastLineLength(String str) {
+        int index = str.lastIndexOf('\n');
+        if (index > -1 && index + 1 < str.length()) {
+            return str.substring(index + 1).length();
+        }
+        return 0;
+    }
+
+
+    /**
+     * Returns the number of Unicode code points in the specified text.
+     * @param str the specified text
+     * @return the number of Unicode code points
+     */
+    public static int codePointCount(String str) {
+        return (str == null) ? 0 : str.codePointCount(0, str.length());
+    }
+
+    /**
+     * Returns the number of Unicode code points in the specified text range of this String.
+     * @param str the specified text
+     * @param beginIndex the index to the first char of the text range
+     * @return the number of Unicode code points
+     */
+    public static int codePointCount(String str, int beginIndex) {
+        return (str == null) ? 0 : str.codePointCount(beginIndex, str.length());
+    }
+
+    /**
+     * Returns the number of Unicode code points in the specified text range of this String.
+     * @param str the specified text
+     * @param beginIndex the index to the first char of the text range
+     * @param endIndex the index after the last char of the text range
+     * @return the number of Unicode code points
+     */
+    public static int codePointCount(String str, int beginIndex, int endIndex) {
+        return (str == null) ? 0 : str.codePointCount(beginIndex, endIndex);
+    }
+
+
+    public static int widthIndex(String str, int asciiIndex) {
+        int[] ints = str.codePoints().map(cp -> {
+            if (cp < 1_024) {
+                // latin
+                return 1;
+            } else if ((65_377 <= cp && cp <= 65_500) || (65_512 <= cp && cp <= 65_518) ) {
+                // FF00～FFEF The Unicode Standard Half-width and Full-width Forms
+                // Half-width
+                return 1;
+            } else {
+                // maybe not Half-width
+                return Math.max(Character.charCount(cp), 2);
+            }
+        }).toArray();
+        int count = 0;
+        for (int i = 0; i < ints.length; i++) {
+            count += ints[i];
+            if (count >= asciiIndex) return i;
+        }
+        return str.length() - 1;
+    }
+
 }

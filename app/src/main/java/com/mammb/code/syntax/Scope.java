@@ -58,11 +58,13 @@ public class Scope {
         Deque<ScopeMark> stack = new ArrayDeque<>();
         for (ScopeMark mark : tree.values()) {
             if (!mark.name().equals(name)) continue;
-            mark.unlink();
-            if (mark.isStart() || mark.isNeutral()) {
+            if (mark.isStart() || (mark.isNeutral() && stack.isEmpty())) {
+                mark.unlink();
                 stack.push(mark);
             } else if (!stack.isEmpty()) {
                 stack.pop().linkTo(mark);
+            } else {
+                mark.unlink();
             }
         }
     }
@@ -87,9 +89,14 @@ public class Scope {
 
 
     public int highWaterLine() {
-        if (tree.isEmpty()) return -1;
-        LinePoint last = tree.lastKey();
-        return (last == null) ? -1 : last.line();
+        LinePoint hwPosition = highWaterPosition();
+        return (hwPosition == null) ? -1 : hwPosition.line();
+    }
+
+
+    public LinePoint highWaterPosition() {
+        if (tree.isEmpty()) return null;
+        return tree.lastKey();
     }
 
     public int size() {

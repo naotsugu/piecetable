@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 public class Colors {
 
     public static final Color bgColor = Color.web("#303841");
-    public static final Color fgColor = Color.web("#d3dee9");
+    public static final Color fgColor = Color.web("#a9b7c6");
     public static final Color darkColor = Color.web("#939ea9");
 
     public static final Color trackColor = Color.web("#626465", 0.2);

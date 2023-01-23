@@ -33,6 +33,8 @@ public class ScreenBuffer {
     private final Content content = new BufferedContent(new ContentImpl());
     private final IntegerProperty originRowIndex = new SimpleIntegerProperty();
     private final IntegerProperty originIndex    = new SimpleIntegerProperty();
+    /** caret index on content. */
+    private int caretIndex = 0;
 
     private final ReadOnlyIntegerWrapper totalLines = new ReadOnlyIntegerWrapper(1);
     private final ReadOnlyIntegerWrapper scrollMaxLines = new ReadOnlyIntegerWrapper(1);
@@ -52,6 +54,7 @@ public class ScreenBuffer {
 
         caretOffsetY = caretOffsetX = 0;
         caretOffset.set(0);
+        caretIndex = 0;
         originRowIndex.set(0);
         originIndex.set(0);
         rows.clear();
@@ -69,8 +72,8 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        boolean caretTailed = caretIndex() == content.length();
-        content.insert(caretIndex(), string);
+        boolean caretTailed = caretIndex == content.length();
+        content.insert(caretIndex, string);
         totalLines.set(getTotalLines() + Strings.countLf(string));
 
         int caretLineCharOffset = caretLineCharOffset();
@@ -85,7 +88,8 @@ public class ScreenBuffer {
             rows.set(caretOffsetY, line);
             editListeners.forEach(EditListener::postEdit);
             caretOffsetX = caretLineCharOffset + string.length();
-            caretOffset.set(getCaretOffset() + string.length());
+            caretOffset.set(caretOffset.get() + string.length());
+            caretIndex += Strings.codePointCount(string);
         } else {
             // multi rows add
             String[] lines = caretTailed
@@ -99,7 +103,8 @@ public class ScreenBuffer {
             editListeners.forEach(EditListener::postEdit);
             caretOffsetX = lines[lines.length - 1].length() - suffix.length();
             caretOffsetY += lines.length - 1;
-            setCaretOffset(getCaretOffset() + string.length());
+            caretOffset.set(caretOffset.get() + string.length());
+            caretIndex += Strings.codePointCount(string);
 
             if (content instanceof BufferedContent buffer) buffer.flush();
             fitRows(getScreenRowSize());
@@ -111,8 +116,6 @@ public class ScreenBuffer {
     public void delete(int len) {
 
         if (len <= 0) return;
-
-        int caretIndex = caretIndex();
         if (caretIndex + len > content.length()) return;
 
         scrollToCaret();
@@ -177,7 +180,7 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (caretIndex() >= content.length()) {
+        if (caretIndex >= content.length()) {
             return;
         }
 
@@ -192,7 +195,8 @@ public class ScreenBuffer {
             caretOffsetX = 0;
             caretOffsetY++;
         }
-        setCaretOffset(getCaretOffset() + n);
+        caretOffset.set(caretOffset.get() + n);
+        caretIndex++;
 
         if (caretOffsetY + 2 > getScreenRowSize() && lastIndexOnScreen() <= content.length()) {
             // scroll if the caret comes to the bottom of the screen
@@ -206,7 +210,7 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (getOriginRowIndex() == 0 && caretOffsetY == 0 && getCaretOffset() == 0) {
+        if (getOriginRowIndex() == 0 && caretOffsetY == 0 && caretOffset.get() == 0) {
             return;
         }
 
@@ -221,7 +225,8 @@ public class ScreenBuffer {
         } else {
             caretOffsetX -= n;
         }
-        setCaretOffset(getCaretOffset() - n);
+        caretOffset.set(caretOffset.get() - n);
+        caretIndex--;
 
         if (getOriginRowIndex() > 0 && caretOffsetY - 1 < 0) {
             // scroll if the caret comes to the head of the screen.
@@ -234,20 +239,22 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (caretIndex() >= content.length() ||
-                !rows.get(caretOffsetY).endsWith("\n")) {
+        if (caretIndex > content.length() - 1 || caretOffsetY == rows.size() - 1) {
             return;
         }
 
-        int remaining = caretLineRemaining();
+        //          +-------+
+        // curr  x x|x x x $ ->  x x x x x $
+        // next  x x x x         x x|x x
+        //      +---+
+        String curr = rows.get(caretOffsetY);
+        String next = rows.get(caretOffsetY + 1).replace("\n", "");
+        String across = curr.substring(caretLineCharOffset())
+            + next.substring(0, Math.min(caretOffsetX, next.length()));
+        caretOffset.set(caretOffset.get() + across.length());
+        caretIndex += Strings.codePointCount(across);
+
         caretOffsetY++;
-
-        //     +-------+ remaining
-        //  x x|x x x $ ->  x x x x x $
-        //  x x x x         x x|x x
-        //                  +--+ caretLineCharOffset
-        setCaretOffset(getCaretOffset() + remaining + caretLineCharOffset());
-
         if (caretOffsetY + 2 > getScreenRowSize() && lastIndexOnScreen() <= content.length()) {
             // scroll if the caret comes to the bottom of the screen
             scrollNext(1);
@@ -259,20 +266,24 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (getOriginRowIndex() == 0 && caretOffsetY == 0) {
+        if (getOriginRowIndex() == 0 && caretOffsetY <= 0) {
             return;
         }
 
-        int remaining = caretLineCharOffset();
+        //          +-------+
+        // prev  x x x x x $ ->  x x|x x x $
+        // curr  x x|x x         x x x x
+        //      +---+
+        String prev = rows.get(caretOffsetY - 1);
+        String curr = rows.get(caretOffsetY);
+
+        int prevCharLen = prev.length() - 1; // end with a new line because there is a next line
+        String across = prev.substring(Math.min(caretOffsetX, prevCharLen))
+            + curr.substring(0, caretLineCharOffset());
+        caretOffset.set(caretOffset.get() - across.length());
+        caretIndex -= Strings.codePointCount(across);
+
         caretOffsetY--;
-
-        //                 +---+ caretLineCharOffset
-        //                 +-----------+ rows.get(caretOffsetY).length()
-        //  x x x x x $ ->  x x|x x x $
-        //  x x|x x         x x x x
-        // +---+ remaining
-        setCaretOffset(getCaretOffset() - remaining - rows.get(caretOffsetY).length() + caretLineCharOffset());
-
         if (getOriginRowIndex() > 0 && caretOffsetY - 1 < 0) {
             scrollPrev(1);
         }
@@ -283,7 +294,8 @@ public class ScreenBuffer {
         scrollToCaret();
         int remaining = caretLineCharOffset();
         caretOffsetX = 0;
-        setCaretOffset(getCaretOffset() - remaining);
+        caretOffset.set(caretOffset.get() - remaining);
+        caretIndex -= Strings.codePointCount(rows.get(caretOffsetY), 0, remaining);
     }
 
 
@@ -291,7 +303,8 @@ public class ScreenBuffer {
         scrollToCaret();
         int remaining = caretLineCharLength() - caretLineCharOffset();
         caretOffsetX = caretLineCharLength();
-        setCaretOffset(getCaretOffset() + remaining);
+        caretOffset.set(caretOffset.get() + remaining);
+        caretIndex += Strings.codePointCount(rows.get(caretOffsetY), remaining);
     }
 
 
@@ -299,18 +312,18 @@ public class ScreenBuffer {
 
         for (int i = 0; i < delta; i ++) {
 
-            if (getOriginRowIndex() == 0) return;
+            if (originRowIndex.get() == 0) return;
 
-            String firstRow = content.untilSol(getOriginIndex() - 1);
-            originRowIndex.set(getOriginRowIndex() - 1);
-            originIndex.set(getOriginIndex() - firstRow.length()); // TODO change to character length
+            String firstRow = content.untilSol(originIndex.get() - 1);
+            originRowIndex.set(originRowIndex.get() - 1);
+            originIndex.set(originIndex.get() - Strings.codePointCount(firstRow));
             rows.add(0, firstRow);
             if (rows.size() > getScreenRowSize()) {
                 rows.remove(rows.size() - 1);
             }
 
             caretOffsetY++;
-            caretOffset.set(getCaretOffset() + firstRow.length());
+            caretOffset.set(caretOffset.get() + firstRow.length());
         }
     }
 
@@ -321,17 +334,17 @@ public class ScreenBuffer {
 
             if (rows.size() < prefRowRemaining()) return;
 
-            int removeLineLength = rows.get(0).length();
+            String removeLine = rows.get(0);
             int bottomLengthOnContent = lastIndexOnScreen();
             if (bottomLengthOnContent < content.length()) {
                 rows.add(content.untilEol(bottomLengthOnContent));
             }
             rows.remove(0);
             originRowIndex.set(getOriginRowIndex() + 1);
-            originIndex.set(getOriginIndex() + removeLineLength); // TODO change to character length
+            originIndex.set(originIndex.get() + Strings.codePointCount(removeLine));
 
             caretOffsetY--;
-            caretOffset.set(getCaretOffset() - removeLineLength);
+            caretOffset.set(caretOffset.get() - removeLine.length());
         }
     }
 
@@ -367,9 +380,9 @@ public class ScreenBuffer {
 
 
     public void backSpace() {
-        int pos = caretIndex();
+        int pos = caretIndex;
         prev();
-        if (pos != caretIndex()) {
+        if (pos != caretIndex) {
             delete(1);
         }
     }
@@ -404,58 +417,46 @@ public class ScreenBuffer {
         if (future.isEmpty()) return;
 
         int startIndex = future.pos();
-        int endIndex = future.pos() + future.len();
         int lineCount = future.lineCount();
         while (startIndex < originIndex.get()) scrollPrev(3);
-        while (startIndex > originIndex.get() + charCountOnScreen())  scrollNext(3);
-        moveCaret(startIndex - originIndex.get());
+        while (startIndex > originIndex.get() + codePointCountOnScreen())  scrollNext(3);
 
-        editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, lineCount));
+        String ceiling = content.substring(originIndex.get(), startIndex);
+        caretOffsetY = Strings.countLf(ceiling);
+        caretOffsetX = Strings.lastLineLength(ceiling);
+        caretOffset.set(ceiling.length());
+        caretIndex = startIndex;
+
+        editListeners.forEach(l -> l.preEdit(originRowIndex.get() + caretOffsetY, caretOffsetY, lineCount));
 
         if (undo) content.undo(); else content.redo();
+        String line = content.lineAt(future.pos());
+        rows.set(caretOffsetY, line);
 
-        rows.set(caretOffsetY, content.lineAt(future.pos()));
-
-        if (lineCount > 1) {
-            // TODO reflect only the changes
-            while (rows.size() - 1 > caretOffsetY) {
-                rows.remove(rows.size() - 1);
-            }
-            fitRows(screenRowSize.get());
+        // TODO reflect only the changes
+        while (rows.size() - 1 > caretOffsetY) {
+            rows.remove(rows.size() - 1);
         }
+        fitRows(screenRowSize.get());
+//        if (lineCount > 1) {
+//            if (future.isDeleted()) {
+//                rows.remove(caretOffsetY + 1, caretOffsetY + 1 + lineCount);
+//                rows.add(caretOffsetY + 1, content.lineAt(startIndex + Strings.codePointCount(line)));
+//            } else {
+//                rows.remove(caretOffsetY + 1);
+//                List<String> adding = new ArrayList<>();
+//                int index = startIndex + Strings.codePointCount(line);
+//                for (int i = 1; i <= lineCount; i++) {
+//                    String str = content.lineAt(index);
+//                    adding.add(str);
+//                    index += str.length();
+//                }
+//                rows.addAll(caretOffsetY + 1, adding);
+//            }
+//        }
 
         editListeners.forEach(EditListener::postEdit);
         totalLines.set(content.lineCount());
-    }
-
-
-    /**
-     * <pre>
-     *    |x|x|$  0
-     *    |x|x|$  1
-     * ---------
-     * 0: |a|b|$  2  <- originRowIndex 2
-     * 1: |c|d|                        |
-     * L caretOffsetY 1  -> caretRowIndex 3
-     * </pre>
-     */
-    public int caretRowIndex() {
-        return getOriginRowIndex() + caretOffsetY;
-    }
-
-
-    /**
-     * <pre>
-     * |x|x|$
-     * ---------
-     *  + originIndex  3
-     * |a|b|$          |
-     * |c|d|           |
-     *   L caretOffset 4 -> caretIndex 7
-     * </pre>
-     */
-    public int caretIndex() {
-        return getOriginIndex() + caretOffset.get();
     }
 
 
@@ -471,7 +472,7 @@ public class ScreenBuffer {
      * </pre>
      */
     public int lastIndexOnScreen() {
-        return getOriginIndex() + charCountOnScreen();
+        return originIndex.get() + charCountOnScreen();
     }
 
 
@@ -491,29 +492,6 @@ public class ScreenBuffer {
         return Math.min(caretLineCharLength(), caretOffsetX);
     }
 
-    /**
-     * <pre>
-     * |c|o|n|t|e|n|t|$
-     *         |     L caretLineCharLength
-     *         └ caretLineCharOffset
-     *         |<-3->| caretLineCharRemaining
-     * </pre>
-     */
-    public int caretLineCharRemaining() {
-        return caretLineCharLength() - caretLineCharOffset();
-    }
-
-    /**
-     * <pre>
-     * |c|o|n|t|e|n|t|$
-     *         |       |
-     *         └ caretLineCharOffset
-     *         |<- 4 ->| caretLineRemaining
-     * </pre>
-     */
-    public int caretLineRemaining() {
-        return rows.get(caretOffsetY).length() - caretLineCharOffset();
-    }
 
     /**
      * <pre>
@@ -547,15 +525,8 @@ public class ScreenBuffer {
         return rows.stream().mapToInt(String::length).sum();
     }
 
-
-    private int toOffsetY(int offset) {
-        for (int i = 0, count = 0; i < rows.size(); i++) {
-            count += rows.get(i).length();
-            if (count > offset) {
-                return i;
-            }
-        }
-        return rows.size();
+    int codePointCountOnScreen() {
+        return rows.stream().mapToInt(Strings::codePointCount).sum();
     }
 
 
@@ -599,18 +570,12 @@ public class ScreenBuffer {
 
 
     private int getCaretCodePoint() {
-        int caretPosOnContent = caretIndex();
-        if (caretPosOnContent >= content.length()) {
-            return 0;
-        }
-        return isCaretVisibleOnScreen()
-            ? rows.get(caretOffsetY).codePointAt(caretLineCharOffset())
-            : content.codePointAt(caretPosOnContent);
+        return (caretIndex >= content.length()) ? 0 : content.codePointAt(caretIndex);
     }
 
 
     private int getCaretPrevCodePoint() {
-        int caretPosOnContent = caretIndex() - 1;
+        int caretPosOnContent = caretIndex - 1;
         if (caretPosOnContent <= 0) {
             return 0;
         }
@@ -654,23 +619,33 @@ public class ScreenBuffer {
 
 
     public final void moveCaret(int offset) {
+
+        if (offset < 0) {
+            throw new IllegalArgumentException("offset:" + offset);
+        }
+
         int charCountOnScreen = charCountOnScreen();
         if (offset > charCountOnScreen) {
             caretOffsetY = rows.size() - 1;
             caretOffsetX = rows.get(caretOffsetY).length();
             caretOffset.set(charCountOnScreen);
+            caretIndex = originIndex.get() + rows.stream().mapToInt(Strings::codePointCount).sum();
             return;
         }
+        int cpLen = 0;
         int index = 0;
         for (int i = 0; i < rows.size(); i++) {
-            int len = rows.get(i).length();
+            String line = rows.get(i);
+            int len = line.length();
             index += len;
             if (index > offset) {
                 caretOffsetY = i;
                 caretOffsetX = len - (index - offset);
                 caretOffset.set(offset);
+                caretIndex = originIndex.get() + cpLen + Strings.codePointCount(line, 0, caretOffsetX);
                 break;
             }
+            cpLen += Strings.codePointCount(line);
         }
     }
 
@@ -679,8 +654,9 @@ public class ScreenBuffer {
 
         int[] ret = new int[] { offset, offset };
 
-        int[] left  = content.untilSol(getOriginIndex() + offset).toLowerCase().codePoints().toArray();
-        int[] right = content.untilEol(getOriginIndex() + offset).toLowerCase().codePoints().toArray();
+        // TODO offset to cp count
+        int[] left  = content.untilSol(originIndex.get() + offset).toLowerCase().codePoints().toArray();
+        int[] right = content.untilEol(originIndex.get() + offset).toLowerCase().codePoints().toArray();
 
         for (int i = left.length - 1; i >= 0; i--) {
             if (Character.getType(left[left.length - 1]) != Character.getType(left[i])) {
@@ -731,41 +707,12 @@ public class ScreenBuffer {
         return caretOffsetX;
     }
 
-    Content getContent() {
-        return content;
-    }
-
     public Path getPath() {
         return content.path();
     }
 
     public boolean isDirty() {
         return content.undoSize() > 0;
-    }
-
-    public String inspect() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n== Debug info ==\n");
-        sb.append("rows.size[%d], rowSize[%d]\n".formatted(rows.size(), getScreenRowSize()));
-        sb.append("originRowIndex[%d], originIndex[%d]\n".formatted(getOriginRowIndex(), getOriginIndex()));
-        sb.append("caretOffsetY[%d], caretOffsetX[%d], caretOffset[%d]\n".formatted(caretOffsetY, caretOffsetX, caretOffset.get()));
-        if (content instanceof BufferedContent editBuffered) {
-            sb.append("editBuffered.getEdit() : [%s]\n".formatted(editBuffered.getEdit()));
-        }
-        return sb.toString();
-    }
-
-    public void reset() {
-        logger.log(INFO, "== reset");
-        if (content instanceof BufferedContent buffer) buffer.flush();
-        caretOffsetY = caretOffsetX = 0;
-        caretOffset.set(0);
-        originRowIndex.set(0);
-        originIndex.set(0);
-        if (content instanceof BufferedContent buffer) buffer.flush();
-        rows.clear();
-        totalLines.set(1);
-        fitRows(getScreenRowSize());
     }
 
     // <editor-fold desc="properties">
@@ -789,6 +736,40 @@ public class ScreenBuffer {
     public ReadOnlyIntegerProperty scrollMaxLinesProperty() { return scrollMaxLines; }
 
     // </editor-fold>
+
+    public String inspect() {
+        return  """
+            -- Debug info -------------------------------
+            rows.size()   = %d
+            caretOffsetY  = %d
+            caretOffsetX  = %d
+            caretOffset   = %d
+            screenRowSize = %d
+
+            originRowIndex = %d
+            originIndex    = %d
+            caretIndex     = %d
+
+            totalLines     = %d
+            scrollMaxLines = %d
+            """.formatted(rows.size(), caretOffsetY, caretOffsetX, caretOffset.get(), screenRowSize.get(),
+            originRowIndex.get(), originIndex.get(), caretIndex, totalLines.get(), scrollMaxLines.get());
+    }
+
+    public void reset() {
+        logger.log(INFO, "== reset");
+        if (content instanceof BufferedContent buffer) buffer.flush();
+        caretOffsetY = caretOffsetX = 0;
+        caretOffset.set(0);
+        caretIndex = 0;
+        originRowIndex.set(0);
+        originIndex.set(0);
+        if (content instanceof BufferedContent buffer) buffer.flush();
+        rows.clear();
+        totalLines.set(1);
+        fitRows(getScreenRowSize());
+    }
+
 
 }
 

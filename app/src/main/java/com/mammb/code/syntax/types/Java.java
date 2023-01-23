@@ -52,14 +52,16 @@ public class Java implements Highlighter {
     public Token decorate(int line, Token token) {
 
         LinePoint point = new LinePoint(line, token.position());
+        LinePoint hwPoint = scope.highWaterPosition();
 
-        if (line > scope.highWaterLine()) {
-            if (token.name().equals("/*"))
+        if (hwPoint == null || point.compareTo(hwPoint) > 0) {
+            if (token.name().equals("/*")) {
                 scope.push(ScopeMark.startOf("blockComment", point, 2));
-            if (token.name().equals("*/"))
+            } else if (token.name().equals("*/")) {
                 scope.push(ScopeMark.endOf("blockComment", point, 2));
-            if (token.name().equals("\"\"\""))
-                scope.push(ScopeMark.endOf("textBlock", point, 3));
+            } else if (token.name().equals("\"\"\"")) {
+                scope.push(ScopeMark.of("textBlock", point, 3));
+            }
         }
 
         if (scope.within(point, "blockComment")) {
@@ -137,6 +139,9 @@ public class Java implements Highlighter {
         }
 
         private Token readText() {
+            if (peekChar(0) == '"' && peekChar(1) == '"') {
+                return token().with("\"\"\"", consume(3), 3);
+            }
             return Helper.readString(this, "string", '"');
         }
 
