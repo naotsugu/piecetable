@@ -3,7 +3,6 @@ package com.mammb.code.editor;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.mammb.code.piecetable.Edited;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -72,16 +71,17 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
+        int lineCount = Strings.countLf(string);
         boolean caretTailed = caretIndex == content.length();
         content.insert(caretIndex, string);
-        totalLines.set(getTotalLines() + Strings.countLf(string));
+        totalLines.set(totalLines.get() + lineCount);
 
         int caretLineCharOffset = caretLineCharOffset();
         String current = rows.get(caretOffsetY);
         String prefix = current.substring(0, caretLineCharOffset);
         String suffix = current.substring(caretLineCharOffset);
 
-        if (Strings.countLf(string) == 0) {
+        if (lineCount == 0) {
             // simple inline add
             String line = prefix + string + suffix;
             editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, 1));
@@ -129,7 +129,7 @@ public class ScreenBuffer {
             fitRows(getScreenRowSize() + deleteLineCount);
         }
         content.delete(caretIndex, len);
-        totalLines.set(getTotalLines() - deleteLineCount);
+        totalLines.set(totalLines.get() - deleteLineCount);
 
         if (deleteLineCount == 0) {
             // simple inline delete
@@ -161,6 +161,7 @@ public class ScreenBuffer {
             editListeners.forEach(EditListener::postEdit);
         }
 
+        prepareTailRow();
     }
 
 
@@ -430,14 +431,21 @@ public class ScreenBuffer {
         editListeners.forEach(l -> l.preEdit(originRowIndex.get() + caretOffsetY, caretOffsetY, lineCount));
 
         if (undo) content.undo(); else content.redo();
-        String line = content.lineAt(future.pos());
-        rows.set(caretOffsetY, line);
+
+        if (future.isInserted()) {
+            totalLines.set(totalLines.get() + lineCount);
+        } else {
+            totalLines.set(totalLines.get() - lineCount);
+        }
 
         // TODO reflect only the changes
-        while (rows.size() - 1 > caretOffsetY) {
+        while (rows.size() - 1 >= caretOffsetY) {
             rows.remove(rows.size() - 1);
         }
         fitRows(screenRowSize.get());
+
+//        String line = content.lineAt(future.pos());
+//        rows.set(caretOffsetY, line);
 //        if (lineCount > 1) {
 //            if (future.isDeleted()) {
 //                rows.remove(caretOffsetY + 1, caretOffsetY + 1 + lineCount);
@@ -456,7 +464,7 @@ public class ScreenBuffer {
 //        }
 
         editListeners.forEach(EditListener::postEdit);
-        totalLines.set(content.lineCount());
+
     }
 
 
@@ -560,14 +568,17 @@ public class ScreenBuffer {
                 rows.add(string);
             }
         }
-
-        if (rows.isEmpty() ||
-            (preferenceSize > rows.size() && rows.get(rows.size() - 1).endsWith("\n"))) {
-            rows.add("");
-        }
-
+        prepareTailRow();
     }
 
+    private void prepareTailRow() {
+        if (rows.size() == 1 && rows.get(0).isEmpty()) {
+            rows.set(0, " ");
+        } else if (rows.isEmpty() ||
+            (totalLines.get() > rows.size() && rows.get(rows.size() - 1).endsWith("\n"))) {
+            rows.add(" ");
+        }
+    }
 
     private int getCaretCodePoint() {
         return (caretIndex >= content.length()) ? 0 : content.codePointAt(caretIndex);
@@ -675,7 +686,7 @@ public class ScreenBuffer {
 
 
     private void updateScrollMaxLines(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        scrollMaxLines.set(totalLines.get() - prefRowRemaining());
+        scrollMaxLines.set(Math.max(totalLines.get() - prefRowRemaining(), 0));
     }
 
     /**
@@ -683,7 +694,7 @@ public class ScreenBuffer {
      * @return the number of lines to remain when scrolling
      */
     private int prefRowRemaining() {
-        return (int) Math.ceil(getScreenRowSize() * 2.0 / 3.0);
+        return (int) Math.ceil(screenRowSize.get() * 2.0 / 3.0);
     }
 
 
@@ -739,7 +750,8 @@ public class ScreenBuffer {
 
     public String inspect() {
         return  """
-            -- Debug info -------------------------------
+
+            -- Debug info ---------------------------------------------------
             rows.size()   = %d
             caretOffsetY  = %d
             caretOffsetX  = %d

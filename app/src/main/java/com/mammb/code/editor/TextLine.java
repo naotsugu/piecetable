@@ -51,10 +51,13 @@ public class TextLine extends TextFlow {
         if (dirty != null && dirty.originLineNumber() != lineNumber - index) {
             logger.log(ERROR, "originLineNumber:{}, lineNumber{}, index{}", dirty.originLineNumber(), lineNumber, index);
         }
-        List<List<Text>> removing = new ArrayList<>(lines.subList(index, index + length));
-        List<Text> nodes = removing.stream().flatMap(Collection::stream).toList();
-        lines.removeAll(removing);
-        if (dirty != null) dirty.removeAll(removing);
+
+        List<List<Text>> removingSublist = lines.subList(index, index + length);
+        List<List<Text>> removingCopy = new ArrayList<>(removingSublist);
+        removingSublist.clear();
+
+        if (dirty != null) dirty.removeAll(removingCopy);
+        List<Text> nodes = removingCopy.stream().flatMap(Collection::stream).toList();
         getChildren().removeAll(nodes);
     }
 
@@ -90,7 +93,7 @@ public class TextLine extends TextFlow {
 
     private List<Text> asTexts(int line, String text) {
         return highlighter.apply(line, text).stream()
-            .map(p -> asText(p.text(), p.paint())).toList();
+            .map(p -> asText(p.text(), p.paint())).collect(Collectors.toList());
     }
 
 
@@ -139,7 +142,8 @@ public class TextLine extends TextFlow {
     record Dirty(List<List<Text>> dirtyLines, boolean invalidated, int lineNumber, int index) {
         int originLineNumber() { return lineNumber - index; }
         void removeAll(List<List<Text>> removing) {
-            dirtyLines.removeAll(removing);
+            // remove by identity
+            dirtyLines.removeIf(d -> removing.stream().anyMatch(r -> r == d));
         }
     }
 

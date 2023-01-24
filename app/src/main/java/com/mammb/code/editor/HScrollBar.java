@@ -22,7 +22,6 @@ public class HScrollBar extends Region {
     private final DoubleProperty min = new SimpleDoubleProperty(0);
     private final DoubleProperty max = new SimpleDoubleProperty(0);
     private final DoubleProperty value = new SimpleDoubleProperty(0);
-    private final DoubleProperty thumbLength = new SimpleDoubleProperty(0);
 
 
     public HScrollBar(ScreenBuffer screenBuffer) {
@@ -50,7 +49,6 @@ public class HScrollBar extends Region {
         thumb.setOnMouseDragged(this::handleThumbDragged);
 
         value.addListener(this::handleValueChanged);
-        thumbLength.addListener((observable, oldValue, newValue) -> applyThumbWidth());
         max.addListener((observable, oldValue, newValue) -> applyThumbWidth());
 
         setOnMouseClicked(this::handleTruckClicked);
@@ -58,13 +56,14 @@ public class HScrollBar extends Region {
 
     private void applyThumbWidth() {
         double len = max.get() - min.get();
-        thumb.setWidth(getWidth() * thumbLength.get() / Math.max(len, thumbLength.get()));
+        thumb.setWidth(Math.max(10, getWidth() * getWidth() / Math.max(len, getWidth())));
     }
 
     private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+
         double len = getMax() - getMin();
         double range = getWidth() - thumb.getWidth();
-        double x = range * clamp(getMin(), newValue.doubleValue(), getMax()) / len;
+        double x = getWidth() * clamp(getMin(), newValue.doubleValue(), getMax()) / len;
         thumb.setX(clamp(0, x, range));
     }
 
@@ -79,7 +78,7 @@ public class HScrollBar extends Region {
             markThumbStart(e);
         }
         double len = getMax() - getMin();
-        double x = getMin() + len * (cur.getX() - dragStart.getX()) / (getWidth() - thumb.getWidth());
+        double x = getMin() + len * (cur.getX() - dragStart.getX()) / getWidth();
         value.setValue(clamp(getMin(), x, getMax()));
         e.consume();
     }
@@ -123,9 +122,9 @@ public class HScrollBar extends Region {
         }
 
         if (e.getX() < thumb.getX() ) {
-            value.setValue(clamp(getMin(), value.getValue() - thumbLength.get(), getMax()));
+            value.setValue(clamp(getMin(), value.getValue() - getWidth(), getMax()));
         } else if (e.getX() > thumb.getX() + thumb.getWidth()) {
-            value.setValue(clamp(getMin(), value.getValue() + thumbLength.get(), getMax()));
+            value.setValue(clamp(getMin(), value.getValue() + getWidth(), getMax()));
         }
         e.consume();
     }
@@ -148,10 +147,6 @@ public class HScrollBar extends Region {
     public final void setValue(double value) { valueProperty().set(value); }
     public final double getValue() { return value == null ? 0 : value.get(); }
     public final DoubleProperty valueProperty() { return value; }
-
-    public final void setThumbLength(double value) { thumbLengthProperty().set(value); }
-    public final double getThumbLength() { return thumbLength == null ? 10 : thumbLength.get(); }
-    public final DoubleProperty thumbLengthProperty() { return thumbLength; }
 
     // </editor-fold>
 

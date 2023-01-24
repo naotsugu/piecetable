@@ -107,7 +107,6 @@ public class TextPane extends Region {
         hScroll = new HScrollBar(screenBuffer);
         hScroll.layoutYProperty().bind(heightProperty().subtract(hScroll.getHeight()));
         hScroll.prefWidthProperty().bind(widthProperty());
-        hScroll.thumbLengthProperty().bind(widthProperty().subtract(left.widthProperty()));
         hScroll.maxProperty().bind(textFlow.widthProperty());
         hScroll.visibleProperty().bind(widthProperty().subtract(left.widthProperty()).lessThan(textFlow.widthProperty()));
         textStack.layoutXProperty().bind(hScroll.valueProperty().multiply(-1));
@@ -124,7 +123,7 @@ public class TextPane extends Region {
         if (!initText.isBlank()) {
             Platform.runLater(() -> {
                 screenBuffer.add(initText);
-                screenBuffer.moveCaret(0);
+                screenBuffer.reset();
             });
         }
     }
