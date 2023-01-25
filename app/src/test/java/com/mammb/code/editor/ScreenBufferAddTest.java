@@ -406,7 +406,7 @@ public class ScreenBufferAddTest {
         // scroll to caret
         assertEquals(7, sb.getCaretOffsetY());
         assertEquals(2, sb.getCaretOffsetX());
-        assertEquals(23, sb.getCaretOffset());
+        assertEquals(26, sb.getCaretOffset());
     }
 
 

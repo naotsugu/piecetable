@@ -2,7 +2,9 @@ package com.mammb.code.editor;
 
 import com.mammb.code.syntax.Highlighter;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class TextLine extends TextFlow {
     private final double textWidth = Utils.getTextWidth(Fonts.main, 1);
     private Highlighter highlighter;
     private Dirty dirty;
+
 
     public TextLine() {
         highlighter = Highlighter.of("");
@@ -88,6 +91,18 @@ public class TextLine extends TextFlow {
                 getChildren().addAll(nodeIndex, replacing);
             }
         }
+    }
+
+
+    public List<Point2D> linePoints() {
+        List<Point2D> points = new ArrayList<>();
+        int start = 0;
+        for (List<Text> line :lines) {
+            PathElement[] paths = rangeShape(start, start + 1);
+            points.add(new Point2D(0, Utils.getPathMaxY(paths)));
+            start += line.stream().map(Text::getText).mapToInt(String::length).sum();
+        }
+        return points;
     }
 
 

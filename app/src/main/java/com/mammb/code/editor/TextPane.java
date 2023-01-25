@@ -27,6 +27,7 @@ public class TextPane extends Region {
     private final ScreenBuffer screenBuffer = new ScreenBuffer();
     private final Stage stage;
     private final TextLine textFlow;
+    private final SidePanel sidePanel = new SidePanel();
     private final Caret caret;
     private final Selection selection;
     private final ImePalette imePalette;
@@ -90,10 +91,8 @@ public class TextPane extends Region {
         StackPane textStack = new StackPane(textFlow, caret, selection, imePalette);
         textStack.setCursor(Cursor.TEXT);
         Pane main = new Pane(textStack);
-        Pane left = new SidePanel(screenBuffer);
-        left.setPadding(new Insets(4));
         pane.setCenter(main);
-        pane.setLeft(left);
+        pane.setLeft(sidePanel);
         getChildren().add(pane);
 
         layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
@@ -104,11 +103,11 @@ public class TextPane extends Region {
         initScreenRowSize(getLayoutBounds().getHeight());
         initDropTarget();
 
-        hScroll = new HScrollBar(screenBuffer);
+        hScroll = new HScrollBar();
         hScroll.layoutYProperty().bind(heightProperty().subtract(hScroll.getHeight()));
         hScroll.prefWidthProperty().bind(widthProperty());
         hScroll.maxProperty().bind(textFlow.widthProperty());
-        hScroll.visibleProperty().bind(widthProperty().subtract(left.widthProperty()).lessThan(textFlow.widthProperty()));
+        hScroll.visibleProperty().bind(widthProperty().subtract(sidePanel.widthProperty()).lessThan(textFlow.widthProperty()));
         textStack.layoutXProperty().bind(hScroll.valueProperty().multiply(-1));
         getChildren().add(hScroll);
 
@@ -136,7 +135,6 @@ public class TextPane extends Region {
     }
 
     private void initScreenRowSize(double height) {
-
         screenBuffer.setupScreenRowSize(Math.max((int) Math.ceil(height / lineHeight), 1));
     }
 
@@ -180,6 +178,7 @@ public class TextPane extends Region {
                     change.getAddedSubList());
             }
         }
+        sidePanel.drawNumber(screenBuffer.getOriginRowIndex(), textFlow.linePoints());
     }
 
 

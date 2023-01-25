@@ -42,17 +42,17 @@ public class Utils {
         return getPathMaxY(elements) - getPathMinY(elements);
     }
 
-    private static double getPathMinX(PathElement... elements) {
+    public static double getPathMinX(PathElement... elements) {
         return Arrays.stream(elements).mapToDouble(Utils::getPathX).min().orElse(0.0);
     }
     private static double getPathMaxX(PathElement... elements) {
         return Arrays.stream(elements).mapToDouble(Utils::getPathX).max().orElse(0.0);
     }
 
-    private static double getPathMinY(PathElement... elements) {
+    public static double getPathMinY(PathElement... elements) {
         return Arrays.stream(elements).mapToDouble(Utils::getPathY).min().orElse(0.0);
     }
-    private static double getPathMaxY(PathElement... elements) {
+    public static double getPathMaxY(PathElement... elements) {
         return Arrays.stream(elements).mapToDouble(Utils::getPathY).max().orElse(0.0);
     }
 

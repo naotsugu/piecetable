@@ -1,6 +1,5 @@
 package com.mammb.code.piecetable;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**

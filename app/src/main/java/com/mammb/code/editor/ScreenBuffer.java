@@ -302,10 +302,11 @@ public class ScreenBuffer {
 
     public void end() {
         scrollToCaret();
-        int remaining = caretLineCharLength() - caretLineCharOffset();
+        int offset = caretLineCharOffset();
+        int remaining = caretLineCharLength() - offset;
         caretOffsetX = caretLineCharLength();
         caretOffset.set(caretOffset.get() + remaining);
-        caretIndex += Strings.codePointCount(rows.get(caretOffsetY), remaining);
+        caretIndex += caretLineCodePointLength() - offset;
     }
 
 
@@ -520,6 +521,14 @@ public class ScreenBuffer {
         return row.endsWith("\n") ? row.length() - 1 : row.length();
     }
 
+    public int caretLineCodePointLength() {
+        if (caretOffsetY >= rows.size() || caretOffsetY < 0) {
+            return 0;
+        }
+        String row = rows.get(caretOffsetY);
+        return row.endsWith("\n") ? Strings.codePointCount(row) - 1 : Strings.codePointCount(row);
+    }
+
 
     /**
      * <pre>
@@ -725,6 +734,7 @@ public class ScreenBuffer {
     public boolean isDirty() {
         return content.undoSize() > 0;
     }
+    public int getCaretIndex() { return caretIndex; }
 
     // <editor-fold desc="properties">
 

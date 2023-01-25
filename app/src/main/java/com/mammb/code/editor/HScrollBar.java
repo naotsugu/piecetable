@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -14,9 +13,10 @@ import javafx.scene.shape.Rectangle;
 
 public class HScrollBar extends Region {
 
-    private final ScreenBuffer screenBuffer;
     private final double HEIGHT = 8;
     private final Rectangle thumb;
+
+    private double preDragThumbPos;
     private Point2D dragStart;
 
     private final DoubleProperty min = new SimpleDoubleProperty(0);
@@ -24,9 +24,7 @@ public class HScrollBar extends Region {
     private final DoubleProperty value = new SimpleDoubleProperty(0);
 
 
-    public HScrollBar(ScreenBuffer screenBuffer) {
-
-        this.screenBuffer = screenBuffer;
+    public HScrollBar() {
 
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
         setBackground(new Background(new BackgroundFill(Colors.hTtrackColor, null, null)));
@@ -38,6 +36,7 @@ public class HScrollBar extends Region {
         this.thumb.setArcHeight(4);
         this.thumb.setArcWidth(4);
         this.thumb.setFill(Colors.thumbColor);
+        this.thumb.setAccessibleRole(AccessibleRole.THUMB);
         this.thumb.setManaged(false);
         getChildren().add(thumb);
 
@@ -54,33 +53,36 @@ public class HScrollBar extends Region {
         setOnMouseClicked(this::handleTruckClicked);
     }
 
+
     private void applyThumbWidth() {
-        double len = max.get() - min.get();
-        thumb.setWidth(Math.max(10, getWidth() * getWidth() / Math.max(len, getWidth())));
+        thumb.setWidth(Math.max(10, getWidth() * getWidth() / Math.max(max.get() - min.get(), getWidth())));
     }
+
 
     private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-
-        double len = getMax() - getMin();
-        double range = getWidth() - thumb.getWidth();
-        double x = getWidth() * clamp(getMin(), newValue.doubleValue(), getMax()) / len;
-        thumb.setX(clamp(0, x, range));
+        double val = clampValue(newValue.doubleValue());
+        double x = (getWidth() - thumb.getWidth()) * (val - min.get()) / valueLength();
+        thumb.setX(x);
     }
 
-    private void handleThumbDragged(MouseEvent e) {
-        if (e.isSynthesized()) {
-            e.consume();
+    private void handleThumbDragged(MouseEvent me) {
+        if (me.isSynthesized()) {
+            me.consume();
             return;
         }
 
-        Point2D cur = thumb.localToParent(e.getX(), e.getY());
+        Point2D cur = thumb.localToParent(me.getX(), me.getY());
         if (dragStart == null) {
-            markThumbStart(e);
+            markThumbStart(me);
         }
-        double len = getMax() - getMin();
-        double x = getMin() + len * (cur.getX() - dragStart.getX()) / getWidth();
-        value.setValue(clamp(getMin(), x, getMax()));
-        e.consume();
+
+        double dragPos = cur.getX() - dragStart.getX();
+        double position = preDragThumbPos + dragPos / (getWidth() - thumb.getWidth());
+        double newValue = (position * valueLength()) + min.get();
+        if (!Double.isNaN(newValue)) {
+            value.setValue(clampValue(newValue));
+        }
+        me.consume();
     }
 
 
@@ -103,14 +105,17 @@ public class HScrollBar extends Region {
     }
 
 
-    private void markThumbStart(MouseEvent e) {
-        dragStart = thumb.localToParent(e.getX(), e.getY());
+    private void markThumbStart(MouseEvent me) {
+        dragStart = thumb.localToParent(me.getX(), me.getY());
+        double val = clampValue(value.get());
+        preDragThumbPos = (val - min.get()) / valueLength();
         thumb.setFill(Colors.thumbActiveColor);
     }
 
 
     private void markThumbEnd(MouseEvent e) {
         dragStart = null;
+        preDragThumbPos = 0;
         thumb.setFill(Colors.thumbColor);
     }
 
@@ -122,16 +127,20 @@ public class HScrollBar extends Region {
         }
 
         if (e.getX() < thumb.getX() ) {
-            value.setValue(clamp(getMin(), value.getValue() - getWidth(), getMax()));
+            value.setValue(clampValue(value.getValue() - getWidth()));
         } else if (e.getX() > thumb.getX() + thumb.getWidth()) {
-            value.setValue(clamp(getMin(), value.getValue() + getWidth(), getMax()));
+            value.setValue(clampValue(value.getValue() + getWidth()));
         }
         e.consume();
     }
 
 
-    private static double clamp(double min, double value, double max) {
-        return Math.min(Math.max(value, min), max);
+    private double clampValue(double value) {
+        return Math.min(Math.max(value, min.get()), max.get() - thumb.getWidth());
+    }
+
+    private double valueLength() {
+        return max.get() - thumb.getWidth() - min.get();
     }
 
     // <editor-fold desc="properties">
