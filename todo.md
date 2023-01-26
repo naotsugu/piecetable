@@ -7,4 +7,8 @@
 * [ ] Correct display of vertical scroll bars
 * [ ] Implement markdown file highlighting
 * [ ] Word wrap
+* [ ] Remember me
+* [ ] Save session
+
+
 

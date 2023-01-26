@@ -21,21 +21,12 @@ public class App extends Application {
         textPane.setNewWindowConsumer((mode, text) -> newWindow(new Stage(), mode, text));
 
         Scene scene = new Scene(textPane, 800, 480);
-        scene.setOnKeyPressed(this::handleKeyPressed);
 
         Image icon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icon/icon512.png")));
         stage.getIcons().add(icon);
 
         stage.setScene(scene);
         stage.show();
-    }
-
-
-    private void handleKeyPressed(KeyEvent e) {
-        if (Keys.SC_N.match(e)) {
-            newWindow(new Stage(), "", "");
-            e.consume();
-        }
     }
 
 

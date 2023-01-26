@@ -285,7 +285,7 @@ public class ScreenBuffer {
         caretIndex -= Strings.codePointCount(across);
 
         caretOffsetY--;
-        if (getOriginRowIndex() > 0 && caretOffsetY - 1 < 0) {
+        if (originRowIndex.get() > 0 && caretOffsetY - 1 < 0) {
             scrollPrev(1);
         }
     }
@@ -320,7 +320,7 @@ public class ScreenBuffer {
             originRowIndex.set(originRowIndex.get() - 1);
             originIndex.set(originIndex.get() - Strings.codePointCount(firstRow));
             rows.add(0, firstRow);
-            if (rows.size() > getScreenRowSize()) {
+            if (rows.size() > screenRowSize.get()) {
                 rows.remove(rows.size() - 1);
             }
 
@@ -573,7 +573,7 @@ public class ScreenBuffer {
                 if (string == null) {
                     break;
                 }
-                i += string.length();
+                i += Strings.codePointCount(string);
                 rows.add(string);
             }
         }
@@ -581,11 +581,9 @@ public class ScreenBuffer {
     }
 
     private void prepareTailRow() {
-        if (rows.size() == 1 && rows.get(0).isEmpty()) {
-            rows.set(0, " ");
-        } else if (rows.isEmpty() ||
+        if (rows.isEmpty() ||
             (totalLines.get() > rows.size() && rows.get(rows.size() - 1).endsWith("\n"))) {
-            rows.add(" ");
+            rows.add("");
         }
     }
 

@@ -3,6 +3,7 @@ package com.mammb.code.editor;
 import com.mammb.code.syntax.Highlighter;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.geometry.VPos;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
@@ -23,13 +24,16 @@ public class TextLine extends TextFlow {
     private Highlighter highlighter;
     private Dirty dirty;
 
+    private static final Text blankText = new Text("X");
+    static { blankText.setFont(Fonts.main); blankText.setTextOrigin(VPos.TOP);}
+
 
     public TextLine() {
         highlighter = Highlighter.of("");
         setPadding(new Insets(4));
         setTabSize(4);
         setMaxWidth(Double.MAX_VALUE);
-        addAll(0, 0, List.of(" "));
+        addAll(0, 0, List.of(""));
     }
 
 
@@ -94,13 +98,32 @@ public class TextLine extends TextFlow {
     }
 
 
+    public PathElement[] caretShape(int charIndex, boolean leading) {
+        if (charIndex == 0) {
+            if (lines.isEmpty() || (lines.size() == 1 && lineString(0).isEmpty())) {
+                return blankText.caretShape(0, leading);
+            }
+        }
+        return super.caretShape(charIndex, leading);
+    }
+
+
     public List<Point2D> linePoints() {
         List<Point2D> points = new ArrayList<>();
-        int start = 0;
+        int offset = 0;
+        double prev = 0;
         for (List<Text> line :lines) {
-            PathElement[] paths = rangeShape(start, start + 1);
-            points.add(new Point2D(0, Utils.getPathMaxY(paths)));
-            start += line.stream().map(Text::getText).mapToInt(String::length).sum();
+            PathElement[] paths = rangeShape(offset, offset + 1);
+            if (lines.size() == 1 && paths.length == 0) {
+                points.add(new Point2D(0, 0));
+            } else {
+                double y = (paths == null || paths.length == 0)
+                    ? prev + Utils.getTextHeight(Fonts.main)
+                    : Utils.getPathMinY(paths);
+                points.add(new Point2D(0, y));
+                prev = y;
+            }
+            offset += line.stream().map(Text::getText).mapToInt(String::length).sum();
         }
         return points;
     }
@@ -108,12 +131,14 @@ public class TextLine extends TextFlow {
 
     private List<Text> asTexts(int line, String text) {
         return highlighter.apply(line, text).stream()
-            .map(p -> asText(p.text(), p.paint())).collect(Collectors.toList());
+            .map(p -> asText(p.text(), p.paint()))
+            .collect(Collectors.toList());
     }
 
 
     private Text asText(String string, Paint paint) {
         Text text = new Text(string);
+        text.setTextOrigin(VPos.TOP);
         text.setFont(Fonts.main);
         text.setFill(paint);
         return text;

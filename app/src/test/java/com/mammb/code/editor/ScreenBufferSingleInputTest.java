@@ -174,7 +174,7 @@ class ScreenBufferSingleInputTest {
         // 2:
         assertEquals(0, sb.getCaretOffsetY());
         assertEquals(0, sb.getCaretOffsetX());
-        assertEquals(1, sb.charCountOnScreen()); // empty space
+        assertEquals(0, sb.charCountOnScreen());
 
     }
 

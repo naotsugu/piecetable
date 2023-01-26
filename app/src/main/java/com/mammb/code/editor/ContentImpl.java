@@ -103,8 +103,6 @@ public class ContentImpl implements Content {
     @Override
     public String untilSol(int pos) {
 
-        if (pos == 0) return "";
-
         var list = new ArrayList<byte[]>();
         Boolean skipFirst = null;
 

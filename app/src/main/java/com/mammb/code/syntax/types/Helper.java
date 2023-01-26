@@ -9,7 +9,7 @@ public class Helper {
     private static final String[] str = IntStream.range(0, 128).mapToObj(Character::toString).toArray(String[]::new);
 
     public static String str(char ch) {
-        return (0 < ch && ch < 128) ? str[ch] : "";
+        return (0 < ch && ch < 128) ? str[ch] : " ";
     }
 
     public static Token readString(Tokenizer tn, String name, char m) {
