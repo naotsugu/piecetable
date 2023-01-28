@@ -277,7 +277,6 @@ public class ScreenBuffer {
         //      +---+
         String prev = rows.get(caretOffsetY - 1);
         String curr = rows.get(caretOffsetY);
-
         int prevCharLen = prev.length() - 1; // end with a new line because there is a next line
         String across = prev.substring(Math.min(caretOffsetX, prevCharLen))
             + curr.substring(0, caretLineCharOffset());
@@ -401,11 +400,11 @@ public class ScreenBuffer {
             }
             scrollPrev(1);
         }
-        if (caretOffsetY > getScreenRowSize()) {
-            while (caretOffsetY > getScreenRowSize()) {
+        if (caretOffsetY >= screenRowSize.get()) {
+            while (caretOffsetY >= screenRowSize.get()) {
                 scrollNext(1);
             }
-            scrollNext(3);
+            scrollNext(1);
         }
     }
 
@@ -582,7 +581,7 @@ public class ScreenBuffer {
 
     private void prepareTailRow() {
         if (rows.isEmpty() ||
-            (totalLines.get() > rows.size() && rows.get(rows.size() - 1).endsWith("\n"))) {
+            (originRowIndex.get() + 1 + rows.size() == totalLines.get() && rows.get(rows.size() - 1).endsWith("\n"))) {
             rows.add("");
         }
     }
@@ -621,7 +620,7 @@ public class ScreenBuffer {
 
 
     private boolean isCaretVisibleOnScreen() {
-        return caretOffset.get() >= 0 && caretOffsetY <= getScreenRowSize();
+        return caretOffset.get() >= 0 && caretOffsetY < screenRowSize.get();
     }
 
 
@@ -789,7 +788,6 @@ public class ScreenBuffer {
         totalLines.set(1);
         fitRows(getScreenRowSize());
     }
-
 
 }
 

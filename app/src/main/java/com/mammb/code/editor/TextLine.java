@@ -6,6 +6,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.PathElement;
+import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
@@ -141,6 +142,7 @@ public class TextLine extends TextFlow {
         text.setTextOrigin(VPos.TOP);
         text.setFont(Fonts.main);
         text.setFill(paint);
+        text.setFontSmoothingType(FontSmoothingType.LCD);
         return text;
     }
 

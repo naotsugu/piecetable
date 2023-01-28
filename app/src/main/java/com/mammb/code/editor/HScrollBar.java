@@ -16,8 +16,8 @@ public class HScrollBar extends Region {
     private final double HEIGHT = 8;
     private final Rectangle thumb;
 
-    private double preDragThumbPos;
     private Point2D dragStart;
+    private double preDragThumbPos;
 
     private final DoubleProperty min = new SimpleDoubleProperty(0);
     private final DoubleProperty max = new SimpleDoubleProperty(0);
@@ -54,7 +54,7 @@ public class HScrollBar extends Region {
     }
 
 
-    private void applyThumbWidth() {
+    void applyThumbWidth() {
         thumb.setWidth(Math.max(10, getWidth() * getWidth() / Math.max(max.get() - min.get(), getWidth())));
     }
 

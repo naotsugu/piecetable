@@ -1,8 +1,11 @@
 package com.mammb.code.editor;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.AccessibleRole;
@@ -43,7 +46,6 @@ public class TextPane extends Region {
 
         this.stage = stage;
         setupStageTitle();
-
         setBackground(new Background(new BackgroundFill(Colors.bgColor, null, null)));
         setAccessibleRole(AccessibleRole.TEXT_AREA);
         setCursor(Cursor.DEFAULT);
@@ -57,17 +59,7 @@ public class TextPane extends Region {
         textFlow = new TextLine();
         textFlow.setFocusTraversable(true);
 
-        screenBuffer.addEditListener(new EditListener() {
-            @Override
-            public void preEdit(int lineNumber, int index, int length) {
-                textFlow.markDirty(lineNumber, index, length);
-            }
-            @Override
-            public void postEdit() {
-                setupStageTitle();
-                textFlow.cleanDirty();
-            }
-        });
+        screenBuffer.addEditListener(editHandler());
 
         caret = new Caret();
         caret.setLayoutX(textFlow.getPadding().getLeft());
@@ -95,14 +87,6 @@ public class TextPane extends Region {
         pane.setLeft(sidePanel);
         getChildren().add(pane);
 
-        layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue.getHeight() != newValue.getHeight()) {
-                initScreenRowSize(newValue.getHeight());
-            }
-        });
-        initScreenRowSize(getLayoutBounds().getHeight());
-        initDropTarget();
-
         hScroll = new HScrollBar();
         hScroll.layoutYProperty().bind(heightProperty().subtract(hScroll.getHeight()));
         hScroll.prefWidthProperty().bind(widthProperty());
@@ -118,6 +102,12 @@ public class TextPane extends Region {
         vScroll.valueProperty().bind(screenBuffer.originRowIndexProperty());
         vScroll.maxProperty().bind(screenBuffer.scrollMaxLinesProperty());
         getChildren().add(vScroll);
+
+        layoutBoundsProperty().addListener(this::handleLayoutEdited);
+        initScreenRowSize(getLayoutBounds().getHeight());
+        initDropTarget();
+
+        stage.focusedProperty().addListener((obs, oldValue, newValue) -> caret.pause(!newValue));
 
         if (!initText.isBlank()) {
             Platform.runLater(() -> {
@@ -160,6 +150,31 @@ public class TextPane extends Region {
                 event.setDropCompleted(false);
             }
         });
+    }
+
+
+    private void handleLayoutEdited(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+        if (oldValue.getHeight() != newValue.getHeight()) {
+            initScreenRowSize(newValue.getHeight());
+        }
+        if (oldValue.getWidth() != newValue.getWidth()) {
+            hScroll.applyThumbWidth();
+        }
+    }
+
+
+    private EditListener editHandler() {
+        return new EditListener() {
+            @Override
+            public void preEdit(int lineNumber, int index, int length) {
+                textFlow.markDirty(lineNumber, index, length);
+            }
+            @Override
+            public void postEdit() {
+                setupStageTitle();
+                textFlow.cleanDirty();
+            }
+        };
     }
 
 
