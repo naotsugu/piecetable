@@ -72,11 +72,14 @@ public class ScreenBufferCaretTest {
         // 3: a$   4
         // 4:|     5
         // ----------
+        assertEquals(8, sb.getCaretIndex());
+        assertEquals(8, sb.getContentLength());
         assertEquals(0, sb.getOriginRowIndex());
         assertEquals(0, sb.getOriginIndex());
         assertEquals(5, sb.getTotalLines());
         assertEquals(5, sb.rows.size());
         assertEquals(4, sb.getCaretOffsetY());
+
 
         sb.add("a\n");
         // 0: a$   1
@@ -88,6 +91,8 @@ public class ScreenBufferCaretTest {
         // 5:|     6
         //
         // ----------
+        assertEquals(10, sb.getCaretIndex());
+        assertEquals(10, sb.getContentLength());
         assertEquals(2, sb.getOriginRowIndex());
         assertEquals(4, sb.getOriginIndex());
         assertEquals(6, sb.getTotalLines());
@@ -105,6 +110,8 @@ public class ScreenBufferCaretTest {
         // 5: a$   6
         // 6:|
         // ----------
+        assertEquals(12, sb.getCaretIndex());
+        assertEquals(12, sb.getContentLength());
         assertEquals(2, sb.getOriginRowIndex());
         assertEquals(4, sb.getOriginIndex());
         assertEquals(7, sb.getTotalLines());
@@ -122,12 +129,116 @@ public class ScreenBufferCaretTest {
         // 5:|a$   6
         // 6:
         // ----------
+        assertEquals(10, sb.getCaretIndex());
+        assertEquals(12, sb.getContentLength());
         assertEquals(2, sb.getOriginRowIndex());
         assertEquals(4, sb.getOriginIndex());
         assertEquals(7, sb.getTotalLines());
         assertEquals(5, sb.rows.size());
         assertEquals(3, sb.getCaretOffsetY());
         assertEquals(6, sb.getCaretOffset());
+
+    }
+
+    @Test
+    void testCaretScrollDelete() {
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(5);
+        assertEquals(5, sb.getScreenRowSize());
+
+        sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n");
+        // 0: a$   1
+        // 1: a$   2
+        // __________
+        // 2: a$   3
+        // 3: a$   4
+        // 4: a$   5
+        // 5: a$   6
+        // 6:|
+        // ----------
+        assertEquals(12, sb.getCaretIndex());
+        assertEquals(12, sb.getContentLength());
+        assertEquals(2, sb.getOriginRowIndex());
+        assertEquals(4, sb.getOriginIndex());
+        assertEquals(7, sb.getTotalLines());
+        assertEquals(5, sb.rows.size());
+        assertEquals(4, sb.getCaretOffsetY());
+        assertEquals(8, sb.getCaretOffset());
+
+        sb.prevLine();sb.prevLine();sb.prevLine();sb.prevLine();sb.prevLine();sb.prevLine();
+        // __________
+        // 0:|a$   1
+        // 1: a$   2
+        // 2: a$   3
+        // 3: a$   4
+        // 4: a$   5
+        // ----------
+        // 5: a$   6
+        // 6:
+        assertEquals(0, sb.getCaretIndex());
+        assertEquals(12, sb.getContentLength());
+        assertEquals(0, sb.getOriginRowIndex());
+        assertEquals(0, sb.getOriginIndex());
+        assertEquals(7, sb.getTotalLines());
+        assertEquals(5, sb.rows.size());
+        assertEquals(0, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffset());
+
+        sb.delete(2);
+        // __________
+        // 0:|a$   1
+        // 1: a$   2
+        // 2: a$   3
+        // 3: a$   4
+        // 4: a$   5
+        // ----------
+        // 5:
+        assertEquals(0, sb.getCaretIndex());
+        assertEquals(10, sb.getContentLength());
+        assertEquals(0, sb.getOriginRowIndex());
+        assertEquals(0, sb.getOriginIndex());
+        assertEquals(6, sb.getTotalLines());
+        assertEquals(5, sb.rows.size());
+        assertEquals(0, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffset());
+
+        sb.delete(2);
+        // __________
+        // 0:|a$   1
+        // 1: a$   2
+        // 2: a$   3
+        // 3: a$   4
+        // 4:
+        // ----------
+        assertEquals(0, sb.getCaretIndex());
+        assertEquals(8, sb.getContentLength());
+        assertEquals(0, sb.getOriginRowIndex());
+        assertEquals(0, sb.getOriginIndex());
+        assertEquals(5, sb.getTotalLines());
+        assertEquals(5, sb.rows.size());
+        assertEquals(0, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffset());
+
+        sb.delete(7);
+        // __________
+        // 0:|$
+        // 1:
+        assertEquals(0, sb.getCaretIndex());
+        assertEquals(1, sb.getContentLength());
+        assertEquals(0, sb.getOriginRowIndex());
+        assertEquals(0, sb.getOriginIndex());
+        assertEquals(2, sb.getTotalLines());
+        assertEquals(2, sb.rows.size());
+
+        sb.delete(1);
+        // __________
+        // 0:|
+        assertEquals(0, sb.getCaretIndex());
+        assertEquals(0, sb.getContentLength());
+        assertEquals(0, sb.getOriginRowIndex());
+        assertEquals(0, sb.getOriginIndex());
+        assertEquals(1, sb.getTotalLines());
+        assertEquals(1, sb.rows.size());
 
     }
 

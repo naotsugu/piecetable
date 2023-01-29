@@ -125,7 +125,7 @@ public class TextPane extends Region {
     }
 
     private void initScreenRowSize(double height) {
-        screenBuffer.setupScreenRowSize(Math.max((int) Math.ceil(height / lineHeight), 1));
+        screenBuffer.setupScreenRowSize(Math.max((int) Math.floor(height / lineHeight), 1));
     }
 
     private void initDropTarget() {

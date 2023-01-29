@@ -18,6 +18,7 @@ public class ScrollBar extends StackPane {
     private final ScreenBuffer screenBuffer;
     private final double WIDTH = 8;
     private final Rectangle thumb;
+
     private Point2D dragStart;
     private int dragStartRowIndex = -1;
 

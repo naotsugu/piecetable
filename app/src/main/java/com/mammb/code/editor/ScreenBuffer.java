@@ -107,8 +107,8 @@ public class ScreenBuffer {
             caretIndex += Strings.codePointCount(string);
 
             if (content instanceof BufferedContent buffer) buffer.flush();
-            fitRows(getScreenRowSize());
             scrollToCaret();
+            fitRows(getScreenRowSize());
         }
     }
 
@@ -126,7 +126,7 @@ public class ScreenBuffer {
         int deleteLineCount = deleteLines.length - 1;
         if (deleteLineCount > 0) {
             // Pre-supply the number of rows to be deleted
-            fitRows(getScreenRowSize() + deleteLineCount);
+            fitRows(screenRowSize.get() + deleteLineCount);
         }
         content.delete(caretIndex, len);
         totalLines.set(totalLines.get() - deleteLineCount);
@@ -161,7 +161,6 @@ public class ScreenBuffer {
             editListeners.forEach(EditListener::postEdit);
         }
 
-        prepareTailRow();
     }
 
 
@@ -341,7 +340,7 @@ public class ScreenBuffer {
                 rows.add(content.untilEol(bottomLengthOnContent));
             }
             rows.remove(0);
-            originRowIndex.set(getOriginRowIndex() + 1);
+            originRowIndex.set(originRowIndex.get() + 1);
             originIndex.set(originIndex.get() + Strings.codePointCount(removeLine));
 
             caretOffsetY--;
@@ -566,6 +565,7 @@ public class ScreenBuffer {
         }
 
         if (preferenceSize > rows.size()) {
+
             // if the size of the rows is small, add a line at the end.
             for (int i = lastIndexOnScreen(); i < content.length() && preferenceSize > rows.size();) {
                 String string = content.untilEol(i);
@@ -576,15 +576,16 @@ public class ScreenBuffer {
                 rows.add(string);
             }
         }
-        prepareTailRow();
-    }
 
-    private void prepareTailRow() {
-        if (rows.isEmpty() ||
-            (originRowIndex.get() + 1 + rows.size() == totalLines.get() && rows.get(rows.size() - 1).endsWith("\n"))) {
+        if (content.length() == 0 && rows.isEmpty()) {
+            rows.add("");
+        } else if (preferenceSize > rows.size()
+            && originRowIndex.get() + rows.size() == totalLines.get() - 1
+            && rows.get(rows.size() - 1).endsWith("\n")) {
             rows.add("");
         }
     }
+
 
     private int getCaretCodePoint() {
         return (caretIndex >= content.length()) ? 0 : content.codePointAt(caretIndex);
@@ -732,6 +733,7 @@ public class ScreenBuffer {
         return content.undoSize() > 0;
     }
     public int getCaretIndex() { return caretIndex; }
+    public int getContentLength() { return  content.length(); }
 
     // <editor-fold desc="properties">
 
