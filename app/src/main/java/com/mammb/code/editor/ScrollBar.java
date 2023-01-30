@@ -14,7 +14,6 @@ import javafx.scene.shape.Rectangle;
 
 public class ScrollBar extends StackPane {
 
-
     private final ScreenBuffer screenBuffer;
     private final double WIDTH = 8;
     private final Rectangle thumb;
@@ -35,12 +34,14 @@ public class ScrollBar extends StackPane {
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
         setBackground(new Background(new BackgroundFill(Colors.trackColor, null, null)));
         setWidth(WIDTH);
+        setPrefWidth(WIDTH);
 
         this.thumb = new Rectangle(WIDTH, 0);
+        this.thumb.setY(0);
         this.thumb.setArcHeight(4);
         this.thumb.setArcWidth(4);
         this.thumb.setFill(Colors.thumbColor);
-        this.thumb.setY(0);
+        this.thumb.setAccessibleRole(AccessibleRole.THUMB);
         this.thumb.setManaged(false);
         getChildren().add(thumb);
 
@@ -49,15 +50,20 @@ public class ScrollBar extends StackPane {
 
         thumb.setOnMousePressed(this::handleThumbMousePressed);
         thumb.setOnMouseReleased(this::handleThumbMouseReleased);
-
         thumb.setOnMouseDragged(this::handleThumbDragged);
-        setOnMouseClicked(this::handleTruckClicked);
 
         value.addListener(this::handleValueChanged);
-
-        thumbLength.addListener((observable, oldValue, newValue) -> applyThumbHeight());
         max.addListener((observable, oldValue, newValue) -> applyThumbHeight());
+        thumbLength.addListener((observable, oldValue, newValue) -> applyThumbHeight());
+
+        setOnMouseClicked(this::handleTruckClicked);
     }
+
+
+    void applyThumbHeight() {
+        thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
+    }
+
 
 
     private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -134,8 +140,12 @@ public class ScrollBar extends StackPane {
     }
 
 
-    void applyThumbHeight() {
-        thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
+    private double clampValue(double value) {
+        return Math.min(Math.max(value, min.get()), max.get());
+    }
+
+    private double valueLength() {
+        return max.get() - min.get();
     }
 
 
