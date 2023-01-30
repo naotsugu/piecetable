@@ -21,12 +21,10 @@ public class Java implements Highlighter {
     public Tokenizer tokenizer() { return tokenizer; }
 
     @Override
-    public boolean invalidate(int line, int length){
-        if (blockEdgeContains(line, length)) {
-            scope.removeCeiling(line);
-            return true;
-        }
-        return false;
+    public boolean invalidate(int line, int length) {
+        int before = scope.size();
+        scope.removeCeiling(line);
+        return before != scope.size();
     }
 
     @Override
@@ -44,6 +42,7 @@ public class Java implements Highlighter {
             case "number" -> Colors.numberLiteralColor;
             case "blockComment" -> Colors.blockCommentColor;
             case "annotation" -> Colors.yellowColor;
+            case "method" -> Colors.functionColor;
             default  -> Colors.fgColor;
         };
     }
@@ -71,6 +70,11 @@ public class Java implements Highlighter {
         }
         return token;
 
+    }
+
+    @Override
+    public String inspect() {
+        return scope.inspect();
     }
 
 

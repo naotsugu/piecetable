@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 public class Scope {
 
-    private TreeMap<LinePoint, ScopeMark> tree = new TreeMap<>();
+    private final TreeMap<LinePoint, ScopeMark> tree = new TreeMap<>();
 
 
     public void push(ScopeMark mark) {
@@ -101,6 +101,15 @@ public class Scope {
 
     public int size() {
         return tree.size();
+    }
+
+
+    public String inspect() {
+        StringBuilder sb = new StringBuilder();
+        for (ScopeMark mark : tree.values()) {
+            sb.append(mark.toString()).append('\n');
+        }
+        return sb.toString();
     }
 
 }

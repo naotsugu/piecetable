@@ -144,7 +144,6 @@ public class ScreenBufferCaretTest {
     void testCaretScrollDelete() {
         var sb = new ScreenBuffer();
         sb.setScreenRowSize(5);
-        assertEquals(5, sb.getScreenRowSize());
 
         sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n");
         // 0: a$   1
@@ -239,6 +238,68 @@ public class ScreenBufferCaretTest {
         assertEquals(0, sb.getOriginIndex());
         assertEquals(1, sb.getTotalLines());
         assertEquals(1, sb.rows.size());
+
+    }
+
+
+    @Test
+    void testCaretLine() {
+        var sb = new ScreenBuffer();
+        sb.setScreenRowSize(5);
+        sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n"); sb.add("a\n");
+        sb.prevLine(); sb.prevLine(); sb.prevLine(); sb.prevLine(); sb.prevLine();
+        // __________
+        // 0:|a$   1
+        // 1: a$   2
+        // 2: a$   3
+        // 3: a$   4
+        // 4: a$   5
+        // ----------
+        assertEquals(0, sb.getCaretIndex());
+        assertEquals(10, sb.getContentLength());
+        assertEquals(0, sb.getOriginRowIndex());
+        assertEquals(0, sb.getOriginIndex());
+        assertEquals(6, sb.getTotalLines());
+        assertEquals(5, sb.rows.size());
+        assertEquals(0, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffset());
+
+        sb.nextLine(); sb.nextLine(); sb.nextLine(); sb.nextLine();
+        // 0: a$   1
+        // __________
+        // 1: a$   2
+        // 2: a$   3
+        // 3: a$   4
+        // 4:|a$   5
+        // 5:
+        // ----------
+        assertEquals(8, sb.getCaretIndex());
+        assertEquals(10, sb.getContentLength());
+        assertEquals(1, sb.getOriginRowIndex());
+        assertEquals(2, sb.getOriginIndex());
+        assertEquals(6, sb.getTotalLines());
+        assertEquals(5, sb.rows.size());
+        assertEquals(3, sb.getCaretOffsetY());
+        assertEquals(6, sb.getCaretOffset());
+
+        sb.nextLine(); sb.nextLine();
+        // 0: a$   1
+        // 1: a$   2
+        // __________
+        // 2: a$   3
+        // 3: a$   4
+        // 4: a$   5
+        // 5:|
+        //
+        // ----------
+        assertEquals(10, sb.getCaretIndex());
+        assertEquals(10, sb.getContentLength());
+        assertEquals(2, sb.getOriginRowIndex());
+        assertEquals(4, sb.getOriginIndex());
+        assertEquals(6, sb.getTotalLines());
+        assertEquals(4, sb.rows.size());
+        assertEquals(3, sb.getCaretOffsetY());
+        assertEquals(6, sb.getCaretOffset());
 
     }
 

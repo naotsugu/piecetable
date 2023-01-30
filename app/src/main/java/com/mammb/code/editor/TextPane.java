@@ -69,6 +69,7 @@ public class TextPane extends Region {
         screenBuffer.caretOffsetProperty().addListener(this::handleCaretMoved);
         screenBuffer.addListChangeListener(this::handleScreenTextChanged);
         screenBuffer.originIndexProperty().addListener(this::handleOriginMoved);
+        screenBuffer.originRowIndexProperty().addListener(this::handleOriginRowIndexChanged);
 
         selection = new Selection();
 
@@ -156,6 +157,7 @@ public class TextPane extends Region {
     private void handleLayoutEdited(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
         if (oldValue.getHeight() != newValue.getHeight()) {
             initScreenRowSize(newValue.getHeight());
+            sidePanel.drawNumber(screenBuffer.getOriginRowIndex(), textFlow.linePoints());
         }
         if (oldValue.getWidth() != newValue.getWidth()) {
             hScroll.applyThumbWidth();
@@ -173,6 +175,7 @@ public class TextPane extends Region {
             public void postEdit() {
                 setupStageTitle();
                 textFlow.cleanDirty();
+                sidePanel.drawNumber(screenBuffer.getOriginRowIndex(), textFlow.linePoints());
             }
         };
     }
@@ -193,7 +196,12 @@ public class TextPane extends Region {
                     change.getAddedSubList());
             }
         }
-        sidePanel.drawNumber(screenBuffer.getOriginRowIndex(), textFlow.linePoints());
+
+    }
+
+
+    private void handleOriginRowIndexChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        sidePanel.drawNumber(newValue.intValue(), textFlow.linePoints());
     }
 
 

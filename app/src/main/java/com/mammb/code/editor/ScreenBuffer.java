@@ -141,7 +141,6 @@ public class ScreenBuffer {
                 line.substring(0, index) + line.substring(index + deleteString.length()));
             editListeners.forEach(EditListener::postEdit);
         } else {
-
             // multi rows delete
             // +-------+ prefix
             //  x x x x|- -          ->    x x x x|x x x
@@ -153,7 +152,7 @@ public class ScreenBuffer {
             if (caretOffsetY + deleteLineCount < rows.size()) {
                 suffix = rows.get(caretOffsetY + deleteLineCount).substring(deleteLines[deleteLineCount].length());
             }
-            editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, deleteLineCount + 1));
+            editListeners.forEach(l -> l.preEdit(originRowIndex.get() + caretOffsetY, caretOffsetY, deleteLineCount + 1));
             rows.set(caretOffsetY, prefix + suffix);
             for (int i = 0; i < deleteLineCount; i++) {
                 rows.remove(caretOffsetY + 1);
@@ -210,7 +209,7 @@ public class ScreenBuffer {
 
         scrollToCaret();
 
-        if (getOriginRowIndex() == 0 && caretOffsetY == 0 && caretOffset.get() == 0) {
+        if (originRowIndex.get() == 0 && caretOffsetY == 0 && caretOffset.get() == 0) {
             return;
         }
 
@@ -346,6 +345,7 @@ public class ScreenBuffer {
             caretOffsetY--;
             caretOffset.set(caretOffset.get() - removeLine.length());
         }
+        prepareTailRow(screenRowSize.get());
     }
 
 
@@ -576,7 +576,11 @@ public class ScreenBuffer {
                 rows.add(string);
             }
         }
+        prepareTailRow(preferenceSize);
+    }
 
+
+    private void prepareTailRow(int preferenceSize) {
         if (content.length() == 0 && rows.isEmpty()) {
             rows.add("");
         } else if (preferenceSize > rows.size()

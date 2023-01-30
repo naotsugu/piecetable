@@ -87,9 +87,9 @@ public class TextLine extends TextFlow {
             !highlighter.blockEdgeContains(target.lineNumber, 1)) return;
 
         for (List<Text> lineText : target.dirtyLines()) {
-            int index = lines.indexOf(lineText);
+            int index = linesIndexOf(lineText);
             if (index > -1) {
-                getChildren().removeAll(lines.get(index));
+                getChildren().removeIf(n -> lines.get(index).stream().anyMatch(e -> e == n));
                 List<Text> replacing = asTexts(target.originLineNumber() + index, lineString(index));
                 lines.set(index, replacing);
                 int nodeIndex = asNodeIndex(index);
@@ -179,6 +179,15 @@ public class TextLine extends TextFlow {
 
     private String asString(List<Text> line) {
         return line.stream().map(Text::getText).collect(Collectors.joining());
+    }
+
+    private int linesIndexOf(List<Text> lineText) {
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i) == lineText) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     record Dirty(List<List<Text>> dirtyLines, boolean invalidated, int lineNumber, int index) {

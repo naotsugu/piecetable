@@ -55,4 +55,9 @@ public class ScopeMark {
     public ScopeMark pair() { return pair; }
     public int size() { return size; }
 
+    @Override
+    public String toString() {
+        return "name:" + name + ", type:" + type + ", linePoint:" + linePoint + ", size:" + size + ", pair:" + pair.hashCode();
+    }
+
 }

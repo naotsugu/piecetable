@@ -63,6 +63,7 @@ public interface Highlighter {
     default Token decorate(int line, Token token) {
         return token;
     }
+    default String inspect() { return this.toString(); }
 
     private PaintText consumeToken(Token token) {
         PaintText paintText = new PaintText(
