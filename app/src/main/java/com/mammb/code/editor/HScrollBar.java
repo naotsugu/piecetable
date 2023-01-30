@@ -55,7 +55,9 @@ public class HScrollBar extends Region {
 
 
     void applyThumbWidth() {
-        thumb.setWidth(Math.max(10, getWidth() * getWidth() / Math.max(max.get() - min.get(), getWidth())));
+        thumb.setWidth(Math.max(10,
+            getWidth() * getWidth() / Math.max(max.get() - min.get(), getWidth())
+        ));
     }
 
 
@@ -65,7 +67,9 @@ public class HScrollBar extends Region {
         thumb.setX(x);
     }
 
+
     private void handleThumbDragged(MouseEvent me) {
+
         if (me.isSynthesized()) {
             me.consume();
             return;

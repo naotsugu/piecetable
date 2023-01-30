@@ -61,50 +61,37 @@ public class ScrollBar extends StackPane {
 
 
     void applyThumbHeight() {
-        thumb.setHeight(getHeight() * getThumbLength() / Math.max(getMax() - getMin(), getThumbLength()));
+        thumb.setHeight(Math.max(10,
+            getHeight() * thumbLength.get() / Math.max(max.get() - min.get(), thumbLength.get())
+        ));
     }
-
 
 
     private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        double len = getMax() - getMin();
-        double range = getHeight() - thumb.getHeight();
-        double y = range * clamp(getMin(), newValue.doubleValue(), getMax()) / len;
-        thumb.setY(clamp(0, y, range));
+        double val = clampValue(newValue.doubleValue());
+        double y = (getHeight() - thumb.getHeight()) * (val - min.get()) / valueLength();
+        thumb.setY(y);
     }
 
 
-    private void handleTruckClicked(MouseEvent e) {
+    private void handleThumbDragged(MouseEvent me) {
 
-        if (!e.getSource().equals(this) || e.getButton() != MouseButton.PRIMARY) {
+        if (me.isSynthesized()) {
+            me.consume();
             return;
         }
 
-        if (e.getY() < thumb.getY() ) {
-            screenBuffer.pageScrollUp();
-        } else if (e.getY() > thumb.getY() + thumb.getHeight()) {
-            screenBuffer.pageScrollDown();
-        }
-        e.consume();
-    }
-
-
-    private void handleThumbDragged(MouseEvent e) {
-
-        if (e.isSynthesized()) {
-            e.consume();
-            return;
-        }
-
-        Point2D cur = thumb.localToParent(e.getX(), e.getY());
+        Point2D cur = thumb.localToParent(me.getX(), me.getY());
         if (dragStart == null) {
-            markThumbStart(e);
+            markThumbStart(me);
         }
-        double len = getMax() - getMin();
-        double y = getMin() + len * (cur.getY() - dragStart.getY()) / (getHeight() - thumb.getHeight());
-
-        screenBuffer.scrollTo(dragStartRowIndex + (int) Math.floor(y));
-        e.consume();
+        double dragPos = cur.getY() - dragStart.getY();
+        double position = dragPos / (getHeight() - thumb.getHeight());
+        double newValue = dragStartRowIndex + position * valueLength() + min.get();
+        if (!Double.isNaN(newValue)) {
+            screenBuffer.scrollTo((int) Math.floor(newValue));
+        }
+        me.consume();
     }
 
 
@@ -116,6 +103,7 @@ public class ScrollBar extends StackPane {
         markThumbStart(e);
         e.consume();
     }
+
 
     private void handleThumbMouseReleased(MouseEvent e) {
         if (e.isSynthesized()) {
@@ -140,17 +128,32 @@ public class ScrollBar extends StackPane {
     }
 
 
+    private void handleTruckClicked(MouseEvent e) {
+
+        if (e.isSynthesized()) {
+            e.consume();
+            return;
+        }
+
+        if (!e.getSource().equals(this) || e.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
+
+        if (e.getY() < thumb.getY() ) {
+            screenBuffer.pageScrollUp();
+        } else if (e.getY() > thumb.getY() + thumb.getHeight()) {
+            screenBuffer.pageScrollDown();
+        }
+        e.consume();
+    }
+
+
     private double clampValue(double value) {
         return Math.min(Math.max(value, min.get()), max.get());
     }
 
     private double valueLength() {
         return max.get() - min.get();
-    }
-
-
-    private static double clamp(double min, double value, double max) {
-        return Math.min(Math.max(value, min), max);
     }
 
     // <editor-fold desc="properties">
