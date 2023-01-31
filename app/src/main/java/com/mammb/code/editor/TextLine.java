@@ -44,9 +44,6 @@ public class TextLine extends TextFlow {
 
 
     public void addAll(int lineNumber, int index, Collection<? extends String> texts) {
-        if (dirty != null && dirty.originLineNumber() != lineNumber - index) {
-            logger.log(ERROR, "originLineNumber:{}, lineNumber{}, index{}", dirty.originLineNumber(), lineNumber, index);
-        }
         int nodeIndex = asNodeIndex(index);
         List<List<Text>> adding = texts.stream().map(text -> asTexts(lineNumber, text)).toList();
         lines.addAll(index, adding);
@@ -56,10 +53,6 @@ public class TextLine extends TextFlow {
 
 
     public void remove(int lineNumber, int index, int length) {
-        if (dirty != null && dirty.originLineNumber() != lineNumber - index) {
-            logger.log(ERROR, "originLineNumber:{}, lineNumber{}, index{}", dirty.originLineNumber(), lineNumber, index);
-        }
-
         List<List<Text>> removingSublist = lines.subList(index, index + length);
         List<List<Text>> removingCopy = new ArrayList<>(removingSublist);
         removingSublist.clear();

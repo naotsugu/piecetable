@@ -65,6 +65,17 @@ public class ScreenBuffer {
     }
 
 
+    protected void addBulk(String string) {
+        content.insert(caretIndex, string);
+        if (content instanceof BufferedContent buffer) buffer.flush();
+        editListeners.forEach(l -> l.preEdit(originRowIndex.get() + caretOffsetY, caretOffsetY, 1));
+        totalLines.set(content.lineCount());
+        rows.clear();
+        fitRows(screenRowSize.get());
+        editListeners.forEach(EditListener::postEdit);
+    }
+
+
     public void add(String string) {
 
         if (string == null) return;
@@ -72,6 +83,11 @@ public class ScreenBuffer {
         scrollToCaret();
 
         int lineCount = Strings.countLf(string);
+        if (lineCount >= screenRowSize.get()) {
+            addBulk(string);
+            return;
+        }
+
         boolean caretTailed = caretIndex == content.length();
         content.insert(caretIndex, string);
         totalLines.set(totalLines.get() + lineCount);
@@ -84,7 +100,7 @@ public class ScreenBuffer {
         if (lineCount == 0) {
             // simple inline add
             String line = prefix + string + suffix;
-            editListeners.forEach(l -> l.preEdit(getOriginRowIndex() + caretOffsetY, caretOffsetY, 1));
+            editListeners.forEach(l -> l.preEdit(originRowIndex.get() + caretOffsetY, caretOffsetY, 1));
             rows.set(caretOffsetY, line);
             editListeners.forEach(EditListener::postEdit);
             caretOffsetX = caretLineCharOffset + string.length();

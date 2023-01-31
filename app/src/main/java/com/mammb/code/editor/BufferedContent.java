@@ -1,9 +1,7 @@
 package com.mammb.code.editor;
 
 import com.mammb.code.piecetable.Edited;
-
 import java.nio.file.Path;
-import java.util.stream.IntStream;
 
 public class BufferedContent implements Content {
 

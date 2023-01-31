@@ -114,12 +114,12 @@ public class ContentImpl implements Content {
             for (int i = startIndex; i >= 0; i--) {
                 skipFirst = (skipFirst == null && readBuffer[startIndex] == '\n');
                 if (!skipFirst && readBuffer[i] == '\n') {
-                    list.add(0, Arrays.copyOfRange(readBuffer, i + 1, startIndex + 1));
+                    list.add(0, Arrays.copyOfRange(readBuffer, i + 1, startIndex + len(readBuffer[startIndex])));
                     break label;
                 }
                 skipFirst = false;
             }
-            list.add(0, Arrays.copyOfRange(readBuffer, 0, startIndex + 1));
+            list.add(0, Arrays.copyOfRange(readBuffer, 0, startIndex + len(readBuffer[startIndex])));
             if (bufferHeadPos == 0) {
                 break;
             }
@@ -197,14 +197,14 @@ public class ContentImpl implements Content {
 
     private void fillBuffer(int pos) {
         bufferHeadPos = Math.max(pos, 0);
-        bufferTailPos = Math.min(pt.length(), pos + bufferChars);
+        bufferTailPos = Math.min(pt.length(), bufferHeadPos + bufferChars);
         readBuffer = pt.bytes(bufferHeadPos, bufferTailPos);
     }
 
 
     private void fillBufferBackward(int endPos) {
         bufferHeadPos = Math.max(endPos + 1 - bufferChars, 0);
-        bufferTailPos = Math.min(pt.length(), endPos + 1);
+        bufferTailPos = Math.min(pt.length(), bufferHeadPos + bufferChars);
         readBuffer = pt.bytes(bufferHeadPos, bufferTailPos);
     }
 
@@ -251,6 +251,13 @@ public class ContentImpl implements Content {
             byteArray.write(bytes, 0, bytes.length);
         }
         return byteArray.toString(StandardCharsets.UTF_8);
+    }
+
+    public static short len(byte b) {
+        if ((b & 0xE0) == 0xC0) return 2;
+        else if ((b & 0xF0) == 0xE0) return 3;
+        else if ((b & 0xF8) == 0xF0) return 4;
+        else return 1;
     }
 
 }

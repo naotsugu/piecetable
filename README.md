@@ -48,4 +48,30 @@ Single character deletion can be one of two possible conditions:
 ![piecetable3](docs/images/piecetable3.png)
 
 
+## Project detail
+
+|directory|description|
+|--------------|-- |
+|`lib`|Piece table implementation|
+|`app`|Example app of editor(sloppy)|
+
+
+### How to run the application
+
+Clone repository.
+
+```
+$ git clone https://github.com/naotsugu/piecetable.git
+$ cd piecetable
+```
+
+Run app
+
+```
+$ .gradlew run
+```
+
+![editor](docs/images/editor.png)
+
+
 

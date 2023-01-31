@@ -6,8 +6,11 @@ import javafx.scene.text.FontWeight;
 
 public class Fonts {
 
-    public static final int fontSize = 16;
-    public static final Font main =
-        Font.loadFont(Fonts.class.getResourceAsStream("/fonts/UDEVGothic35-Regular.ttf"), fontSize);
-
+    public static final int fontSize = 14;
+    public static final Font main;
+    static {
+        Font temp = Font.loadFont(Fonts.class.getResourceAsStream("/fonts/UDEVGothic35-Regular.ttf"), fontSize);
+        // enabling font fallback
+        main = new Font(temp.getName(), fontSize);
+    }
 }

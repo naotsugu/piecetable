@@ -403,10 +403,9 @@ public class ScreenBufferAddTest {
         sb.setScreenRowSize(10);
 
         sb.add("aa\n".repeat(20) + "aa");
-        // scroll to caret
-        assertEquals(8, sb.getCaretOffsetY());
-        assertEquals(2, sb.getCaretOffsetX());
-        assertEquals(26, sb.getCaretOffset());
+        assertEquals(0, sb.getCaretOffsetY());
+        assertEquals(0, sb.getCaretOffsetX());
+        assertEquals(0, sb.getCaretOffset());
     }
 
 
