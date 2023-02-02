@@ -130,7 +130,7 @@ public class TrieNode {
             return null;
         }
         return parent.children.entrySet().stream()
-            .filter(e -> e.getValue().equals(this))
+            .filter(e -> e.getValue() == this)
             .findFirst()
             .map(Map.Entry::getKey)
             .orElse(null);
