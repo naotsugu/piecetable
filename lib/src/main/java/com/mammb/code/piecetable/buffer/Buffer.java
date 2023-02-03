@@ -10,6 +10,10 @@ import java.nio.channels.WritableByteChannel;
  */
 public interface Buffer {
 
+    /**
+     * count of code point.
+     * @return
+     */
     int length();
 
     byte[] charAt(int index);

@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -132,6 +133,10 @@ public class PieceTable {
 
     public byte[] bytes(int startPos, int endPos) {
         return pieces.bytes(startPos, endPos).get();
+    }
+
+    public byte[] bytes(int startPos, Predicate<byte[]> until) {
+        return pieces.bytes(startPos, until).get();
     }
 
     public int undoSize() {

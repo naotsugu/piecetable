@@ -1,6 +1,7 @@
 package com.mammb.code.piecetable.piece;
 
 import com.mammb.code.piecetable.array.ByteArray;
+import com.mammb.code.piecetable.buffer.Buffer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -8,6 +9,7 @@ import java.nio.channels.WritableByteChannel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -100,6 +102,32 @@ public class CursoredList {
             int s = (i == 0) ? startPos - from.position() : 0;
             int e = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
             byteArray.add(piece.bytes(s, e).bytes());
+        }
+        return byteArray;
+    }
+
+    public ByteArray bytes(int startPos, Predicate<byte[]> until) {
+        ByteArray byteArray = ByteArray.of();
+        PiecePoint from = at(startPos);
+        int start = startPos - from.position();
+        for (int i = from.index(); i < length(); i++) {
+            Piece piece = get(i);
+            for (;;) {
+                int end = Math.min(piece.end(), startPos + 256);
+                Buffer buf = piece.bytes(start, end);
+                for (int j = 0; j < buf.length(); j++) {
+                    byte[] bytes = buf.charAt(j);
+                    byteArray.add(bytes);
+                    if (until.test(bytes)) {
+                        return byteArray;
+                    }
+                }
+                if (end == piece.end()) {
+                    break;
+                }
+                start = end;
+            }
+            start = 0;
         }
         return byteArray;
     }
