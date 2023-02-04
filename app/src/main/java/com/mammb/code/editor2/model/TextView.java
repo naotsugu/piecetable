@@ -1,4 +1,21 @@
+/*
+ * Copyright 2019-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.mammb.code.editor2.model;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * TextView.
@@ -6,8 +23,11 @@ package com.mammb.code.editor2.model;
  */
 public class TextView {
 
+    /** The parent view point. */
+    private final ViewPoint parent;
+
     /** The origin row number. */
-    private int originRow;
+    private final AtomicInteger originRow = new AtomicInteger();
 
     /** The text view buffer. */
     private final StringFigure text = new StringFigure();
@@ -18,17 +38,14 @@ public class TextView {
     /** text wrap?. */
     private boolean textWrap;
 
-    /** The edit event listener. */
-    private EventListener<Edit> editListener;
-
 
     /**
      * Constructor.
-     * @param editListener the edit event listener
+     * @param parent the parent view point
      */
-    public TextView(EventListener<Edit> editListener) {
-        this.editListener = editListener;
-        this.originRow = 0;
+    public TextView(ViewPoint parent) {
+        this.parent = parent;
+        this.originRow.set(0);
         this.textWrap = false;
     }
 
@@ -54,7 +71,7 @@ public class TextView {
      * Get the origin row number.
      * @return the origin row number
      */
-    public int originRow() { return originRow; }
+    public int originRow() { return originRow.get(); }
 
     /**
      * Get the code point count.
@@ -88,16 +105,16 @@ public class TextView {
         return text.rowIndex(caretPoint.row()) + caretPoint.offset();
     }
 
-    int scrollNext(CharSequence tail) {
-        int deleted = text.shiftAppend(tail);
-        originRow += Strings.countLf(tail);
-        return deleted;
+    void scrollNext() {
+        CharSequence tail = parent.scrollNext(text.rowCodePointCount(0));
+        text.shiftAppend(tail);
+        originRow.getAndAdd(Strings.countLf(tail));
     }
 
-    int scrollPrev(CharSequence head) {
-        int deleted = text.shiftInsert(0, head);
-        originRow -= Strings.countLf(head);
-        return deleted;
+    void scrollPrev() {
+        CharSequence head = parent.scrollPrev(text.rowCodePointCount(text.rowSize() - 1));
+        text.shiftInsert(0, head);
+        originRow.getAndAdd(-Strings.countLf(head));
     }
 
     private void moveToCaretVisible() {

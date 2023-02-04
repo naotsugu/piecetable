@@ -68,24 +68,6 @@ public class StringFigure {
     }
 
     /**
-     * Returns the number of Unicode code points in the specified range of this view text.
-     * @param beginIndex the index to the first char of the text range
-     * @param endIndex the index after the last char of the text range
-     * @return the number of Unicode code points in the specified text range
-     */
-    public int codePointCount(int beginIndex, int endIndex) {
-        return text.codePointCount(beginIndex, endIndex);
-    }
-
-    /**
-     * Get the code point count.
-     * @return the code point count
-     */
-    public int codePointCount() {
-        return figure().codePointCount();
-    }
-
-    /**
      * Get the row index of this text.
      * @param row the number of row. zero origin
      * @return the row index
@@ -104,6 +86,39 @@ public class StringFigure {
             return rowIndex(row + 1) - rowIndex(row);
         } else if (row == rowSize() - 1) {
             return text.length() - rowIndex(row);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Returns the number of Unicode code points in the specified range of this view text.
+     * @param beginIndex the index to the first char of the text range
+     * @param endIndex the index after the last char of the text range
+     * @return the number of Unicode code points in the specified text range
+     */
+    public int codePointCount(int beginIndex, int endIndex) {
+        return text.codePointCount(beginIndex, endIndex);
+    }
+
+    /**
+     * Get the code point count.
+     * @return the code point count
+     */
+    public int codePointCount() {
+        return figure().codePointCount();
+    }
+
+    /**
+     * Get the row code point count.
+     * @param row the specified row
+     * @return the row code point count
+     */
+    public int rowCodePointCount(int row) {
+        if (row < rowSize() - 1) {
+            return codePointCount(rowIndex(row), rowIndex(row + 1));
+        } else if (row == rowSize() - 1) {
+            return codePointCount(rowIndex(row), text.length());
         } else {
             return 0;
         }
