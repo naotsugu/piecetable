@@ -5,4 +5,5 @@ module com.mammb.code.editor {
     requires com.mammb.code.piecetable;
 
     exports com.mammb.code.editor;
+    exports com.mammb.code.editor2;
 }

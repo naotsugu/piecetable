@@ -66,6 +66,16 @@ public class ByteArray implements Serializable {
         return Arrays.copyOfRange(bytes, from, to);
     }
 
+    public ByteArray reverse() {
+        byte[] ret = get();
+        for(int i = 0; i < ret.length / 2; i++) {
+            byte temp = ret[i];
+            ret[i] = ret[ret.length - i - 1];
+            ret[ret.length - i - 1] = temp;
+        }
+        return new ByteArray(ret, length);
+    }
+
     public void clear() {
         bytes = EMPTY;
         length = 0;

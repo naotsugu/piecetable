@@ -132,6 +132,36 @@ public class CursoredList {
         return byteArray;
     }
 
+    public ByteArray bytesBefore(int startPos, Predicate<byte[]> until) {
+        ByteArray byteArray = ByteArray.of();
+        PiecePoint from = at(startPos);
+        boolean first = true;
+        int start = startPos - from.position();
+        for (int i = from.index(); i >= 0; i--) {
+            Piece piece = get(i);
+            if (!first) {
+                start = piece.end();
+            }
+            for (;;) {
+                int end = Math.max(piece.bufIndex(), startPos - 256);
+                Buffer buf = piece.bytes(end, start);
+                for (int j = buf.length() - 1; j >= 0; j--) {
+                    byte[] bytes = buf.charAt(j);
+                    byteArray.add(bytes);
+                    if (until.test(bytes)) {
+                        return byteArray.reverse();
+                    }
+                }
+                if (end == piece.bufIndex()) {
+                    break;
+                }
+                start = end;
+            }
+            first = false;
+        }
+        return byteArray.reverse();
+    }
+
     private Piece next() {
         if (cursor.hasNext()) {
             var piece = cursor.next();

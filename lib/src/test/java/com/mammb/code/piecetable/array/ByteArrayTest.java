@@ -45,4 +45,14 @@ class ByteArrayTest {
 
     }
 
+    @Test
+    void testReverse() {
+        var b = ByteArray.of();
+        var bytes = "abc".getBytes(StandardCharsets.UTF_8);
+        for (int i = bytes.length - 1; i >= 0; i--) {
+            b.add(bytes[i]);
+        }
+        assertArrayEquals(bytes, b.reverse().get());
+    }
+
 }
