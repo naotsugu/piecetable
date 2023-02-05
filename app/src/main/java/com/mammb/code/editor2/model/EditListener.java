@@ -13,26 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor2.ui;
-
-import javafx.geometry.Insets;
-import javafx.scene.text.Text;
-
-import java.util.List;
+package com.mammb.code.editor2.model;
 
 /**
- * TextFlow.
+ * EditListener.
  * @author Naotsugu Kobayashi
  */
-public class TextFlow extends javafx.scene.text.TextFlow {
-
-    public TextFlow() {
-        setPadding(new Insets(4));
-        setTabSize(4);
-    }
-
-    void set(List<Text> texts) {
-        getChildren().setAll(texts);
-    }
-
+public interface EditListener extends EventListener<Edit> {
+    void handle(Edit event);
 }

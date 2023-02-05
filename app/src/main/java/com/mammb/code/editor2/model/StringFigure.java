@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.mammb.code.editor2.model;
 
 import java.util.stream.IntStream;
@@ -16,6 +31,34 @@ public class StringFigure {
 
 
     /**
+     * Sets the text.
+     * @param cs the text
+     */
+    public void set(CharSequence cs) {
+        text.delete(0, text.length());
+        append(cs);
+    }
+
+    /**
+     * Appends the specified character sequence to this Appendable.
+     * @param cs the character sequence to append
+     */
+    public void append(CharSequence cs) {
+        text.append(cs);
+        figure.clear();
+    }
+
+    /**
+     * Inserts the specified CharSequence into this sequence.
+     * @param offset the offset
+     * @param cs the sequence to be inserted
+     */
+    public void insert(int offset, CharSequence cs) {
+        text.insert(offset, cs);
+        figure.clear();
+    }
+
+    /**
      * Shift row and append text.
      * @param tail append string
      * @return the number of deleted character
@@ -23,8 +66,7 @@ public class StringFigure {
     int shiftAppend(CharSequence tail) {
         int len = IntStream.range(0, Strings.countLf(tail)).map(this::rowLength).sum();
         if (len > 0) text.delete(0, len);
-        text.append(tail);
-        figure.clear();
+        append(tail);
         return len;
     }
 
@@ -37,8 +79,7 @@ public class StringFigure {
         int rowIndex = rowIndex(row);
         int len = IntStream.range(rowSize() - Strings.countLf(cs), rowSize()).map(this::rowLength).sum();
         if (len > 0) text.delete(text.length() - len, text.length());
-        text.insert(rowIndex, cs);
-        figure.clear();
+        insert(rowIndex, cs);
         return len;
     }
 

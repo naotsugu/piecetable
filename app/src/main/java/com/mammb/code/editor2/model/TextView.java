@@ -15,38 +15,57 @@
  */
 package com.mammb.code.editor2.model;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * TextView.
  * @author Naotsugu Kobayashi
  */
 public class TextView {
 
-    /** The parent view point. */
-    private final ViewPoint parent;
-
     /** The origin row number. */
-    private final AtomicInteger originRow = new AtomicInteger();
+    private int originRow;
+
+    /** row height. */
+    private int height;
 
     /** The text view buffer. */
     private final StringFigure text = new StringFigure();
 
+    /** The text source. */
+    private final TextSource source;
+
     /** The caret point. */
-    private LinePoint caretPoint = new LinePoint();
+    private final LinePoint caretPoint = new LinePoint();
 
     /** text wrap?. */
     private boolean textWrap;
 
+    /** The scroll behavior. */
+    private ScrollBehavior scrollBehavior;
+
+    /** The caret behavior. */
+    private CaretBehavior caretBehavior;
+
 
     /**
      * Constructor.
-     * @param parent the parent view point
+     * @param source the text source
      */
-    public TextView(ViewPoint parent) {
-        this.parent = parent;
-        this.originRow.set(0);
+    public TextView(TextSource source) {
+        this.originRow = 0;
+        this.height = 10;
+        this.source = source;
         this.textWrap = false;
+        this.scrollBehavior = this.textWrap
+            ? new ScrollBehavior.WrapScrollBehavior(source, this)
+            : new ScrollBehavior.NowrapScrollBehavior(source, this);
+        this.caretBehavior = this.textWrap
+            ? new CaretBehavior.WrapCaretBehavior(this)
+            : new CaretBehavior.NowrapCaretBehavior(this);
+        fillText();
+    }
+
+    public void fillText() {
+        text.set(source.rows(height));
     }
 
     /**
@@ -71,7 +90,15 @@ public class TextView {
      * Get the origin row number.
      * @return the origin row number
      */
-    public int originRow() { return originRow.get(); }
+    public int originRow() { return originRow; }
+
+    /**
+     * Set the origin row number.
+     * @param originRow the origin row number
+     */
+    void setOriginRow(int originRow) {
+        this.originRow = originRow;
+    }
 
     /**
      * Get the code point count.
@@ -95,72 +122,50 @@ public class TextView {
         return text.toString();
     }
 
+    /**
+     * Get the scroll behavior.
+     * @return the scroll behavior
+     */
+    public ScrollBehavior scrollBehavior() {
+        return scrollBehavior;
+    }
+
+    /**
+     * Get the caret behavior.
+     * @return the caret behavior
+     */
+    public CaretBehavior caretBehavior() {
+        return caretBehavior;
+    }
+
     // ------------------------------------------------------------------------
+
+    /**
+     * Get the text view buffer.
+     * @return the text view buffer
+     */
+    StringFigure text() {
+        return text;
+    }
 
     /**
      * Get the caret index.
      * @return the caret index
      */
-    private int caretIndex() {
+    int caretIndex() {
         return text.rowIndex(caretPoint.row()) + caretPoint.offset();
     }
 
-    void scrollNext() {
-        CharSequence tail = parent.scrollNext(text.rowCodePointCount(0));
-        text.shiftAppend(tail);
-        originRow.getAndAdd(Strings.countLf(tail));
-    }
-
-    void scrollPrev() {
-        CharSequence head = parent.scrollPrev(text.rowCodePointCount(text.rowSize() - 1));
-        text.shiftInsert(0, head);
-        originRow.getAndAdd(-Strings.countLf(head));
+    /**
+     * Get the caret point.
+     * @return the caret point
+     */
+    LinePoint caretPoint() {
+        return caretPoint;
     }
 
     private void moveToCaretVisible() {
 
-    }
-
-    public void caretNext() {
-        moveToCaretVisible();
-        int nextIndex = caretIndex() + 1;
-        if (nextIndex >= text.length()) return;
-        if (text.charAt(nextIndex) == '\n') {
-            caretPoint.toNextHead();
-        } else {
-            caretPoint.toNext();
-        }
-    }
-
-    public void caretPrev() {
-        moveToCaretVisible();
-        int prevIndex = caretIndex() - 1;
-        if (prevIndex <= 0) return;
-        if (text.charAt(prevIndex) == '\n') {
-            caretPoint.toPrevTail(text.rowLength(caretPoint.row() - 1));
-        } else {
-            caretPoint.toPrev();
-        }
-    }
-
-    public void caretNextRow() {
-        moveToCaretVisible();
-        if (textWrap) {
-
-        } else {
-            if (caretPoint.row() == rowSize() - 1) return;
-            caretPoint.toNextRow();
-        }
-    }
-
-    public void caretPrevRow() {
-        moveToCaretVisible();
-        if (textWrap) {
-
-        } else {
-            if (caretPoint.row() == 0) return;
-            caretPoint.toPrevRow();
-        }
     }
 
 }
