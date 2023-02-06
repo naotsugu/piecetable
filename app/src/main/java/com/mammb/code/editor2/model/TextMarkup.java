@@ -15,13 +15,33 @@
  */
 package com.mammb.code.editor2.model;
 
+import java.util.TreeMap;
+
 /**
- * EditListener.
+ * TextMarkup.
  * @author Naotsugu Kobayashi
  */
-public interface EditListener extends EventListener<Edit> {
+public class TextMarkup {
 
-    @Override
-    void handle(Edit event);
+    private final TreeMap<Integer, Marker> tree = new TreeMap<>();
+
+
+    public int highWaterIndex() {
+        return tree.isEmpty() ? 0 : tree.lastKey();
+    }
+
+
+    public int size() {
+        return tree.size();
+    }
+
+
+    public String inspect() {
+        StringBuilder sb = new StringBuilder();
+        for (Marker marker : tree.values()) {
+            sb.append(marker.toString()).append('\n');
+        }
+        return sb.toString();
+    }
 
 }

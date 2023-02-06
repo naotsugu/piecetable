@@ -64,7 +64,8 @@ public class StringFigure {
      * @return the number of deleted character
      */
     int shiftAppend(CharSequence tail) {
-        int len = IntStream.range(0, Strings.countLf(tail)).map(this::rowLength).sum();
+        int len = IntStream.range(0, Strings.countLf(tail))
+                           .map(this::rowLength).sum();
         if (len > 0) text.delete(0, len);
         append(tail);
         return len;
@@ -77,7 +78,8 @@ public class StringFigure {
      */
     int shiftInsert(int row, CharSequence cs) {
         int rowIndex = rowIndex(row);
-        int len = IntStream.range(rowSize() - Strings.countLf(cs), rowSize()).map(this::rowLength).sum();
+        int len = IntStream.range(rowSize() - Strings.countLf(cs), rowSize())
+                           .map(this::rowLength).sum();
         if (len > 0) text.delete(text.length() - len, text.length());
         insert(rowIndex, cs);
         return len;

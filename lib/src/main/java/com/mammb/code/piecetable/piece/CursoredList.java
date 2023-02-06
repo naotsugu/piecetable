@@ -177,6 +177,31 @@ public class CursoredList {
         return byteArray.reverse();
     }
 
+    public int count(int startPos, Predicate<byte[]> predicate) {
+        int count = 0;
+        PiecePoint from = at(startPos);
+        int start = startPos - from.position();
+        for (int i = from.index(); i < length(); i++) {
+            Piece piece = get(i);
+            for (;;) {
+                int end = Math.min(piece.end(), startPos + 256);
+                Buffer buf = piece.bytes(start, end);
+                for (int j = 0; j < buf.length(); j++) {
+                    byte[] bytes = buf.charAt(j);
+                    if (predicate.test(bytes)) {
+                        count++;
+                    }
+                }
+                if (end == piece.end()) {
+                    break;
+                }
+                start = end;
+            }
+            start = 0;
+        }
+        return count;
+    }
+
     private Piece next() {
         if (cursor.hasNext()) {
             var piece = cursor.next();

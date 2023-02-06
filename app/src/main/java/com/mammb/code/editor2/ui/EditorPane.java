@@ -28,9 +28,15 @@ import javafx.scene.layout.StackPane;
  */
 public class EditorPane extends StackPane {
 
-    private TextPane textPane;
+    /** The content. */
     private Content content;
 
+    /** The text pane. */
+    private TextPane textPane;
+
+    /**
+     * Constructor.
+     */
     public EditorPane() {
         content = new BasicContent();
         content.handle(new Edit.InsertEdit(0, "hello"));

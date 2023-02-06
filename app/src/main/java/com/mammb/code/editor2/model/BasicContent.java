@@ -28,6 +28,9 @@ public class BasicContent implements Content {
     /** The piece table. */
     private PieceTable pt;
 
+    /** The number of row. */
+    private int rowSize;
+
     /** The content path. */
     private Path path;
 
@@ -36,11 +39,14 @@ public class BasicContent implements Content {
      */
     public BasicContent() {
         this.pt = PieceTable.of("");
+        this.rowSize = 0;
     }
 
     @Override
-    public int length() {
-        return pt.length();
+    public void open(Path path) {
+        this.pt = PieceTable.of(path);
+        this.path = path;
+        this.rowSize = pt.count(0, bytes -> bytes[0] == '\n');
     }
 
     @Override
@@ -57,9 +63,19 @@ public class BasicContent implements Content {
     public void handle(Edit event) {
         if (event instanceof Edit.InsertEdit insert) {
             pt.insert(insert.pos(), insert.cs());
+            rowSize += Strings.countLf(insert.cs());
         } else if (event instanceof Edit.DeleteEdit delete) {
             pt.delete(delete.pos(), delete.cs().length());
+            rowSize -= Strings.countLf(delete.cs());
         }
     }
 
+    @Override
+    public Path path() { return path; }
+
+    @Override
+    public int length() { return pt.length(); }
+
+    @Override
+    public int rowSize() { return rowSize; }
 }

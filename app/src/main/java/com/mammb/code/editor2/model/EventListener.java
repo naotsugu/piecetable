@@ -20,5 +20,10 @@ package com.mammb.code.editor2.model;
  * @author Naotsugu Kobayashi
  */
 public interface EventListener<T> {
+
+    /**
+     * Handle the event.
+     * @param event the event
+     */
     void handle(T event);
 }

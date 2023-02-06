@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor2.model;
+package com.mammb.code.editor2.ui;
+
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 /**
- * EditListener.
+ * Text utilities.
  * @author Naotsugu Kobayashi
  */
-public interface EditListener extends EventListener<Edit> {
-
-    @Override
-    void handle(Edit event);
-
+public class Texts {
+    public static final Text bit = new Text("X");
+    public static final Font font = bit.getFont();
+    public static final double height = bit.getLayoutBounds().getHeight();
+    public static final double width  = bit.getLayoutBounds().getWidth();
 }

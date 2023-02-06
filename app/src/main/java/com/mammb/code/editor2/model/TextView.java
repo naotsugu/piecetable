@@ -15,6 +15,8 @@
  */
 package com.mammb.code.editor2.model;
 
+import java.util.Objects;
+
 /**
  * TextView.
  * @author Naotsugu Kobayashi
@@ -24,8 +26,8 @@ public class TextView {
     /** The origin row number. */
     private int originRow;
 
-    /** row height. */
-    private int height;
+    /** max rows. */
+    private int maxRows;
 
     /** The text view buffer. */
     private final StringFigure text = new StringFigure();
@@ -52,8 +54,8 @@ public class TextView {
      */
     public TextView(TextSource source) {
         this.originRow = 0;
-        this.height = 10;
-        this.source = source;
+        this.maxRows = 10;
+        this.source = Objects.requireNonNull(source);
         this.textWrap = false;
         this.scrollBehavior = this.textWrap
             ? new ScrollBehavior.WrapScrollBehavior(source, this)
@@ -61,11 +63,21 @@ public class TextView {
         this.caretBehavior = this.textWrap
             ? new CaretBehavior.WrapCaretBehavior(this)
             : new CaretBehavior.NowrapCaretBehavior(this);
-        fillText();
+    }
+
+    /**
+     * Set the max row number.
+     * @param maxRows the max row number
+     */
+    public void setupMaxRows(int maxRows) {
+        if (maxRows > 1 && this.maxRows != maxRows) {
+            this.maxRows = maxRows;
+            fillText();
+        }
     }
 
     public void fillText() {
-        text.set(source.rows(height));
+        text.set(source.rows(maxRows));
     }
 
     /**

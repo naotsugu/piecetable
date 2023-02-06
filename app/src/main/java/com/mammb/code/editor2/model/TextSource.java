@@ -70,10 +70,10 @@ public class TextSource {
         if (rowDelta == 0) return;
         int count = 0;
         if (rowDelta > 0) {
-            byte[] row = source.bytes(sourceIndex(), UntilLf.of(Math.abs(rowDelta)));
+            byte[] row = source.bytes(sourceIndex(), Until.lf(Math.abs(rowDelta)));
             for (byte b : row) if ((b & 0xC0) != 0x80) count++;
         } else {
-            byte[] row = source.bytesBefore(sourceIndex(), UntilLf.of(Math.abs(rowDelta) + 1));
+            byte[] row = source.bytesBefore(sourceIndex(), Until.lf(Math.abs(rowDelta) + 1));
             for (byte b : row) if ((b & 0xC0) != 0x80) count--;
         }
         shiftIndex(count);
@@ -85,7 +85,7 @@ public class TextSource {
      * @return the before row
      */
     String rows(int count) {
-        byte[] tailRow = source.bytes(sourceIndex(), UntilLf.of(count));
+        byte[] tailRow = source.bytes(sourceIndex(), Until.lf(count));
         return new String(tailRow, charset);
     }
 
@@ -94,7 +94,7 @@ public class TextSource {
      * @return the before row
      */
     String beforeRow() {
-        byte[] headRow = source.bytesBefore(sourceIndex(), UntilLf.of(2));
+        byte[] headRow = source.bytesBefore(sourceIndex(), Until.lf(2));
         return new String(headRow, charset);
     }
 
@@ -103,7 +103,7 @@ public class TextSource {
      * @return the after row
      */
     String afterRow(int offsetCpCount) {
-        byte[] tailRow = source.bytes(sourceIndex() + offsetCpCount, UntilLf.of());
+        byte[] tailRow = source.bytes(sourceIndex() + offsetCpCount, Until.lf());
         return new String(tailRow, charset);
     }
 

@@ -15,19 +15,55 @@
  */
 package com.mammb.code.editor2.model;
 
+import java.nio.file.Path;
 import java.util.function.Predicate;
 
 /**
+ * Content.
  * @author Naotsugu Kobayashi
  */
 public interface Content extends EditListener {
 
     void handle(Edit event);
 
+    /**
+     * Get the content length.
+     * length is a code point count.
+     * @return the content length
+     */
     int length();
 
+    /**
+     * Get the number of row.
+     */
+    int rowSize();
+
+    /**
+     * Get the bytes.
+     * @param startPos start position(code point index).
+     * @param until the until predicate
+     * @return the bytes
+     */
     byte[] bytes(int startPos, Predicate<byte[]> until);
 
+    /**
+     * Get the bytes.
+     * @param startPos start position(code point index).
+     * @param until the until predicate
+     * @return the bytes
+     */
     byte[] bytesBefore(int startPos, Predicate<byte[]> until);
+
+    /**
+     * Open content.
+     * @param path the path to content
+     */
+    void open(Path path);
+
+    /**
+     * Get the content path.
+     * @return the content path
+     */
+    Path path();
 
 }

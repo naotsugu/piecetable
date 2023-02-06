@@ -31,14 +31,23 @@ public class TextPane extends StackPane {
 
     private TextFlow textFlow = new TextFlow();
 
+    /**
+     * Constructor.
+     * @param textView the text view
+     */
     public TextPane(TextView textView) {
+
         this.textView = Objects.requireNonNull(textView);
         getChildren().add(textFlow);
-        fillText();
+        boundsInParentProperty().addListener((observable, ov, nv) -> fillText());
+
+        setOnDragOver(DragDrop.dragOverHandler());
+        setOnDragDropped(DragDrop.droppedHandler(System.out::println));
     }
 
     void fillText() {
-        textView.fillText();
+        int maxRows = (int) Math.ceil(getBoundsInParent().getHeight() / Texts.height);
+        textView.setupMaxRows(maxRows);
         textFlow.set(List.of(new Text(textView.string())));
     }
 

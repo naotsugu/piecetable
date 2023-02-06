@@ -53,7 +53,9 @@ public class LinePoint implements Comparable<LinePoint> {
      * Move to previous offset.
      */
     void toPrev() {
-        if (offset <= 0) throw new IllegalStateException();
+        if (offset <= 0) {
+            throw new IllegalStateException();
+        }
         offset--;
     }
 
@@ -61,7 +63,9 @@ public class LinePoint implements Comparable<LinePoint> {
      * Move to previous row.
      */
     void toPrevRow() {
-        if (row <= 0) throw new IllegalStateException();
+        if (row <= 0) {
+            throw new IllegalStateException();
+        }
         row--;
     }
 
@@ -69,7 +73,9 @@ public class LinePoint implements Comparable<LinePoint> {
      * Move to previous row tail.
      */
     void toPrevTail(int tailOffset) {
-        if (row <= 0) throw new IllegalStateException();
+        if (row <= 0) {
+            throw new IllegalStateException();
+        }
         row--;
         offset = tailOffset;
     }
