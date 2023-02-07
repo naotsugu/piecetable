@@ -157,8 +157,12 @@ public class PieceTable {
         return pieces.bytesBefore(startPos, until).get();
     }
 
-    public int count(int startPos, Predicate<byte[]> predicate) {
-        return pieces.count(startPos, predicate);
+    public int count(int startPos, int endPos, Predicate<byte[]> predicate) {
+        return pieces.count(startPos, endPos, predicate);
+    }
+
+    public int count(Predicate<byte[]> predicate) {
+        return pieces.count(0, length, predicate);
     }
 
     public int undoSize() {

@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor2.model;
+package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor2.model.Strings;
 import com.mammb.code.piecetable.PieceTable;
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
 /**
- * BasicContent.
+ * Content.
  * @author Naotsugu Kobayashi
  */
-public class BasicContent implements Content {
+public class ContentImpl implements Content {
 
     /** The piece table. */
     private PieceTable pt;
@@ -37,7 +38,7 @@ public class BasicContent implements Content {
     /**
      * Constructor.
      */
-    public BasicContent() {
+    public ContentImpl() {
         this.pt = PieceTable.of("");
         this.rowSize = 0;
     }
@@ -47,6 +48,16 @@ public class BasicContent implements Content {
         this.pt = PieceTable.of(path);
         this.path = path;
         this.rowSize = pt.count(bytes -> bytes[0] == '\n');
+    }
+
+    @Override
+    public Path path() {
+        return path;
+    }
+
+    @Override
+    public int length() {
+        return pt.length();
     }
 
     @Override
@@ -60,22 +71,14 @@ public class BasicContent implements Content {
     }
 
     @Override
-    public void handle(Edit event) {
-        if (event instanceof Edit.InsertEdit insert) {
-            pt.insert(insert.pos(), insert.cs());
-            rowSize += Strings.countLf(insert.cs());
-        } else if (event instanceof Edit.DeleteEdit delete) {
-            pt.delete(delete.pos(), delete.cs().length());
-            rowSize -= Strings.countLf(delete.cs());
+    public void handle(Edit edit) {
+        if (edit.isInsert()) {
+            pt.insert(edit.position(), edit.string());
+            rowSize += Strings.countLf(edit.string());
+        } else {
+            pt.delete(edit.position(), Strings.codePointCount(edit.string()));
+            rowSize -= Strings.countLf(edit.string());
         }
     }
 
-    @Override
-    public Path path() { return path; }
-
-    @Override
-    public int length() { return pt.length(); }
-
-    @Override
-    public int rowSize() { return rowSize; }
 }
