@@ -23,27 +23,53 @@ import com.mammb.code.editor3.lang.Strings;
  */
 public class Edit {
 
+    /** The empty edit. */
     public static Edit empty = new Edit(Type.NIL, 0, "", 0);
 
+    /** The type of edit. */
     private enum Type { INSERT, DELETE, NIL }
 
+    /** The type of edit. */
     private final Type type;
+    /** The position of edit. */
     private final int position;
+    /** The edited string. */
     private final String string;
+    /** The occurred on. */
     private final long occurredOn;
+    /** The code point count of edited string. */
     private int codePointCount;
 
-    public Edit(Type type, int position, String string, long occurredOn) {
+    /**
+     * Constructor.
+     * @param type the type of edit
+     * @param position the position of edit
+     * @param string the edited string
+     * @param occurredOn the occurred on
+     */
+    private Edit(Type type, int position, String string, long occurredOn) {
         this.type = type;
         this.position = position;
         this.string = string;
         this.occurredOn = occurredOn;
     }
 
+    /**
+     * Create the insert edit.
+     * @param position the position of edit
+     * @param string the edited string
+     * @return
+     */
     public static Edit insert(int position, String string) {
         return new Edit(Type.INSERT, position, string, System.currentTimeMillis());
     }
 
+    /**
+     * Create the deleted edit.
+     * @param position the position of edit
+     * @param string the edited string
+     * @return
+     */
     public static Edit delete(int position, String string) {
         return new Edit(Type.DELETE, position, string, System.currentTimeMillis());
     }
@@ -71,14 +97,26 @@ public class Edit {
         return new Edit(this.type, this.position, this.string + other.string, other.occurredOn);
     }
 
+    /**
+     * Get the position of edit.
+     * @return the position of edit
+     */
     public int position() {
         return position;
     }
 
+    /**
+     * Get the edited string.
+     * @return the edited string
+     */
     public String string() {
         return string;
     }
 
+    /**
+     * Get the code point count of edited string.
+     * @return the code point count of edited string
+     */
     public int codePointCount() {
         if (codePointCount < 0) {
             codePointCount = Strings.codePointCount(string);

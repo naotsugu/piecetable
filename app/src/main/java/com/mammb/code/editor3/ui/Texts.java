@@ -23,8 +23,13 @@ import javafx.scene.text.Text;
  * @author Naotsugu Kobayashi
  */
 public class Texts {
+
     public static final Text bit = new Text("X");
+
     public static final Font font = bit.getFont();
+
     public static final double height = bit.getLayoutBounds().getHeight();
+
     public static final double width  = bit.getLayoutBounds().getWidth();
+
 }

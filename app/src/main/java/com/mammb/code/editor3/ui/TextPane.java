@@ -19,6 +19,8 @@ import com.mammb.code.editor3.model.TextView;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.scene.layout.StackPane;
+
+import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -27,9 +29,12 @@ import java.util.Objects;
  */
 public class TextPane extends StackPane {
 
+    /** The text flow pane. */
     private final TextFlow textFlow = new TextFlow();
 
-    private final TextView model;
+    /** The text model. */
+    private TextView model;
+
 
     /**
      * Constructor.
@@ -39,14 +44,28 @@ public class TextPane extends StackPane {
 
         this.model = Objects.requireNonNull(model);
         getChildren().add(textFlow);
+
         boundsInParentProperty().addListener(this::handleBoundsChanged);
 
         setOnDragOver(DragDrop.dragOverHandler());
-        setOnDragDropped(DragDrop.droppedHandler(System.out::println));
+        setOnDragDropped(DragDrop.droppedHandler(this::open));
     }
 
 
-    private void handleBoundsChanged(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+    /**
+     * Open the file content path.
+     * @param path the file content path
+     */
+    private void open(Path path) {
+        if (model.isDirty()) {
+            // TODO
+        }
+        model = new TextView(path);
+    }
+
+
+    private void handleBoundsChanged(
+            ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
         if (oldValue.getHeight() != newValue.getHeight()) {
             int maxRows = (int) Math.ceil(getBoundsInParent().getHeight() / Texts.height);
             model.setupMaxRows(maxRows);

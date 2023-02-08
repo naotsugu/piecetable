@@ -5,7 +5,7 @@ import com.mammb.code.editor3.model.Edit;
 import com.mammb.code.editor3.model.TextSlice;
 import com.mammb.code.editor3.model.TextSource;
 import com.mammb.code.editor3.model.TextView;
-import com.mammb.code.editor3.model.ContentImpl;
+import com.mammb.code.editor3.model.specifics.ContentImpl;
 import javafx.scene.layout.StackPane;
 
 /**
@@ -14,9 +14,6 @@ import javafx.scene.layout.StackPane;
  */
 public class EditorPane extends StackPane {
 
-    /** The content. */
-    private Content content;
-
     /** The text pane. */
     private TextPane textPane;
 
@@ -24,7 +21,7 @@ public class EditorPane extends StackPane {
      * Constructor.
      */
     public EditorPane() {
-        content = new ContentImpl();
+        Content content = new ContentImpl();
         content.handle(Edit.insert(0, "hello"));
         TextSource textSource = new TextSource(content);
         TextSlice textSlice = new TextSlice(textSource);

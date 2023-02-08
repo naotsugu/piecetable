@@ -15,10 +15,9 @@
  */
 package com.mammb.code.editor3.model;
 
-import java.util.TreeMap;
-
-public class Marking {
-
-    private final TreeMap<Integer, Mark> tree = new TreeMap<>();
-
+/**
+ * Marker.
+ * @author Naotsugu Kobayashi
+ */
+public interface Marker {
 }

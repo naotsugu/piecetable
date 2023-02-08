@@ -15,6 +15,14 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.lang.StringsBuffer;
+
+import java.util.Objects;
+
+/**
+ * TextSlice.
+ * @author Naotsugu Kobayashi
+ */
 public class TextSlice {
 
     /** The origin row number. */
@@ -27,22 +35,30 @@ public class TextSlice {
     private final TextSource source;
 
     /** The text slice buffer. */
-    private final StringBuffer buffer = new StringBuffer();
+    private final StringsBuffer buffer = new StringsBuffer();
 
 
+    /**
+     * Constructor.
+     * @param source the text source
+     */
     public TextSlice(TextSource source) {
-        this.source = source;
+        this.source = Objects.requireNonNull(source);
         this.originRow = 0;
         this.rowSize = 10;
     }
 
+    /**
+     * Get the string.
+     * @return the string
+     */
     public String string() {
         return buffer.toString();
     }
 
 
     public void refresh() {
-        buffer.replace(0, buffer.length(), source.rows(rowSize));
+        buffer.set(source.rows(rowSize));
     }
 
 }

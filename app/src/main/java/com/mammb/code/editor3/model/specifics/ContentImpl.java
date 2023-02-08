@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.model;
+package com.mammb.code.editor3.model.specifics;
 
 import com.mammb.code.editor2.model.Strings;
+import com.mammb.code.editor3.model.Content;
+import com.mammb.code.editor3.model.Edit;
 import com.mammb.code.piecetable.PieceTable;
 import java.nio.file.Path;
 import java.util.function.Predicate;
@@ -29,11 +31,11 @@ public class ContentImpl implements Content {
     /** The piece table. */
     private PieceTable pt;
 
-    /** The number of row. */
-    private int rowSize;
-
     /** The content path. */
     private Path path;
+
+    /** The number of row. */
+    private int rowSize;
 
     /**
      * Constructor.
@@ -43,10 +45,14 @@ public class ContentImpl implements Content {
         this.rowSize = 0;
     }
 
-    @Override
-    public void open(Path path) {
+    /**
+     * Create content for specified path.
+     * @param path the content path
+     */
+    public ContentImpl(Path path) {
         this.pt = PieceTable.of(path);
         this.path = path;
+        this.rowSize = 0;
         this.rowSize = pt.count(bytes -> bytes[0] == '\n');
     }
 
@@ -59,6 +65,9 @@ public class ContentImpl implements Content {
     public int length() {
         return pt.length();
     }
+
+    @Override
+    public int rowSize() { return rowSize; }
 
     @Override
     public byte[] bytes(int startPos, Predicate<byte[]> until) {

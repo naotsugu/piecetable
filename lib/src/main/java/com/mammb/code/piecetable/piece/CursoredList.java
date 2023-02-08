@@ -131,10 +131,10 @@ public class CursoredList {
                 Buffer buf = piece.bytes(start, end);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
-                    byteArray.add(bytes);
                     if (until.test(bytes)) {
                         return byteArray;
                     }
+                    byteArray.add(bytes);
                 }
                 if (end == piece.end()) {
                     break;

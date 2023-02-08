@@ -29,7 +29,7 @@ public class Until {
      * @return the Until LF predicate
      */
     public static Until.LF lf(int count) {
-        return new Until.LF(count);
+        return new Until.LF(count, true);
     }
 
     /**
@@ -37,7 +37,24 @@ public class Until {
      * @return the Until LF predicate
      */
     public static Until.LF lf() {
-        return new Until.LF(1);
+        return new Until.LF(1, true);
+    }
+
+    /**
+     * Create a new Until LF.
+     * @param count the line feed count
+     * @return the Until LF predicate
+     */
+    public static Until.LF lfInclusive(int count) {
+        return new Until.LF(count, false);
+    }
+
+    /**
+     * Create a new Until LF.
+     * @return the Until LF predicate
+     */
+    public static Until.LF lfInclusive() {
+        return new Until.LF(1, false);
     }
 
 
@@ -47,13 +64,18 @@ public class Until {
         /** The line feed count. */
         private int count;
 
+        /** The exclusive flag. */
+        private boolean exclusive;
+
         /**
          * Constructor.
          * @param count the line feed count
+         * @param exclusive the exclusive flag
          */
-        private LF(int count) {
+        public LF(int count, boolean exclusive) {
             if (count <= 0) throw new IllegalArgumentException();
             this.count = count;
+            this.exclusive = exclusive;
         }
 
         @Override
@@ -61,9 +83,12 @@ public class Until {
             if (bytes != null && bytes.length > 0 && bytes[0] == '\n') {
                 count--;
             }
-            return count == 0;
+            boolean ret = exclusive && count <= 0;
+            if (count <= 0) {
+                exclusive = true;
+            }
+            return ret;
         }
-
     }
 
 }

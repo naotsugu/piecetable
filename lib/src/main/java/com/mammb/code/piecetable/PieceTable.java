@@ -149,10 +149,32 @@ public class PieceTable {
         return pieces.bytes(startPos, endPos).get();
     }
 
+    /**
+     * Get the bytes.
+     * <pre>
+     *     | a | b | c | d |
+     *       L startPos
+     *                   L  until [d] appears [a, b, c]
+     * </pre>
+     * @param startPos start position(code point index), inclusive
+     * @param until the until predicate, exclusive
+     * @return the bytes
+     */
     public byte[] bytes(int startPos, Predicate<byte[]> until) {
         return pieces.bytes(startPos, until).get();
     }
 
+    /**
+     * Get the bytes.
+     * <pre>
+     *     | a | b | c | d | a |
+     *                       L startPos
+     *      L  until [a] appears [a, b, c]
+     * </pre>
+     * @param startPos start position(code point index), exclusive
+     * @param until the until predicate, exclusive
+     * @return the bytes
+     */
     public byte[] bytesBefore(int startPos, Predicate<byte[]> until) {
         return pieces.bytesBefore(startPos, until).get();
     }

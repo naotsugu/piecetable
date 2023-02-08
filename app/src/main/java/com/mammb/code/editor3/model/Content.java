@@ -25,12 +25,6 @@ import java.util.function.Predicate;
 public interface Content extends EditListener {
 
     /**
-     * Open content.
-     * @param path the path to content
-     */
-    void open(Path path);
-
-    /**
      * Get the content path.
      * @return the content path
      */
@@ -44,17 +38,33 @@ public interface Content extends EditListener {
     int length();
 
     /**
+     * Get the total row size.
+     * @return the total row size
+     */
+    int rowSize();
+
+    /**
      * Get the bytes.
-     * @param startPos start position(code point index).
-     * @param until the until predicate
+     * <pre>
+     *     | a | b | c | d |
+     *       L startPos
+     *                   L  until [d] appears [a, b, c]
+     * </pre>
+     * @param startPos start position(code point index), inclusive
+     * @param until the until predicate, exclusive
      * @return the bytes
      */
     byte[] bytes(int startPos, Predicate<byte[]> until);
 
     /**
      * Get the bytes.
-     * @param startPos start position(code point index).
-     * @param until the until predicate
+     * <pre>
+     *     | a | b | c | d | a |
+     *                       L startPos
+     *      L  until [a] appears [a, b, c]
+     * </pre>
+     * @param startPos start position(code point index), exclusive
+     * @param until the until predicate, exclusive
      * @return the bytes
      */
     byte[] bytesBefore(int startPos, Predicate<byte[]> until);

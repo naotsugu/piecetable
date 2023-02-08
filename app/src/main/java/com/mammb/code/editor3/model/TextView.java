@@ -15,11 +15,11 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor2.model.CaretBehavior;
 import com.mammb.code.editor2.model.LinePoint;
-import com.mammb.code.editor2.model.ScrollBehavior;
+import com.mammb.code.editor3.model.specifics.ContentImpl;
 import javafx.scene.text.Text;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -39,11 +39,14 @@ public class TextView {
     /** text wrap?. */
     private boolean textWrap;
 
-    /** The scroll behavior. */
-    private ScrollBehavior scrollBehavior;
+    /** dirty?. */
+    private boolean dirty;
 
-    /** The caret behavior. */
-    private CaretBehavior caretBehavior;
+    /** The scroll handler. */
+    private ScrollHandler scrollHandler;
+
+    /** The caret handler. */
+    private CaretHandler caretHandler;
 
 
     /**
@@ -55,9 +58,19 @@ public class TextView {
     }
 
 
+    /**
+     * Create text view.
+     * @param path the content path
+     */
+    public TextView(Path path) {
+        TextSource source = new TextSource(new ContentImpl(path));
+        this.textSlice = new TextSlice(source);
+    }
+
     public List<Text> text() {
         return List.of(new Text(textSlice.string()));
     }
+
 
     /**
      * Set the max row number.
@@ -69,5 +82,12 @@ public class TextView {
             textSlice.refresh();
         }
     }
+
+
+    /**
+     * Gets whether this text is dirty.
+     * @return {@code true} if text is dirty.
+     */
+    public boolean isDirty() { return dirty; }
 
 }

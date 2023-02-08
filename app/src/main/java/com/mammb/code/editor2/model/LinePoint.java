@@ -81,6 +81,14 @@ public class LinePoint implements Comparable<LinePoint> {
     }
 
     /**
+     * Reset this line point.
+     */
+    public void reset() {
+        row = 0;
+        offset = 0;
+    }
+
+    /**
      * Get the number of row.
      * @return the number of row
      */

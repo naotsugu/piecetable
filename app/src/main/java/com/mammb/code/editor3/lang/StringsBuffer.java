@@ -19,11 +19,11 @@ import com.mammb.code.editor2.model.Strings;
 import java.util.stream.IntStream;
 
 /**
- * StringBuffer.
+ * StringsBuffer.
  * StringBuilder to cache string metrics.
  * @author Naotsugu Kobayashi
  */
-public class StringBuffer {
+public class StringsBuffer {
 
     /** The string buffer. */
     private final StringBuilder value = new StringBuilder();

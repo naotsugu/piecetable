@@ -15,7 +15,7 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor2.model.Until;
+import com.mammb.code.editor3.lang.Until;
 import com.mammb.code.editor3.lang.EventListener;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -32,8 +32,8 @@ public class TextSource implements EventListener<Edit> {
     /** The source text content. */
     private Content source;
 
-    /** The code point index on the source. */
-    private int index;
+    /** The code point offset index on the source. */
+    private int offset;
 
     /** The buffered edit. */
     private Edit bufferedEdit = Edit.empty;
@@ -41,19 +41,19 @@ public class TextSource implements EventListener<Edit> {
 
     /**
      * Constructor.
-     * @param source the code point index
+     * @param source the code point offset index
      */
     public TextSource(Content source) {
         this.source = source;
-        this.index = 0;
+        this.offset = 0;
     }
 
     /**
      * Get the source index.
      * @return the source index
      */
-    public int sourceIndex() {
-        return index;
+    public int offset() {
+        return offset;
     }
 
     /**
@@ -61,12 +61,12 @@ public class TextSource implements EventListener<Edit> {
      * @param deltaCodePoint delta code point
      */
     public void shiftIndex(int deltaCodePoint) {
-        int newValue = index + deltaCodePoint;
+        int newValue = offset + deltaCodePoint;
         if (newValue < 0 || newValue > source.length()) {
             throw new IndexOutOfBoundsException();
         }
         flush();
-        index += deltaCodePoint;
+        offset += deltaCodePoint;
     }
 
     /**
@@ -78,13 +78,13 @@ public class TextSource implements EventListener<Edit> {
         flush();
         int count = 0;
         if (rowDelta > 0) {
-            byte[] row = source.bytes(index, Until.lf(Math.abs(rowDelta)));
+            byte[] row = source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)));
             for (byte b : row) if ((b & 0xC0) != 0x80) count++;
         } else {
-            byte[] row = source.bytesBefore(index, Until.lf(Math.abs(rowDelta) + 1));
+            byte[] row = source.bytesBefore(offset, Until.lf(Math.abs(rowDelta) + 1));
             for (byte b : row) if ((b & 0xC0) != 0x80) count--;
         }
-        index += count;
+        offset += count;
     }
 
     /**
@@ -94,7 +94,7 @@ public class TextSource implements EventListener<Edit> {
      */
     String rows(int count) {
         flush();
-        byte[] tailRow = source.bytes(index, Until.lf(count));
+        byte[] tailRow = source.bytes(offset, Until.lfInclusive(count));
         return new String(tailRow, charset);
     }
 
@@ -104,7 +104,7 @@ public class TextSource implements EventListener<Edit> {
      */
     String beforeRow() {
         flush();
-        byte[] headRow = source.bytesBefore(index, Until.lf(2));
+        byte[] headRow = source.bytesBefore(offset, Until.lf(2));
         return new String(headRow, charset);
     }
 
@@ -114,8 +114,16 @@ public class TextSource implements EventListener<Edit> {
      */
     String afterRow(int offsetCpCount) {
         flush();
-        byte[] tailRow = source.bytes(index + offsetCpCount, Until.lf());
+        byte[] tailRow = source.bytes(offset + offsetCpCount, Until.lfInclusive());
         return new String(tailRow, charset);
+    }
+
+    /**
+     * Get the total row size.
+     * @return the total row size
+     */
+    public int totalRowSize() {
+        return source.rowSize();
     }
 
     @Override
@@ -123,7 +131,7 @@ public class TextSource implements EventListener<Edit> {
         if (event.isEmpty()) {
             return;
         }
-        Edit edit = event.withOffset(index);
+        Edit edit = event.withOffset(offset);
         if (bufferedEdit.canMarge(edit)) {
             bufferedEdit = bufferedEdit.marge(edit);
         } else {
