@@ -24,6 +24,15 @@ import java.util.function.Predicate;
 public class Until {
 
     /**
+     * Create a new Until char length.
+     * @return the Until char length
+     */
+    public static Until.CharLen charLength(int length) {
+        return new Until.CharLen(length);
+    }
+
+
+    /**
      * Create a new Until LF.
      * @param count the line feed count
      * @return the Until LF predicate
@@ -32,6 +41,7 @@ public class Until {
         return new Until.LF(count, true);
     }
 
+
     /**
      * Create a new Until LF.
      * @return the Until LF predicate
@@ -39,6 +49,7 @@ public class Until {
     public static Until.LF lf() {
         return new Until.LF(1, true);
     }
+
 
     /**
      * Create a new Until LF.
@@ -49,12 +60,35 @@ public class Until {
         return new Until.LF(count, false);
     }
 
+
     /**
      * Create a new Until LF.
      * @return the Until LF predicate
      */
     public static Until.LF lfInclusive() {
         return new Until.LF(1, false);
+    }
+
+
+    /** CharLen. */
+    static class CharLen implements Predicate<byte[]> {
+
+        /** The char count. */
+        private int count;
+
+        /**
+         * Constructor.
+         * @param count the line feed count
+         */
+        public CharLen(int count) {
+            this.count = count;
+        }
+
+        @Override
+        public boolean test(byte[] bytes) {
+            count -= bytes.length;
+            return count <= 0;
+        }
     }
 
 

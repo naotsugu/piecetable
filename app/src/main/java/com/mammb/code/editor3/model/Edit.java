@@ -80,8 +80,8 @@ public class Edit {
 
     public boolean isEmpty() { return type == Type.NIL; }
 
-    public Edit withOffset(int offset) {
-        return new Edit(type, offset + position, string, occurredOn);
+    public Edit withPosition(int newPosition) {
+        return new Edit(type, newPosition, string, occurredOn);
     }
 
     public boolean canMarge(Edit other) {

@@ -29,7 +29,7 @@ public class TextSlice {
     private int originRow;
 
     /** The slice row size. */
-    private int rowSize;
+    private int maxRowSize;
 
     /** The text source. */
     private final TextSource source;
@@ -45,8 +45,28 @@ public class TextSlice {
     public TextSlice(TextSource source) {
         this.source = Objects.requireNonNull(source);
         this.originRow = 0;
-        this.rowSize = 10;
+        this.maxRowSize = 10;
     }
+
+
+    /**
+     *
+     * @param offset
+     * @param string
+     */
+    public void insert(int offset, String string) {
+        buffer.insert(offset, string);
+        source.handle(Edit.insert(offset, string));
+        fitRow();
+    }
+
+
+    public void delete(int offset, int length) {
+        String deleted = buffer.delete(offset, length);
+        source.handle(Edit.delete(offset, deleted));
+        fitRow();
+    }
+
 
     /**
      * Get the string.
@@ -57,8 +77,18 @@ public class TextSlice {
     }
 
 
+
     public void refresh() {
-        buffer.set(source.rows(rowSize));
+        buffer.set(source.rows(maxRowSize));
+    }
+
+
+    private void fitRow() {
+        if (maxRowSize > buffer.rowSize() && source.totalRowSize() > maxRowSize) {
+            buffer.append(source.afterRow(buffer.length()));
+        } else if (buffer.rowSize() > maxRowSize) {
+            buffer.truncateRows(buffer.rowSize() - maxRowSize);
+        }
     }
 
 }

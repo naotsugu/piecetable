@@ -22,6 +22,10 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * TextSource.
+ *
+ * Translates access by character index to access by code point.
+ * It manages the offset of the code point from which access to the content originates.
+ *
  * @author Naotsugu Kobayashi
  */
 public class TextSource implements EventListener<Edit> {
@@ -48,6 +52,7 @@ public class TextSource implements EventListener<Edit> {
         this.offset = 0;
     }
 
+
     /**
      * Get the source index.
      * @return the source index
@@ -56,18 +61,20 @@ public class TextSource implements EventListener<Edit> {
         return offset;
     }
 
+
     /**
      * Shifts source index.
-     * @param deltaCodePoint delta code point
+     * @param charOffset the char offset
      */
-    public void shiftIndex(int deltaCodePoint) {
-        int newValue = offset + deltaCodePoint;
+    public void shiftIndex(int charOffset) {
+        int newValue = offset + asCodePointCount(charOffset);
         if (newValue < 0 || newValue > source.length()) {
             throw new IndexOutOfBoundsException();
         }
         flush();
-        offset += deltaCodePoint;
+        offset += newValue;
     }
+
 
     /**
      * Shifts source index at row.
@@ -87,16 +94,18 @@ public class TextSource implements EventListener<Edit> {
         offset += count;
     }
 
+
     /**
-     * Get the rows.
-     * @param count the number of rows to retrieve
+     * Get the rows from content head.
+     * @param rowCount the number of rows to retrieve
      * @return the before row
      */
-    String rows(int count) {
+    String rows(int rowCount) {
         flush();
-        byte[] tailRow = source.bytes(offset, Until.lfInclusive(count));
+        byte[] tailRow = source.bytes(offset, Until.lfInclusive(rowCount));
         return new String(tailRow, charset);
     }
+
 
     /**
      * Get the before row.
@@ -108,15 +117,19 @@ public class TextSource implements EventListener<Edit> {
         return new String(headRow, charset);
     }
 
+
     /**
      * Get the after row.
-     * @return the after row
+     * @param charOffset the char offset
+     * @return the row string
      */
-    String afterRow(int offsetCpCount) {
+    String afterRow(int charOffset) {
+        int offsetCodePoint = asCodePointCount(charOffset);
         flush();
-        byte[] tailRow = source.bytes(offset + offsetCpCount, Until.lfInclusive());
+        byte[] tailRow = source.bytes(offset + offsetCodePoint, Until.lfInclusive());
         return new String(tailRow, charset);
     }
+
 
     /**
      * Get the total row size.
@@ -126,12 +139,13 @@ public class TextSource implements EventListener<Edit> {
         return source.rowSize();
     }
 
+
     @Override
     public void handle(Edit event) {
         if (event.isEmpty()) {
             return;
         }
-        Edit edit = event.withOffset(offset);
+        Edit edit = event.withPosition(offset + asCodePointCount(event.position()));
         if (bufferedEdit.canMarge(edit)) {
             bufferedEdit = bufferedEdit.marge(edit);
         } else {
@@ -139,6 +153,17 @@ public class TextSource implements EventListener<Edit> {
             bufferedEdit = edit;
         }
     }
+
+
+    /**
+     * Converts character length to code point length.
+     * @param length character length
+     * @return code point length
+     */
+    private int asCodePointCount(int length) {
+        return source.count(offset, Until.charLength(length));
+    }
+
 
     /**
      * Flush buffered edit.

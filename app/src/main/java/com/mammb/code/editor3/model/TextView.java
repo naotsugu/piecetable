@@ -15,10 +15,8 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor2.model.LinePoint;
 import com.mammb.code.editor3.model.specifics.ContentImpl;
 import javafx.scene.text.Text;
-
 import java.nio.file.Path;
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class TextView {
     private final TextSlice textSlice;
 
     /** The caret point. */
-    private final LinePoint caretPoint = new LinePoint();
+    private final CaretPoint caretPoint = new CaretPoint();
 
     /** max rows. */
     private int maxRows;
@@ -67,8 +65,26 @@ public class TextView {
         this.textSlice = new TextSlice(source);
     }
 
-    public List<Text> text() {
-        return List.of(new Text(textSlice.string()));
+
+    /**
+     * Add text in caret point.
+     * @param string the string to add
+     */
+    public void add(String string) {
+        if (string == null || string.isEmpty()) return;
+        textSlice.insert(caretPoint.offset(), string);
+        caretPoint.forward(string);
+    }
+
+
+    /**
+     * Add text in caret point.
+     * @param length the length of delete string
+     */
+    public void delete(int length) {
+        if (length <= 0) return;
+        textSlice.delete(caretPoint.offset(), length);
+        caretPoint.syncPositionOnRow();
     }
 
 
@@ -89,5 +105,10 @@ public class TextView {
      * @return {@code true} if text is dirty.
      */
     public boolean isDirty() { return dirty; }
+
+
+    public List<Text> text() {
+        return List.of(new Text(textSlice.string()));
+    }
 
 }

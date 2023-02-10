@@ -31,6 +31,9 @@ public class StringsBuffer {
     /** The string metrics. */
     private final StringMetrics metrics = new StringMetrics(value);
 
+    /** The cache of row size. */
+    private int rowSizeCache = -1;
+
 
     /**
      * Sets the text(replace all).
@@ -38,8 +41,11 @@ public class StringsBuffer {
      */
     public void set(CharSequence cs) {
         value.delete(0, value.length());
-        append(cs);
+        value.append(cs);
+        metrics.clear();
+        rowSizeCache = -1;
     }
+
 
     /**
      * Appends the specified character sequence to this Appendable.
@@ -48,7 +54,26 @@ public class StringsBuffer {
     public void append(CharSequence cs) {
         value.append(cs);
         metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache += Strings.countLf(cs);
+        }
     }
+
+
+    /**
+     * Truncate last rows.
+     * @param n the number of row to truncate
+     */
+    public void truncateRows(int n) {
+        for (int i = 0; i < n; i++) {
+            value.delete(rowIndex(rowSize() - 1), value.length());
+        }
+        metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache -= n;
+        }
+    }
+
 
     /**
      * Inserts the specified CharSequence into this sequence.
@@ -58,7 +83,28 @@ public class StringsBuffer {
     public void insert(int offset, CharSequence cs) {
         value.insert(offset, cs);
         metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache += Strings.countLf(cs);
+        }
     }
+
+
+    /**
+     * Removes the characters in a substring of this sequence.
+     * @param offset the beginning index
+     * @param length the length to delete, exclusive
+     * @return the deleted string
+     */
+    public String delete(int offset, int length) {
+        String deleted = value.substring(offset, offset + length);
+        value.delete(offset, offset + length);
+        metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache -= Strings.countLf(deleted);
+        }
+        return deleted;
+    }
+
 
     /**
      * Shift row and append text.
@@ -72,6 +118,7 @@ public class StringsBuffer {
         append(tail);
         return len;
     }
+
 
     /**
      * Shift row and insert text.
@@ -87,6 +134,7 @@ public class StringsBuffer {
         return len;
     }
 
+
     /**
      * Get the character length.
      * @return the length of the sequence of characters currently represented by this object
@@ -94,6 +142,7 @@ public class StringsBuffer {
     public int length() {
         return value.length();
     }
+
 
     /**
      * Returns the char value in this sequence at the specified index.
@@ -104,13 +153,19 @@ public class StringsBuffer {
         return value.charAt(index);
     }
 
+
     /**
      * Get the row size of this view text.
      * @return the row size
      */
     public int rowSize() {
-        return metrics().rowSize();
+        if (rowSizeCache > -1) {
+            return rowSizeCache;
+        }
+        rowSizeCache = metrics().rowSize();
+        return rowSizeCache;
     }
+
 
     /**
      * Get the row index of this text.
@@ -120,6 +175,7 @@ public class StringsBuffer {
     public int rowIndex(int row) {
         return (row == 0) ? 0 : metrics().rowIndex(row);
     }
+
 
     /**
      * Get the row length.
@@ -136,30 +192,33 @@ public class StringsBuffer {
         }
     }
 
+
     /**
      * Returns the number of Unicode code points in the specified range of this view text.
      * @param beginIndex the index to the first char of the text range
      * @param endIndex the index after the last char of the text range
      * @return the number of Unicode code points in the specified text range
      */
-    public int codePointCount(int beginIndex, int endIndex) {
+    private int codePointCount(int beginIndex, int endIndex) {
         return value.codePointCount(beginIndex, endIndex);
     }
+
 
     /**
      * Get the code point count.
      * @return the code point count
      */
-    public int codePointCount() {
+    private int codePointCount() {
         return metrics().codePointCount();
     }
+
 
     /**
      * Get the row code point count.
      * @param row the specified row
      * @return the row code point count
      */
-    public int rowCodePointCount(int row) {
+    private int rowCodePointCount(int row) {
         if (row < rowSize() - 1) {
             return codePointCount(rowIndex(row), rowIndex(row + 1));
         } else if (row == rowSize() - 1) {
@@ -168,6 +227,7 @@ public class StringsBuffer {
             return 0;
         }
     }
+
 
     @Override
     public String toString() {

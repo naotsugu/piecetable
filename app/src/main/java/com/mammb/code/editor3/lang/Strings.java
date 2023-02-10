@@ -26,6 +26,34 @@ public class Strings {
     /** line feed. */
     public static char LF = '\n';
 
+
+    /**
+     * Get the length of specified character sequences last row.
+     * @param cs the specified char sequence
+     * @return the length of last row(not code point)
+     */
+    public static int lengthOfLastRow(CharSequence cs) {
+        int index = Math.max(0, lastIndexOf(cs, LF));
+        return cs.subSequence(index, cs.length()).length();
+    }
+
+
+    /**
+     * Get the index within this string of the last occurrence of the specified character.
+     * @param ch a character
+     * @return the index of the last occurrence of the character in the character sequence
+     * represented by this object,or {@code -1} if the character does not occur
+     */
+    public static int lastIndexOf(CharSequence cs, char ch) {
+        for (int i = cs.length(); i >= 0; i--) {
+            if (cs.charAt(i) == ch) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
     /**
      * Count the number of line feed in the specified char sequence.
      * @param cs the specified char sequence

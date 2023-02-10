@@ -57,6 +57,14 @@ public interface Content extends EditListener {
     byte[] bytes(int startPos, Predicate<byte[]> until);
 
     /**
+     * Get the code point count.
+     * @param startPos start position(code point index), inclusive
+     * @param until the until predicate, exclusive
+     * @return the code point count
+     */
+    int count(int startPos, Predicate<byte[]> until);
+
+    /**
      * Get the bytes.
      * <pre>
      *     | a | b | c | d | a |
