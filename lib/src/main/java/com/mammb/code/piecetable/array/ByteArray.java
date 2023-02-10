@@ -60,6 +60,10 @@ public class ByteArray implements Serializable {
         return new ByteArray(Arrays.copyOf(bytes, bytes.length), bytes.length);
     }
 
+    /**
+     * Add byte value to this array.
+     * @param value byte value to be added
+     */
     public void add(byte value) {
         if (length == bytes.length) {
             bytes = grow(length + 1);
@@ -67,6 +71,10 @@ public class ByteArray implements Serializable {
         bytes[length++] = value;
     }
 
+    /**
+     * Add byte array to this array.
+     * @param values byte array to be added
+     */
     public void add(byte[] values) {
         if (length + values.length > bytes.length) {
             this.bytes = grow(length + values.length);
@@ -75,6 +83,11 @@ public class ByteArray implements Serializable {
         length += values.length;
     }
 
+    /**
+     * Get byte at the specified index position.
+     * @param index the specified index position
+     * @return byte value
+     */
     public byte get(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException(
@@ -83,14 +96,20 @@ public class ByteArray implements Serializable {
         return bytes[index];
     }
 
+    /**
+     * Get the copies of byte array.
+     * @return the copies of byte array
+     */
     public byte[] get() {
         return Arrays.copyOf(bytes, length);
     }
 
-    public void fill(byte[] dest) {
-        System.arraycopy(bytes, 0, dest, 0, Math.min(bytes.length, dest.length));
-    }
-
+    /**
+     * Get copies the specified range of this array.
+     * @param from the initial index of the range to be copied, inclusive
+     * @param to the final index of the range to be copied, exclusive
+     * @return a new array containing the specified range from the original array
+     */
     public byte[] get(int from, int to) {
         if (from < 0 || to > length || from > to) {
             throw new IndexOutOfBoundsException(
@@ -99,6 +118,10 @@ public class ByteArray implements Serializable {
         return Arrays.copyOfRange(bytes, from, to);
     }
 
+    /**
+     * Get the new reversed {@code ByteArray}.
+     * @return the new reversed {@code ByteArray}
+     */
     public ByteArray reverse() {
         byte[] ret = get();
         for(int i = 0; i < ret.length / 2; i++) {
@@ -109,19 +132,35 @@ public class ByteArray implements Serializable {
         return new ByteArray(ret, length);
     }
 
+    /**
+     * Clear this array.
+     */
     public void clear() {
         bytes = EMPTY;
         length = 0;
     }
 
+    /**
+     * Get the length of byte array.
+     * @return the length of byte array
+     */
     public int length() {
         return length;
     }
 
+    /**
+     * Get the capacity of byte array.
+     * @return the capacity of byte array
+     */
     public int capacity() {
         return bytes.length;
     }
 
+    /**
+     * Grow this byte array buffer.
+     * @param minCapacity the growth capacity
+     * @return the grown byte array
+     */
     private byte[] grow(int minCapacity) {
         int oldCapacity = bytes.length;
         if (length == 0 || bytes == EMPTY) {

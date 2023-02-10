@@ -28,15 +28,29 @@ import java.util.Objects;
  */
 public class ChannelArray implements Closeable {
 
+    /** The size of buffer. */
     private static final short PREF_BUF_SIZE = 1024 * 4;
+
+    /** The empty byte array. */
     private static final byte[] EMPTY = {};
 
+    /** The source channel. */
     private final SeekableByteChannel ch;
+
+    /** The current size of entity to which this channel is connected. */
     private final int chSize;
 
+    /** The byte buffer. */
     private byte[] buffer;
+
+    /** The offset of buffer. */
     private int offset;
 
+
+    /**
+     * Create a new {@link ChannelArray}.
+     * @param ch the source channel
+     */
     private ChannelArray(SeekableByteChannel ch) {
         Objects.requireNonNull(ch);
         try {
@@ -49,10 +63,20 @@ public class ChannelArray implements Closeable {
         this.offset = 0;
     }
 
+    /**
+     * Create a new {@code ChannelArray} from the given {@code SeekableByteChannel}.
+     * @param ch the given {@code SeekableByteChannel}
+     * @return a new {@code ChannelArray}
+     */
     public static ChannelArray of(SeekableByteChannel ch) {
         return new ChannelArray(ch);
     }
 
+    /**
+     * Get byte at the specified index position.
+     * @param index the specified index position
+     * @return byte value
+     */
     public byte get(int index) {
         if (index < 0 || index >= chSize) {
             throw new IndexOutOfBoundsException(
@@ -64,6 +88,12 @@ public class ChannelArray implements Closeable {
         return buffer[index - offset];
     }
 
+    /**
+     * Get copies the specified range of this array.
+     * @param from the initial index of the range to be copied, inclusive
+     * @param to the final index of the range to be copied, exclusive
+     * @return a new array containing the specified range from the original array
+     */
     public byte[] get(int from, int to) {
         if (from < 0 || to > chSize || from > to) {
             throw new IndexOutOfBoundsException(
@@ -82,13 +112,20 @@ public class ChannelArray implements Closeable {
         return Arrays.copyOfRange(buffer, from - offset, to - offset);
     }
 
-    public int length() {
-        return chSize;
-    }
-
+    /**
+     * Clear this array.
+     */
     public void clear() {
         this.buffer = EMPTY;
         this.offset = 0;
+    }
+
+    /**
+     * Get the length of byte array.
+     * @return the length of byte array
+     */
+    public int length() {
+        return chSize;
     }
 
     @Override
@@ -96,6 +133,11 @@ public class ChannelArray implements Closeable {
         ch.close();
     }
 
+    /**
+     * Fill buffer.
+     * @param from start position of channel
+     * @param to end position of channel
+     */
     private void fillBuffer(int from, int to) {
         try {
             var bb = ByteBuffer.allocate(

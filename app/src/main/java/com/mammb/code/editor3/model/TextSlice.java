@@ -67,6 +67,19 @@ public class TextSlice {
     }
 
 
+    public void shiftRow(int rowDelta) {
+        if (rowDelta < 0) {
+            source.shiftRow(rowDelta);
+            buffer.shiftInsert(0, source.rows(1));
+        } else {
+            String next = source.afterRow(buffer.length());
+            source.shiftRow(rowDelta);
+            buffer.shiftAppend(next);
+        }
+        originRow += rowDelta;
+    }
+
+
     /**
      * Get the string.
      * @return the string

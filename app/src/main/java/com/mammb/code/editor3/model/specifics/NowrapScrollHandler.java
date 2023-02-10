@@ -19,25 +19,41 @@ import com.mammb.code.editor3.model.CaretPoint;
 import com.mammb.code.editor3.model.ScrollHandler;
 import com.mammb.code.editor3.model.TextSlice;
 
+/**
+ * NowrapScrollHandler.
+ * @author Naotsugu Kobayashi
+ */
 public class NowrapScrollHandler implements ScrollHandler {
 
+    /** The textSlice. */
     private final TextSlice textSlice;
 
+    /** The caretPoint. */
     private final CaretPoint caretPoint;
 
 
+    /**
+     * Create a {@link NowrapScrollHandler}.
+     * @param textSlice the {@link TextSlice}
+     * @param caretPoint the {@link CaretPoint}
+     */
     public NowrapScrollHandler(TextSlice textSlice, CaretPoint caretPoint) {
         this.textSlice = textSlice;
         this.caretPoint = caretPoint;
     }
 
+
     @Override
     public void next() {
-
+        textSlice.shiftRow(1);
+        // caretPoint.nextRow()
     }
+
 
     @Override
     public void prev() {
-
+        textSlice.shiftRow(-1);
+        // caretPoint.prevRow()
     }
+
 }

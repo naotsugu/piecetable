@@ -111,7 +111,7 @@ public class StringsBuffer {
      * @param tail append string
      * @return the number of deleted character
      */
-    int shiftAppend(CharSequence tail) {
+    public int shiftAppend(CharSequence tail) {
         int len = IntStream.range(0, Strings.countLf(tail))
             .map(this::rowLength).sum();
         if (len > 0) value.delete(0, len);
@@ -125,7 +125,7 @@ public class StringsBuffer {
      * @param cs insert string
      * @return the number of deleted character
      */
-    int shiftInsert(int row, CharSequence cs) {
+    public int shiftInsert(int row, CharSequence cs) {
         int rowIndex = rowIndex(row);
         int len = IntStream.range(rowSize() - Strings.countLf(cs), rowSize())
             .map(this::rowLength).sum();
