@@ -16,7 +16,6 @@
 package com.mammb.code.editor3.model;
 
 import com.mammb.code.editor3.lang.StringsBuffer;
-
 import java.util.Objects;
 
 /**

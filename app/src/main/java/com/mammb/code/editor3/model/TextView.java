@@ -16,6 +16,8 @@
 package com.mammb.code.editor3.model;
 
 import com.mammb.code.editor3.model.specifics.ContentImpl;
+import com.mammb.code.editor3.model.specifics.NowrapScrollHandler;
+import com.mammb.code.editor3.model.specifics.WrapScrollHandler;
 import javafx.scene.text.Text;
 import java.nio.file.Path;
 import java.util.List;
@@ -53,6 +55,7 @@ public class TextView {
      */
     public TextView(TextSlice textSlice) {
         this.textSlice = textSlice;
+        initHandler();
     }
 
 
@@ -61,8 +64,7 @@ public class TextView {
      * @param path the content path
      */
     public TextView(Path path) {
-        TextSource source = new TextSource(new ContentImpl(path));
-        this.textSlice = new TextSlice(source);
+        this(new TextSlice(new TextSource(new ContentImpl(path))));
     }
 
 
@@ -109,6 +111,15 @@ public class TextView {
 
     public List<Text> text() {
         return List.of(new Text(textSlice.string()));
+    }
+
+
+    private void initHandler() {
+        if (textWrap) {
+            scrollHandler = new WrapScrollHandler();
+        } else {
+            scrollHandler = new NowrapScrollHandler(textSlice, caretPoint);
+        }
     }
 
 }
