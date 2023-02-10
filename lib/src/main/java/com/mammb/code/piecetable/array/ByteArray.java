@@ -24,20 +24,38 @@ import java.util.Arrays;
  */
 public class ByteArray implements Serializable {
 
+    /** The empty byte array. */
     private static final byte[] EMPTY = {};
 
+    /** The byte array. */
     private byte[] bytes;
+
+    /** The length of array. */
     private int length;
 
+    /**
+     * Create a new {@code ByteArray}.
+     * @param bytes the source byte array
+     * @param length the length of array
+     */
     private ByteArray(byte[] bytes, int length) {
         this.bytes = bytes;
         this.length = length;
     }
 
+    /**
+     * Create a new {@code ByteArray}.
+     * @return a new {@code ByteArray}
+     */
     public static ByteArray of() {
         return new ByteArray(EMPTY, 0);
     }
 
+    /**
+     * Create a new {@code ByteArray} from the given byte array.
+     * @param bytes the given byte array
+     * @return a new {@code ByteArray}
+     */
     public static ByteArray of(byte[] bytes) {
         return new ByteArray(Arrays.copyOf(bytes, bytes.length), bytes.length);
     }

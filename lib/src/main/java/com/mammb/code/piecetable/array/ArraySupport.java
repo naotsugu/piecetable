@@ -21,8 +21,16 @@ package com.mammb.code.piecetable.array;
  */
 public class ArraySupport {
 
+    /** The max length of array. */
     private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 
+    /**
+     * Create new capacity size.
+     * @param oldLength the old length
+     * @param minGrowth the min growth
+     * @param prefGrowth the pref growth
+     * @return the new capacity size
+     */
     public static int newCapacity(int oldLength, int minGrowth, int prefGrowth) {
         int prefLength = oldLength + Math.max(minGrowth, prefGrowth);
         if (0 < prefLength && prefLength <= SOFT_MAX_ARRAY_LENGTH) {
