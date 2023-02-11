@@ -35,6 +35,11 @@ public record Piece(Buffer target, int bufIndex, int length) {
     public record Pair(Piece left, Piece right) { }
 
 
+    /**
+     * Split this piece at the specified offset.
+     * @param offset the split position
+     * @return the split pieces
+     */
     public Pair split(int offset) {
         if (offset >= length) {
             throw new RuntimeException("Illegal offset value. offset[%s], length[%s]"
@@ -45,6 +50,12 @@ public record Piece(Buffer target, int bufIndex, int length) {
                 new Piece(target, bufIndex + offset, length - offset));
     }
 
+
+    /**
+     * Marge the piece.
+     * @param other the piece to be merged
+     * @return the merged piece
+     */
     public Optional<Piece> marge(Piece other) {
         if (target == other.target) {
             if (end() == other.bufIndex) {
@@ -57,6 +68,13 @@ public record Piece(Buffer target, int bufIndex, int length) {
         return Optional.empty();
     }
 
+
+    /**
+     * Get the sub buffer of the specified range of this piece.
+     * @param start the start index of the range to be copied, inclusive
+     * @param end the end index of the range to be copied, exclusive
+     * @return the sub buffer of the specified range of this piece
+     */
     public Buffer bytes(int start, int end) {
         if (start < 0 || end > end() || start >= end) {
             throw new RuntimeException("Illegal index. start[%s], end[%s]".formatted(start, end));
@@ -64,14 +82,32 @@ public record Piece(Buffer target, int bufIndex, int length) {
         return target.subBuffer(bufIndex + start, bufIndex + end);
     }
 
+
+    /**
+     * Get the bytes.
+     * @return the bytes
+     */
     public Buffer bytes() {
         return bytes(0, length);
     }
 
+
+    /**
+     * Writes a sequence of bytes to the channel from this piece.
+     * @param channel the channel to write to
+     * @param buf the buffer used for writing
+     * @return the number of bytes written, possibly zero
+     * @throws IOException If some other I/O error occurs
+     */
     int writeTo(WritableByteChannel channel, ByteBuffer buf) throws IOException {
         return target.write(channel, buf, bufIndex, length);
     }
 
+
+    /**
+     * Get the end position.
+     * @return the end position
+     */
     public int end() {
         return bufIndex + length;
     }
