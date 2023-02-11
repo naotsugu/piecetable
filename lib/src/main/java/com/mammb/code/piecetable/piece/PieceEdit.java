@@ -32,7 +32,9 @@ import java.util.Objects;
  */
 public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
 
+    /** The edit palce. */
     public enum Place { HEAD, MID, TAIL }
+
 
     public PieceEdit {
         Objects.requireNonNull(org);
@@ -40,6 +42,11 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
         Objects.requireNonNull(place);
     }
 
+
+    /**
+     * Flip this piece edit.
+     * @return the flipped piece edit.
+     */
     public PieceEdit flip() {
         return new PieceEdit(index, mod, org, place);
     }
