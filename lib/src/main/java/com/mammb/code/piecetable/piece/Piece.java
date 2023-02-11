@@ -31,7 +31,9 @@ import java.util.Optional;
  */
 public record Piece(Buffer target, int bufIndex, int length) {
 
+    /** Piece pair. */
     public record Pair(Piece left, Piece right) { }
+
 
     public Pair split(int offset) {
         if (offset >= length) {

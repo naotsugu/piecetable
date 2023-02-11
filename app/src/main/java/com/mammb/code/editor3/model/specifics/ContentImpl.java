@@ -15,7 +15,7 @@
  */
 package com.mammb.code.editor3.model.specifics;
 
-import com.mammb.code.editor2.model.Strings;
+import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.editor3.model.Content;
 import com.mammb.code.editor3.model.Edit;
 import com.mammb.code.piecetable.PieceTable;

@@ -88,7 +88,13 @@ public class TextSlice {
         return buffer.toString();
     }
 
+    public int maxRowSize() {
+        return maxRowSize;
+    }
 
+    public void setMaxRowSize(int maxRowSize) {
+        this.maxRowSize = maxRowSize;
+    }
 
     public void refresh() {
         buffer.set(source.rows(maxRowSize));

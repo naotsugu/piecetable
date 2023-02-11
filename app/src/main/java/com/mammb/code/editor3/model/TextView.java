@@ -33,9 +33,6 @@ public class TextView {
     /** The caret point. */
     private final CaretPoint caretPoint = new CaretPoint();
 
-    /** max rows. */
-    private int maxRows;
-
     /** text wrap?. */
     private boolean textWrap;
 
@@ -95,8 +92,8 @@ public class TextView {
      * @param maxRows the max row number
      */
     public void setupMaxRows(int maxRows) {
-        if (maxRows > 1 && this.maxRows != maxRows) {
-            this.maxRows = maxRows;
+        if (maxRows > 1 && textSlice.maxRowSize() != maxRows) {
+            textSlice.setMaxRowSize(maxRows);
             textSlice.refresh();
         }
     }

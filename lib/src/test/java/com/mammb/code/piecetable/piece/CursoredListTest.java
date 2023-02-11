@@ -15,7 +15,12 @@
  */
 package com.mammb.code.piecetable.piece;
 
+import com.mammb.code.piecetable.buffer.Buffer;
+import com.mammb.code.piecetable.buffer.ReadBuffer;
 import org.junit.jupiter.api.Test;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Naotsugu Kobayashi
  */
 class CursoredListTest {
+
+    Charset cs = StandardCharsets.UTF_8;
 
     @Test
     void testCursorList() {
@@ -84,4 +91,73 @@ class CursoredListTest {
         assertEquals(3, list.at(6).position());
 
     }
+
+
+    @Test
+    void testBytes() {
+
+        var list = new CursoredList();
+
+        Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
+        list.add(0, new Piece(buf, 0, 3));
+        list.add(1, new Piece(buf, 4, 3));
+        list.add(2, new Piece(buf, 8, 3));
+
+        assertArrayEquals("abcdefghi".getBytes(cs), list.bytes(0, 9).get());
+        assertArrayEquals("abc".getBytes(cs), list.bytes(0, 3).get());
+        assertArrayEquals("def".getBytes(cs), list.bytes(3, 6).get());
+        assertArrayEquals("ghi".getBytes(cs), list.bytes(6, 9).get());
+        assertArrayEquals("bcdefgh".getBytes(cs), list.bytes(1, 8).get());
+
+        assertArrayEquals("abcdefghi".getBytes(cs), list.bytes(0, b -> b[0] == 'z').get());
+        assertArrayEquals("bcdefgh".getBytes(cs), list.bytes(1, b -> b[0] == 'i').get());
+        assertArrayEquals("def".getBytes(cs), list.bytes(3, b -> b[0] == 'g').get());
+    }
+
+
+    @Test
+    void testBytesBefore() {
+
+        var list = new CursoredList();
+
+        Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
+        list.add(0, new Piece(buf, 0, 3));
+        list.add(1, new Piece(buf, 4, 3));
+        list.add(2, new Piece(buf, 8, 3));
+
+        assertArrayEquals("abcdefghi".getBytes(cs), list.bytesBefore(9, b -> b[0] == '1').get());
+        assertArrayEquals("defghi".getBytes(cs), list.bytesBefore(9, b -> b[0] == 'c').get());
+        assertArrayEquals("bcdefgh".getBytes(cs), list.bytesBefore(8, b -> b[0] == 'a').get());
+        assertArrayEquals("def".getBytes(cs), list.bytesBefore(6, b -> b[0] == 'c').get());
+
+    }
+
+
+    @Test
+    void testCount() {
+
+        var list = new CursoredList();
+
+        Buffer buf = ReadBuffer.of("abc_121_abc".getBytes(cs));
+        list.add(0, new Piece(buf, 0, 3));
+        list.add(1, new Piece(buf, 4, 3));
+        list.add(2, new Piece(buf, 8, 3));
+
+        assertEquals(0, list.count(0, 9, b -> b[0] == 'z'));
+        assertEquals(2, list.count(0, 9, b -> b[0] == 'a'));
+        assertEquals(2, list.count(0, 9, b -> b[0] == 'b'));
+        assertEquals(2, list.count(0, 9, b -> b[0] == 'c'));
+
+        assertEquals(2, list.count(3, 6, b -> b[0] == '1'));
+        assertEquals(1, list.count(3, 6, b -> b[0] == '2'));
+
+        assertEquals(1, list.count(1, 8, b -> b[0] == 'a'));
+        assertEquals(2, list.count(1, 8, b -> b[0] == 'b'));
+        assertEquals(1, list.count(1, 8, b -> b[0] == 'c'));
+
+        assertEquals(1, list.count(1, 2, b -> b[0] == 'b'));
+        assertEquals(1, list.count(6, 8, b -> b[0] == 'b'));
+
+    }
+
 }

@@ -127,7 +127,7 @@ public class CursoredList {
         for (int i = from.index(); i < length(); i++) {
             Piece piece = get(i);
             for (;;) {
-                int end = Math.min(piece.end(), startPos + 256);
+                int end = Math.min(piece.length(), start + 256);
                 Buffer buf = piece.bytes(start, end);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
@@ -136,7 +136,7 @@ public class CursoredList {
                     }
                     byteArray.add(bytes);
                 }
-                if (end == piece.end()) {
+                if (end == piece.length()) {
                     break;
                 }
                 start = end;
@@ -155,10 +155,10 @@ public class CursoredList {
         for (int i = from.index(); i >= 0; i--) {
             Piece piece = get(i);
             if (!first) {
-                start = piece.end();
+                start = piece.length();
             }
             for (;;) {
-                int end = Math.max(piece.bufIndex(), startPosExclude - 256);
+                int end = Math.max(0, start - 256);
                 Buffer buf = piece.bytes(end, start);
                 for (int j = buf.length() - 1; j >= 0; j--) {
                     byte[] bytes = buf.charAt(j);
@@ -167,7 +167,7 @@ public class CursoredList {
                     }
                     byteArray.add(bytes);
                 }
-                if (end == piece.bufIndex()) {
+                if (end == 0) {
                     break;
                 }
                 start = end;
@@ -187,18 +187,18 @@ public class CursoredList {
             int start = (i == 0) ? startPos - from.position() : 0;
             int end = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
             for (;;) {
-                end = Math.min(end, start + 256);
-                Buffer buf = piece.bytes(start, end);
+                int eu = Math.min(end, start + 256);
+                Buffer buf = piece.bytes(start, eu);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
                     if (predicate.test(bytes)) {
                         count++;
                     }
                 }
-                if (end == piece.end()) {
+                if (eu == end) {
                     break;
                 }
-                start = end;
+                start = eu;
             }
         }
         return count;

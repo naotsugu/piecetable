@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.lang;
 
-import com.mammb.code.editor2.model.Strings;
 import java.util.stream.IntStream;
 
 /**

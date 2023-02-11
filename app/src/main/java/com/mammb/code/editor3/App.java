@@ -1,6 +1,6 @@
-package com.mammb.code.editor2;
+package com.mammb.code.editor3;
 
-import com.mammb.code.editor2.ui.EditorPane;
+import com.mammb.code.editor3.ui.EditorPane;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
