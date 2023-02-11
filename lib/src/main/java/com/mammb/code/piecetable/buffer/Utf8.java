@@ -26,12 +26,12 @@ public abstract class Utf8 {
 
     private Utf8() { }
 
-    public static boolean isSurrogateRetain(byte b) {
+    public static boolean isLower(byte b) {
         // 10.. ....
         return (b & 0xC0) == 0x80;
     }
 
-    public static short surrogateCount(byte b) {
+    public static short followsCount(byte b) {
         if ((b & 0x80) == 0x00) {
             // 0... ....
             return 1;
@@ -51,13 +51,43 @@ public abstract class Utf8 {
 
     public static byte[] asCharBytes(byte[] bytes, int index) {
         byte b = bytes[index];
-        return switch (surrogateCount(b)) {
+        return switch (followsCount(b)) {
             case 1 -> new byte[] { b };
             case 2 -> new byte[] { b, bytes[index + 1] };
             case 3 -> new byte[] { b, bytes[index + 1], bytes[index + 2] };
             case 4 -> new byte[] { b, bytes[index + 1], bytes[index + 2], bytes[index + 3] };
             default -> throw new IllegalStateException("Unexpected value: " + index);
         };
+    }
+
+    public static byte[] fromCodePoint(int cp) {
+
+        int mask = 0x3F; // 6bit mask 0011 1111
+
+        if (0x0000 <= cp && cp <= 0x007f) {
+            return new byte[] { (byte) cp };
+
+        } else if (0x0080 <= cp && cp <= 0x07ff) {
+            return new byte[] {
+                (byte) (0xC0 | (cp >>> 6)),
+                (byte) (0x80 | (cp & mask)) };
+
+        } else if (0x0800 <= cp && cp <= 0xffff) {
+            return new byte[] {
+                (byte) (0xE0 | (cp >>> 12)),
+                (byte) (0x80 | (cp >>>  6 & mask)),
+                (byte) (0x80 | (cp & mask)) };
+
+        } else if (0x10000 <= cp && cp <= 0x10ffff) {
+            return new byte[] {
+                (byte) (0xF0 | (cp >>> 18)),
+                (byte) (0x80 | (cp >>> 12 & mask)),
+                (byte) (0x80 | (cp >>>  6 & mask)),
+                (byte) (0x80 | (cp & mask)) };
+        } else {
+            throw new IllegalStateException("Illegal code point. " + cp);
+        }
+
     }
 
     public static Charset charset() {

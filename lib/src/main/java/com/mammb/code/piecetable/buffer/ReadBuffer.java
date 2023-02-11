@@ -52,7 +52,7 @@ public class ReadBuffer implements Buffer {
             if (charCount++ % pitch == 0) {
                 array.add(i);
             }
-            i += (Utf8.surrogateCount(elements[i]) - 1);
+            i += (Utf8.followsCount(elements[i]) - 1);
         }
         return new ReadBuffer(elements, charCount, pitch, array.get());
     }
@@ -94,7 +94,7 @@ public class ReadBuffer implements Buffer {
         int i = piles[index / pilePitch];
         int remaining = index % pilePitch;
         for (; remaining > 0 && i < elements.length; remaining--, i++) {
-            i += (Utf8.surrogateCount(elements[i]) - 1);
+            i += (Utf8.followsCount(elements[i]) - 1);
         }
         cache.put(index, i);
         return i;

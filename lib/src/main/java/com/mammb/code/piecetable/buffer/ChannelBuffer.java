@@ -55,7 +55,7 @@ public class ChannelBuffer implements Buffer, Closeable {
             if (charCount++ % pitch == 0) {
                 piles.add(i);
             }
-            i += (Utf8.surrogateCount(ch.get(i)) - 1);
+            i += (Utf8.followsCount(ch.get(i)) - 1);
         }
         return new ChannelBuffer(ch, charCount, pitch, piles.get());
     }
@@ -98,7 +98,7 @@ public class ChannelBuffer implements Buffer, Closeable {
         int i = piles[index / pilePitch];
         int remaining = index % pilePitch;
         for (; remaining > 0 && i < ch.length(); remaining--, i++) {
-            i += (Utf8.surrogateCount(ch.get(i)) - 1);
+            i += (Utf8.followsCount(ch.get(i)) - 1);
         }
         cache.put(index, i);
         return i;

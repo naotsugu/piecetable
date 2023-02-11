@@ -76,7 +76,7 @@ public class GrowBuffer implements AppendBuffer {
         for (int i = 0; i < bytes.length; i++) {
             byte b = bytes[i];
             elements.add(b);
-            if (!Utf8.isSurrogateRetain(b)) {
+            if (!Utf8.isLower(b)) {
                 if (length++ % pilePitch == 0) {
                     piles.add(elements.length() - 1);
                 }
@@ -124,7 +124,7 @@ public class GrowBuffer implements AppendBuffer {
         int i = piles.get(index / pilePitch);
         int remaining = index % pilePitch;
         for (; remaining > 0 && i < elements.length(); remaining--, i++) {
-            i += (Utf8.surrogateCount(elements.get(i)) - 1);
+            i += (Utf8.followsCount(elements.get(i)) - 1);
         }
         cache.put(index, i);
         return i;
