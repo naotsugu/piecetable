@@ -38,13 +38,27 @@ import java.util.stream.Collectors;
  */
 public class PieceTable {
 
+    /** The pieces. */
     private final CursoredList pieces;
+
+    /** The Append buffer. */
     private final AppendBuffer buffer;
+
+    /** The length of characters(code point). */
     private int length;
 
+    /** The undo queue. */
     private final Deque<PieceEdit> undo;
+
+    /** The redo queue. */
     private final Deque<PieceEdit> redo;
 
+
+    /**
+     * Constructor.
+     * @param readBuffer the read buffer
+     * @param appendBuffer the Append buffer
+     */
     public PieceTable(Buffer readBuffer, AppendBuffer appendBuffer) {
         this.pieces = CursoredList.of();
         this.pieces.add(0, new Piece(readBuffer, 0, readBuffer.length()));
@@ -54,19 +68,42 @@ public class PieceTable {
         this.redo = new ArrayDeque<>();
     }
 
+
+    /**
+     * Create a new {@code PieceTable}.
+     * @param readBuffer the read buffer
+     * @return a new {@code PieceTable}
+     */
     public static PieceTable of(Buffer readBuffer) {
         return new PieceTable(readBuffer, Buffers.appendOf());
     }
 
+
+    /**
+     * Create a new {@code PieceTable}.
+     * @param cs the char Sequence
+     * @return a new {@code PieceTable}
+     */
     public static PieceTable of(CharSequence cs) {
         return new PieceTable(Buffers.of(cs), Buffers.appendOf());
     }
 
+
+    /**
+     * Create a new {@code PieceTable}.
+     * @param path the path
+     * @return a new {@code PieceTable}
+     */
     public static PieceTable of(Path path) {
         return new PieceTable(Buffers.of(path), Buffers.appendOf());
     }
 
 
+    /**
+     * Inserts the char sequence into this {@code PieceTable}.
+     * @param pos the offset
+     * @param cs a char sequence
+     */
     public void insert(int pos, CharSequence cs) {
 
         if (pos < 0 || pos > length) {
@@ -100,6 +137,12 @@ public class PieceTable {
 
     }
 
+
+    /**
+     * Removes the characters in a substring of this {@code PieceTable}.
+     * @param pos the beginning index, inclusive
+     * @param len the length to be deleted
+     */
     public void delete(int pos, int len) {
 
         if (pos < 0 || pos >= length) {
@@ -137,17 +180,38 @@ public class PieceTable {
         length -= len;
     }
 
+
+    /**
+     * Get the length of characters(code points) this piece table holds.
+     * @return the length of characters(code points)
+     */
     public int length() {
         return length;
     }
 
+
+    /**
+     * Gets a new String that contains a subsequence of characters
+     * currently contained in this {@code PieceTable}.
+     * @param startPos the beginning index, inclusive
+     * @param endPos the ending index, exclusive
+     * @return the new string
+     */
     public String substring(int startPos, int endPos) {
         return new String(pieces.bytes(startPos, endPos).get(), StandardCharsets.UTF_8);
     }
 
+
+    /**
+     * Get the byte array.
+     * @param startPos the beginning index, inclusive
+     * @param endPos the ending index, exclusive
+     * @return
+     */
     public byte[] bytes(int startPos, int endPos) {
         return pieces.bytes(startPos, endPos).get();
     }
+
 
     /**
      * Get the bytes.
@@ -156,13 +220,14 @@ public class PieceTable {
      *       L startPos
      *                   L  until [d] appears [a, b, c]
      * </pre>
-     * @param startPos start position(code point index), inclusive
+     * @param startPos the start position(code point index), inclusive
      * @param until the until predicate, exclusive
      * @return the bytes
      */
     public byte[] bytes(int startPos, Predicate<byte[]> until) {
         return pieces.bytes(startPos, until).get();
     }
+
 
     /**
      * Get the bytes.
@@ -179,14 +244,33 @@ public class PieceTable {
         return pieces.bytesBefore(startPos, until).get();
     }
 
+
+    /**
+     * Get the count.
+     * @param startPos the start position(code point index), inclusive
+     * @param endPos the ending position(code point index), exclusive
+     * @param predicate the until predicate
+     * @return the count
+     */
     public int count(int startPos, int endPos, Predicate<byte[]> predicate) {
         return pieces.count(startPos, endPos, predicate);
     }
 
+
+    /**
+     * Get the count.
+     * @param predicate the until predicate
+     * @return the count
+     */
     public int count(Predicate<byte[]> predicate) {
         return pieces.count(0, length, predicate);
     }
 
+
+    /**
+     * Get the size of undo stack.
+     * @return the size of undo stack
+     */
     public int undoSize() {
         return undo.size();
     }
