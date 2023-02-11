@@ -234,5 +234,4 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
         return byteArray;
     }
 
-
 }

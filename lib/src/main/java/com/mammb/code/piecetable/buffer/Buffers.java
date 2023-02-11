@@ -28,20 +28,47 @@ import java.nio.file.StandardOpenOption;
  */
 public abstract class Buffers {
 
+    /**
+     * Constructor.
+     */
     private Buffers() { }
 
+
+    /**
+     * Create a new buffer form given CharSequence.
+     * @param cs the source CharSequence
+     * @return a new buffer
+     */
     public static Buffer of(CharSequence cs) {
         return of(cs.toString().getBytes(Utf8.charset()));
     }
 
+
+    /**
+     * Create a new buffer form given byte array.
+     * @param bytes the source byte array
+     * @return a new buffer
+     */
     public static Buffer of(byte[] bytes) {
         return ReadBuffer.of(bytes);
     }
 
+
+    /**
+     * Create a new buffer form given channel.
+     * @param channel the source channel
+     * @return a new buffer
+     */
     public static Buffer of(SeekableByteChannel channel) {
         return ChannelBuffer.of(channel);
     }
 
+
+    /**
+     * Create a new buffer form given path.
+     * @param path the source path
+     * @return a new buffer
+     */
     public static Buffer of(Path path) {
         try {
             return (Files.size(path) >= Runtime.getRuntime().freeMemory() * 0.8)
@@ -52,6 +79,11 @@ public abstract class Buffers {
         }
     }
 
+
+    /**
+     * Create a new append buffer.
+     * @return a new append buffer
+     */
     public static AppendBuffer appendOf() {
         return GrowBuffer.of();
     }

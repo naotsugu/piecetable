@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * TextSource.
- *
  * Translates access by character index to access by code point.
  * It manages the offset of the code point from which access to the content originates.
  *
@@ -50,15 +49,6 @@ public class TextSource implements EventListener<Edit> {
     public TextSource(Content source) {
         this.source = source;
         this.offset = 0;
-    }
-
-
-    /**
-     * Get the source index.
-     * @return the source index
-     */
-    public int offset() {
-        return offset;
     }
 
 
@@ -152,6 +142,15 @@ public class TextSource implements EventListener<Edit> {
             flush();
             bufferedEdit = edit;
         }
+    }
+
+
+    /**
+     * Get the source index.
+     * @return the source index
+     */
+    public int offset() {
+        return offset;
     }
 
 
