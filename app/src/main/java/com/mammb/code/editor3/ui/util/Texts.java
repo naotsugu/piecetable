@@ -24,7 +24,12 @@ import javafx.scene.text.Text;
  */
 public class Texts {
 
+    private static final Font DEFAULT = new Font("System Regular", 14);
+
     public static final Text bit = new Text("X");
+    static {
+        bit.setFont(DEFAULT);
+    }
 
     public static final Font font = bit.getFont();
 

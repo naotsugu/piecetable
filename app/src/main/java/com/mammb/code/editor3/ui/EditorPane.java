@@ -15,12 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
-import com.mammb.code.editor3.model.Content;
-import com.mammb.code.editor3.model.Edit;
-import com.mammb.code.editor3.model.TextSlice;
-import com.mammb.code.editor3.model.TextSource;
 import com.mammb.code.editor3.model.TextView;
-import com.mammb.code.editor3.model.specifics.ContentImpl;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -42,15 +37,8 @@ public class EditorPane extends StackPane {
      * Constructor.
      */
     public EditorPane(Stage stage) {
-
         this.stage = stage;
-
-        Content content = new ContentImpl();
-        content.handle(Edit.insert(0, "hello"));
-        TextSource textSource = new TextSource(content);
-        TextSlice textSlice = new TextSlice(textSource);
-        textPane = new TextPane(stage, new TextView(textSlice));
-
+        this.textPane = new TextPane(stage, new TextView());
         getChildren().add(textPane);
     }
 

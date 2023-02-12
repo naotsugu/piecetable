@@ -43,15 +43,15 @@ public class NowrapScrollBehavior implements ScrollBehavior {
 
 
     @Override
-    public void next() {
-        textSlice.shiftRow(1);
+    public void next(int delta) {
+        textSlice.shiftRow(delta);
         // caretPoint.nextRow()
     }
 
 
     @Override
-    public void prev() {
-        textSlice.shiftRow(-1);
+    public void prev(int delta) {
+        textSlice.shiftRow(-delta);
         // caretPoint.prevRow()
     }
 

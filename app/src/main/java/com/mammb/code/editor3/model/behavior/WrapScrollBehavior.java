@@ -22,12 +22,12 @@ package com.mammb.code.editor3.model.behavior;
 public class WrapScrollBehavior implements ScrollBehavior {
 
     @Override
-    public void next() {
+    public void next(int delta) {
 
     }
 
     @Override
-    public void prev() {
+    public void prev(int delta) {
 
     }
 }

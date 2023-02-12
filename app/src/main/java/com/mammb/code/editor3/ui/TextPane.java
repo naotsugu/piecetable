@@ -44,6 +44,9 @@ public class TextPane extends StackPane {
     /** The text flow pane. */
     private final TextFlow textFlow = new TextFlow();
 
+    /** The ui caret. */
+    private final UiCaret caret = new UiCaret(textFlow);
+
 
     /**
      * Constructor.
@@ -56,7 +59,7 @@ public class TextPane extends StackPane {
 
         this.stage = Objects.requireNonNull(stage);
         this.model = Objects.requireNonNull(model);
-        getChildren().add(textFlow);
+        getChildren().addAll(textFlow, caret);
 
         initHandler();
         initListener();
@@ -66,7 +69,7 @@ public class TextPane extends StackPane {
     private void initHandler() {
         setOnKeyPressed(KeyPressedHandler.of(this));
         setOnKeyTyped(KeyTypedHandler.of());
-        setOnScroll(ScrollHandler.of());
+        setOnScroll(ScrollHandler.of(model.scrollBehavior()));
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
     }
@@ -86,17 +89,13 @@ public class TextPane extends StackPane {
             // TODO
         }
         model = new TextView(path);
-        model.setupMaxRows(maxRows());
-        textFlow.set(model.text());
+        sync();
     }
 
 
     private void handleBoundsChanged(
             ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-        if (oldValue.getHeight() != newValue.getHeight()) {
-            model.setupMaxRows(maxRows());
-            textFlow.set(model.text());
-        }
+        if (oldValue.getHeight() != newValue.getHeight()) sync();
     }
 
 
@@ -105,6 +104,22 @@ public class TextPane extends StackPane {
      * @return the stage
      */
     public Stage stage() { return stage; }
+
+
+    /**
+     * Get the caret.
+     * @return the caret
+     */
+    public UiCaret caret() { return caret; }
+
+
+    /**
+     * Sync model to textFlow.
+     */
+    private void sync() {
+        model.setupMaxRows(maxRows());
+        textFlow.set(model.text());
+    }
 
 
     /**

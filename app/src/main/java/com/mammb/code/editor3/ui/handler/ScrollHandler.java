@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.handler;
 
+import com.mammb.code.editor3.model.behavior.ScrollBehavior;
 import javafx.event.EventHandler;
 import javafx.scene.input.ScrollEvent;
 
@@ -24,26 +25,36 @@ import javafx.scene.input.ScrollEvent;
  */
 public class ScrollHandler implements EventHandler<ScrollEvent> {
 
+    /** The scroll behavior. */
+    private final ScrollBehavior scrollBehavior;
+
+
     /**
      * Constructor.
+     * @param scrollBehavior the scroll behavior
      */
-    private ScrollHandler() {
+    private ScrollHandler(ScrollBehavior scrollBehavior) {
+        this.scrollBehavior = scrollBehavior;
     }
 
 
     /**
      * Create a new {@code EventHandler<ScrollEvent>}.
+     * @param scrollBehavior the scroll behavior
      * @return a new {@code EventHandler<ScrollEvent>}
      */
-    public static EventHandler<ScrollEvent> of() {
-        return new ScrollHandler();
+    public static EventHandler<ScrollEvent> of(ScrollBehavior scrollBehavior) {
+        return new ScrollHandler(scrollBehavior);
     }
 
 
     @Override
     public void handle(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
-            System.out.println("ScrollEvent:" + e.getDeltaY());
+            if (e.getDeltaY() > 2)  scrollBehavior.prev(2);
+            else if (e.getDeltaY() > 0)  scrollBehavior.prev(1);
+            else if (e.getDeltaY() < -2) scrollBehavior.next(2);
+            else if (e.getDeltaY() < 0)  scrollBehavior.next(1);
         }
     }
 

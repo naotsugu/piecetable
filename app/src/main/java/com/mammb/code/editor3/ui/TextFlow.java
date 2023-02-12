@@ -16,9 +16,13 @@
 package com.mammb.code.editor3.ui;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * TextFlow.
@@ -36,6 +40,16 @@ public class TextFlow extends javafx.scene.text.TextFlow {
 
     void set(List<Text> texts) {
         getChildren().setAll(texts);
+    }
+
+
+    final Function<Point2D, HitInfo> hitTestFun() {
+        return point -> hitTest(parentToLocal(point));
+    }
+
+
+    final Function<Integer, PathElement[]> caretShapeFun() {
+        return caretIndex -> caretShape(caretIndex, false);
     }
 
 }

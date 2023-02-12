@@ -69,6 +69,14 @@ public class TextView {
 
 
     /**
+     * Create text view.
+     */
+    public TextView() {
+        this(new TextSlice(new TextSource(new ContentImpl())));
+    }
+
+
+    /**
      * Add text in caret point.
      * @param string the string to add
      */
@@ -109,6 +117,14 @@ public class TextView {
     public boolean isDirty() { return dirty; }
 
 
+    /**
+     * Get the {@link ScrollBehavior}.
+     * @return the {@link ScrollBehavior}
+     */
+    public ScrollBehavior scrollBehavior() { return scrollBehavior; }
+
+
+
     public List<Text> text() {
         return List.of(new Text(textSlice.string()));
     }
@@ -121,5 +137,6 @@ public class TextView {
             scrollBehavior = new NowrapScrollBehavior(textSlice, caretPoint);
         }
     }
+
 
 }

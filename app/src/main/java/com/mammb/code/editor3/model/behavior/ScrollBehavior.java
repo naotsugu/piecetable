@@ -15,16 +15,22 @@
  */
 package com.mammb.code.editor3.model.behavior;
 
+/**
+ * ScrollBehavior.
+ * @author Naotsugu Kobayashi
+ */
 public interface ScrollBehavior {
 
     /**
      * Scroll next.
+     * @param delta the delta
      */
-    void next();
+    void next(int delta);
 
     /**
      * Scroll prev.
+     * @param delta the delta
      */
-    void prev();
+    void prev(int delta);
 
 }
