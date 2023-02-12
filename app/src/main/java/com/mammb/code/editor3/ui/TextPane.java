@@ -51,22 +51,29 @@ public class TextPane extends StackPane {
      */
     public TextPane(Stage stage, TextView model) {
 
-        this.stage = stage;
-
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
 
+        this.stage = stage;
         this.model = Objects.requireNonNull(model);
         getChildren().add(textFlow);
 
+        initHandler();
+        initListener();
+    }
+
+
+    private void initHandler() {
         setOnKeyPressed(new KeyPressedHandler(this));
         setOnKeyTyped(new KeyTypedHandler());
         setOnScroll(new ScrollHandler());
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
+    }
 
+
+    private void initListener() {
         boundsInParentProperty().addListener(this::handleBoundsChanged);
-
     }
 
 
