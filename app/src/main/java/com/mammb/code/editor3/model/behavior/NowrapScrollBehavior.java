@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.model.specifics;
+package com.mammb.code.editor3.model.behavior;
 
 import com.mammb.code.editor3.model.CaretPoint;
-import com.mammb.code.editor3.model.ScrollHandler;
 import com.mammb.code.editor3.model.TextSlice;
 
 /**
- * NowrapScrollHandler.
+ * NowrapScrollBehavior.
  * @author Naotsugu Kobayashi
  */
-public class NowrapScrollHandler implements ScrollHandler {
+public class NowrapScrollBehavior implements ScrollBehavior {
 
     /** The textSlice. */
     private final TextSlice textSlice;
@@ -33,11 +32,11 @@ public class NowrapScrollHandler implements ScrollHandler {
 
 
     /**
-     * Create a {@link NowrapScrollHandler}.
+     * Create a {@link NowrapScrollBehavior}.
      * @param textSlice the {@link TextSlice}
      * @param caretPoint the {@link CaretPoint}
      */
-    public NowrapScrollHandler(TextSlice textSlice, CaretPoint caretPoint) {
+    public NowrapScrollBehavior(TextSlice textSlice, CaretPoint caretPoint) {
         this.textSlice = textSlice;
         this.caretPoint = caretPoint;
     }

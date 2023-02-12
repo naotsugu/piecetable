@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.model;
+package com.mammb.code.editor3.model.behavior;
 
-public interface ScrollHandler {
+/**
+ * WrapScrollBehavior.
+ * @author Naotsugu Kobayashi
+ */
+public class WrapScrollBehavior implements ScrollBehavior {
 
-    /**
-     * Scroll next.
-     */
-    void next();
+    @Override
+    public void next() {
 
-    /**
-     * Scroll prev.
-     */
-    void prev();
+    }
 
+    @Override
+    public void prev() {
+
+    }
 }

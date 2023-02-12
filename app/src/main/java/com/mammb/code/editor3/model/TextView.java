@@ -15,9 +15,11 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.model.behavior.CaretBehavior;
+import com.mammb.code.editor3.model.behavior.ScrollBehavior;
 import com.mammb.code.editor3.model.specifics.ContentImpl;
-import com.mammb.code.editor3.model.specifics.NowrapScrollHandler;
-import com.mammb.code.editor3.model.specifics.WrapScrollHandler;
+import com.mammb.code.editor3.model.behavior.NowrapScrollBehavior;
+import com.mammb.code.editor3.model.behavior.WrapScrollBehavior;
 import javafx.scene.text.Text;
 import java.nio.file.Path;
 import java.util.List;
@@ -40,11 +42,11 @@ public class TextView {
     /** dirty?. */
     private boolean dirty;
 
-    /** The scroll handler. */
-    private ScrollHandler scrollHandler;
+    /** The scroll behavior. */
+    private ScrollBehavior scrollBehavior;
 
-    /** The caret handler. */
-    private CaretHandler caretHandler;
+    /** The caret behavior. */
+    private CaretBehavior caretBehavior;
 
 
     /**
@@ -53,7 +55,7 @@ public class TextView {
      */
     public TextView(TextSlice textSlice) {
         this.textSlice = textSlice;
-        initHandler();
+        initBehavior();
     }
 
 
@@ -112,11 +114,11 @@ public class TextView {
     }
 
 
-    private void initHandler() {
+    private void initBehavior() {
         if (textWrap) {
-            scrollHandler = new WrapScrollHandler();
+            scrollBehavior = new WrapScrollBehavior();
         } else {
-            scrollHandler = new NowrapScrollHandler(textSlice, caretPoint);
+            scrollBehavior = new NowrapScrollBehavior(textSlice, caretPoint);
         }
     }
 
