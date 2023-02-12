@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.ui;
+package com.mammb.code.editor3.ui.handler;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.DragEvent;
@@ -34,7 +34,7 @@ public class DragDrop {
      * Get the drag over handler.
      * @return the drag over handler
      */
-    static EventHandler<? super DragEvent> dragOverHandler() {
+    public static EventHandler<? super DragEvent> dragOverHandler() {
         return event -> {
             Dragboard board = event.getDragboard();
             if (board.hasFiles()) {
@@ -48,7 +48,7 @@ public class DragDrop {
      * @param consumer the path consumer
      * @return the dropped handler
      */
-    static EventHandler<? super DragEvent> droppedHandler(Consumer<Path> consumer) {
+    public static EventHandler<? super DragEvent> droppedHandler(Consumer<Path> consumer) {
         return event -> {
             Dragboard board = event.getDragboard();
             if (board.hasFiles()) {

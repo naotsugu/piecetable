@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class TextView {
 
+    /** The text slice. */
     private final TextSlice textSlice;
 
     /** The caret point. */

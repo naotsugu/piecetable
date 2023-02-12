@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3;
+package com.mammb.code.editor3.ui.handler;
 
-import com.mammb.code.editor3.ui.EditorPane;
-import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.event.EventHandler;
+import javafx.scene.input.ScrollEvent;
 
 /**
- * The Application.
+ * ScrollHandler.
  * @author Naotsugu Kobayashi
  */
-public class App extends Application {
+public class ScrollHandler implements EventHandler<ScrollEvent> {
 
     @Override
-    public void start(Stage stage) {
-        new EditorPane(stage).showScene();
-    }
-
-    public static void main(String[] args) {
-        System.setProperty(
-            "java.util.logging.SimpleFormatter.format",
-            "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %4$s %2$s %5$s%6$s%n");
-        launch();
+    public void handle(ScrollEvent e) {
+        if (e.getEventType() == ScrollEvent.SCROLL) {
+            System.out.println("ScrollEvent:" + e.getDeltaY());
+        }
     }
 
 }

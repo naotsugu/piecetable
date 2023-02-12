@@ -16,10 +16,16 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.model.TextView;
+import com.mammb.code.editor3.ui.handler.DragDrop;
+import com.mammb.code.editor3.ui.handler.KeyPressedHandler;
+import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
+import com.mammb.code.editor3.ui.handler.ScrollHandler;
+import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
+import javafx.scene.AccessibleRole;
 import javafx.scene.layout.StackPane;
-
+import javafx.stage.Stage;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -28,6 +34,9 @@ import java.util.Objects;
  * @author Naotsugu Kobayashi
  */
 public class TextPane extends StackPane {
+
+    /** The stage. */
+    private final Stage stage;
 
     /** The text flow pane. */
     private final TextFlow textFlow = new TextFlow();
@@ -40,15 +49,24 @@ public class TextPane extends StackPane {
      * Constructor.
      * @param model the text view model
      */
-    public TextPane(TextView model) {
+    public TextPane(Stage stage, TextView model) {
+
+        this.stage = stage;
+
+        setFocusTraversable(true);
+        setAccessibleRole(AccessibleRole.TEXT_AREA);
 
         this.model = Objects.requireNonNull(model);
         getChildren().add(textFlow);
 
-        boundsInParentProperty().addListener(this::handleBoundsChanged);
-
+        setOnKeyPressed(new KeyPressedHandler(this));
+        setOnKeyTyped(new KeyTypedHandler());
+        setOnScroll(new ScrollHandler());
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
+
+        boundsInParentProperty().addListener(this::handleBoundsChanged);
+
     }
 
 
@@ -56,21 +74,38 @@ public class TextPane extends StackPane {
      * Open the file content path.
      * @param path the file content path
      */
-    private void open(Path path) {
+    public void open(Path path) {
         if (model.isDirty()) {
             // TODO
         }
         model = new TextView(path);
+        model.setupMaxRows(maxRows());
+        textFlow.set(model.text());
     }
 
 
     private void handleBoundsChanged(
             ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
         if (oldValue.getHeight() != newValue.getHeight()) {
-            int maxRows = (int) Math.ceil(getBoundsInParent().getHeight() / Texts.height);
-            model.setupMaxRows(maxRows);
+            model.setupMaxRows(maxRows());
             textFlow.set(model.text());
         }
+    }
+
+
+    /**
+     * Get the stage.
+     * @return the stage
+     */
+    public Stage stage() { return stage; }
+
+
+    /**
+     * Get the max rows by bounds height.
+     * @return the max rows
+     */
+    private int maxRows() {
+        return (int) Math.ceil(getBoundsInParent().getHeight() / Texts.height);
     }
 
 }

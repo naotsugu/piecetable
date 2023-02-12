@@ -91,7 +91,6 @@ public class Utils {
         } else {
             fc.setInitialDirectory(path.getParent().toFile());
         }
-        fc.setInitialDirectory(new File(System.getProperty("user.home")));
         return fc.showSaveDialog(owner);
     }
 }
