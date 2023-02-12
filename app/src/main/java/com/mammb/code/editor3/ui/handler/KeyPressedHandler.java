@@ -32,12 +32,23 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     /** The text pane. */
     private final TextPane textPane;
 
+
     /**
      * Constructor.
      * @param textPane the text pane
      */
-    public KeyPressedHandler(TextPane textPane) {
+    private KeyPressedHandler(TextPane textPane) {
         this.textPane = textPane;
+    }
+
+
+    /**
+     * Create a new {@code KeyPressedHandler}.
+     * @param textPane the text pane
+     * @return a new {@code KeyPressedHandler}
+     */
+    public static EventHandler<KeyEvent> of(TextPane textPane) {
+        return new KeyPressedHandler(textPane);
     }
 
 

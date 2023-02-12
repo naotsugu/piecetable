@@ -22,7 +22,23 @@ import javafx.scene.input.KeyEvent;
  * KeyTypedHandler.
  * @author Naotsugu Kobayashi
  */
-public class KeyTypedHandler implements EventHandler<KeyEvent>{
+public class KeyTypedHandler implements EventHandler<KeyEvent> {
+
+    /**
+     * Constructor.
+     */
+    private KeyTypedHandler() {
+    }
+
+
+    /**
+     * Create a new {@code EventHandler<KeyEvent>}.
+     * @return a new {@code EventHandler<KeyEvent>}
+     */
+    public static EventHandler<KeyEvent> of() {
+        return new KeyTypedHandler();
+    }
+
 
     @Override
     public void handle(KeyEvent e) {

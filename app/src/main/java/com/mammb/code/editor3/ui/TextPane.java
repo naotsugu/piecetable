@@ -38,11 +38,11 @@ public class TextPane extends StackPane {
     /** The stage. */
     private final Stage stage;
 
-    /** The text flow pane. */
-    private final TextFlow textFlow = new TextFlow();
-
     /** The text model. */
     private TextView model;
+
+    /** The text flow pane. */
+    private final TextFlow textFlow = new TextFlow();
 
 
     /**
@@ -54,7 +54,7 @@ public class TextPane extends StackPane {
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
 
-        this.stage = stage;
+        this.stage = Objects.requireNonNull(stage);
         this.model = Objects.requireNonNull(model);
         getChildren().add(textFlow);
 
@@ -64,9 +64,9 @@ public class TextPane extends StackPane {
 
 
     private void initHandler() {
-        setOnKeyPressed(new KeyPressedHandler(this));
-        setOnKeyTyped(new KeyTypedHandler());
-        setOnScroll(new ScrollHandler());
+        setOnKeyPressed(KeyPressedHandler.of(this));
+        setOnKeyTyped(KeyTypedHandler.of());
+        setOnScroll(ScrollHandler.of());
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
     }

@@ -24,6 +24,22 @@ import javafx.scene.input.ScrollEvent;
  */
 public class ScrollHandler implements EventHandler<ScrollEvent> {
 
+    /**
+     * Constructor.
+     */
+    private ScrollHandler() {
+    }
+
+
+    /**
+     * Create a new {@code EventHandler<ScrollEvent>}.
+     * @return a new {@code EventHandler<ScrollEvent>}
+     */
+    public static EventHandler<ScrollEvent> of() {
+        return new ScrollHandler();
+    }
+
+
     @Override
     public void handle(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
