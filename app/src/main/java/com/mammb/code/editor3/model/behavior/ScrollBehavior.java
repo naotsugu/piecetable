@@ -24,13 +24,15 @@ public interface ScrollBehavior {
     /**
      * Scroll next.
      * @param delta the delta
+     * @return the shifted offset
      */
-    void next(int delta);
+    int next(int delta);
 
     /**
      * Scroll prev.
      * @param delta the delta
+     * @return the shifted offset
      */
-    void prev(int delta);
+    int prev(int delta);
 
 }

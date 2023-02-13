@@ -59,12 +59,12 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
         if (handled) return;
 
         switch (e.getCode()) {
-            case LEFT       -> System.out.println("left");
-            case RIGHT      -> System.out.println("right");
+            case LEFT       -> textPane.caret().left();
+            case RIGHT      -> textPane.caret().right();
             case UP         -> textPane.caret().up();
             case DOWN       -> textPane.caret().down();
-            case HOME       -> System.out.println("home");
-            case END        -> System.out.println("end");
+            case HOME       -> textPane.caret().home();
+            case END        -> textPane.caret().end();
             case PAGE_UP    -> System.out.println("pu");
             case PAGE_DOWN  -> System.out.println("pd");
             case DELETE     -> System.out.println("del");

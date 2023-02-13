@@ -67,16 +67,22 @@ public class TextSlice {
     }
 
 
-    public void shiftRow(int rowDelta) {
+    public int shiftRow(int rowDelta) {
+        int shiftedOffset;
         if (rowDelta < 0) {
+            // scroll prev
             source.shiftRow(rowDelta);
-            buffer.shiftInsert(0, source.rows(1));
+            String head = source.rows(1);
+            buffer.shiftInsert(0, head);
+            shiftedOffset = head.length();
         } else {
-            String next = source.afterRow(buffer.length());
+            // scroll next
+            String tail = source.afterRow(buffer.length());
             source.shiftRow(rowDelta);
-            buffer.shiftAppend(next);
+            shiftedOffset = buffer.shiftAppend(tail);
         }
         originRow += rowDelta;
+        return shiftedOffset;
     }
 
 

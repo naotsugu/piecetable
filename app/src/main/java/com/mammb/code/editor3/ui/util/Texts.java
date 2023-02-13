@@ -18,6 +18,8 @@ package com.mammb.code.editor3.ui.util;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.List;
+
 /**
  * Text utilities.
  * @author Naotsugu Kobayashi
@@ -36,5 +38,15 @@ public class Texts {
     public static final double height = bit.getLayoutBounds().getHeight();
 
     public static final double width  = bit.getLayoutBounds().getWidth();
+
+    public static Text asText(String string) {
+        Text text = new Text(string);
+        text.setFont(font);
+        return text;
+    }
+
+    public static List<Text> asText(List<String> strings) {
+        return strings.stream().map(Texts::asText).toList();
+    }
 
 }

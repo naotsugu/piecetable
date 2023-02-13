@@ -20,7 +20,6 @@ import com.mammb.code.editor3.model.behavior.ScrollBehavior;
 import com.mammb.code.editor3.model.specifics.ContentImpl;
 import com.mammb.code.editor3.model.behavior.NowrapScrollBehavior;
 import com.mammb.code.editor3.model.behavior.WrapScrollBehavior;
-import javafx.scene.text.Text;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -32,9 +31,6 @@ public class TextView {
 
     /** The text slice. */
     private final TextSlice textSlice;
-
-    /** The caret point. */
-    private final CaretPoint caretPoint = new CaretPoint();
 
     /** text wrap?. */
     private boolean textWrap;
@@ -77,24 +73,24 @@ public class TextView {
 
 
     /**
-     * Add text in caret point.
+     * Add text.
+     * @param offset the offset to add
      * @param string the string to add
      */
-    public void add(String string) {
+    public void add(int offset, String string) {
         if (string == null || string.isEmpty()) return;
-        textSlice.insert(caretPoint.offset(), string);
-        caretPoint.forward(string);
+        textSlice.insert(offset, string);
     }
 
 
     /**
-     * Add text in caret point.
+     * Delete text.
+     * @param offset the offset to delete
      * @param length the length of delete string
      */
-    public void delete(int length) {
+    public void delete(int offset, int length) {
         if (length <= 0) return;
-        textSlice.delete(caretPoint.offset(), length);
-        caretPoint.syncPositionOnRow();
+        textSlice.delete(offset, length);
     }
 
 
@@ -125,8 +121,8 @@ public class TextView {
 
 
 
-    public List<Text> text() {
-        return List.of(new Text(textSlice.string()));
+    public List<String> text() {
+        return List.of(textSlice.string());
     }
 
 
@@ -134,7 +130,7 @@ public class TextView {
         if (textWrap) {
             scrollBehavior = new WrapScrollBehavior();
         } else {
-            scrollBehavior = new NowrapScrollBehavior(textSlice, caretPoint);
+            scrollBehavior = new NowrapScrollBehavior(textSlice);
         }
     }
 

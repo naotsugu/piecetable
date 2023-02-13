@@ -15,20 +15,21 @@
  */
 package com.mammb.code.editor3.ui;
 
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.HitInfo;
+import javafx.scene.Node;
 import javafx.scene.text.Text;
-
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * TextFlow.
  * @author Naotsugu Kobayashi
  */
 public class TextFlow extends javafx.scene.text.TextFlow {
+
+    /** the text length. */
+    private int textLength;
+
 
     /**
      * Constructor.
@@ -38,18 +39,23 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         setTabSize(4);
     }
 
-    void set(List<Text> texts) {
+
+    /**
+     * Set the text list.
+     * @param texts the text list
+     */
+    void setAll(List<Text> texts) {
         getChildren().setAll(texts);
+        textLength = texts.stream().map(Text::getText).mapToInt(String::length).sum();
     }
 
 
-    final Function<Point2D, HitInfo> hitTestFun() {
-        return point -> hitTest(parentToLocal(point));
-    }
-
-
-    final Function<Integer, PathElement[]> caretShapeFun() {
-        return caretIndex -> caretShape(caretIndex, false);
+    /**
+     * Get the text length.
+     * @return the text length
+     */
+    public int textLength() {
+        return textLength;
     }
 
 }

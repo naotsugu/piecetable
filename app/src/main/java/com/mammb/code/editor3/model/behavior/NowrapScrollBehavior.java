@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.model.behavior;
 
-import com.mammb.code.editor3.model.CaretPoint;
 import com.mammb.code.editor3.model.TextSlice;
 
 /**
@@ -27,32 +26,24 @@ public class NowrapScrollBehavior implements ScrollBehavior {
     /** The textSlice. */
     private final TextSlice textSlice;
 
-    /** The caretPoint. */
-    private final CaretPoint caretPoint;
-
-
     /**
      * Create a {@link NowrapScrollBehavior}.
      * @param textSlice the {@link TextSlice}
-     * @param caretPoint the {@link CaretPoint}
      */
-    public NowrapScrollBehavior(TextSlice textSlice, CaretPoint caretPoint) {
+    public NowrapScrollBehavior(TextSlice textSlice) {
         this.textSlice = textSlice;
-        this.caretPoint = caretPoint;
     }
 
 
     @Override
-    public void next(int delta) {
-        textSlice.shiftRow(delta);
-        // caretPoint.nextRow()
+    public int next(int delta) {
+        return textSlice.shiftRow(delta);
     }
 
 
     @Override
-    public void prev(int delta) {
-        textSlice.shiftRow(-delta);
-        // caretPoint.prevRow()
+    public int prev(int delta) {
+        return textSlice.shiftRow(-delta);
     }
 
 }

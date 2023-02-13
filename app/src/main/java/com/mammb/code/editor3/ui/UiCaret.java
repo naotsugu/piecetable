@@ -15,10 +15,10 @@
  */
 package com.mammb.code.editor3.ui;
 
+import com.mammb.code.editor3.ui.util.Texts;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Point2D;
-import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -27,26 +27,35 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.text.HitInfo;
 import javafx.util.Duration;
 
-import java.util.function.Function;
-
 /**
  * UiCaret.
  * @author Naotsugu Kobayashi
  */
 public class UiCaret extends Path {
 
+    /** The default height of caret. */
+    private static double DEFAULT_HEIGHT = Texts.height;
+
+    /** The textFlow. */
+    private final TextFlow textFlow;
+
     /** The timeline. */
     private final Timeline timeline = new Timeline();
 
-    private final Function<Point2D, HitInfo> hitTestFun;
-
-    private final Function<Integer, PathElement[]> caretShapeFun;
-
+    /** The physical caret position x. */
     private double physicalX;
+
+    /** The physical caret position y. */
     private double physicalY;
+
+    /** The height of caret. */
     private double height;
 
+    /** The logical caret position x. */
     private double logicalX;
+
+    /** The caret offset. */
+    private int offset;
 
 
     /**
@@ -57,18 +66,31 @@ public class UiCaret extends Path {
         setStrokeWidth(2);
         setStroke(Color.ORANGE);
         setManaged(false);
+        layoutXProperty().bind(textFlow.layoutXProperty().add(textFlow.getPadding().getLeft()));
+        layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()));
 
-        this.hitTestFun = textFlow.hitTestFun();
-        this.caretShapeFun = textFlow.caretShapeFun();
+        this.textFlow = textFlow;
 
         timeline.setCycleCount(-1);
         timeline.getKeyFrames().add(new KeyFrame(Duration.millis(500), e -> setVisible(!isVisible())));
         timeline.play();
 
-        moveTo(0, 0);
+        setShape(defaultShape());
     }
 
 
+    /**
+     * Reset caret.
+     */
+    public void reset() {
+        moveToPoint(0, 0);
+        logicalX = physicalX;
+    }
+
+
+    /**
+     * Disable this caret.
+     */
     void disable() {
         timeline.stop();
         setVisible(false);
@@ -76,42 +98,142 @@ public class UiCaret extends Path {
     }
 
 
-    public int down() {
-        return moveTo(logicalX, physicalY + height);
+    public void addOffset(int delta) {
+        offset += delta;
+        moveToOffset();
     }
 
 
-    public int up() {
-        return moveTo(logicalX, physicalY - 1);
+    /**
+     * Move the caret to the right.
+     * @return the caret offset
+     */
+    public int right() {
+        offset++;
+        if (moveToOffsetSyncLogical()) return offset;
+        offset++;
+        if (moveToOffsetSyncLogical()) return offset;
+        offset -= 2;
+        return offset;
     }
 
 
-    private int moveTo(double x, double y) {
-        HitInfo hit = hitTestFun.apply(new Point2D(x, y));
-        int insertionIndex = hit.getInsertionIndex();
-        setShape(caretShapeFun.apply(insertionIndex));
-        return insertionIndex;
+    /**
+     * Move the caret to the left.
+     * @return the caret offset
+     */
+    public int left() {
+        if (offset == 0) return 0;
+        offset--;
+        if (moveToOffsetSyncLogical()) return offset;
+        offset--;
+        if (moveToOffsetSyncLogical()) return offset;
+        offset += 2;
+        return offset;
     }
 
 
+    /**
+     * Move the caret to the end of row.
+     * @return the caret offset
+     */
+    public int end() {
+        moveToPoint(Double.MAX_VALUE, physicalY);
+        logicalX = physicalX;
+        return offset;
+    }
+
+
+    /**
+     * Move the caret to the end of row.
+     * @return the caret offset
+     */
+    public int home() {
+        moveToPoint(0, physicalY);
+        logicalX = physicalX;
+        return offset;
+    }
+
+
+    /**
+     * Move the caret down.
+     * @return the caret offset
+     */
+    public int down() { return moveToPoint(logicalX, physicalY + height); }
+
+
+    /**
+     * Move the caret up.
+     * @return the caret offset
+     */
+    public int up() { return moveToPoint(logicalX, physicalY - 1); }
+
+
+    private boolean moveToOffsetSyncLogical() {
+        boolean moved = moveToOffset();
+        if (moved) {
+            logicalX = physicalX;
+        }
+        return moved;
+    }
+
+
+    private boolean moveToOffset() {
+        double oldX = physicalX;
+        double oldY = physicalY;
+        setShape(textFlow.caretShape(offset, true));
+        return oldX != physicalX || oldY != physicalY;
+    }
+
+
+    private int moveToPoint(double x, double y) {
+        HitInfo hit = textFlow.hitTest(new Point2D(x, y));
+        offset = hit.getInsertionIndex();
+        setShape(textFlow.caretShape(offset, true));
+        return offset;
+    }
+
+
+    /**
+     * Set the caret shape.
+     * @param elements the path elements of caret shape
+     */
     private void setShape(PathElement... elements) {
 
         if (elements == null || elements.length == 0) {
-            disable();
-            return;
+            elements = defaultShape();
         }
+
         if (elements[0] instanceof MoveTo moveTo) {
             physicalX = moveTo.getX();
             physicalY = moveTo.getY();
         }
         if (elements[1] instanceof LineTo lineTo) {
+            if (lineTo.getY() - physicalY == 0) {
+                lineTo.setY(physicalY + DEFAULT_HEIGHT);
+            }
             height = lineTo.getY() - physicalY;
         }
 
         timeline.stop();
-        getElements().setAll(elements);
-        setVisible(true);
-        timeline.play();
+        setVisible(false);
+        if (offset >= 0 && offset <= textFlow.textLength()) {
+            getElements().setAll(elements);
+            setVisible(true);
+            timeline.play();
+        }
+    }
+
+
+    /**
+     * Get the default caret shape.
+     * @return the default caret shape
+     */
+    private PathElement[] defaultShape() {
+        PathElement[] result = new PathElement[2];
+        result[0] = new MoveTo(0, 0);
+        result[1] = new LineTo(0, DEFAULT_HEIGHT);
+        return result;
     }
 
 }

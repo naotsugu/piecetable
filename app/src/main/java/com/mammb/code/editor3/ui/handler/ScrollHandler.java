@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.handler;
 
 import com.mammb.code.editor3.model.behavior.ScrollBehavior;
+import com.mammb.code.editor3.ui.TextPane;
 import javafx.event.EventHandler;
 import javafx.scene.input.ScrollEvent;
 
@@ -25,36 +26,47 @@ import javafx.scene.input.ScrollEvent;
  */
 public class ScrollHandler implements EventHandler<ScrollEvent> {
 
+    /** The text pane. */
+    private final TextPane textPane;
+
     /** The scroll behavior. */
     private final ScrollBehavior scrollBehavior;
 
 
     /**
      * Constructor.
+     * @param textPane the text pane
      * @param scrollBehavior the scroll behavior
      */
-    private ScrollHandler(ScrollBehavior scrollBehavior) {
+    private ScrollHandler(TextPane textPane, ScrollBehavior scrollBehavior) {
+        this.textPane = textPane;
         this.scrollBehavior = scrollBehavior;
     }
 
 
     /**
      * Create a new {@code EventHandler<ScrollEvent>}.
+     * @param textPane the text pane
      * @param scrollBehavior the scroll behavior
      * @return a new {@code EventHandler<ScrollEvent>}
      */
-    public static EventHandler<ScrollEvent> of(ScrollBehavior scrollBehavior) {
-        return new ScrollHandler(scrollBehavior);
+    public static EventHandler<ScrollEvent> of(TextPane textPane, ScrollBehavior scrollBehavior) {
+        return new ScrollHandler(textPane, scrollBehavior);
     }
 
 
     @Override
     public void handle(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
-            if (e.getDeltaY() > 2)  scrollBehavior.prev(2);
-            else if (e.getDeltaY() > 0)  scrollBehavior.prev(1);
-            else if (e.getDeltaY() < -2) scrollBehavior.next(2);
-            else if (e.getDeltaY() < 0)  scrollBehavior.next(1);
+            if (e.getDeltaY() > 0) {
+                int shiftedOffset = scrollBehavior.prev(1);
+                textPane.sync();
+                textPane.caret().addOffset(shiftedOffset);
+            } else if (e.getDeltaY() < 0) {
+                int shiftedOffset = scrollBehavior.next(1);
+                textPane.sync();
+                textPane.caret().addOffset(-shiftedOffset);
+            }
         }
     }
 
