@@ -143,18 +143,18 @@ class PieceTableTest {
         // |a|b|c| |d|e|f|
         // |0|1|2| |3|4|5|
 
-        assertArrayEquals("a".getBytes(StandardCharsets.UTF_8),
+        assertArrayEquals("".getBytes(StandardCharsets.UTF_8),
             table.bytes(0, b-> b[0] == 'a'));
-        assertArrayEquals("ab".getBytes(StandardCharsets.UTF_8),
+        assertArrayEquals("a".getBytes(StandardCharsets.UTF_8),
             table.bytes(0, b-> b[0] == 'b'));
-        assertArrayEquals("abc".getBytes(StandardCharsets.UTF_8),
+        assertArrayEquals("ab".getBytes(StandardCharsets.UTF_8),
             table.bytes(0, b-> b[0] == 'c'));
 
-        assertArrayEquals("bcde".getBytes(StandardCharsets.UTF_8),
+        assertArrayEquals("bcd".getBytes(StandardCharsets.UTF_8),
             table.bytes(1, b-> b[0] == 'e'));
-        assertArrayEquals("cde".getBytes(StandardCharsets.UTF_8),
+        assertArrayEquals("cd".getBytes(StandardCharsets.UTF_8),
             table.bytes(2, b-> b[0] == 'e'));
-        assertArrayEquals("de".getBytes(StandardCharsets.UTF_8),
+        assertArrayEquals("d".getBytes(StandardCharsets.UTF_8),
             table.bytes(3, b-> b[0] == 'e'));
 
         assertArrayEquals("ef".getBytes(StandardCharsets.UTF_8),
