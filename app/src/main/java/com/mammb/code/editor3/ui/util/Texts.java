@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.util;
 
+import javafx.geometry.Point2D;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -38,6 +39,36 @@ public class Texts {
     public static final double height = bit.getLayoutBounds().getHeight();
 
     public static final double width  = bit.getLayoutBounds().getWidth();
+
+    /**
+     * Split a string with specified wrapping width.
+     * @param string a string
+     * @param wrappingWidth wrapping width
+     * @return split string
+     */
+    public static String[] split(String string, float wrappingWidth) {
+
+        if (string == null || string.isEmpty()) {
+            return new String[0];
+        }
+
+        Text text = asText(string);
+        text.setWrappingWidth(wrappingWidth);
+        int line = (int) (text.getLayoutBounds().getHeight() / height);
+        if (string.charAt(string.length() - 1) == '\n') line--;
+
+        String[] ret = new String[line];
+        int offset = 0;
+        for (int i = 0; i < line; i++) {
+            int end = (i < line - 1)
+                ? text.hitTest(new Point2D(Double.MAX_VALUE, i * height)).getInsertionIndex()
+                : string.length();
+            ret[i] = string.substring(offset, end);
+            offset = end;
+        }
+        return ret;
+    }
+
 
     public static Text asText(String string) {
         Text text = new Text(string);

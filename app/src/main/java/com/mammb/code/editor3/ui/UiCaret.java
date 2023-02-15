@@ -187,8 +187,7 @@ public class UiCaret extends Path {
 
 
     private int moveToPoint(double x, double y) {
-        HitInfo hit = textFlow.hitTest(new Point2D(x, y));
-        offset = hit.getInsertionIndex();
+        offset = textFlow.insertionIndexAt(x, y);
         setShape(textFlow.caretShape(offset, true));
         return offset;
     }

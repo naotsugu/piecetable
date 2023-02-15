@@ -54,9 +54,12 @@ public class TextSource implements EventListener<Edit> {
 
     /**
      * Shifts source index.
-     * @param charOffset the char offset
+     * @param charOffset the char offset from this source offset
      */
     public void shiftIndex(int charOffset) {
+        if (charOffset == 0) return;
+        if (charOffset < 0) throw new IndexOutOfBoundsException();
+
         int newValue = offset + asCodePointCount(charOffset);
         if (newValue < 0 || newValue > source.length()) {
             throw new IndexOutOfBoundsException();

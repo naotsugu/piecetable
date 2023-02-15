@@ -78,7 +78,7 @@ public class TextPane extends StackPane {
 
 
     private void initListener() {
-        boundsInParentProperty().addListener(this::handleBoundsChanged);
+        heightProperty().addListener(this::handleHeightChanged);
     }
 
 
@@ -97,9 +97,9 @@ public class TextPane extends StackPane {
     }
 
 
-    private void handleBoundsChanged(
-            ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-        if (oldValue.getHeight() != newValue.getHeight()) sync();
+    private void handleHeightChanged(ObservableValue<? extends Number> observable,
+            Number oldValue, Number newValue) {
+        if (!newValue.equals(oldValue)) sync();
     }
 
 
