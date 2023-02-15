@@ -24,6 +24,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,6 +96,27 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         double height = PathElements.height(caretShape(
             insertionIndexAt(0, getTranslateY() - 1), true));
         setTranslateY(getTranslateY() + height);
+    }
+
+
+    public String[] rowAt(int physicalRow) {
+        int[] indexes = rowOffset(physicalRow);
+        if (indexes[0] < 0 || indexes[1] < 0) {
+            return new String[0];
+        }
+        List<String> ret = new ArrayList<>();
+        String text = text();
+        int startIndex = indexes[0];
+        for (;;) {
+            double y = PathElements.getY(caretShape(startIndex, true)[0]);
+            int endIndex = insertionIndexAt(Double.MAX_VALUE, y) + 1;
+            ret.add(text.substring(startIndex, endIndex));
+            if (endIndex >= indexes[1]) {
+                break;
+            }
+            startIndex = endIndex;
+        }
+        return ret.toArray(new String[0]);
     }
 
 
@@ -175,6 +197,37 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         return getChildren().stream()
             .filter(Text.class::isInstance).map(Text.class::cast)
             .map(Text::getText).collect(Collectors.joining());
+    }
+
+
+    /**
+     * Get the row index pair(start inclusive, end inclusive).
+     * @param physicalRow number of row
+     * @return the row index pair(start, end)
+     */
+    private int[] rowOffset(int physicalRow) {
+
+        int[] ret = new int[] { -1, -1 };
+
+        int index = 0;
+        for (Node node : getChildren()) {
+            if (node instanceof Text text) {
+                String str = text.getText();
+                for (int i = 0; i < str.length(); i++, index++) {
+                    if (physicalRow == 0 && ret[0] == -1) {
+                        ret[0] = index;
+                    }
+                    if (str.charAt(i) == '\n') {
+                        if (ret[0] > -1) {
+                            ret[1] = index;
+                            return ret;
+                        }
+                        physicalRow--;
+                    }
+                }
+            }
+        }
+        return new int[] { 0, index };
     }
 
 
