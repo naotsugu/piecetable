@@ -65,7 +65,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * @return {@code true} if the display can be moved to the next line
      */
     public boolean canTranslateRowNext() {
-        double remaining = getBoundsInLocal().getHeight() - getLayoutBounds().getHeight()
+        double remaining = getBoundsInLocal().getHeight() - getScene().getHeight()
             + getTranslateY();
         return remaining >= visuallyHeadRowHeight();
     }
@@ -99,19 +99,29 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     }
 
 
+    /**
+     * Get the string with the specified line number.
+     * The string will be in a format divided by the wrap width of the screen display.
+     * @param physicalRow the specified line number
+     * @return the wrapped string
+     */
     public String[] rowAt(int physicalRow) {
+
         int[] indexes = rowOffset(physicalRow);
         if (indexes[0] < 0 || indexes[1] < 0) {
             return new String[0];
         }
-        List<String> ret = new ArrayList<>();
+
         String text = text();
+        if (text.isEmpty()) return new String[0];
+
+        List<String> ret = new ArrayList<>();
         int startIndex = indexes[0];
         for (;;) {
             double y = PathElements.getY(caretShape(startIndex, true)[0]);
-            int endIndex = insertionIndexAt(Double.MAX_VALUE, y) + 1;
+            int endIndex = insertionIndexAt(Double.MAX_VALUE, y);
             ret.add(text.substring(startIndex, endIndex));
-            if (endIndex >= indexes[1]) {
+            if (endIndex + 1 >= indexes[1]) {
                 break;
             }
             startIndex = endIndex;
@@ -129,6 +139,97 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     public int insertionIndexAt(double x, double y) {
         HitInfo hit = hitTest(new Point2D(x, y));
         return hit.getInsertionIndex();
+    }
+
+
+    /**
+     * Get the size of head row.
+     * @return the size of head row
+     */
+    private double visuallyHeadRowHeight() {
+        return PathElements.height(caretShape(
+            insertionIndexAt(0, getTranslateY()), true));
+    }
+
+
+    /**
+     * Get the text content.
+     * @return the text content
+     */
+    private String text() {
+        return getChildren().stream()
+            .filter(Text.class::isInstance).map(Text.class::cast)
+            .map(Text::getText).collect(Collectors.joining());
+    }
+
+
+    /**
+     * Get the row index pair(start inclusive, end inclusive).
+     * int[0] sol index
+     * int[1] eol index (index of '\n', maybe)
+     * @param physicalRow number of row
+     * @return the row index pair(start, end)
+     */
+    int[] rowOffset(int physicalRow) {
+
+        int[] ret = new int[] { -1, -1 };
+
+        int index = 0;
+        for (Node node : getChildren()) {
+            if (node instanceof Text text) {
+                String str = text.getText();
+                for (int i = 0; i < str.length(); i++, index++) {
+                    if (physicalRow == 0 && ret[0] == -1) {
+                        ret[0] = index;
+                    }
+                    if (str.charAt(i) == '\n') {
+                        if (ret[0] > -1) {
+                            ret[1] = index;
+                            return ret;
+                        }
+                        physicalRow--;
+                    }
+                }
+            }
+        }
+        return new int[] { 0, index };
+    }
+
+
+    /**
+     * Get the character sequence that is a subsequence of this text flow.
+     * @param beginIndex the begin index, inclusive
+     * @param endIndex the end index, exclusive
+     * @return the character sequence
+     */
+    public CharSequence subSequence(int beginIndex, int endIndex) {
+        if (beginIndex < 0 || endIndex > textLength()) {
+            throw new IndexOutOfBoundsException();
+        }
+        int count = 0;
+        StringBuilder sb = new StringBuilder();
+        for (Node node : getChildren()) {
+            if (node instanceof Text text) {
+                int nextCount = count + text.getText().length();
+                if (sb.isEmpty() && nextCount > beginIndex) {
+                    int from = beginIndex - count;
+                    if (nextCount >= endIndex) {
+                        int to = endIndex - count;
+                        return text.getText().subSequence(from, to);
+                    } else {
+                        sb.append(text.getText().substring(from));
+                    }
+                } else if (nextCount > beginIndex && nextCount < endIndex) {
+                    sb.append(text.getText());
+                } else if (nextCount >= endIndex) {
+                    int to = endIndex - count;
+                    sb.append(text.getText().subSequence(0, to));
+                    return sb;
+                }
+                count = nextCount;
+            }
+        }
+        return sb;
     }
 
 
@@ -176,58 +277,6 @@ public class TextFlow extends javafx.scene.text.TextFlow {
             }
         }
         return rowLength;
-    }
-
-
-    /**
-     * Get the size of head row.
-     * @return the size of head row
-     */
-    private double visuallyHeadRowHeight() {
-        return PathElements.height(caretShape(
-            insertionIndexAt(0, getTranslateY()), true));
-    }
-
-
-    /**
-     * Get the text content.
-     * @return the text content
-     */
-    private String text() {
-        return getChildren().stream()
-            .filter(Text.class::isInstance).map(Text.class::cast)
-            .map(Text::getText).collect(Collectors.joining());
-    }
-
-
-    /**
-     * Get the row index pair(start inclusive, end inclusive).
-     * @param physicalRow number of row
-     * @return the row index pair(start, end)
-     */
-    private int[] rowOffset(int physicalRow) {
-
-        int[] ret = new int[] { -1, -1 };
-
-        int index = 0;
-        for (Node node : getChildren()) {
-            if (node instanceof Text text) {
-                String str = text.getText();
-                for (int i = 0; i < str.length(); i++, index++) {
-                    if (physicalRow == 0 && ret[0] == -1) {
-                        ret[0] = index;
-                    }
-                    if (str.charAt(i) == '\n') {
-                        if (ret[0] > -1) {
-                            ret[1] = index;
-                            return ret;
-                        }
-                        physicalRow--;
-                    }
-                }
-            }
-        }
-        return new int[] { 0, index };
     }
 
 

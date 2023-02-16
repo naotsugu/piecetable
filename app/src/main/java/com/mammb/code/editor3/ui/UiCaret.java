@@ -18,13 +18,11 @@ package com.mammb.code.editor3.ui;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.text.HitInfo;
 import javafx.util.Duration;
 
 /**
@@ -222,6 +220,24 @@ public class UiCaret extends Path {
             timeline.play();
         }
     }
+
+    public void slipY(double delta) {
+        physicalY += delta;
+        getElements().forEach(e -> {
+            if (e instanceof MoveTo moveTo) {
+                moveTo.setY(moveTo.getY() + delta);
+            } else if (e instanceof LineTo lineTo) {
+                lineTo.setY(lineTo.getY() + delta);
+            }
+        });
+    }
+
+
+    /**
+     * Get the caret offset.
+     * @return the caret offset
+     */
+    public int offset() { return offset; }
 
 
     /**

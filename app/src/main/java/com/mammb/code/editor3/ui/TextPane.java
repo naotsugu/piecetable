@@ -22,7 +22,6 @@ import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
 import com.mammb.code.editor3.ui.handler.ScrollHandler;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
 import javafx.scene.layout.StackPane;
@@ -70,7 +69,7 @@ public class TextPane extends StackPane {
     private void initHandler() {
         setOnKeyPressed(KeyPressedHandler.of(this));
         setOnKeyTyped(KeyTypedHandler.of());
-        setOnScroll(ScrollHandler.of(this, model.scrollBehavior()));
+        setOnScroll(ScrollHandler.of(textFlow, caret, model.scrollBehavior()));
 
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));

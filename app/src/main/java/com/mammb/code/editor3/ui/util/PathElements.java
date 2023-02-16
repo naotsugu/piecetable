@@ -25,18 +25,33 @@ import java.util.Arrays;
 public class PathElements {
 
 
+    /**
+     * Get the width of the path elements.
+     * @param elements the path elements
+     * @return the width
+     */
     public static double width(PathElement... elements) {
         return Arrays.stream(elements).mapToDouble(PathElements::getX).max().orElse(0.0) -
                Arrays.stream(elements).mapToDouble(PathElements::getX).min().orElse(0.0);
     }
 
 
+    /**
+     * Get the height of the path elements.
+     * @param elements the path elements
+     * @return the height
+     */
     public static double height(PathElement... elements) {
         return Arrays.stream(elements).mapToDouble(PathElements::getY).max().orElse(0.0) -
                Arrays.stream(elements).mapToDouble(PathElements::getY).min().orElse(0.0);
     }
 
 
+    /**
+     * Get the x position of the path element.
+     * @param element the path element
+     * @return the x position
+     */
     public static double getX(PathElement element) {
         if (element instanceof MoveTo moveTo) return moveTo.getX();
         else if (element instanceof LineTo lineTo) return lineTo.getX();
@@ -45,6 +60,11 @@ public class PathElements {
     }
 
 
+    /**
+     * Get the y position of the path element.
+     * @param element the path element
+     * @return the y position
+     */
     public static double getY(PathElement element) {
         if (element instanceof MoveTo moveTo) return moveTo.getY();
         else if (element instanceof LineTo lineTo) return lineTo.getY();
