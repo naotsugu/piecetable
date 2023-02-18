@@ -27,7 +27,10 @@ public class TextSlice {
     /** The origin row number. */
     private int originRow;
 
-    /** The slice row size. */
+    /** The origin offset(not code point counts). */
+    private int originOffset;
+
+    /** The row size of slice. */
     private int maxRowSize;
 
     /** The text source. */
@@ -44,6 +47,7 @@ public class TextSlice {
     public TextSlice(TextSource source) {
         this.source = Objects.requireNonNull(source);
         this.originRow = 0;
+        this.originOffset = 0;
         this.maxRowSize = 10;
     }
 
@@ -67,40 +71,28 @@ public class TextSlice {
     }
 
 
-    public int shiftRow(int rowDelta) {
-        int shiftedOffset;
-        if (rowDelta < 0) {
-            // scroll prev
+    /**
+     * Shift the row.
+     * @param rowDelta the delta of row
+     */
+    public void shiftRow(int rowDelta) {
+        if (rowDelta > 0) {
+            // scroll next (i.e. arrow down)
+            String tail = source.afterRow(buffer.length(), rowDelta);
+            if (tail.isEmpty()) return;
             source.shiftRow(rowDelta);
-            String head = source.rows(1);
+            originOffset += buffer.shiftAppend(tail);
+        } else if (rowDelta < 0) {
+            // scroll prev (i.e. arrow up)
+            int cp = source.shiftRow(rowDelta);
+            if (cp == 0) return;
+            String head = source.rows(Math.abs(rowDelta));
             buffer.shiftInsert(0, head);
-            shiftedOffset = head.length();
-        } else {
-            // scroll next
-            String tail = source.afterRow(buffer.length());
-            source.shiftRow(rowDelta);
-            shiftedOffset = buffer.shiftAppend(tail);
+            originOffset -= head.length();
         }
         originRow += rowDelta;
-        return shiftedOffset;
     }
 
-
-    /**
-     * Get the string.
-     * @return the string
-     */
-    public String string() {
-        return buffer.toString();
-    }
-
-    public int maxRowSize() {
-        return maxRowSize;
-    }
-
-    public void setMaxRowSize(int maxRowSize) {
-        this.maxRowSize = maxRowSize;
-    }
 
     public void refresh() {
         buffer.set(source.rows(maxRowSize));
@@ -113,6 +105,51 @@ public class TextSlice {
         } else if (buffer.rowSize() > maxRowSize) {
             buffer.truncateRows(buffer.rowSize() - maxRowSize);
         }
+    }
+
+
+    /**
+     * Get the string.
+     * @return the string
+     */
+    public String string() {
+        return buffer.toString();
+    }
+
+
+    /**
+     * Get the row size of slice.
+     * @return the row size of slice
+     */
+    public int maxRowSize() {
+        return maxRowSize;
+    }
+
+
+    /**
+     * Set the row size of slice.
+     * @param maxRowSize the row size of slice
+     */
+    public void setMaxRowSize(int maxRowSize) {
+        this.maxRowSize = maxRowSize;
+    }
+
+
+    /**
+     * Get the origin row number.
+     * @return the origin row number
+     */
+    public int originRow() {
+        return originRow;
+    }
+
+
+    /**
+     * Get the origin offset(not code point counts).
+     * @return the origin offset(not code point counts)
+     */
+    public int originOffset() {
+        return originOffset;
     }
 
 }

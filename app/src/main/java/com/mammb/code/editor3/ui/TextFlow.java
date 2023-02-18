@@ -54,7 +54,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Set the text list.
      * @param texts the text list
      */
-    void setAll(List<Text> texts) {
+    public void setAll(List<Text> texts) {
         getChildren().setAll(texts);
         clearCacheValue();
     }
@@ -197,14 +197,41 @@ public class TextFlow extends javafx.scene.text.TextFlow {
 
 
     /**
+     * Get the char value at the specified index.
+     * The first char value is at index 0.
+     * @param index the index of the char value
+     * @return the char value at the specified index of this string.
+     */
+    public char charAt(int index) {
+        if (index < 0 || index >= textLength()) {
+            throw new IndexOutOfBoundsException(
+                "index:%d, text length:%d".formatted(index, textLength()));
+        }
+        int count = 0;
+        for (Node node : getChildren()) {
+            if (node instanceof Text text) {
+                int nextCount = count + text.getText().length();
+                if (nextCount > index) {
+                    int at = index - count;
+                    return text.getText().charAt(at);
+                }
+                count = nextCount;
+            }
+        }
+        return (char) -1;
+    }
+
+
+    /**
      * Get the character sequence that is a subsequence of this text flow.
-     * @param beginIndex the begin index, inclusive
+     * @param beginIndex the beginning index, inclusive
      * @param endIndex the end index, exclusive
      * @return the character sequence
      */
     public CharSequence subSequence(int beginIndex, int endIndex) {
         if (beginIndex < 0 || endIndex > textLength()) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException(
+                "beginIndex:%d, endIndex:%d, text length:%d".formatted(beginIndex, endIndex, textLength()));
         }
         int count = 0;
         StringBuilder sb = new StringBuilder();

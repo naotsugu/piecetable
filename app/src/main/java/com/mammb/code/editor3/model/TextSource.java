@@ -72,19 +72,23 @@ public class TextSource implements EventListener<Edit> {
     /**
      * Shifts source index at row.
      * @param rowDelta row delta
+     * @return the code point count of delta
      */
-    public void shiftRow(int rowDelta) {
-        if (rowDelta == 0) return;
+    public int shiftRow(int rowDelta) {
+        if (rowDelta == 0) return 0;
         flush();
         int count = 0;
         if (rowDelta > 0) {
+            // scroll next (i.e. arrow down)
             byte[] row = source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)));
             for (byte b : row) if ((b & 0xC0) != 0x80) count++;
         } else {
+            // scroll prev (i.e. arrow up)
             byte[] row = source.bytesBefore(offset, Until.lf(Math.abs(rowDelta) + 1));
             for (byte b : row) if ((b & 0xC0) != 0x80) count--;
         }
         offset += count;
+        return count;
     }
 
 
@@ -116,10 +120,19 @@ public class TextSource implements EventListener<Edit> {
      * @param charOffset the char offset
      * @return the row string
      */
-    String afterRow(int charOffset) {
+    String afterRow(int charOffset) { return afterRow(charOffset, 1); }
+
+
+    /**
+     * Get the after row.
+     * @param charOffset the char offset
+     * @param n the number of row to get
+     * @return the row string
+     */
+    String afterRow(int charOffset, int n) {
         int offsetCodePoint = asCodePointCount(charOffset);
         flush();
-        byte[] tailRow = source.bytes(offset + offsetCodePoint, Until.lfInclusive());
+        byte[] tailRow = source.bytes(offset + offsetCodePoint, Until.lfInclusive(n));
         return new String(tailRow, charset);
     }
 

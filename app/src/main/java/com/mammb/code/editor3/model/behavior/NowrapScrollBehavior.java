@@ -37,13 +37,18 @@ public class NowrapScrollBehavior implements ScrollBehavior {
 
     @Override
     public int next(int delta) {
-        return textSlice.shiftRow(delta);
+        int old = textSlice.originOffset();
+        textSlice.shiftRow(delta);
+        return Math.abs(textSlice.originOffset() - old);
     }
 
 
     @Override
     public int prev(int delta) {
-        return textSlice.shiftRow(-delta);
+        if (textSlice.originRow() == 0) return 0;
+        int old = textSlice.originOffset();
+        textSlice.shiftRow(-delta);
+        return Math.abs(textSlice.originOffset() - old);
     }
 
 }

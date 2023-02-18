@@ -14,7 +14,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.mammb.code.editor3.App")
+    mainClass.set("com.mammb.code.editor.App")
     mainModule.set("com.mammb.code.editor")
 }
 

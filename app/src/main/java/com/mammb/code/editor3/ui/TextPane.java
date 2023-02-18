@@ -15,7 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
-import com.mammb.code.editor3.model.TextView;
+import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.handler.DragDrop;
 import com.mammb.code.editor3.ui.handler.KeyPressedHandler;
 import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
@@ -45,14 +45,14 @@ public class TextPane extends StackPane {
     private final UiCaret caret = new UiCaret(textFlow);
 
     /** The text model. */
-    private TextView model;
+    private TextModel model;
 
 
     /**
      * Constructor.
      * @param model the text view model
      */
-    public TextPane(Stage stage, TextView model) {
+    public TextPane(Stage stage, TextModel model) {
 
         this.stage = Objects.requireNonNull(stage);
         this.model = Objects.requireNonNull(model);
@@ -69,10 +69,10 @@ public class TextPane extends StackPane {
     private void initHandler() {
         setOnKeyPressed(KeyPressedHandler.of(this));
         setOnKeyTyped(KeyTypedHandler.of());
-        setOnScroll(ScrollHandler.of(textFlow, caret, model.scrollBehavior()));
-
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
+
+        setOnScroll(ScrollHandler.of(textFlow, caret, model));
     }
 
 
@@ -89,7 +89,7 @@ public class TextPane extends StackPane {
         if (model.isDirty()) {
             // TODO
         }
-        model = new TextView(path);
+        model = new TextModel(path);
         initHandler();
         sync();
         caret.reset();

@@ -115,7 +115,9 @@ public class StringMetrics {
      */
     int rowIndex(int row) {
         if (isDisabled()) throw new IllegalStateException("not initialized");
-        if (row >= rowAnchor.size()) throw new IllegalArgumentException("out of index");
+        if (row >= rowAnchor.size())
+            throw new IllegalArgumentException(
+                "out of index.[row:%d][rowAnchor.size:%d]".formatted(row, rowAnchor.size()));
         return rowAnchor.get(row);
     }
 

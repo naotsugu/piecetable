@@ -125,6 +125,7 @@ public class StringsBuffer {
      * @return the number of deleted character
      */
     public int shiftInsert(int row, CharSequence cs) {
+        if (cs.isEmpty()) return 0;
         int rowIndex = rowIndex(row);
         int len = IntStream.range(rowSize() - Strings.countLf(cs), rowSize())
             .map(this::rowLength).sum();

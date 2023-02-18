@@ -52,7 +52,7 @@ public class UiCaret extends Path {
     /** The logical caret position x. */
     private double logicalX;
 
-    /** The caret offset. */
+    /** The caret offset (textFlow based). */
     private int offset;
 
 
@@ -97,6 +97,7 @@ public class UiCaret extends Path {
 
 
     public void addOffset(int delta) {
+        if (delta == 0) return;
         offset += delta;
         moveToOffset();
     }
@@ -107,11 +108,10 @@ public class UiCaret extends Path {
      * @return the caret offset
      */
     public int right() {
-        offset++;
-        if (moveToOffsetSyncLogical()) return offset;
-        offset++;
-        if (moveToOffsetSyncLogical()) return offset;
-        offset -= 2;
+        if (Character.isHighSurrogate(textFlow.charAt(++offset))) {
+            offset++;
+        }
+        moveToOffsetSyncLogical();
         return offset;
     }
 
@@ -122,11 +122,10 @@ public class UiCaret extends Path {
      */
     public int left() {
         if (offset == 0) return 0;
-        offset--;
-        if (moveToOffsetSyncLogical()) return offset;
-        offset--;
-        if (moveToOffsetSyncLogical()) return offset;
-        offset += 2;
+        if (Character.isLowSurrogate(textFlow.charAt(--offset))) {
+            offset--;
+        }
+        moveToOffsetSyncLogical();
         return offset;
     }
 
@@ -239,6 +238,11 @@ public class UiCaret extends Path {
      */
     public int offset() { return offset; }
 
+    public double physicalX() { return physicalX; }
+
+    public double physicalY() { return physicalY; }
+
+    public double bottom() { return physicalY + height; }
 
     /**
      * Get the default caret shape.

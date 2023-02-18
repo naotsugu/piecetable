@@ -15,19 +15,15 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor3.model.behavior.CaretBehavior;
-import com.mammb.code.editor3.model.behavior.ScrollBehavior;
 import com.mammb.code.editor3.model.specifics.ContentImpl;
-import com.mammb.code.editor3.model.behavior.NowrapScrollBehavior;
-import com.mammb.code.editor3.model.behavior.WrapScrollBehavior;
 import java.nio.file.Path;
 import java.util.List;
 
 /**
- * TextView.
+ * TextModel.
  * @author Naotsugu Kobayashi
  */
-public class TextView {
+public class TextModel {
 
     /** The text slice. */
     private final TextSlice textSlice;
@@ -38,20 +34,13 @@ public class TextView {
     /** dirty?. */
     private boolean dirty;
 
-    /** The scroll behavior. */
-    private ScrollBehavior scrollBehavior;
-
-    /** The caret behavior. */
-    private CaretBehavior caretBehavior;
-
 
     /**
      * Constructor.
      * @param textSlice the text slice
      */
-    public TextView(TextSlice textSlice) {
+    public TextModel(TextSlice textSlice) {
         this.textSlice = textSlice;
-        initBehavior();
     }
 
 
@@ -59,7 +48,7 @@ public class TextView {
      * Create text view.
      * @param path the content path
      */
-    public TextView(Path path) {
+    public TextModel(Path path) {
         this(new TextSlice(new TextSource(new ContentImpl(path))));
     }
 
@@ -67,7 +56,7 @@ public class TextView {
     /**
      * Create text view.
      */
-    public TextView() {
+    public TextModel() {
         this(new TextSlice(new TextSource(new ContentImpl())));
     }
 
@@ -94,6 +83,21 @@ public class TextView {
     }
 
 
+    public int scrollNext(int delta) {
+        int old = textSlice.originOffset();
+        textSlice.shiftRow(delta);
+        return Math.abs(textSlice.originOffset() - old);
+    }
+
+
+    public int scrollPrev(int delta) {
+        if (textSlice.originRow() == 0) return 0;
+        int old = textSlice.originOffset();
+        textSlice.shiftRow(-delta);
+        return Math.abs(textSlice.originOffset() - old);
+    }
+
+
     /**
      * Set the max row number.
      * @param maxRows the max row number
@@ -113,25 +117,9 @@ public class TextView {
     public boolean isDirty() { return dirty; }
 
 
-    /**
-     * Get the {@link ScrollBehavior}.
-     * @return the {@link ScrollBehavior}
-     */
-    public ScrollBehavior scrollBehavior() { return scrollBehavior; }
-
-
-
     public List<String> text() {
+        // TODO token string
         return List.of(textSlice.string());
-    }
-
-
-    private void initBehavior() {
-        if (textWrap) {
-            scrollBehavior = new WrapScrollBehavior();
-        } else {
-            scrollBehavior = new NowrapScrollBehavior(textSlice);
-        }
     }
 
 

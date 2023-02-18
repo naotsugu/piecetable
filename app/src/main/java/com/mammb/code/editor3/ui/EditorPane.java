@@ -15,8 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
-import com.mammb.code.editor3.model.TextView;
-import com.mammb.code.editor3.ui.util.Texts;
+import com.mammb.code.editor3.model.TextModel;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -40,7 +39,7 @@ public class EditorPane extends StackPane {
      */
     public EditorPane(Stage stage) {
         this.stage = stage;
-        this.textPane = new TextPane(stage, new TextView());
+        this.textPane = new TextPane(stage, new TextModel());
         setAlignment(Pos.TOP_LEFT);
         getChildren().add(textPane);
     }

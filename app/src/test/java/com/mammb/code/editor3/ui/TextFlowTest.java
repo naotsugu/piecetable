@@ -29,6 +29,19 @@ class TextFlowTest {
 
     }
 
+    @Test
+    void testCharAt() {
+        var textFlow = new TextFlow();
+        textFlow.setAll(List.of(new Text("ab"), new Text("cde"), new Text("fgh")));
+        assertEquals('a', textFlow.charAt(0));
+        assertEquals('b', textFlow.charAt(1));
+        assertEquals('c', textFlow.charAt(2));
+        assertEquals('d', textFlow.charAt(3));
+        assertEquals('e', textFlow.charAt(4));
+        assertEquals('f', textFlow.charAt(5));
+        assertEquals('g', textFlow.charAt(6));
+        assertEquals('h', textFlow.charAt(7));
+    }
 
     @Test
     void testSubSequence() {
