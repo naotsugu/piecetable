@@ -15,10 +15,7 @@
  */
 package com.mammb.code.editor3.ui.handler;
 
-import com.mammb.code.editor3.model.TextModel;
-import com.mammb.code.editor3.ui.TextFlow;
-import com.mammb.code.editor3.ui.UiCaret;
-import com.mammb.code.editor3.ui.util.Texts;
+import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import javafx.event.EventHandler;
 import javafx.scene.input.ScrollEvent;
 
@@ -28,37 +25,26 @@ import javafx.scene.input.ScrollEvent;
  */
 public class ScrollHandler implements EventHandler<ScrollEvent> {
 
-    private final TextModel model;
-
-    /** The text flow pane. */
-    private final TextFlow textFlow;
-
-    /** The ui caret. */
-    private final UiCaret caret;
+    /** The text model. */
+    private final ScrollBehavior behavior;
 
 
     /**
      * Constructor.
-     * @param textFlow the text flow pane
-     * @param caret the ui caret
-     * @param model
+     * @param behavior the behavior
      */
-    private ScrollHandler(TextFlow textFlow, UiCaret caret, TextModel model) {
-        this.textFlow = textFlow;
-        this.caret = caret;
-        this.model = model;
+    private ScrollHandler(ScrollBehavior behavior) {
+        this.behavior = behavior;
     }
 
 
     /**
      * Create a new {@code EventHandler<ScrollEvent>}.
-     * @param textFlow the text flow pane
-     * @param caret the ui caret
-     * @param model the scroll behavior
+     * @param behavior the behavior
      * @return a new {@code EventHandler<ScrollEvent>}
      */
-    public static EventHandler<ScrollEvent> of(TextFlow textFlow, UiCaret caret, TextModel model) {
-        return new ScrollHandler(textFlow, caret, model);
+    public static EventHandler<ScrollEvent> of(ScrollBehavior behavior) {
+        return new ScrollHandler(behavior);
     }
 
 
@@ -66,45 +52,9 @@ public class ScrollHandler implements EventHandler<ScrollEvent> {
     public void handle(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
             if (e.getDeltaY() > 0) {
-                scrollPrev();
+                behavior.scrollPrev();
             } else if (e.getDeltaY() < 0) {
-                scrollNext();
-            }
-        }
-    }
-
-
-    /**
-     * Scroll next (i.e. arrow down).
-     */
-    private void scrollNext() {
-        if (textFlow.canTranslateRowNext()) {
-            double old = textFlow.getTranslateY();
-            textFlow.translateRowNext();
-            caret.slipY(textFlow.getTranslateY() - old);
-        } else {
-            int shiftedOffset = model.scrollNext(1);
-            caret.addOffset(-shiftedOffset);
-            if (shiftedOffset > 0) {
-                textFlow.setAll(Texts.asText(model.text()));
-            }
-        }
-    }
-
-
-    /**
-     * Scroll prev (i.e. arrow up).
-     */
-    private void scrollPrev() {
-        if (textFlow.canTranslateRowPrev()) {
-            double old = textFlow.getTranslateY();
-            textFlow.translateRowPrev();
-            caret.slipY(textFlow.getTranslateY() - old);
-        } else {
-            int shiftedOffset = model.scrollPrev(1);
-            caret.addOffset(shiftedOffset);
-            if (shiftedOffset > 0) {
-                textFlow.setAll(Texts.asText(model.text()));
+                behavior.scrollNext();
             }
         }
     }

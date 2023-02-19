@@ -1,4 +1,4 @@
-package com.mammb.code.editor3.ui.handler;
+package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.ui.UiCaret;
 
@@ -15,6 +15,7 @@ public class CaretBehavior {
     public CaretBehavior(UiCaret caret) {
         this.caret = caret;
     }
+
 
     /**
      * Move the caret to the right.

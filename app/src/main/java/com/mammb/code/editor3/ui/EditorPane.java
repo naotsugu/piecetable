@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.model.TextModel;
+import com.mammb.code.editor3.ui.util.Colors;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -42,11 +43,13 @@ public class EditorPane extends StackPane {
         this.textPane = new TextPane(stage, new TextModel());
         setAlignment(Pos.TOP_LEFT);
         getChildren().add(textPane);
+
     }
 
 
     public void showScene() {
         Scene scene = new Scene(this, 800, 480);
+        scene.setFill(Colors.background);
         stage.setScene(scene);
         stage.show();
     }

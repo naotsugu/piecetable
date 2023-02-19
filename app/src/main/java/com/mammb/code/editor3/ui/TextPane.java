@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.model.TextModel;
+import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.handler.DragDrop;
 import com.mammb.code.editor3.ui.handler.KeyPressedHandler;
 import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
@@ -72,7 +73,7 @@ public class TextPane extends StackPane {
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
 
-        setOnScroll(ScrollHandler.of(textFlow, caret, model));
+        setOnScroll(ScrollHandler.of(scrollBehavior()));
     }
 
 
@@ -131,6 +132,11 @@ public class TextPane extends StackPane {
      */
     private int maxRows() {
         return (int) Math.ceil(getLayoutBounds().getHeight() / Texts.height);
+    }
+
+
+    private ScrollBehavior scrollBehavior() {
+        return new ScrollBehavior(textFlow, caret, model);
     }
 
 }

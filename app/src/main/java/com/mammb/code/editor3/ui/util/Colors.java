@@ -15,9 +15,16 @@
  */
 package com.mammb.code.editor3.ui.util;
 
+import javafx.scene.paint.Color;
+
 /**
  * Color utilities.
  * @author Naotsugu Kobayashi
  */
 public class Colors {
+
+    public static final Color background = Color.web("#222222");
+
+    public static final Color foreground = Color.web("#DDDDDD");
+
 }

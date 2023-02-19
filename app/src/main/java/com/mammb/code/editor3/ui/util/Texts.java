@@ -73,6 +73,7 @@ public class Texts {
     public static Text asText(String string) {
         Text text = new Text(string);
         text.setFont(font);
+        text.setFill(Colors.foreground);
         return text;
     }
 
