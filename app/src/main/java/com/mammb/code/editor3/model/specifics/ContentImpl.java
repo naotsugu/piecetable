@@ -76,7 +76,7 @@ public class ContentImpl implements Content {
 
     @Override
     public int count(int startPos, Predicate<byte[]> until) {
-        return pt.count(startPos, pt.length(), until);
+        return pt.count(startPos, until);
     }
 
     @Override

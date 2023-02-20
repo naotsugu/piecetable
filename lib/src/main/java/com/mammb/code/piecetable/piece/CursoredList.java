@@ -146,6 +146,34 @@ public class CursoredList {
         return byteArray;
     }
 
+
+    public int count(int startPos, Predicate<byte[]> until) {
+        int count = 0;
+        PiecePoint from = at(startPos);
+        int start = startPos - from.position();
+        for (int i = from.index(); i < length(); i++) {
+            Piece piece = get(i);
+            for (;;) {
+                int end = Math.min(piece.length(), start + 256);
+                Buffer buf = piece.bytes(start, end);
+                for (int j = 0; j < buf.length(); j++) {
+                    byte[] bytes = buf.charAt(j);
+                    if (until.test(bytes)) {
+                        return count;
+                    }
+                    count++;
+                }
+                if (end == piece.length()) {
+                    break;
+                }
+                start = end;
+            }
+            start = 0;
+        }
+        return count;
+    }
+
+
     public ByteArray bytesBefore(int startPosExclude, Predicate<byte[]> until) {
         if (startPosExclude <= 0) throw new IndexOutOfBoundsException();
         ByteArray byteArray = ByteArray.of();

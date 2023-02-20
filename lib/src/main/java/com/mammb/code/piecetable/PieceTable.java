@@ -206,7 +206,7 @@ public class PieceTable {
      * Get the byte array.
      * @param startPos the beginning index, inclusive
      * @param endPos the ending index, exclusive
-     * @return
+     * @return the bytes
      */
     public byte[] bytes(int startPos, int endPos) {
         return pieces.bytes(startPos, endPos).get();
@@ -230,6 +230,17 @@ public class PieceTable {
 
 
     /**
+     * Get the count.
+     * @param startPos the start position(code point index), inclusive
+     * @param until the until predicate, exclusive
+     * @return the count
+     */
+    public int count(int startPos, Predicate<byte[]> until) {
+        return pieces.count(startPos, until);
+    }
+
+
+    /**
      * Get the bytes.
      * <pre>
      *     | a | b | c | d | a |
@@ -249,7 +260,7 @@ public class PieceTable {
      * Get the count.
      * @param startPos the start position(code point index), inclusive
      * @param endPos the ending position(code point index), exclusive
-     * @param predicate the until predicate
+     * @param predicate the count predicate
      * @return the count
      */
     public int count(int startPos, int endPos, Predicate<byte[]> predicate) {
@@ -259,7 +270,7 @@ public class PieceTable {
 
     /**
      * Get the count.
-     * @param predicate the until predicate
+     * @param predicate the count predicate
      * @return the count
      */
     public int count(Predicate<byte[]> predicate) {
