@@ -20,6 +20,10 @@ import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.UiCaret;
 import com.mammb.code.editor3.ui.util.Texts;
 
+/**
+ * ScrollBehavior.
+ * @author Naotsugu Kobayashi
+ */
 public class ScrollBehavior {
 
     /** The text model. */

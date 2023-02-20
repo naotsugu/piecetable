@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class Texts {
 
-    private static final Font DEFAULT = new Font("System Regular", 14);
+    private static final Font DEFAULT = new Font("System Regular", 15);
 
     public static final Text bit = new Text("X");
     static {

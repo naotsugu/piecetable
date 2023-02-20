@@ -25,7 +25,7 @@ import javafx.scene.input.ScrollEvent;
  */
 public class ScrollHandler implements EventHandler<ScrollEvent> {
 
-    /** The text model. */
+    /** The scroll behavior. */
     private final ScrollBehavior behavior;
 
 

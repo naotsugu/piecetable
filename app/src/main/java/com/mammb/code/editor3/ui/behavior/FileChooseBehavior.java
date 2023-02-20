@@ -13,24 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.ui;
+package com.mammb.code.editor3.ui.behavior;
 
-import com.mammb.code.editor3.ui.util.Colors;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import com.mammb.code.editor3.ui.TextPane;
+import java.io.File;
+
+import static com.mammb.code.editor3.ui.util.FileChoosers.fileChooseOpen;
 
 /**
- * LeftGarter.
+ * FileChooseBehavior.
  * @author Naotsugu Kobayashi
  */
-public class LeftGarter extends StackPane {
+public class FileChooseBehavior {
 
-    static final double MIN_WIDTH = 50;
+    /** The text pane. */
+    private final TextPane textPane;
 
-    public LeftGarter() {
-        setPrefWidth(MIN_WIDTH);
-        setMaxSize(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE);
-        setBackground(new Background(new BackgroundFill(Colors.panel, null, null)));
+
+    /**
+     * Constructor.
+     * @param textPane the text pane
+     */
+    public FileChooseBehavior(TextPane textPane) {
+        this.textPane = textPane;
     }
 
+
+    public void open() {
+        File file = fileChooseOpen(textPane.stage(), null);
+        if (file != null) {
+            textPane.open(file.toPath());
+        }
+    }
 }

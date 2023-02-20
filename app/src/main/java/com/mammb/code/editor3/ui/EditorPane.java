@@ -19,6 +19,7 @@ import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.util.Colors;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -26,7 +27,7 @@ import javafx.stage.Stage;
  * EditorPane.
  * @author Naotsugu Kobayashi
  */
-public class EditorPane extends StackPane {
+public class EditorPane extends BorderPane {
 
     /** The stage. */
     private final Stage stage;
@@ -39,11 +40,22 @@ public class EditorPane extends StackPane {
      * Constructor.
      */
     public EditorPane(Stage stage) {
+
         this.stage = stage;
         this.textPane = new TextPane(stage, new TextModel());
-        setAlignment(Pos.TOP_LEFT);
-        getChildren().add(textPane);
 
+        setCenter(textPane);
+        initGarter();
+
+    }
+
+
+    private void initGarter() {
+        TopGarter topGarter = new TopGarter();
+        LeftGarter leftGarter = new LeftGarter();
+        setTop(topGarter);
+        setLeft(leftGarter);
+        topGarter.leftWidthProperty().bind(leftGarter.widthProperty());
     }
 
 

@@ -23,8 +23,10 @@ import javafx.scene.paint.Color;
  */
 public class Colors {
 
-    public static final Color background = Color.web("#222222");
+    public static final Color background = Color.web("#2B2B2B");
 
     public static final Color foreground = Color.web("#DDDDDD");
+
+    public static final Color panel = Color.web("#313335");
 
 }

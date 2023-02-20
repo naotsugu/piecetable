@@ -18,6 +18,7 @@ package com.mammb.code.editor3.ui;
 import com.mammb.code.editor3.ui.util.PathElements;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -45,8 +46,9 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Constructor.
      */
     public TextFlow() {
-        setPadding(new Insets(4));
+        setPadding(new Insets(0,0,0,4));
         setTabSize(4);
+        setCursor(Cursor.TEXT);
     }
 
 

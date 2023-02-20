@@ -242,6 +242,8 @@ public class UiCaret extends Path {
 
     public double physicalY() { return physicalY; }
 
+    public double height() { return height; }
+
     public double bottom() { return physicalY + height; }
 
     /**

@@ -15,13 +15,12 @@
  */
 package com.mammb.code.editor3.ui.handler;
 
-import com.mammb.code.editor3.ui.TextPane;
+import com.mammb.code.editor3.ui.behavior.CaretBehavior;
+import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
+import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.util.Keys;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
-import java.io.File;
-
-import static com.mammb.code.editor3.ui.util.FileChoosers.fileChooseOpen;
 
 /**
  * KeyPressedHandler.
@@ -29,26 +28,38 @@ import static com.mammb.code.editor3.ui.util.FileChoosers.fileChooseOpen;
  */
 public class KeyPressedHandler implements EventHandler<KeyEvent> {
 
-    /** The text pane. */
-    private final TextPane textPane;
+    /** The caret behavior. */
+    private final CaretBehavior caretBehavior;
+
+    /** The scroll behavior. */
+    private final ScrollBehavior scrollBehavior;
+
+    /** The file choose behavior. */
+    private final FileChooseBehavior fileChooseBehavior;
 
 
     /**
      * Constructor.
-     * @param textPane the text pane
+     * @param caretBehavior the caret behavior
+     * @param scrollBehavior the scroll behavior
+     * @param fileChooseBehavior the file choose behavior
      */
-    private KeyPressedHandler(TextPane textPane) {
-        this.textPane = textPane;
+    private KeyPressedHandler(CaretBehavior caretBehavior, ScrollBehavior scrollBehavior, FileChooseBehavior fileChooseBehavior) {
+        this.caretBehavior = caretBehavior;
+        this.scrollBehavior = scrollBehavior;
+        this.fileChooseBehavior = fileChooseBehavior;
     }
 
 
     /**
      * Create a new {@code KeyPressedHandler}.
-     * @param textPane the text pane
+     * @param caretBehavior the caret behavior
+     * @param scrollBehavior the scroll behavior
+     * @param fileChooseBehavior the file choose behavior
      * @return a new {@code KeyPressedHandler}
      */
-    public static EventHandler<KeyEvent> of(TextPane textPane) {
-        return new KeyPressedHandler(textPane);
+    public static EventHandler<KeyEvent> of(CaretBehavior caretBehavior, ScrollBehavior scrollBehavior, FileChooseBehavior fileChooseBehavior) {
+        return new KeyPressedHandler(caretBehavior, scrollBehavior, fileChooseBehavior);
     }
 
 
@@ -59,12 +70,12 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
         if (handled) return;
 
         switch (e.getCode()) {
-            case LEFT       -> textPane.caret().left();
-            case RIGHT      -> textPane.caret().right();
-            case UP         -> textPane.caret().up();
-            case DOWN       -> textPane.caret().down();
-            case HOME       -> textPane.caret().home();
-            case END        -> textPane.caret().end();
+            case LEFT       -> caretBehavior.left();
+            case RIGHT      -> caretBehavior.right();
+            case UP         -> caretBehavior.up();
+            case DOWN       -> caretBehavior.down();
+            case HOME       -> caretBehavior.home();
+            case END        -> caretBehavior.end();
             case PAGE_UP    -> System.out.println("pu");
             case PAGE_DOWN  -> System.out.println("pd");
             case DELETE     -> System.out.println("del");
@@ -75,6 +86,7 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
         }
     }
 
+
     /**
      * Handle key combination event.
      * @param e the key event
@@ -82,10 +94,7 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
      */
     private boolean handleKeyCombination(KeyEvent e) {
         if (Keys.SC_O.match(e)) {
-            File file = fileChooseOpen(textPane.stage(), null);
-            if (file != null) {
-                textPane.open(file.toPath());
-            }
+            fileChooseBehavior.open();
             return true;
         }
 
