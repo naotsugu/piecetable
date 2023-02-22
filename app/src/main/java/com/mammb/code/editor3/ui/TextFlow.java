@@ -27,6 +27,7 @@ import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +47,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Constructor.
      */
     public TextFlow() {
-        setPadding(new Insets(0,0,0,4));
+        setPadding(new Insets(0, 0, 0, 4));
         setTabSize(4);
         setCursor(Cursor.TEXT);
     }
@@ -67,9 +68,10 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * @return {@code true} if the display can be moved to the next line
      */
     public boolean canTranslateRowNext() {
-        double remaining = getBoundsInLocal().getHeight() - getScene().getHeight()
+        double remaining = getBoundsInLocal().getHeight()
+            - getParent().getLayoutBounds().getHeight()
             + getTranslateY();
-        return remaining >= visuallyHeadRowHeight();
+        return remaining > visuallyHeadLineHeight();
     }
 
 
@@ -77,7 +79,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Display moves to the next line.
      */
     public void translateRowNext() {
-        setTranslateY(getTranslateY() - visuallyHeadRowHeight());
+        setTranslateY(getTranslateY() - visuallyHeadLineHeight());
     }
 
 
@@ -148,9 +150,42 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Get the size of head row.
      * @return the size of head row
      */
+    private double visuallyHeadLineHeight() {
+        int index = insertionIndexAt(0, -getTranslateY());
+        PathElement[] paths = caretShape(index, true);
+        return PathElements.height(paths);
+    }
+
+
+    /**
+     * Get the height of the first row of the visible area.
+     * If text is text-wrapped, it will be the height of multiple lines.
+     * @return the height of the first row of the visible area
+     */
     private double visuallyHeadRowHeight() {
-        return PathElements.height(caretShape(
-            insertionIndexAt(0, getTranslateY()), true));
+
+        int start = insertionIndexAt(0, -getTranslateY());
+
+        boolean scope = false;
+        int end = 0;
+        for (Node node : getChildren()) {
+            if (node instanceof Text text) {
+                int length = text.getText().length();
+                int lfIndex = -1;
+                if (scope) {
+                    lfIndex = text.getText().indexOf('\n');
+                } else if (end + length > start) {
+                    scope = true;
+                    lfIndex = text.getText().substring(start - end).indexOf('\n');
+                }
+                if (lfIndex > -1) {
+                    end += lfIndex;
+                    break;
+                }
+                end += length;
+            }
+        }
+        return PathElements.height(rangeShape(start, end));
     }
 
 
@@ -306,6 +341,15 @@ public class TextFlow extends javafx.scene.text.TextFlow {
             }
         }
         return rowLength;
+    }
+
+
+    @Override
+    public PathElement[] caretShape(int charIndex, boolean leading) {
+        if (charIndex < 0) {
+            return new PathElement[] { new MoveTo(-1, -1), new LineTo(-1, -1) };
+        }
+        return super.caretShape(charIndex, leading);
     }
 
 

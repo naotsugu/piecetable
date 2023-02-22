@@ -39,10 +39,17 @@ public class FileChooseBehavior {
     }
 
 
+    /**
+     * Open file.
+     */
     public void open() {
+        if (textPane.isDirty()) {
+            // TODO
+        }
         File file = fileChooseOpen(textPane.stage(), null);
         if (file != null) {
             textPane.open(file.toPath());
         }
     }
+
 }

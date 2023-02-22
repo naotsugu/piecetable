@@ -25,6 +25,8 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
 
+import java.util.Arrays;
+
 /**
  * UiCaret.
  * @author Naotsugu Kobayashi

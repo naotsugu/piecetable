@@ -27,6 +27,7 @@ import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.nio.file.Path;
@@ -62,10 +63,14 @@ public class TextPane extends StackPane {
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
+        setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
+        setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
         setAlignment(Pos.TOP_LEFT);
+
         getChildren().addAll(textFlow, caret);
         initHandler();
         initListener();
+
     }
 
 
@@ -89,9 +94,6 @@ public class TextPane extends StackPane {
      * @param path the file content path
      */
     public void open(Path path) {
-        if (model.isDirty()) {
-            // TODO
-        }
         model = new TextModel(path);
         initHandler();
         sync();
@@ -129,11 +131,18 @@ public class TextPane extends StackPane {
 
 
     /**
+     * Gets whether this text is dirty.
+     * @return {@code true} if text is dirty.
+     */
+    public boolean isDirty() { return model.isDirty(); }
+
+
+    /**
      * Get the max rows by bounds height.
      * @return the max rows
      */
     private int maxRows() {
-        return (int) Math.ceil(getLayoutBounds().getHeight() / Texts.height);
+        return (int) Math.ceil(getHeight() / Texts.height);
     }
 
 

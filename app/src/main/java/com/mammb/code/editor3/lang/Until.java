@@ -86,7 +86,7 @@ public class Until {
 
         @Override
         public boolean test(byte[] bytes) {
-            count -= bytes.length;
+            count -= Strings.lengthByteAsUtf16(bytes[0]);
             return count < 0;
         }
     }

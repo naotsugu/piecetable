@@ -56,6 +56,7 @@ public class EditorPane extends BorderPane {
         setTop(topGarter);
         setLeft(leftGarter);
         topGarter.leftWidthProperty().bind(leftGarter.widthProperty());
+        textPane.prefHeightProperty().bind(heightProperty().subtract(topGarter.heightProperty()));
     }
 
 
