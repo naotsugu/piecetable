@@ -17,11 +17,14 @@ package com.mammb.code.editor3.ui;
 
 import javafx.scene.text.Text;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * The test of {@link TextFlow}.
+ * @author Naotsugu Kobayashi
+ */
 class TextFlowTest {
 
 

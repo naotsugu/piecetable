@@ -14,12 +14,13 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.mammb.code.editor.App")
+    mainClass.set("com.mammb.code.editor3.App")
     mainModule.set("com.mammb.code.editor")
 }
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+
 }
 
 tasks.compileJava.configure { options.encoding = Charsets.UTF_8.name() }

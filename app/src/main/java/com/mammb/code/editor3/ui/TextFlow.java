@@ -27,7 +27,6 @@ import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +40,10 @@ public class TextFlow extends javafx.scene.text.TextFlow {
 
     /** the row length. */
     private int rowLength = -1;
+
+    private int translateShiftLine = 0;
+
+    private int translateShiftRow = 0;
 
 
     /**
@@ -71,7 +74,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         double remaining = getBoundsInLocal().getHeight()
             - getParent().getLayoutBounds().getHeight()
             + getTranslateY();
-        return remaining > visuallyHeadLineHeight();
+        return remaining > visuallyHeadRowHeight();
     }
 
 
@@ -79,6 +82,9 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Display moves to the next line.
      */
     public void translateRowNext() {
+        int index = insertionIndexAt(Double.MAX_VALUE, -getTranslateY());
+        translateShiftLine += charAt(index + 1) == '\n' ? 1 : 0;
+        translateShiftLine += 1;
         setTranslateY(getTranslateY() - visuallyHeadLineHeight());
     }
 
@@ -96,10 +102,26 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Display moves to the previous line.
      */
     public void translateRowPrev() {
-        if (getTranslateY() == 0) return;
-        double height = PathElements.height(caretShape(
-            insertionIndexAt(0, getTranslateY() - 1), true));
-        setTranslateY(getTranslateY() + height);
+
+        if (getTranslateY() == 0) {
+            return;
+        }
+
+        int index = insertionIndexAt(Double.MAX_VALUE, -getTranslateY() - 1);
+        translateShiftLine -= charAt(index + 1) == '\n' ? 1 : 0;
+        translateShiftLine -= 1;
+        setTranslateY(getTranslateY() + PathElements.height(caretShape(index, true)));
+
+    }
+
+
+    /**
+     * Clear translate
+     */
+    public void clearTranslation() {
+        translateShiftLine = 0;
+        translateShiftRow = 0;
+        setTranslateY(0);
     }
 
 
@@ -361,4 +383,11 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         rowLength = -1;
     }
 
+    public int translateShiftLine() {
+        return translateShiftLine;
+    }
+
+    public int translateShiftRow() {
+        return translateShiftRow;
+    }
 }

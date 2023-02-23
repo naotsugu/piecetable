@@ -58,7 +58,8 @@ public class ScrollBehavior {
             textFlow.translateRowNext();
             caret.slipY(textFlow.getTranslateY() - old);
         } else {
-            int shiftedOffset = model.scrollNext(1);
+            int shiftedOffset = model.scrollNext(textFlow.translateShiftRow() + 1);
+            textFlow.clearTranslation();
             caret.addOffset(-shiftedOffset);
             if (shiftedOffset > 0) {
                 textFlow.setAll(Texts.asText(model.text()));
