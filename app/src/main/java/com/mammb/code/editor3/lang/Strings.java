@@ -60,8 +60,20 @@ public class Strings {
      * @return the number of line feed
      */
     public static int countLf(CharSequence cs) {
-        return (int) cs.chars().filter(c -> c == LF).count();
+        return count(cs, LF);
     }
+
+
+    /**
+     * Count the number of the specified char in the specified char sequence.
+     * @param cs the char sequence
+     * @param ch the specified char
+     * @return the number of the specified char
+     */
+    public static int count(CharSequence cs, char ch) {
+        return (int) cs.chars().filter(c -> c == ch).count();
+    }
+
 
     /**
      * Returns the number of Unicode code points in the specified text.
@@ -81,6 +93,18 @@ public class Strings {
      */
     public static int codePointCount(CharSequence cs, int beginIndex, int endIndex) {
         return (cs == null) ? 0 : (int) cs.subSequence(beginIndex, endIndex).codePoints().count();
+    }
+
+
+    public static boolean isLineSeparator(char ch) {
+        return ch == LF || ch == CR;
+    }
+
+    public static boolean isLf(char ch) {
+        return ch == LF;
+    }
+    public static boolean isCrLf(char ch1, char ch2) {
+        return ch1 == CR && ch2 == LF;
     }
 
 

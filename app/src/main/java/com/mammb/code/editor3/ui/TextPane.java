@@ -127,6 +127,7 @@ public class TextPane extends StackPane {
     public void sync() {
         model.setupMaxRows(maxRows());
         textFlow.setAll(Texts.asText(model.text()));
+        textFlow.clearTranslation();
     }
 
 

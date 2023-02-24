@@ -15,7 +15,9 @@
  */
 package com.mammb.code.editor3.ui.util;
 
+import com.mammb.code.editor3.lang.Strings;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
@@ -34,6 +36,11 @@ public class TextMetrics {
 
     public record Line(int rowIndex, int offset, int length, double height) { }
 
+    /** the row length. */
+    private int rowLength = 0;
+
+    /** the text. */
+    private String textString = "";
 
     private final List<Line> lines;
 
@@ -70,13 +77,19 @@ public class TextMetrics {
         while (offset < text.length()) {
             int tail = flow.hitTest(new Point2D(Double.MAX_VALUE, y + 1)).getInsertionIndex();
             double height = height(flow.caretShape(tail, true));
-            int lf = (tail < text.length() && text.charAt(tail) == '\n') ? 1 : 0;
-            tail += lf;
+            int eol = (tail >= text.length()) ? 0
+                : Strings.isLf(text.charAt(tail)) ? 1
+                : Strings.isCrLf(text.charAt(tail), text.charAt(tail + 1)) ? 2 : 0;
+            tail += eol;
             lines.add(new Line(row, offset, tail - offset, height));
-            row += lf;
+            if (eol > 0) row++;
             offset = tail;
             y += height;
         }
+
+        textString = text;
+        rowLength = Strings.countLf(textString) + 1;
+
         return lines;
     }
 
@@ -86,6 +99,27 @@ public class TextMetrics {
      * @return the lines
      */
     public List<Line> lines() { return lines; }
+
+
+    /**
+     * Get the text length.
+     * @return the text length
+     */
+    public int textLength() { return textString.length(); }
+
+
+    /**
+     * Get the row length.
+     * @return the row length
+     */
+    public int rowLength() { return rowLength; }
+
+
+    /**
+     * Get the text string.
+     * @return the text string
+     */
+    public String textString() { return textString; }
 
 
     /**

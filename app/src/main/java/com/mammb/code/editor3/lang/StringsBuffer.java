@@ -114,14 +114,16 @@ public class StringsBuffer {
         int len = IntStream.range(0, Strings.countLf(tail))
             .map(this::rowLength).sum();
         if (len > 0) value.delete(0, len);
-        append(tail);
+        value.append(tail);
+        metrics.clear();
         return len;
     }
 
 
     /**
      * Shift row and insert text.
-     * @param cs insert string
+     * @param row at the number of row
+     * @param cs insertion string
      * @return the number of deleted character
      */
     public int shiftInsert(int row, CharSequence cs) {

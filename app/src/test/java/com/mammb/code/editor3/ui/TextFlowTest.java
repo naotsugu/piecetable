@@ -31,15 +31,15 @@ class TextFlowTest {
     @Test
     void testRowOffset() {
         var textFlow = new TextFlow();
-        textFlow.setAll(List.of(new Text("ab\n"), new Text("cde\n"), new Text("fgh\n")));
+        textFlow.setAll(List.of(new Text("ab\n"), new Text("cde\n"), new Text("fgh")));
 
         var ret = textFlow.rowOffset(0);
         assertEquals(0, ret[0]);
-        assertEquals(2, ret[1]);
+        assertEquals(3, ret[1]);
 
         ret = textFlow.rowOffset(1);
         assertEquals(3, ret[0]);
-        assertEquals(6, ret[1]);
+        assertEquals(7, ret[1]);
 
         ret = textFlow.rowOffset(2);
         assertEquals(7, ret[0]);

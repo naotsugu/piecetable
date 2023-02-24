@@ -58,13 +58,14 @@ public class ScrollBehavior {
             textFlow.translateRowNext();
             caret.slipY(textFlow.getTranslateY() - old);
         } else {
-            int shiftedOffset = model.scrollNext(textFlow.translateShiftRow() + 1);
+            int shiftedOffset = model.scrollNext(textFlow.translatedShiftRow() + 1);
             textFlow.clearTranslation();
             caret.addOffset(-shiftedOffset);
             if (shiftedOffset > 0) {
                 textFlow.setAll(Texts.asText(model.text()));
             }
         }
+
     }
 
 
@@ -77,7 +78,7 @@ public class ScrollBehavior {
             textFlow.translateRowPrev();
             caret.slipY(textFlow.getTranslateY() - old);
         } else {
-            int shiftedOffset = model.scrollPrev(1);
+            int shiftedOffset = model.scrollPrev(textFlow.translatedShiftRow() + 1);
             caret.addOffset(shiftedOffset);
             if (shiftedOffset > 0) {
                 textFlow.setAll(Texts.asText(model.text()));
