@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.ui.UiCaret;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 
 /**
  * CaretBehavior.
@@ -29,15 +30,19 @@ public class CaretBehavior {
     /** The scroll behavior. */
     private final ScrollBehavior scrollBehavior;
 
+    /** The height of view port. */
+    private final ReadOnlyDoubleProperty viewHeight;
+
 
     /**
      * Constructor.
      * @param caret the ui caret
      * @param scrollBehavior the scroll behavior
      */
-    public CaretBehavior(UiCaret caret, ScrollBehavior scrollBehavior) {
+    public CaretBehavior(UiCaret caret, ScrollBehavior scrollBehavior, ReadOnlyDoubleProperty viewHeight) {
         this.caret = caret;
         this.scrollBehavior = scrollBehavior;
+        this.viewHeight = viewHeight;
     }
 
 
@@ -69,7 +74,12 @@ public class CaretBehavior {
      * Move the caret down.
      */
     public void down() {
-        caret.down();
+        int offset = caret.offset();
+        int newOffset = caret.down();
+        if (offset == newOffset) return;
+        if (caret.physicalY() >= viewHeight.get()) {
+            scrollBehavior.scrollNext();
+        }
     }
 
 

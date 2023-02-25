@@ -66,9 +66,7 @@ public class ScrollBehavior {
                 return;
             }
             // slip scroll
-            double old = textFlow.getTranslateY();
             textFlow.translateRowNext();
-            caret.slipY(textFlow.getTranslateY() - old);
         } else {
             int shiftedOffset = model.scrollNext(textFlow.translatedShiftRow() + 1);
             if (shiftedOffset > 0) {
@@ -87,9 +85,7 @@ public class ScrollBehavior {
     public void scrollPrev() {
         if (textFlow.canTranslateRowPrev()) {
             // slip scroll
-            double old = textFlow.getTranslateY();
             textFlow.translateRowPrev();
-            caret.slipY(textFlow.getTranslateY() - old);
         } else {
             int shiftedOffset = model.scrollPrev(textFlow.translatedShiftRow() + 1);
             if (shiftedOffset > 0) {

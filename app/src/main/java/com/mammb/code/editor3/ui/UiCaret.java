@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
+import com.mammb.code.editor3.ui.util.PathElements;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -68,6 +69,8 @@ public class UiCaret extends Path {
         setManaged(false);
         layoutXProperty().bind(textFlow.layoutXProperty().add(textFlow.getPadding().getLeft()));
         layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()));
+        translateXProperty().bind(textFlow.translateXProperty());
+        translateYProperty().bind(textFlow.translateYProperty());
 
         this.textFlow = textFlow;
 
@@ -156,9 +159,10 @@ public class UiCaret extends Path {
 
     /**
      * Move the caret down.
-     * @return the caret offset
      */
-    public int down() { return moveToPoint(logicalX, physicalY + height); }
+    public int down() {
+        return moveToPointRow(physicalY + height);
+    }
 
 
     /**
@@ -192,6 +196,17 @@ public class UiCaret extends Path {
     }
 
 
+    private int moveToPointRow(double y) {
+        int indexAt = textFlow.insertionIndexAt(logicalX, y);
+        PathElement[] pathElements = textFlow.caretShape(indexAt, true);
+        if (PathElements.getY(pathElements[0]) != physicalY) {
+            offset = indexAt;
+            setShape(pathElements);
+        }
+        return offset;
+    }
+
+
     /**
      * Set the caret shape.
      * @param elements the path elements of caret shape
@@ -220,17 +235,6 @@ public class UiCaret extends Path {
             setVisible(true);
             timeline.play();
         }
-    }
-
-    public void slipY(double delta) {
-        physicalY += delta;
-        getElements().forEach(e -> {
-            if (e instanceof MoveTo moveTo) {
-                moveTo.setY(moveTo.getY() + delta);
-            } else if (e instanceof LineTo lineTo) {
-                lineTo.setY(lineTo.getY() + delta);
-            }
-        });
     }
 
 

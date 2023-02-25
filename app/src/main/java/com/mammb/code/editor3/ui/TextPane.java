@@ -156,7 +156,7 @@ public class TextPane extends StackPane {
     }
 
     private CaretBehavior caretBehavior() {
-        return new CaretBehavior(caret, scrollBehavior());
+        return new CaretBehavior(caret, scrollBehavior(), heightProperty());
     }
 
     private FileChooseBehavior fileChooseBehavior() {
