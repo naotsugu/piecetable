@@ -58,7 +58,7 @@ public class RowsPanel extends Pane {
      * Draw the row number.
      * @param origin the origin number(zero based)
      */
-    void draw(int origin) {
+    public void draw(int origin) {
 
         List<TextMetrics.Line> lines = flow.metrics().lines();
         if (lines.isEmpty()) {

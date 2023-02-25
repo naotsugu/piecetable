@@ -152,7 +152,7 @@ public class TextPane extends StackPane {
 
 
     private ScrollBehavior scrollBehavior() {
-        return new ScrollBehavior(textFlow, caret, model);
+        return new ScrollBehavior(textFlow, caret, model, rowsPanel);
     }
 
     private CaretBehavior caretBehavior() {

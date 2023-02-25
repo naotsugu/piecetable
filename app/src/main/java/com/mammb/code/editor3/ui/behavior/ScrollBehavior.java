@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.model.TextModel;
+import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.UiCaret;
 import com.mammb.code.editor3.ui.util.Texts;
@@ -35,6 +36,9 @@ public class ScrollBehavior {
     /** The ui caret. */
     private final UiCaret caret;
 
+    /** The rows panel. */
+    private final RowsPanel rowsPanel;
+
 
     /**
      * Constructor.
@@ -42,10 +46,11 @@ public class ScrollBehavior {
      * @param caret the ui caret
      * @param model the text model
      */
-    public ScrollBehavior(TextFlow textFlow, UiCaret caret, TextModel model) {
+    public ScrollBehavior(TextFlow textFlow, UiCaret caret, TextModel model, RowsPanel rowsPanel) {
         this.textFlow = textFlow;
         this.caret = caret;
         this.model = model;
+        this.rowsPanel = rowsPanel;
     }
 
 
@@ -63,6 +68,7 @@ public class ScrollBehavior {
                 textFlow.clearTranslation();
                 caret.addOffset(-shiftedOffset);
                 textFlow.setAll(Texts.asText(model.text()));
+                rowsPanel.draw(model.originRowIndex());
             }
         }
     }
@@ -78,9 +84,10 @@ public class ScrollBehavior {
             caret.slipY(textFlow.getTranslateY() - old);
         } else {
             int shiftedOffset = model.scrollPrev(textFlow.translatedShiftRow() + 1);
-            caret.addOffset(shiftedOffset);
             if (shiftedOffset > 0) {
+                caret.addOffset(shiftedOffset);
                 textFlow.setAll(Texts.asText(model.text()));
+                rowsPanel.draw(model.originRowIndex());
             }
         }
     }
