@@ -51,6 +51,9 @@ public class CaretBehavior {
      */
     public void right() {
         caret.right();
+        if (caret.physicalYInParent() >= viewHeight.get()) {
+            scrollBehavior.scrollNext();
+        }
     }
 
 
@@ -59,6 +62,9 @@ public class CaretBehavior {
      */
     public void left() {
         caret.left();
+        if (caret.physicalYInParent() < 0) {
+            scrollBehavior.scrollPrev();
+        }
     }
 
 
@@ -67,7 +73,7 @@ public class CaretBehavior {
      */
     public void up() {
         if (caret.offset() == caret.up()) return;
-        if (caret.physicalY() + caret.getTranslateY() < 0) {
+        if (caret.physicalYInParent() < 0) {
             scrollBehavior.scrollPrev();
         }
     }
@@ -78,7 +84,7 @@ public class CaretBehavior {
      */
     public void down() {
         if (caret.offset() == caret.down()) return;
-        if (caret.physicalY() >= viewHeight.get()) {
+        if (caret.physicalYInParent() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
     }
@@ -97,17 +103,6 @@ public class CaretBehavior {
      */
     public void home() {
         caret.home();
-    }
-
-
-    private void scrollIfEdged() {
-
-        if (caret.physicalY() < 0) {
-            int n = (int) Math.ceil(Math.abs(caret.physicalY() - caret.height()) / caret.height());
-            for (int i = 0; i <= n; i++) {
-                scrollBehavior.scrollNext();
-            }
-        }
     }
 
 }

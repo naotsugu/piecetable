@@ -238,6 +238,11 @@ public class UiCaret extends Path {
     }
 
 
+    public double physicalYInParent() {
+        return physicalY + getTranslateY();
+    }
+
+
     /**
      * Get the caret offset.
      * @return the caret offset
