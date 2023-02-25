@@ -206,6 +206,24 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     }
 
 
+    /**
+     * Get the number of lines containing wrapped text.
+     * @return the number of lines containing wrapped text
+     */
+    public int lineSize() {
+        return metrics().lines().size();
+    }
+
+
+    /**
+     * Get the row length.
+     * @return the row length
+     */
+    public int rowSize() {
+        return metrics().rowSize();
+    }
+
+
     @Override
     public PathElement[] caretShape(int charIndex, boolean leading) {
         if (charIndex < 0) {

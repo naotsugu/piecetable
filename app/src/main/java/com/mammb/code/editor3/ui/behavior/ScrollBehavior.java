@@ -68,13 +68,7 @@ public class ScrollBehavior {
             // slip scroll
             textFlow.translateRowNext();
         } else {
-            int shiftedOffset = model.scrollNext(textFlow.translatedShiftRow() + 1);
-            if (shiftedOffset > 0) {
-                textFlow.clearTranslation();
-                caret.addOffset(-shiftedOffset);
-                textFlow.setAll(Texts.asText(model.text()));
-                rowsPanel.draw(model.originRowIndex());
-            }
+            scrollNext(textFlow.translatedShiftRow() + 1);
         }
     }
 
@@ -87,12 +81,62 @@ public class ScrollBehavior {
             // slip scroll
             textFlow.translateRowPrev();
         } else {
-            int shiftedOffset = model.scrollPrev(textFlow.translatedShiftRow() + 1);
-            if (shiftedOffset > 0) {
-                caret.addOffset(shiftedOffset);
-                textFlow.setAll(Texts.asText(model.text()));
-                rowsPanel.draw(model.originRowIndex());
-            }
+            scrollPrev(textFlow.translatedShiftRow() + 1);
+        }
+    }
+
+
+    /**
+     * Scroll down to the next page.
+     */
+    public void pageDown() {
+        int rows = textFlow.rowSize();
+        if (rows == textFlow.lineSize()) { // if the text is not wrapping
+            scrollNext(rows - 1);
+        } else {
+            for (int i = 1; i < rows; i++) scrollNext();
+        }
+    }
+
+
+    /**
+     * Scroll up to the previous page.
+     */
+    public void pageUp() {
+        int rows = textFlow.rowSize();
+        if (rows == textFlow.lineSize()) { // if the text is not wrapping
+            scrollPrev(rows - 1);
+        } else {
+            for (int i = 1; i < rows; i++) scrollPrev();
+        }
+    }
+
+
+    /**
+     * Scroll next.
+     * @param n the number of row
+     */
+    private void scrollNext(int n) {
+        int shiftedOffset = model.scrollNext(n);
+        if (shiftedOffset > 0) {
+            textFlow.clearTranslation();
+            textFlow.setAll(Texts.asText(model.text()));
+            caret.addOffset(-shiftedOffset);
+            rowsPanel.draw(model.originRowIndex());
+        }
+    }
+
+
+    /**
+     * Scroll previous.
+     * @param n the number of row
+     */
+    private void scrollPrev(int n) {
+        int shiftedOffset = model.scrollPrev(n);
+        if (shiftedOffset > 0) {
+            textFlow.setAll(Texts.asText(model.text()));
+            caret.addOffset(shiftedOffset);
+            rowsPanel.draw(model.originRowIndex());
         }
     }
 

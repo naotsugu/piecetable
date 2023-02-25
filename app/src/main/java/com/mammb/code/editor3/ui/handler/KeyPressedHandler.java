@@ -76,8 +76,8 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             case DOWN       -> caretBehavior.down();
             case HOME       -> caretBehavior.home();
             case END        -> caretBehavior.end();
-            case PAGE_UP    -> System.out.println("pu");
-            case PAGE_DOWN  -> System.out.println("pd");
+            case PAGE_UP    -> scrollBehavior.pageUp();
+            case PAGE_DOWN  -> scrollBehavior.pageDown();
             case DELETE     -> System.out.println("del");
             case BACK_SPACE -> System.out.println("bs");
             case F1         -> System.out.println("f1");

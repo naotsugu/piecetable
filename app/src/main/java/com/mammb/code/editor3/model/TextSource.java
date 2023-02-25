@@ -84,7 +84,7 @@ public class TextSource implements EventListener<Edit> {
             ? source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)))   // scroll next (i.e. arrow down)
             : source.bytesBefore(offset, Until.lf(Math.abs(rowDelta) + 1)); // scroll prev (i.e. arrow up)
 
-        int rows = 0;
+        int rows = 1;
         int count = 0;
         for (byte b : row) {
             if ((b & 0xC0) != 0x80) count++;
