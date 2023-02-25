@@ -15,10 +15,12 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor.Strings;
 import com.mammb.code.editor3.lang.Until;
 import com.mammb.code.editor3.lang.EventListener;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Predicate;
 
 /**
  * TextSource.
@@ -58,10 +60,10 @@ public class TextSource implements EventListener<Edit> {
      */
     public void shiftIndex(int charOffset) {
         if (charOffset == 0) return;
-        if (charOffset < 0) throw new IndexOutOfBoundsException();
+        if (charOffset < 0) throw new IndexOutOfBoundsException("charOffset[" + charOffset + "]");
 
         int newValue = offset + asCodePointCount(charOffset);
-        if (newValue < 0 || newValue > source.length()) {
+        if (newValue < 0 || newValue > totalSize()) {
             throw new IndexOutOfBoundsException();
         }
         flush();
@@ -72,23 +74,26 @@ public class TextSource implements EventListener<Edit> {
     /**
      * Shifts source index at row.
      * @param rowDelta row delta
-     * @return the code point count of delta
+     * @return the number of shifted row
      */
     public int shiftRow(int rowDelta) {
         if (rowDelta == 0) return 0;
         flush();
+
+        byte[] row = (rowDelta > 0)
+            ? source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)))   // scroll next (i.e. arrow down)
+            : source.bytesBefore(offset, Until.lf(Math.abs(rowDelta) + 1)); // scroll prev (i.e. arrow up)
+
+        int rows = 0;
         int count = 0;
-        if (rowDelta > 0) {
-            // scroll next (i.e. arrow down)
-            byte[] row = source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)));
-            for (byte b : row) if ((b & 0xC0) != 0x80) count++;
-        } else {
-            // scroll prev (i.e. arrow up)
-            byte[] row = source.bytesBefore(offset, Until.lf(Math.abs(rowDelta) + 1));
-            for (byte b : row) if ((b & 0xC0) != 0x80) count--;
+        for (byte b : row) {
+            if ((b & 0xC0) != 0x80) count++;
+            if (b == '\n') rows++;
         }
-        offset += count;
-        return count;
+        if (row[row.length - 1] == '\n') rows--;
+
+        offset += Math.signum(rowDelta) * count;
+        return rows;
     }
 
 
@@ -142,7 +147,22 @@ public class TextSource implements EventListener<Edit> {
      * @return the total row size
      */
     public int totalRowSize() {
-        return source.rowSize();
+        int pend = bufferedEdit.isDelete() ? -Strings.countLf(bufferedEdit.string())
+                 : bufferedEdit.isInsert() ? +Strings.countLf(bufferedEdit.string())
+                 : 0;
+        return source.rowSize() + pend;
+    }
+
+
+    /**
+     * Get the total code point counts.
+     * @return the total code point counts
+     */
+    public int totalSize() {
+        int pend = bufferedEdit.isDelete() ? -bufferedEdit.codePointCount()
+                 : bufferedEdit.isInsert() ? +bufferedEdit.codePointCount()
+                 : 0;
+        return source.length() + pend;
     }
 
 

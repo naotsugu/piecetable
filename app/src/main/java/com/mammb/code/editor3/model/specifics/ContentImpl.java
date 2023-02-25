@@ -37,6 +37,7 @@ public class ContentImpl implements Content {
     /** The number of row. */
     private int rowSize;
 
+
     /**
      * Constructor.
      */

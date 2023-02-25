@@ -45,6 +45,7 @@ public class ScrollBehavior {
      * @param textFlow the text flow pane
      * @param caret the ui caret
      * @param model the text model
+     * @param rowsPanel the rows panel
      */
     public ScrollBehavior(TextFlow textFlow, UiCaret caret, TextModel model, RowsPanel rowsPanel) {
         this.textFlow = textFlow;
@@ -59,6 +60,7 @@ public class ScrollBehavior {
      */
     public void scrollNext() {
         if (textFlow.canTranslateRowNext()) {
+            // slip scroll
             double old = textFlow.getTranslateY();
             textFlow.translateRowNext();
             caret.slipY(textFlow.getTranslateY() - old);
@@ -79,6 +81,7 @@ public class ScrollBehavior {
      */
     public void scrollPrev() {
         if (textFlow.canTranslateRowPrev()) {
+            // slip scroll
             double old = textFlow.getTranslateY();
             textFlow.translateRowPrev();
             caret.slipY(textFlow.getTranslateY() - old);

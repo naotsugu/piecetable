@@ -28,9 +28,6 @@ public class TextModel {
     /** The text slice. */
     private final TextSlice textSlice;
 
-    /** text wrap?. */
-    private boolean textWrap;
-
     /** dirty?. */
     private boolean dirty;
 
@@ -126,11 +123,9 @@ public class TextModel {
     }
 
 
-
     public List<String> text() {
         // TODO token string
         return List.of(textSlice.string());
     }
-
 
 }

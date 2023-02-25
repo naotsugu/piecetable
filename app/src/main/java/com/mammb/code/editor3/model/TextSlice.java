@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor.Strings;
 import com.mammb.code.editor3.lang.StringsBuffer;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ import java.util.Objects;
  */
 public class TextSlice {
 
-    /** The origin row number. */
+    /** The origin row number(zero based). */
     private int originRow;
 
     /** The origin offset(not code point counts). */
@@ -79,21 +80,24 @@ public class TextSlice {
 
         if (rowDelta > 0) {
             // scroll next (i.e. arrow down)
+            if (!hasNext()) return;
             String tail = source.afterRow(buffer.length(), rowDelta);
             if (tail.isEmpty()) return;
-            source.shiftRow(rowDelta);
+            int n = source.shiftRow(rowDelta);
             originOffset += buffer.shiftAppend(tail);
+            originRow += n;
 
         } else if (rowDelta < 0) {
             // scroll prev (i.e. arrow up)
-            int cp = source.shiftRow(rowDelta);
-            if (cp == 0) return;
+            if (originRow == 0) return;
+            int n = source.shiftRow(rowDelta);
+            if (n == 0) return;
             String head = source.rows(Math.abs(rowDelta));
             buffer.shiftInsert(0, head);
             originOffset -= head.length();
+            originRow -= n;
         }
 
-        originRow += rowDelta;
     }
 
 
@@ -153,6 +157,15 @@ public class TextSlice {
      */
     public int originOffset() {
         return originOffset;
+    }
+
+
+    /**
+     * Gets whether a subsequent slice exists.
+     * @return {@code true} if exists next
+     */
+    public boolean hasNext() {
+        return originRow + buffer.rowSize() < source.totalRowSize();
     }
 
 }
