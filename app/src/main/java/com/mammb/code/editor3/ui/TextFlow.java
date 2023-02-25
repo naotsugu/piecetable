@@ -197,6 +197,15 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     }
 
 
+    /**
+     * Get the total height of text.
+     * @return the total height of text
+     */
+    public double totalHeight() {
+        return metrics().totalHeight();
+    }
+
+
     @Override
     public PathElement[] caretShape(int charIndex, boolean leading) {
         if (charIndex < 0) {

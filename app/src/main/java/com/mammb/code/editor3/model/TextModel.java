@@ -115,6 +115,15 @@ public class TextModel {
 
 
     /**
+     * Gets whether a subsequent slice exists.
+     * @return {@code true} if exists next
+     */
+    public boolean hasNext() {
+        return textSlice.hasNext();
+    }
+
+
+    /**
      * Get the number of origin row index.
      * @return the number of origin row index
      */

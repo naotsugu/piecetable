@@ -37,10 +37,13 @@ public class TextMetrics {
     public record Line(int rowIndex, int offset, int length, double height) { }
 
     /** The row length. */
-    private int rowLength = 0;
+    private int rowSize = 0;
 
     /** The text. */
     private String textString = "";
+
+    /** The total height. */
+    private double totalHeight = 0;
 
     private final List<Line> lines;
 
@@ -88,7 +91,8 @@ public class TextMetrics {
         }
 
         textString = text;
-        rowLength = Strings.countLf(textString) + 1;
+        rowSize = Strings.countLf(textString) + 1;
+        totalHeight = y;
 
         return lines;
     }
@@ -112,7 +116,16 @@ public class TextMetrics {
      * Get the row length.
      * @return the row length
      */
-    public int rowLength() { return rowLength; }
+    public int rowSize() { return rowSize; }
+
+
+    /**
+     * Get the total height.
+     * @return the total height
+     */
+    public double totalHeight() {
+        return totalHeight;
+    }
 
 
     /**

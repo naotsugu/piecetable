@@ -59,7 +59,12 @@ public class ScrollBehavior {
      * Scroll next (i.e. arrow down).
      */
     public void scrollNext() {
-        if (textFlow.canTranslateRowNext()) {
+
+        if (!model.hasNext() || textFlow.canTranslateRowNext()) {
+            if (!model.hasNext() &&
+                textFlow.totalHeight() + textFlow.getTranslateY() <= Texts.height * 2) {
+                return;
+            }
             // slip scroll
             double old = textFlow.getTranslateY();
             textFlow.translateRowNext();
