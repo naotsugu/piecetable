@@ -169,7 +169,7 @@ public class UiCaret extends Path {
      * Move the caret up.
      * @return the caret offset
      */
-    public int up() { return moveToPoint(logicalX, physicalY - 1); }
+    public int up() { return moveToPointRow(physicalY - 1); }
 
 
     private boolean moveToOffsetSyncLogical() {
