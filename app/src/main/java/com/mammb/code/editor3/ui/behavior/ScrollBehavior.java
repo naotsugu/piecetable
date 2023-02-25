@@ -53,8 +53,18 @@ public class ScrollBehavior {
      * Scroll next (i.e. arrow down).
      */
     public void scrollNext() {
-        if (textFlow.canTranslateRowNext()) scrollNextSlip();
-        else scrollNextShift();
+        if (textFlow.canTranslateRowNext()) {
+            double old = textFlow.getTranslateY();
+            textFlow.translateRowNext();
+            caret.slipY(textFlow.getTranslateY() - old);
+        } else {
+            int shiftedOffset = model.scrollNext(textFlow.translatedShiftRow() + 1);
+            if (shiftedOffset > 0) {
+                textFlow.clearTranslation();
+                caret.addOffset(-shiftedOffset);
+                textFlow.setAll(Texts.asText(model.text()));
+            }
+        }
     }
 
 
@@ -62,40 +72,16 @@ public class ScrollBehavior {
      * Scroll prev (i.e. arrow up).
      */
     public void scrollPrev() {
-        if (textFlow.canTranslateRowPrev()) scrollPrevSlip();
-        else scrollPervShift();
-    }
-
-
-    private void scrollNextSlip() {
-        double old = textFlow.getTranslateY();
-        textFlow.translateRowNext();
-        caret.slipY(textFlow.getTranslateY() - old);
-    }
-
-
-    private void scrollPrevSlip() {
-        double old = textFlow.getTranslateY();
-        textFlow.translateRowPrev();
-        caret.slipY(textFlow.getTranslateY() - old);
-    }
-
-
-    private void scrollNextShift() {
-        int shiftedOffset = model.scrollNext(textFlow.translatedShiftRow() + 1);
-        if (shiftedOffset > 0) {
-            textFlow.clearTranslation();
-            caret.addOffset(-shiftedOffset);
-            textFlow.setAll(Texts.asText(model.text()));
-        }
-    }
-
-
-    private void scrollPervShift() {
-        int shiftedOffset = model.scrollPrev(textFlow.translatedShiftRow() + 1);
-        caret.addOffset(shiftedOffset);
-        if (shiftedOffset > 0) {
-            textFlow.setAll(Texts.asText(model.text()));
+        if (textFlow.canTranslateRowPrev()) {
+            double old = textFlow.getTranslateY();
+            textFlow.translateRowPrev();
+            caret.slipY(textFlow.getTranslateY() - old);
+        } else {
+            int shiftedOffset = model.scrollPrev(textFlow.translatedShiftRow() + 1);
+            caret.addOffset(shiftedOffset);
+            if (shiftedOffset > 0) {
+                textFlow.setAll(Texts.asText(model.text()));
+            }
         }
     }
 
