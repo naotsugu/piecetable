@@ -76,12 +76,14 @@ public class TextSlice {
      * @param rowDelta the delta of row
      */
     public void shiftRow(int rowDelta) {
+
         if (rowDelta > 0) {
             // scroll next (i.e. arrow down)
             String tail = source.afterRow(buffer.length(), rowDelta);
             if (tail.isEmpty()) return;
             source.shiftRow(rowDelta);
             originOffset += buffer.shiftAppend(tail);
+
         } else if (rowDelta < 0) {
             // scroll prev (i.e. arrow up)
             int cp = source.shiftRow(rowDelta);
@@ -90,6 +92,7 @@ public class TextSlice {
             buffer.shiftInsert(0, head);
             originOffset -= head.length();
         }
+
         originRow += rowDelta;
     }
 

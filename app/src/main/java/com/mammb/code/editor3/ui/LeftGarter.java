@@ -16,6 +16,10 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.ui.util.Colors;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -27,10 +31,11 @@ public class LeftGarter extends StackPane {
 
     static final double MIN_WIDTH = 50;
 
-    public LeftGarter() {
+    public LeftGarter(RowsPanel rowsPanel) {
         setPrefWidth(MIN_WIDTH);
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE);
         setBackground(new Background(new BackgroundFill(Colors.panel, null, null)));
+        getChildren().add(rowsPanel);
     }
 
 }

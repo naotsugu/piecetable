@@ -17,7 +17,6 @@ package com.mammb.code.editor3.ui.util;
 
 import com.mammb.code.editor3.lang.Strings;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
@@ -34,12 +33,13 @@ import java.util.stream.Collectors;
  */
 public class TextMetrics {
 
+    /** The metrics line. */
     public record Line(int rowIndex, int offset, int length, double height) { }
 
-    /** the row length. */
+    /** The row length. */
     private int rowLength = 0;
 
-    /** the text. */
+    /** The text. */
     private String textString = "";
 
     private final List<Line> lines;

@@ -27,7 +27,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        new EditorPane(stage).showScene();
+        new EditorPane(stage).show();
     }
 
     public static void main(String[] args) {

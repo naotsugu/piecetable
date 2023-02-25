@@ -117,6 +117,16 @@ public class TextModel {
     public boolean isDirty() { return dirty; }
 
 
+    /**
+     * Get the number of origin row index.
+     * @return the number of origin row index
+     */
+    public int originRowIndex() {
+        return textSlice.originRow();
+    }
+
+
+
     public List<String> text() {
         // TODO token string
         return List.of(textSlice.string());

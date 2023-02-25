@@ -48,6 +48,9 @@ public class TextPane extends StackPane {
     /** The ui caret. */
     private final UiCaret caret = new UiCaret(textFlow);
 
+    /** The rows panel. */
+    private final RowsPanel rowsPanel = new RowsPanel(textFlow);
+
     /** The text model. */
     private TextModel model;
 
@@ -128,6 +131,7 @@ public class TextPane extends StackPane {
         model.setupMaxRows(maxRows());
         textFlow.setAll(Texts.asText(model.text()));
         textFlow.clearTranslation();
+        rowsPanel.draw(model.originRowIndex());
     }
 
 
@@ -158,4 +162,7 @@ public class TextPane extends StackPane {
     private FileChooseBehavior fileChooseBehavior() {
         return new FileChooseBehavior(this);
     }
+
+    RowsPanel rowsPanel() { return rowsPanel; }
+
 }

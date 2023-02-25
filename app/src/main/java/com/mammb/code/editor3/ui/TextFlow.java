@@ -23,7 +23,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
-
 import java.util.List;
 
 /**
@@ -211,7 +210,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Get the text metrics.
      * @return the text metrics
      */
-    private TextMetrics metrics() {
+    TextMetrics metrics() {
         TextMetrics value = metrics;
         if (metrics == null) {
             metrics = value = TextMetrics.of(this);
@@ -226,10 +225,6 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      */
     public int translatedShiftRow() {
         return metrics().lines().get(translatedOffset).rowIndex();
-    }
-
-    public int translatedOffset() {
-        return translatedOffset;
     }
 
 }
