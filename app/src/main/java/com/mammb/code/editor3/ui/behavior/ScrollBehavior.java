@@ -59,13 +59,11 @@ public class ScrollBehavior {
      * Scroll next (i.e. arrow down).
      */
     public void scrollNext() {
-
         if (!model.hasNext() || textFlow.canTranslateRowNext()) {
             if (!model.hasNext() &&
                 textFlow.totalHeight() + textFlow.getTranslateY() <= Texts.height * 2) {
                 return;
             }
-            // slip scroll
             textFlow.translateRowNext();
         } else {
             scrollNext(textFlow.translatedShiftRow() + 1);
@@ -78,7 +76,6 @@ public class ScrollBehavior {
      */
     public void scrollPrev() {
         if (textFlow.canTranslateRowPrev()) {
-            // slip scroll
             textFlow.translateRowPrev();
         } else {
             scrollPrev(textFlow.translatedShiftRow() + 1);

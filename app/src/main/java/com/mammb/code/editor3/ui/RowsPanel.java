@@ -21,7 +21,6 @@ import javafx.geometry.VPos;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import java.util.List;
 
 /**
  * RowsPanel.
@@ -60,30 +59,16 @@ public class RowsPanel extends Pane {
      */
     public void draw(int origin) {
 
-        List<TextMetrics.Line> lines = flow.metrics().lines();
-        if (lines.isEmpty()) {
-            clear();
-            return;
-        }
-
         getChildren().clear();
         double y = 0;
         int n = -1;
-        for (TextMetrics.Line line : lines) {
+        for (TextMetrics.Line line : flow.metrics().lines()) {
             if (n != line.rowIndex()) {
                 n = line.rowIndex();
                 getChildren().add(asText(origin + n + 1, y));
             }
             y += line.height();
         }
-    }
-
-
-    /**
-     * clear the row number.
-     */
-    void clear() {
-        getChildren().setAll(asText(1, 0));
     }
 
 

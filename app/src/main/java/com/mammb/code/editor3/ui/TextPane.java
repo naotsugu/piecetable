@@ -89,6 +89,7 @@ public class TextPane extends StackPane {
 
     private void initListener() {
         heightProperty().addListener(this::handleHeightChanged);
+        stage.focusedProperty().addListener((ob, ov, nv) -> { if (nv) caret.start(); else caret.stop(); });
     }
 
 

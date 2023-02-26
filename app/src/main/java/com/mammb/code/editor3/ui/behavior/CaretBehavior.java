@@ -72,10 +72,10 @@ public class CaretBehavior {
      * Move the caret up.
      */
     public void up() {
-        if (caret.offset() == caret.up()) return;
-        if (caret.physicalYInParent() < 0) {
+        if (caret.physicalYInParent() <= 0) {
             scrollBehavior.scrollPrev();
         }
+        caret.up();
     }
 
 

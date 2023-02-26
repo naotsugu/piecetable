@@ -91,6 +91,19 @@ public class UiCaret extends Path {
     }
 
 
+    public void start() {
+        setVisible(true);
+        timeline.play();
+    }
+
+
+    public void stop() {
+        timeline.stop();
+        setVisible(false);
+    }
+
+
+
     /**
      * Disable this caret.
      */

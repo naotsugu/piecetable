@@ -79,7 +79,7 @@ public class TextMetrics {
 
         while (offset < text.length()) {
             int tail = flow.hitTest(new Point2D(Double.MAX_VALUE, y + 1)).getInsertionIndex();
-            double height = height(flow.caretShape(tail, true));
+            double height = PathElements.height(flow.caretShape(tail, true));
             int eol = (tail >= text.length()) ? 0
                 : Strings.isLf(text.charAt(tail)) ? 1
                 : Strings.isCrLf(text.charAt(tail), text.charAt(tail + 1)) ? 2 : 0;
@@ -90,8 +90,12 @@ public class TextMetrics {
             y += height;
         }
 
+        if (lines.isEmpty() || text.charAt(text.length() - 1) == '\n') {
+            lines.add(new Line(row, offset, 0, Texts.height));
+        }
+
         textString = text;
-        rowSize = Strings.countLf(textString) + 1;
+        rowSize = lines.get(lines.size() - 1).rowIndex + 1;
         totalHeight = y;
 
         return lines;
@@ -133,16 +137,6 @@ public class TextMetrics {
      * @return the text string
      */
     public String textString() { return textString; }
-
-
-    /**
-     * Get the height of path.
-     * @param elements the path elements
-     * @return the height of path
-     */
-    private double height(PathElement[] elements) {
-        return ((LineTo) elements[1]).getY() - ((MoveTo) elements[0]).getY();
-    }
 
 
     /**
