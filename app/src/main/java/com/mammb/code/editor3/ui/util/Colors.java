@@ -27,6 +27,9 @@ public class Colors {
 
     public static final Color foreground = Color.web("#DDDDDD");
 
+    public static final Color foregroundModest = Color.web("#939ea9");
+
+
     public static final Color panel = Color.web("#313335");
 
 }

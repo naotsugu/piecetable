@@ -16,6 +16,8 @@
 package com.mammb.code.editor3.ui.util;
 
 import javafx.geometry.Point2D;
+import javafx.geometry.VPos;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -27,7 +29,7 @@ import java.util.List;
  */
 public class Texts {
 
-    private static final Font DEFAULT = new Font("System Regular", 15);
+    private static final Font DEFAULT = new Font("Consolas", 15);
 
     public static final Text bit = new Text("X");
     static {
@@ -36,9 +38,10 @@ public class Texts {
 
     public static final Font font = bit.getFont();
 
-    public static final double height = bit.getLayoutBounds().getHeight();
+    public static final double height = PathElements.height(bit.caretShape(1, true));
 
-    public static final double width  = bit.getLayoutBounds().getWidth();
+    public static final double width = PathElements.width(bit.rangeShape(0, 1));
+
 
     /**
      * Split a string with specified wrapping width.
@@ -71,11 +74,16 @@ public class Texts {
 
 
     public static Text asText(String string) {
+        return asText(string, Colors.foreground);
+    }
+
+    public static Text asText(String string, Color color) {
         Text text = new Text(string);
         text.setFont(font);
-        text.setFill(Colors.foreground);
+        text.setFill(color);
         return text;
     }
+
 
     public static List<Text> asText(List<String> strings) {
         return strings.stream().map(Texts::asText).toList();

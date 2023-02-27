@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
+import com.mammb.code.editor3.ui.util.Colors;
 import com.mammb.code.editor3.ui.util.TextMetrics;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.geometry.VPos;
@@ -79,7 +80,7 @@ public class RowsPanel extends Pane {
      * @return a row number text
      */
     private Text asText(int n, double y) {
-        Text text = Texts.asText(Integer.toString(n));
+        Text text = Texts.asText(Integer.toString(n), Colors.foregroundModest);
         text.setTextOrigin(VPos.TOP);
         text.setTextAlignment(TextAlignment.RIGHT);
         double x = getWidth() - text.getLayoutBounds().getWidth() - marginRight;
