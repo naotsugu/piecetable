@@ -111,9 +111,10 @@ public class StringsBuffer {
      * @return the number of deleted character
      */
     public int shiftAppend(CharSequence tail) {
-        int len = IntStream.range(0, Strings.countLf(tail))
-            .map(this::rowLength).sum();
+        int lf = Strings.countLf(tail);
+        int len = IntStream.range(0, lf).map(this::rowLength).sum();
         if (len > 0) value.delete(0, len);
+        else if (rowSizeCache > -1) rowSizeCache += lf;
         value.append(tail);
         metrics.clear();
         return len;
@@ -128,11 +129,15 @@ public class StringsBuffer {
      */
     public int shiftInsert(int row, CharSequence cs) {
         if (cs.isEmpty()) return 0;
+        int lf = Strings.countLf(cs);
         int rowIndex = rowIndex(row);
-        int len = IntStream.range(rowSize() - Strings.countLf(cs), rowSize())
+        int gap = (value.charAt(value.length() - 1) == '\n') ? 1 : 0;
+        int len = IntStream.range(rowSize() - (lf + gap), rowSize())
             .map(this::rowLength).sum();
         if (len > 0) value.delete(value.length() - len, value.length());
-        insert(rowIndex, cs);
+        else if (rowSizeCache > -1) rowSizeCache += lf;
+        value.insert(rowIndex, cs);
+        metrics.clear();
         return len;
     }
 

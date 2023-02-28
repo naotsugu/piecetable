@@ -74,7 +74,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Display moves to the next line.
      */
     public void translateRowNext() {
-        setTranslateY(getTranslateY() - metrics().lines().get(translatedOffset).height());
+        setTranslateY(getTranslateY()
+            - metrics().lines().get(translatedOffset).height());
         translatedOffset += 1;
     }
 
@@ -96,7 +97,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
             return;
         }
         translatedOffset -= 1;
-        setTranslateY(getTranslateY() + metrics().lines().get(translatedOffset).height());
+        setTranslateY(getTranslateY()
+            + metrics().lines().get(translatedOffset).height());
     }
 
 
@@ -135,10 +137,11 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     private double visuallyHeadRowHeight() {
         double height = 0;
         List<TextMetrics.Line> lines = metrics().lines();
+        int originIndex = lines.get(translatedOffset).rowIndex();
         for (int i = translatedOffset; i < lines.size(); i++) {
             TextMetrics.Line line = lines.get(i);
             height += line.height();
-            if (line.rowIndex() != lines.get(translatedOffset).rowIndex()) {
+            if (line.rowIndex() != originIndex) {
                 break;
             }
         }
@@ -252,6 +255,15 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      */
     public int translatedShiftRow() {
         return metrics().lines().get(translatedOffset).rowIndex();
+    }
+
+
+    @Override
+    public String toString() {
+        return "TextFlow{" +
+            "metrics=" + metrics +
+            ", translatedOffset=" + translatedOffset +
+            '}';
     }
 
 }

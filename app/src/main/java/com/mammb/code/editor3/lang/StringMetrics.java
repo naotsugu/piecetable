@@ -53,6 +53,7 @@ public class StringMetrics {
         this.source = source;
     }
 
+
     /**
      * Get statistics disabled or not.
      * @return {@code true} if disabled
@@ -61,6 +62,7 @@ public class StringMetrics {
         return codePointCount < 0 || rowAnchor.isEmpty();
     }
 
+
     /**
      * Clear this figure.
      */
@@ -68,6 +70,7 @@ public class StringMetrics {
         codePointCount = -1;
         rowAnchor.clear();
     }
+
 
     /**
      * Creates an anchor at the line start position
@@ -90,23 +93,28 @@ public class StringMetrics {
 
     }
 
+
     /**
      * Get the row size of this view text.
      * @return the row size
      */
     int rowSize() {
-        if (isDisabled()) throw new IllegalStateException("not initialized");
+        if (isDisabled())
+            throw new IllegalStateException("not initialized");
         return rowAnchor.size();
     }
+
 
     /**
      * Get the code point count of this view text.
      * @return the code point count
      */
     int codePointCount() {
-        if (isDisabled()) throw new IllegalStateException("not initialized");
+        if (isDisabled())
+            throw new IllegalStateException("not initialized");
         return codePointCount;
     }
+
 
     /**
      * Get the row index of this view text.
@@ -114,7 +122,8 @@ public class StringMetrics {
      * @return the row index
      */
     int rowIndex(int row) {
-        if (isDisabled()) throw new IllegalStateException("not initialized");
+        if (isDisabled())
+            throw new IllegalStateException("not initialized");
         if (row >= rowAnchor.size())
             throw new IllegalArgumentException(
                 "out of index.[row:%d][rowAnchor.size:%d]".formatted(row, rowAnchor.size()));

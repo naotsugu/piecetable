@@ -24,12 +24,22 @@ import java.util.function.Predicate;
 
 /**
  * Content.
+ *
+ * <pre>
+ *              0          0   1          0   1   2           0   1   2   3
+ *            |  |       | a | b |      | a | b | $ |       | a | b | $ | c |
+ *
+ *            1:         1 : ab         1 : ab$             1 : ab$
+ *                                      2 :                 2 : c
+ *           ----------------------------------------------------------------
+ *  rowSize : 1          1              2                   2
+ * </pre>
  * @author Naotsugu Kobayashi
  */
 public class ContentImpl implements Content {
 
     /** The piece table. */
-    private PieceTable pt;
+    private final PieceTable pt;
 
     /** The content path. */
     private Path path;
@@ -53,8 +63,7 @@ public class ContentImpl implements Content {
     public ContentImpl(Path path) {
         this.pt = PieceTable.of(path);
         this.path = path;
-        this.rowSize = 0;
-        this.rowSize = pt.count(bytes -> bytes[0] == '\n');
+        this.rowSize = pt.count(bytes -> bytes[0] == '\n') + 1;
     }
 
     @Override

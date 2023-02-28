@@ -165,7 +165,7 @@ public class TextSlice {
      * @return {@code true} if exists next
      */
     public boolean hasNext() {
-        return originRow + buffer.rowSize() <= source.totalRowSize();
+        return originRow + buffer.rowSize() < source.totalRowSize();
     }
 
 }

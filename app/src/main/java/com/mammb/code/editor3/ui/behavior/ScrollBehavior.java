@@ -15,11 +15,13 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
+import com.mammb.code.editor.Strings;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.UiCaret;
 import com.mammb.code.editor3.ui.util.Texts;
+import javafx.scene.text.Text;
 
 /**
  * ScrollBehavior.
@@ -47,7 +49,8 @@ public class ScrollBehavior {
      * @param model the text model
      * @param rowsPanel the rows panel
      */
-    public ScrollBehavior(TextFlow textFlow, UiCaret caret, TextModel model, RowsPanel rowsPanel) {
+    public ScrollBehavior(TextFlow textFlow, UiCaret caret,
+            TextModel model, RowsPanel rowsPanel) {
         this.textFlow = textFlow;
         this.caret = caret;
         this.model = model;
@@ -59,13 +62,18 @@ public class ScrollBehavior {
      * Scroll next (i.e. arrow down).
      */
     public void scrollNext() {
+        if (!model.hasNext() &&
+            textFlow.totalHeight() + textFlow.getTranslateY() <= Texts.height * 2) {
+            // Do not scroll anymore, when if the end of row is reached
+            // and the minimum number of rows has been reached.
+            return;
+        }
         if (!model.hasNext() || textFlow.canTranslateRowNext()) {
-            if (!model.hasNext() &&
-                textFlow.totalHeight() + textFlow.getTranslateY() <= Texts.height * 2) {
-                return;
-            }
+            // If there are enough lines to read (if the text is wrapped),
+            // only the Y-axis coordinate transformation is performed.
             textFlow.translateRowNext();
         } else {
+            // Read next rows from the backing model.
             scrollNext(textFlow.translatedShiftRow() + 1);
         }
     }
@@ -76,9 +84,12 @@ public class ScrollBehavior {
      */
     public void scrollPrev() {
         if (textFlow.canTranslateRowPrev()) {
+            // If row scrolling by Y-axis transformation is possible.
             textFlow.translateRowPrev();
         } else {
-            scrollPrev(textFlow.translatedShiftRow() + 1);
+            // Read previous rows from the backing model.
+            //scrollPrev(textFlow.translatedShiftRow() + 1);
+            scrollPrev(1);
         }
     }
 
@@ -115,8 +126,8 @@ public class ScrollBehavior {
      */
     private void scrollNext(int n) {
         int shiftedOffset = model.scrollNext(n);
+        textFlow.clearTranslation();
         if (shiftedOffset > 0) {
-            textFlow.clearTranslation();
             textFlow.setAll(Texts.asText(model.text()));
             caret.addOffset(-shiftedOffset);
             rowsPanel.draw(model.originRowIndex());
@@ -130,6 +141,7 @@ public class ScrollBehavior {
      */
     private void scrollPrev(int n) {
         int shiftedOffset = model.scrollPrev(n);
+        textFlow.clearTranslation();
         if (shiftedOffset > 0) {
             textFlow.setAll(Texts.asText(model.text()));
             caret.addOffset(shiftedOffset);

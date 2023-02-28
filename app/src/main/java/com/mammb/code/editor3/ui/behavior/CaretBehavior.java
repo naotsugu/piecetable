@@ -84,7 +84,8 @@ public class CaretBehavior {
      */
     public void down() {
         if (caret.offset() == caret.down()) return;
-        if (caret.physicalYInParent() >= viewHeight.get()) {
+        double caretBottom = caret.physicalYInParent() + caret.height();
+        if (caretBottom >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
     }

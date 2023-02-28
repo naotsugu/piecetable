@@ -164,8 +164,18 @@ public class UiCaret extends Path {
      * @return the caret offset
      */
     public int home() {
-        moveToPoint(0, physicalY);
-        logicalX = physicalX;
+        if (physicalX == 0) {
+            if (Character.isWhitespace(textFlow.charAt(offset))) {
+                while (offset < textFlow.textLength() &&
+                    Character.isWhitespace(textFlow.charAt(offset))) {
+                    offset++;
+                }
+                moveToOffset();
+            }
+        } else {
+            moveToPoint(0, physicalY);
+            logicalX = physicalX;
+        }
         return offset;
     }
 
