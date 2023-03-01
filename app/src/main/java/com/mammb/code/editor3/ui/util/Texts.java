@@ -77,6 +77,7 @@ public class Texts {
         return asText(string, Colors.foreground);
     }
 
+
     public static Text asText(String string, Color color) {
         Text text = new Text(string);
         text.setFont(font);

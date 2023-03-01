@@ -90,8 +90,10 @@ public class TextMetrics {
             y += height;
         }
 
-        if (lines.isEmpty() || text.charAt(text.length() - 1) == '\n') {
-            lines.add(new Line(row, offset, 0, Texts.height));
+        if (lines.isEmpty()) {
+            lines.add(new Line(0, 0, 0, Texts.height));
+        } else if (text.charAt(text.length() - 1) == '\n') {
+            lines.add(new Line(row, offset, 0, lines.get(lines.size() - 1).height()));
         }
 
         textString = text;

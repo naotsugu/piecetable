@@ -68,9 +68,10 @@ class TextMetricsTest {
         TextMetrics tm = TextMetrics.of(flow);
         List<Line> lines = tm.lines();
 
-        assertEquals(2, lines.size());
+        assertEquals(3, lines.size());
         assertEquals(new Line(0, 0, 4, defaultHeight), lines.get(0));
         assertEquals(new Line(1, 4, 4, defaultHeight), lines.get(1));
+        assertEquals(new Line(2, 8, 0, defaultHeight), lines.get(2));
     }
 
 }
