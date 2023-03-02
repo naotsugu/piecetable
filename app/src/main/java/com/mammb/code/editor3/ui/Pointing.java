@@ -22,7 +22,7 @@ import javafx.scene.layout.Region;
  * Pointing.
  * @author Naotsugu Kobayashi
  */
-public class Pointing extends Pane {
+public class Pointing extends Region {
 
     /** The caret. */
     private final UiCaret caret;
@@ -39,6 +39,7 @@ public class Pointing extends Pane {
 
         this.caret = new UiCaret(textFlow);
         this.selection = new Selection(textFlow);
+
         setManaged(false);
         translateXProperty().bind(textFlow.translateXProperty());
         translateYProperty().bind(textFlow.translateYProperty());
@@ -115,11 +116,11 @@ public class Pointing extends Pane {
     }
 
     public double caretTop() {
-        return caret.physicalYInParent();
+        return getTranslateY() + caret.physicalYInParent();
     }
 
     public double caretBottom() {
-        return caret.physicalYInParent() + caret.height();
+        return getTranslateY() + caret.physicalYInParent() + caret.height();
     }
 
 }
