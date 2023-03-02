@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.ui;
 
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 /**
@@ -45,7 +44,7 @@ public class Pointing extends Region {
         translateYProperty().bind(textFlow.translateYProperty());
 
         layoutXProperty().bind(textFlow.layoutXProperty().add(textFlow.getPadding().getLeft()));
-        layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()));
+        layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()).subtract(1));
 
         getChildren().setAll(selection, caret);
     }
