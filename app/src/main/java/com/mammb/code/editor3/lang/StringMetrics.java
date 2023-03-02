@@ -82,7 +82,7 @@ public class StringMetrics {
         int cpCount = 0;
         for (int i = 0; i < source.length(); i++) {
             char ch = source.charAt(i);
-            if (Character.isHighSurrogate(ch)) {
+            if (!Character.isSurrogate(ch) || Character.isHighSurrogate(ch)) {
                 cpCount++;
             }
             if (ch == '\n') {

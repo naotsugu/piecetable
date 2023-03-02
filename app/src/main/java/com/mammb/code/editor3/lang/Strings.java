@@ -33,7 +33,7 @@ public class Strings {
      * @return the length of last row(not code point)
      */
     public static int lengthOfLastRow(CharSequence cs) {
-        int index = Math.max(0, lastIndexOf(cs, LF));
+        int index = Math.max(0, Math.min(lastIndexOf(cs, LF) + 1, cs.length()));
         return cs.subSequence(index, cs.length()).length();
     }
 
@@ -45,7 +45,7 @@ public class Strings {
      * represented by this object,or {@code -1} if the character does not occur
      */
     public static int lastIndexOf(CharSequence cs, char ch) {
-        for (int i = cs.length(); i >= 0; i--) {
+        for (int i = cs.length() - 1; i >= 0; i--) {
             if (cs.charAt(i) == ch) {
                 return i;
             }
