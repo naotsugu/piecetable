@@ -123,47 +123,40 @@ public class UiCaret extends Path {
 
     /**
      * Move the caret to the right.
-     * @return the caret offset
      */
-    public int right() {
+    public void right() {
         if (Character.isHighSurrogate(textFlow.charAt(++offset))) {
             offset++;
         }
         moveToOffsetSyncLogical();
-        return offset;
     }
 
 
     /**
      * Move the caret to the left.
-     * @return the caret offset
      */
-    public int left() {
-        if (offset == 0) return 0;
+    public void left() {
+        if (offset == 0) return;
         if (Character.isLowSurrogate(textFlow.charAt(--offset))) {
             offset--;
         }
         moveToOffsetSyncLogical();
-        return offset;
     }
 
 
     /**
      * Move the caret to the end of row.
-     * @return the caret offset
      */
-    public int end() {
+    public void end() {
         moveToPoint(Double.MAX_VALUE, physicalY);
         logicalX = physicalX;
-        return offset;
     }
 
 
     /**
      * Move the caret to the end of row.
-     * @return the caret offset
      */
-    public int home() {
+    public void home() {
         if (physicalX == 0) {
             if (Character.isWhitespace(textFlow.charAt(offset))) {
                 while (offset < textFlow.textLength() &&
@@ -176,23 +169,19 @@ public class UiCaret extends Path {
             moveToPoint(0, physicalY);
             logicalX = physicalX;
         }
-        return offset;
     }
 
 
     /**
      * Move the caret down.
      */
-    public int down() {
-        return moveToPointRow(physicalY + height);
-    }
+    public void down() { moveToPointRow(physicalY + height); }
 
 
     /**
      * Move the caret up.
-     * @return the caret offset
      */
-    public int up() { return moveToPointRow(physicalY - 1); }
+    public void up() { moveToPointRow(physicalY - 1); }
 
 
     private boolean moveToOffsetSyncLogical() {

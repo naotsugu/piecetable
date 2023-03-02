@@ -83,7 +83,9 @@ public class CaretBehavior {
      * Move the caret down.
      */
     public void down() {
-        if (caret.offset() == caret.down()) return;
+        int old = caret.offset();
+        caret.down();
+        if (old == caret.offset()) return;
         double caretBottom = caret.physicalYInParent() + caret.height();
         if (caretBottom >= viewHeight.get()) {
             scrollBehavior.scrollNext();
