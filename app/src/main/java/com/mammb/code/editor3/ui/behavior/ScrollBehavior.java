@@ -15,13 +15,11 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
-import com.mammb.code.editor.Strings;
 import com.mammb.code.editor3.model.TextModel;
+import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
-import com.mammb.code.editor3.ui.UiCaret;
 import com.mammb.code.editor3.ui.util.Texts;
-import javafx.scene.text.Text;
 
 /**
  * ScrollBehavior.
@@ -35,8 +33,8 @@ public class ScrollBehavior {
     /** The text flow pane. */
     private final TextFlow textFlow;
 
-    /** The ui caret. */
-    private final UiCaret caret;
+    /** The pointing. */
+    private final Pointing pointing;
 
     /** The rows panel. */
     private final RowsPanel rowsPanel;
@@ -45,14 +43,14 @@ public class ScrollBehavior {
     /**
      * Constructor.
      * @param textFlow the text flow pane
-     * @param caret the ui caret
+     * @param pointing the pointing
      * @param model the text model
      * @param rowsPanel the rows panel
      */
-    public ScrollBehavior(TextFlow textFlow, UiCaret caret,
+    public ScrollBehavior(TextFlow textFlow, Pointing pointing,
             TextModel model, RowsPanel rowsPanel) {
         this.textFlow = textFlow;
-        this.caret = caret;
+        this.pointing = pointing;
         this.model = model;
         this.rowsPanel = rowsPanel;
     }
@@ -129,7 +127,7 @@ public class ScrollBehavior {
         textFlow.clearTranslation();
         if (shiftedOffset > 0) {
             textFlow.setAll(Texts.asText(model.text()));
-            caret.addOffset(-shiftedOffset);
+            pointing.addOffset(-shiftedOffset);
             rowsPanel.draw(model.originRowIndex());
         }
     }
@@ -144,7 +142,7 @@ public class ScrollBehavior {
         textFlow.clearTranslation();
         if (shiftedOffset > 0) {
             textFlow.setAll(Texts.asText(model.text()));
-            caret.addOffset(shiftedOffset);
+            pointing.addOffset(shiftedOffset);
             rowsPanel.draw(model.originRowIndex());
         }
     }

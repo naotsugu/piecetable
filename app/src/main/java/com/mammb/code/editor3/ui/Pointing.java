@@ -15,13 +15,14 @@
  */
 package com.mammb.code.editor3.ui;
 
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 /**
  * Pointing.
  * @author Naotsugu Kobayashi
  */
-public class Pointing extends Region {
+public class Pointing extends Pane {
 
     /** The caret. */
     private final UiCaret caret;
@@ -38,15 +39,15 @@ public class Pointing extends Region {
 
         this.caret = new UiCaret(textFlow);
         this.selection = new Selection(textFlow);
-
+        setManaged(false);
         translateXProperty().bind(textFlow.translateXProperty());
         translateYProperty().bind(textFlow.translateYProperty());
 
         layoutXProperty().bind(textFlow.layoutXProperty().add(textFlow.getPadding().getLeft()));
         layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()));
 
+        getChildren().setAll(selection, caret);
     }
-
 
     /**
      * Reset caret.
@@ -56,6 +57,10 @@ public class Pointing extends Region {
         selection.reset();
     }
 
+
+    public void addOffset(int delta) {
+        caret.addOffset(delta);
+    }
 
     /**
      * Move the caret to the right.
@@ -91,5 +96,30 @@ public class Pointing extends Region {
      * Move the caret up.
      */
     public void up() { caret.up(); }
+
+
+    public void hideCaret() {
+        caret.stop();
+    }
+
+    public void showCaret() {
+        caret.start();
+    }
+
+    /**
+     * Get the caret offset.
+     * @return the caret offset
+     */
+    public int caretOffset() {
+        return caret.offset();
+    }
+
+    public double caretTop() {
+        return caret.physicalYInParent();
+    }
+
+    public double caretBottom() {
+        return caret.physicalYInParent() + caret.height();
+    }
 
 }

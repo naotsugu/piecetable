@@ -15,7 +15,7 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
-import com.mammb.code.editor3.ui.UiCaret;
+import com.mammb.code.editor3.ui.Pointing;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 
 /**
@@ -24,8 +24,8 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
  */
 public class CaretBehavior {
 
-    /** The ui caret. */
-    private final UiCaret caret;
+    /** The pointing. */
+    private final Pointing pointing;
 
     /** The scroll behavior. */
     private final ScrollBehavior scrollBehavior;
@@ -36,11 +36,11 @@ public class CaretBehavior {
 
     /**
      * Constructor.
-     * @param caret the ui caret
+     * @param pointing the pointing
      * @param scrollBehavior the scroll behavior
      */
-    public CaretBehavior(UiCaret caret, ScrollBehavior scrollBehavior, ReadOnlyDoubleProperty viewHeight) {
-        this.caret = caret;
+    public CaretBehavior(Pointing pointing, ScrollBehavior scrollBehavior, ReadOnlyDoubleProperty viewHeight) {
+        this.pointing = pointing;
         this.scrollBehavior = scrollBehavior;
         this.viewHeight = viewHeight;
     }
@@ -50,8 +50,8 @@ public class CaretBehavior {
      * Move the caret to the right.
      */
     public void right() {
-        caret.right();
-        if (caret.physicalYInParent() >= viewHeight.get()) {
+        pointing.right();
+        if (pointing.caretTop() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
     }
@@ -61,8 +61,8 @@ public class CaretBehavior {
      * Move the caret to the left.
      */
     public void left() {
-        caret.left();
-        if (caret.physicalYInParent() < 0) {
+        pointing.left();
+        if (pointing.caretTop() < 0) {
             scrollBehavior.scrollPrev();
         }
     }
@@ -72,10 +72,10 @@ public class CaretBehavior {
      * Move the caret up.
      */
     public void up() {
-        if (caret.physicalYInParent() <= 0) {
+        if (pointing.caretTop() <= 0) {
             scrollBehavior.scrollPrev();
         }
-        caret.up();
+        pointing.up();
     }
 
 
@@ -83,11 +83,10 @@ public class CaretBehavior {
      * Move the caret down.
      */
     public void down() {
-        int old = caret.offset();
-        caret.down();
-        if (old == caret.offset()) return;
-        double caretBottom = caret.physicalYInParent() + caret.height();
-        if (caretBottom >= viewHeight.get()) {
+        int old = pointing.caretOffset();
+        pointing.down();
+        if (old == pointing.caretOffset()) return;
+        if (pointing.caretBottom() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
     }
@@ -97,7 +96,7 @@ public class CaretBehavior {
      * Move the caret to the end of row.
      */
     public void end() {
-        caret.end();
+        pointing.end();
     }
 
 
@@ -105,7 +104,7 @@ public class CaretBehavior {
      * Move the caret to the end of row.
      */
     public void home() {
-        caret.home();
+        pointing.home();
     }
 
 }

@@ -67,10 +67,6 @@ public class UiCaret extends Path {
         setStrokeWidth(2);
         setStroke(Color.ORANGE);
         setManaged(false);
-        layoutXProperty().bind(textFlow.layoutXProperty().add(textFlow.getPadding().getLeft()));
-        layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()));
-        translateXProperty().bind(textFlow.translateXProperty());
-        translateYProperty().bind(textFlow.translateYProperty());
 
         this.textFlow = textFlow;
 
@@ -102,16 +98,6 @@ public class UiCaret extends Path {
         setVisible(false);
     }
 
-
-
-    /**
-     * Disable this caret.
-     */
-    void disable() {
-        timeline.stop();
-        setVisible(false);
-        getElements().remove(0, getElements().size());
-    }
 
 
     public void addOffset(int delta) {

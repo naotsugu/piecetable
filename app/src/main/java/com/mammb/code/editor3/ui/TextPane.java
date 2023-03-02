@@ -46,8 +46,8 @@ public class TextPane extends StackPane {
     /** The text flow pane. */
     private final TextFlow textFlow = new TextFlow();
 
-    /** The ui caret. */
-    private final UiCaret caret = new UiCaret(textFlow);
+    /** The pointing. */
+    private final Pointing pointing = new Pointing(textFlow);
 
     /** The rows panel. */
     private final RowsPanel rowsPanel = new RowsPanel(textFlow);
@@ -71,7 +71,7 @@ public class TextPane extends StackPane {
         setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
         setAlignment(Pos.TOP_LEFT);
 
-        getChildren().addAll(textFlow, caret);
+        getChildren().addAll(textFlow, pointing);
         initHandler();
         initListener();
 
@@ -90,7 +90,7 @@ public class TextPane extends StackPane {
 
     private void initListener() {
         layoutBoundsProperty().addListener(this::layoutBoundsChanged);
-        stage.focusedProperty().addListener((ob, ov, nv) -> { if (nv) caret.start(); else caret.stop(); });
+        stage.focusedProperty().addListener((ob, ov, nv) -> { if (nv) pointing.showCaret(); else pointing.hideCaret(); });
     }
 
 
@@ -102,7 +102,7 @@ public class TextPane extends StackPane {
         model = new TextModel(path);
         initHandler();
         sync();
-        caret.reset();
+        pointing.reset();
     }
 
 
@@ -118,13 +118,6 @@ public class TextPane extends StackPane {
      * @return the stage
      */
     public Stage stage() { return stage; }
-
-
-    /**
-     * Get the caret.
-     * @return the caret
-     */
-    UiCaret caret() { return caret; }
 
 
     /**
@@ -155,11 +148,11 @@ public class TextPane extends StackPane {
 
 
     private ScrollBehavior scrollBehavior() {
-        return new ScrollBehavior(textFlow, caret, model, rowsPanel);
+        return new ScrollBehavior(textFlow, pointing, model, rowsPanel);
     }
 
     private CaretBehavior caretBehavior() {
-        return new CaretBehavior(caret, scrollBehavior(), heightProperty());
+        return new CaretBehavior(pointing, scrollBehavior(), heightProperty());
     }
 
     private FileChooseBehavior fileChooseBehavior() {
