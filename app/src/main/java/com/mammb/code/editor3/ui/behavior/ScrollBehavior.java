@@ -60,13 +60,15 @@ public class ScrollBehavior {
      * Scroll next (i.e. arrow down).
      */
     public void scrollNext() {
-        if (!model.hasNext() &&
-            textFlow.totalHeight() + textFlow.getTranslateY() <= Texts.height * 2) {
+        if (!model.hasNextSlice() &&
+            textFlow.translatedOffset() >= textFlow.lineSize() - 1) {
             // Do not scroll anymore, when if the end of row is reached
             // and the minimum number of rows has been reached.
+            // Retain the last '1' line of display.
             return;
         }
-        if (!model.hasNext() || textFlow.canTranslateRowNext()) {
+        if (!model.hasNextSlice() ||
+            textFlow.lineSize() - model.capacityOfRows() > textFlow.translatedOffset() + 1) {
             // If there are enough lines to read (if the text is wrapped),
             // only the Y-axis coordinate transformation is performed.
             textFlow.translateRowNext();
@@ -81,7 +83,7 @@ public class ScrollBehavior {
      * Scroll prev (i.e. arrow up).
      */
     public void scrollPrev() {
-        if (textFlow.canTranslateRowPrev()) {
+        if (textFlow.translatedOffset() > 0) {
             // If row scrolling by Y-axis transformation is possible.
             textFlow.translateRowPrev();
         } else {

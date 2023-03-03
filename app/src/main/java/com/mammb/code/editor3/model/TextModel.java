@@ -108,6 +108,15 @@ public class TextModel {
 
 
     /**
+     * The capacity of row on slice.
+     * @return the capacity of row on slice
+     */
+    public int capacityOfRows() {
+        return textSlice.maxRowSize();
+    }
+
+
+    /**
      * Gets whether this text is dirty.
      * @return {@code true} if text is dirty.
      */
@@ -118,7 +127,7 @@ public class TextModel {
      * Gets whether a subsequent slice exists.
      * @return {@code true} if exists next
      */
-    public boolean hasNext() {
+    public boolean hasNextSlice() {
         return textSlice.hasNext();
     }
 

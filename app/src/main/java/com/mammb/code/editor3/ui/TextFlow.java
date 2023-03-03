@@ -34,7 +34,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     /** The text metrics. */
     private TextMetrics metrics;
 
-    /** The translated offset. */
+    /** The translated line(not row) offset. */
     private int translatedOffset = 0;
 
 
@@ -59,33 +59,15 @@ public class TextFlow extends javafx.scene.text.TextFlow {
 
 
     /**
-     * Gets whether the display can be moved to the next line.
-     * @return {@code true} if the display can be moved to the next line
-     */
-    public boolean canTranslateRowNext() {
-        double remaining = getBoundsInLocal().getHeight()
-            - getParent().getLayoutBounds().getHeight()
-            + getTranslateY();
-        return remaining > visuallyHeadRowHeight();
-    }
-
-
-    /**
      * Display moves to the next line.
      */
     public void translateRowNext() {
+        if (translatedOffset >= metrics().lines().size() - 1) {
+            return;
+        }
         setTranslateY(getTranslateY()
             - metrics().lines().get(translatedOffset).height());
         translatedOffset += 1;
-    }
-
-
-    /**
-     * Gets whether the display can be moved to the previous line.
-     * @return {@code true} if the display can be moved to the previous line
-     */
-    public boolean canTranslateRowPrev() {
-        return translatedOffset > 0;
     }
 
 
@@ -119,33 +101,6 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      */
     public int insertionIndexAt(double x, double y) {
         return hitTest(new Point2D(x, y)).getInsertionIndex();
-    }
-
-
-    /**
-     * Get the height of the first row of the visible area.
-     * If text is text-wrapped, it will be the height of multiple lines.
-     * <pre>
-     *     xxxxxxxxxxxxxxx
-     *     ----------------
-     *    |ooooooooooooooo|
-     *    |oooo$          |
-     *    |               |
-     * </pre>
-     * @return the height of the first row of the visible area
-     */
-    private double visuallyHeadRowHeight() {
-        double height = 0;
-        List<TextMetrics.Line> lines = metrics().lines();
-        int originIndex = lines.get(translatedOffset).rowIndex();
-        for (int i = translatedOffset; i < lines.size(); i++) {
-            TextMetrics.Line line = lines.get(i);
-            height += line.height();
-            if (line.rowIndex() != originIndex) {
-                break;
-            }
-        }
-        return height;
     }
 
 
@@ -237,6 +192,22 @@ public class TextFlow extends javafx.scene.text.TextFlow {
 
 
     /**
+     * The translated row offset.
+     * @return the translated row offset
+     */
+    public int translatedOffset() { return translatedOffset; }
+
+
+    /**
+     * Get the translated shift row.
+     * @return the translated shift row
+     */
+    public int translatedShiftRow() {
+        return metrics().lines().get(translatedOffset).rowIndex();
+    }
+
+
+    /**
      * Get the text metrics.
      * @return the text metrics
      */
@@ -246,15 +217,6 @@ public class TextFlow extends javafx.scene.text.TextFlow {
             metrics = value = TextMetrics.of(this);
         }
         return value;
-    }
-
-
-    /**
-     * Get the translated shift row.
-     * @return the translated shift row
-     */
-    public int translatedShiftRow() {
-        return metrics().lines().get(translatedOffset).rowIndex();
     }
 
 
