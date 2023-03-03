@@ -61,17 +61,17 @@ public class ScrollBehavior {
      */
     public void scrollNext() {
         if (!model.hasNextSlice() &&
-            textFlow.translatedOffset() >= textFlow.lineSize() - 1) {
+            textFlow.translatedLineOffset() >= textFlow.lineSize() - 1) {
             // Do not scroll anymore, when if the end of row is reached
             // and the minimum number of rows has been reached.
             // Retain the last '1' line of display.
             return;
         }
         if (!model.hasNextSlice() ||
-            textFlow.lineSize() - model.capacityOfRows() > textFlow.translatedOffset() + 1) {
+            textFlow.lineSize() - model.capacityOfRows() > textFlow.translatedLineOffset() + 1) {
             // If there are enough lines to read (if the text is wrapped),
             // only the Y-axis coordinate transformation is performed.
-            textFlow.translateRowNext();
+            textFlow.translateLineNext();
         } else {
             // Read next rows from the backing model.
             scrollNext(textFlow.translatedShiftRow() + 1);
@@ -83,12 +83,11 @@ public class ScrollBehavior {
      * Scroll prev (i.e. arrow up).
      */
     public void scrollPrev() {
-        if (textFlow.translatedOffset() > 0) {
+        if (textFlow.translatedLineOffset() > 0) {
             // If row scrolling by Y-axis transformation is possible.
-            textFlow.translateRowPrev();
+            textFlow.translateLinePrev();
         } else {
             // Read previous rows from the backing model.
-            //scrollPrev(textFlow.translatedShiftRow() + 1);
             scrollPrev(1);
         }
     }
@@ -99,7 +98,8 @@ public class ScrollBehavior {
      */
     public void pageDown() {
         int rows = textFlow.rowSize();
-        if (rows == textFlow.lineSize()) { // if the text is not wrapping
+        if (rows == textFlow.lineSize()) {
+            // if the text is not wrapped
             scrollNext(rows - 1);
         } else {
             for (int i = 1; i < rows; i++) scrollNext();
@@ -112,7 +112,8 @@ public class ScrollBehavior {
      */
     public void pageUp() {
         int rows = textFlow.rowSize();
-        if (rows == textFlow.lineSize()) { // if the text is not wrapping
+        if (rows == textFlow.lineSize()) {
+            // if the text is not wrapping
             scrollPrev(rows - 1);
         } else {
             for (int i = 1; i < rows; i++) scrollPrev();

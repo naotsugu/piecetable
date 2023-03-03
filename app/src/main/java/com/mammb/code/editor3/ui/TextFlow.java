@@ -35,7 +35,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     private TextMetrics metrics;
 
     /** The translated line(not row) offset. */
-    private int translatedOffset = 0;
+    private int translatedLineOffset = 0;
 
 
     /**
@@ -61,26 +61,26 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     /**
      * Display moves to the next line.
      */
-    public void translateRowNext() {
-        if (translatedOffset >= metrics().lines().size() - 1) {
+    public void translateLineNext() {
+        if (translatedLineOffset >= metrics().lines().size() - 1) {
             return;
         }
         setTranslateY(getTranslateY()
-            - metrics().lines().get(translatedOffset).height());
-        translatedOffset += 1;
+            - metrics().lines().get(translatedLineOffset).height());
+        translatedLineOffset += 1;
     }
 
 
     /**
      * Display moves to the previous line.
      */
-    public void translateRowPrev() {
-        if (translatedOffset == 0) {
+    public void translateLinePrev() {
+        if (translatedLineOffset == 0) {
             return;
         }
-        translatedOffset -= 1;
+        translatedLineOffset -= 1;
         setTranslateY(getTranslateY()
-            + metrics().lines().get(translatedOffset).height());
+            + metrics().lines().get(translatedLineOffset).height());
     }
 
 
@@ -88,7 +88,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * Clear translate
      */
     public void clearTranslation() {
-        translatedOffset = 0;
+        translatedLineOffset = 0;
         setTranslateY(0);
     }
 
@@ -195,7 +195,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * The translated row offset.
      * @return the translated row offset
      */
-    public int translatedOffset() { return translatedOffset; }
+    public int translatedLineOffset() { return translatedLineOffset; }
 
 
     /**
@@ -203,7 +203,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * @return the translated shift row
      */
     public int translatedShiftRow() {
-        return metrics().lines().get(translatedOffset).rowIndex();
+        return metrics().lines().get(translatedLineOffset).rowIndex();
     }
 
 
@@ -224,7 +224,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     public String toString() {
         return "TextFlow{" +
             "metrics=" + metrics +
-            ", translatedOffset=" + translatedOffset +
+            ", translatedOffset=" + translatedLineOffset +
             '}';
     }
 
