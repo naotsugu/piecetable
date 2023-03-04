@@ -59,7 +59,18 @@ public class Selection extends Path {
 
 
     /**
-     * Reset.
+     * Start selection.
+     * @param offset the start position
+     */
+    public void start(int offset) {
+        openOffset = closeOffset = offset;
+        on = true;
+        dragging = false;
+    }
+
+
+    /**
+     * Reset this selection.
      */
     public void reset() {
         openOffset = -1;
@@ -67,5 +78,58 @@ public class Selection extends Path {
         on = false;
         dragging = false;
     }
+
+
+    /**
+     * Start drag selection.
+     * @param offset the start position
+     */
+    public void startDragging(int offset) {
+        start(offset);
+        dragging = true;
+    }
+
+
+    /**
+     * Release dragging.
+     */
+    public void releaseDragging() {
+        dragging = false;
+    }
+
+
+    /**
+     * Get whether the selection is dragging.
+     * @return {@code true}, if the selection is dragging
+     */
+    public boolean isDragging() {
+        return on && dragging;
+    }
+
+
+    /**
+     * Shift the current offset.
+     * @param delta the number of offsets to shift
+     */
+    public void shiftOffset(int delta) {
+        if (on) {
+            openOffset += delta;
+            closeOffset += delta;
+        }
+    }
+
+
+    /**
+     * Get the selection open offset.
+     * @return the selection open offset
+     */
+    public int openOffset() { return openOffset; }
+
+
+    /**
+     * The selection close offset.
+     * @return the selection close offset
+     */
+    public int closeOffset() { return closeOffset; }
 
 }

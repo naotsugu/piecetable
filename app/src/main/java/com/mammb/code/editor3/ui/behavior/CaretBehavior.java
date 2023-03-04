@@ -115,7 +115,7 @@ public class CaretBehavior {
 
 
     /**
-     * If the caret is off-screen, scroll the screen to the caret position.
+     * Scroll the screen to the caret position, if the caret is off-screen.
      */
     private void scrollToCaretPoint() {
         while (pointing.caretOffset() < 0)

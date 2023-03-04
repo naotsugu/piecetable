@@ -84,6 +84,7 @@ public class Strings {
         return (cs == null) ? 0 : codePointCount(cs, 0, cs.length());
     }
 
+
     /**
      * Returns the number of Unicode code points in the specified text range of this String.
      * @param cs the specified text
@@ -95,14 +96,22 @@ public class Strings {
         return (cs == null) ? 0 : (int) cs.subSequence(beginIndex, endIndex).codePoints().count();
     }
 
-
-    public static boolean isLineSeparator(char ch) {
-        return ch == LF || ch == CR;
-    }
-
+    /**
+     * Get whether the given byte is a carriage return.
+     * @param ch the byte to be checked
+     * @return {@code true}, if given byte is a carriage return
+     */
     public static boolean isLf(char ch) {
         return ch == LF;
     }
+
+
+    /**
+     * Get whether the given bytes is line feed and carriage return.
+     * @param ch1 the first byte to be checked
+     * @param ch2 the second byte to be checked
+     * @return {@code true}, if given bytes is a CRLF
+     */
     public static boolean isCrLf(char ch1, char ch2) {
         return ch1 == CR && ch2 == LF;
     }
