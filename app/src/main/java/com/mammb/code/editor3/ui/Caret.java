@@ -27,7 +27,7 @@ import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
 
 /**
- * UiCaret.
+ * Caret.
  * @author Naotsugu Kobayashi
  */
 public class Caret extends Path {
@@ -69,7 +69,9 @@ public class Caret extends Path {
         this.textFlow = textFlow;
 
         timeline.setCycleCount(-1);
-        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(500), e -> setVisible(!isVisible())));
+        timeline.getKeyFrames().add(
+            new KeyFrame(Duration.millis(500),
+            e -> setVisible(!isVisible())));
         timeline.play();
 
         setShape(defaultShape());
@@ -85,12 +87,18 @@ public class Caret extends Path {
     }
 
 
+    /**
+     * Show caret and start blink.
+     */
     public void start() {
         setVisible(true);
         timeline.play();
     }
 
 
+    /**
+     * Hide caret and stop blink.
+     */
     public void stop() {
         timeline.stop();
         setVisible(false);
@@ -168,40 +176,26 @@ public class Caret extends Path {
     public void up() { moveToPointRow(physicalY - 1); }
 
 
-    private boolean moveToOffsetSyncLogical() {
-        boolean moved = moveToOffset();
-        if (moved) {
-            logicalX = physicalX;
-        }
-        return moved;
+    public double physicalYInParent() {
+        return physicalY + getTranslateY();
     }
 
 
-    private boolean moveToOffset() {
-        double oldX = physicalX;
-        double oldY = physicalY;
-        setShape(textFlow.caretShape(offset, true));
-        return oldX != physicalX || oldY != physicalY;
-    }
+    /**
+     * Get the caret offset.
+     * @return the caret offset
+     */
+    public int offset() { return offset; }
 
+    public double physicalX() { return physicalX; }
 
-    private int moveToPoint(double x, double y) {
-        offset = textFlow.insertionIndexAt(x, y);
-        setShape(textFlow.caretShape(offset, true));
-        return offset;
-    }
+    public double physicalY() { return physicalY; }
 
+    public double height() { return height; }
 
-    private int moveToPointRow(double y) {
-        int indexAt = textFlow.insertionIndexAt(logicalX, y);
-        PathElement[] pathElements = textFlow.caretShape(indexAt, true);
-        if (PathElements.getY(pathElements[0]) != physicalY) {
-            offset = indexAt;
-            setShape(pathElements);
-        }
-        return offset;
-    }
+    public double bottom() { return physicalY + height; }
 
+    // -- private -------------------------------------------------------------
 
     /**
      * Set the caret shape.
@@ -234,25 +228,6 @@ public class Caret extends Path {
     }
 
 
-    public double physicalYInParent() {
-        return physicalY + getTranslateY();
-    }
-
-
-    /**
-     * Get the caret offset.
-     * @return the caret offset
-     */
-    public int offset() { return offset; }
-
-    public double physicalX() { return physicalX; }
-
-    public double physicalY() { return physicalY; }
-
-    public double height() { return height; }
-
-    public double bottom() { return physicalY + height; }
-
     /**
      * Get the default caret shape.
      * @return the default caret shape
@@ -262,6 +237,41 @@ public class Caret extends Path {
         result[0] = new MoveTo(0, 0);
         result[1] = new LineTo(0, DEFAULT_HEIGHT);
         return result;
+    }
+
+
+    private boolean moveToOffsetSyncLogical() {
+        boolean moved = moveToOffset();
+        if (moved) {
+            logicalX = physicalX;
+        }
+        return moved;
+    }
+
+
+    private boolean moveToOffset() {
+        double oldX = physicalX;
+        double oldY = physicalY;
+        setShape(textFlow.caretShape(offset, true));
+        return oldX != physicalX || oldY != physicalY;
+    }
+
+
+    private int moveToPoint(double x, double y) {
+        offset = textFlow.insertionIndexAt(x, y);
+        setShape(textFlow.caretShape(offset, true));
+        return offset;
+    }
+
+
+    private int moveToPointRow(double y) {
+        int indexAt = textFlow.insertionIndexAt(logicalX, y);
+        PathElement[] pathElements = textFlow.caretShape(indexAt, true);
+        if (PathElements.getY(pathElements[0]) != physicalY) {
+            offset = indexAt;
+            setShape(pathElements);
+        }
+        return offset;
     }
 
 }

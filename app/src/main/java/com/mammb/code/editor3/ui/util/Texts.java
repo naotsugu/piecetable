@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.util;
 
+import com.mammb.code.editor3.lang.Strings;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.paint.Color;

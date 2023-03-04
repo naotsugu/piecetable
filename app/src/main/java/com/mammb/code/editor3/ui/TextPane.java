@@ -67,6 +67,7 @@ public class TextPane extends StackPane {
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
+
         setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
         setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
         setAlignment(Pos.TOP_LEFT);

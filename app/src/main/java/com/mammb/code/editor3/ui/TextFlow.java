@@ -19,6 +19,7 @@ import com.mammb.code.editor3.ui.util.TextMetrics;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
@@ -27,6 +28,7 @@ import java.util.List;
 
 /**
  * TextFlow.
+ * Extended {@link javafx.scene.text.TextFlow} components.
  * @author Naotsugu Kobayashi
  */
 public class TextFlow extends javafx.scene.text.TextFlow {
@@ -34,7 +36,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     /** The text metrics. */
     private TextMetrics metrics;
 
-    /** The translated line(not row) offset. */
+    /** The translated line(not a row) offset. */
     private int translatedLineOffset = 0;
 
 
@@ -45,6 +47,9 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         setPadding(new Insets(0, 0, 0, 4));
         setTabSize(4);
         setCursor(Cursor.TEXT);
+
+        setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
+
     }
 
 

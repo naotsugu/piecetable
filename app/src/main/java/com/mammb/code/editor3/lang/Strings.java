@@ -15,6 +15,9 @@
  */
 package com.mammb.code.editor3.lang;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The string utilities.
  * @author Naotsugu Kobayashi
@@ -40,6 +43,7 @@ public class Strings {
 
     /**
      * Get the index within this string of the last occurrence of the specified character.
+     * @param cs the specified char sequence
      * @param ch a character
      * @return the index of the last occurrence of the character in the character sequence
      * represented by this object,or {@code -1} if the character does not occur
@@ -51,6 +55,23 @@ public class Strings {
             }
         }
         return -1;
+    }
+
+
+    /**
+     * Get the all indexes of the specified character.
+     * @param cs the specified char sequence
+     * @param ch a character to be used on checking
+     * @return the all indexes of ch occurrence
+     */
+    public static int[] indexesOf(CharSequence cs, char ch) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < cs.length(); i++) {
+            if (cs.charAt(i) == ch) {
+                list.add(i);
+            }
+        }
+        return list.stream().mapToInt(Integer::intValue).toArray();
     }
 
 
