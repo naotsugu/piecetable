@@ -24,7 +24,7 @@ import javafx.scene.layout.Region;
 public class Pointing extends Region {
 
     /** The caret. */
-    private final UiCaret caret;
+    private final Caret caret;
 
     /** The selection. */
     private final Selection selection;
@@ -36,7 +36,7 @@ public class Pointing extends Region {
      */
     public Pointing(TextFlow textFlow) {
 
-        this.caret = new UiCaret(textFlow);
+        this.caret = new Caret(textFlow);
         this.selection = new Selection(textFlow);
 
         setManaged(false);

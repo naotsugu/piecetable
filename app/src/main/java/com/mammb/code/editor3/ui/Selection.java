@@ -159,9 +159,11 @@ public class Selection extends Path {
      */
     private void drawSelection() {
         if (on) {
-            getElements().setAll(textFlow.rangeShape(
-                Math.min(openOffset, closeOffset),
-                Math.max(openOffset, closeOffset)));
+            int start = Math.min(openOffset, closeOffset);
+            int end   = Math.max(openOffset, closeOffset);
+            if (start >= 0 && end <= textFlow.textLength()) {
+                getElements().setAll(textFlow.rangeShape(start, end));
+            }
         } else {
             getElements().clear();
         }

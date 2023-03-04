@@ -30,7 +30,7 @@ import javafx.util.Duration;
  * UiCaret.
  * @author Naotsugu Kobayashi
  */
-public class UiCaret extends Path {
+public class Caret extends Path {
 
     /** The default height of caret. */
     private static double DEFAULT_HEIGHT = Texts.height;
@@ -60,7 +60,7 @@ public class UiCaret extends Path {
     /**
      * Constructor.
      */
-    public UiCaret(TextFlow textFlow) {
+    public Caret(TextFlow textFlow) {
 
         setStrokeWidth(2);
         setStroke(Color.ORANGE);

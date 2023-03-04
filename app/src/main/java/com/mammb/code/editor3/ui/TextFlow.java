@@ -158,8 +158,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
 
 
     /**
-     * Get the text length.
-     * @return the text length
+     * Get the length of the text string contained in the text flow.
+     * @return the length of the text string contained in the text flow
      */
     public int textLength() {
         return metrics().textLength();
