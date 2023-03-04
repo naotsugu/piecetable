@@ -114,6 +114,20 @@ public class CaretBehavior {
     }
 
 
+    public void select() {
+        if (!pointing.selectionOn()) {
+            pointing.startSelection();
+        }
+    }
+
+
+    public void clearSelect() {
+        if (pointing.selectionOn()) {
+            pointing.clearSelection();
+        }
+    }
+
+
     /**
      * Scroll the screen to the caret position, if the caret is off-screen.
      */

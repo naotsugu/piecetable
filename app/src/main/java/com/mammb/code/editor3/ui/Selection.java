@@ -76,21 +76,20 @@ public class Selection extends Path {
     public void moveCaretTo(int newOffset) {
         if (on) {
             closeOffset = newOffset;
-            getElements().setAll(textFlow.rangeShape(
-                Math.min(openOffset, closeOffset),
-                Math.max(openOffset, closeOffset)));
+            drawSelection();
         }
     }
 
 
     /**
-     * Reset this selection.
+     * Clear this selection.
      */
-    public void reset() {
+    public void clear() {
         openOffset = -1;
         closeOffset = -1;
         on = false;
         dragging = false;
+        getElements().clear();
     }
 
 
@@ -129,6 +128,7 @@ public class Selection extends Path {
         if (on) {
             openOffset += delta;
             closeOffset += delta;
+            drawSelection();
         }
     }
 
@@ -145,5 +145,23 @@ public class Selection extends Path {
      * @return the selection close offset
      */
     public int closeOffset() { return closeOffset; }
+
+
+    /**
+     * Get the selection on.
+     * @return the selection on
+     */
+    public boolean on() { return on; }
+
+
+    private void drawSelection() {
+        if (on) {
+            getElements().setAll(textFlow.rangeShape(
+                Math.min(openOffset, closeOffset),
+                Math.max(openOffset, closeOffset)));
+        } else {
+            getElements().clear();
+        }
+    }
 
 }

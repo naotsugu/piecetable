@@ -26,8 +26,6 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
 
-import java.util.Arrays;
-
 /**
  * UiCaret.
  * @author Naotsugu Kobayashi
@@ -100,7 +98,7 @@ public class UiCaret extends Path {
 
 
 
-    public void addOffset(int delta) {
+    public void shiftOffset(int delta) {
         if (delta == 0) return;
         offset += delta;
         moveToOffset();

@@ -54,57 +54,84 @@ public class Pointing extends Region {
      */
     public void reset() {
         caret.reset();
-        selection.reset();
+        selection.clear();
     }
 
 
     public void addOffset(int delta) {
-        caret.addOffset(delta);
+        caret.shiftOffset(delta);
+        selection.shiftOffset(delta);
     }
 
     /**
      * Move the caret to the right.
      */
-    public void right() { caret.right(); }
+    public void right() {
+        caret.right();
+        postCaretMoved();
+    }
 
 
     /**
      * Move the caret to the left.
      */
-    public void left() { caret.left(); }
+    public void left() {
+        caret.left();
+        postCaretMoved();
+    }
 
 
     /**
      * Move the caret to the end of row.
      */
-    public void end() { caret.end(); }
+    public void end() {
+        caret.end();
+        postCaretMoved();
+    }
 
 
     /**
      * Move the caret to the end of row.
      */
-    public void home() { caret.home(); }
+    public void home() {
+        caret.home();
+        postCaretMoved();
+    }
 
 
     /**
      * Move the caret down.
      */
-    public void down() { caret.down(); }
+    public void down() {
+        caret.down();
+        postCaretMoved();
+    }
 
 
     /**
      * Move the caret up.
      */
-    public void up() { caret.up(); }
+    public void up() {
+        caret.up();
+        postCaretMoved();
+    }
 
 
+    /**
+     * Hide caret.
+     */
     public void hideCaret() {
         caret.stop();
     }
 
+
+    /**
+     * Show caret.
+     */
     public void showCaret() {
         caret.start();
     }
+
 
     /**
      * Get the caret offset.
@@ -114,12 +141,44 @@ public class Pointing extends Region {
         return caret.offset();
     }
 
+
+    /**
+     * Get the caret top position.
+     * @return the caret top position
+     */
     public double caretTop() {
         return getTranslateY() + caret.physicalYInParent();
     }
 
+
+    /**
+     * Get the caret bottom position
+     * @return the caret bottom position
+     */
     public double caretBottom() {
         return getTranslateY() + caret.physicalYInParent() + caret.height();
+    }
+
+
+    public void startSelection() {
+        selection.start(caret.offset());
+    }
+
+
+    public void clearSelection() {
+        selection.clear();
+    }
+
+
+    public boolean selectionOn() {
+        return selection.on();
+    }
+
+
+    private void postCaretMoved() {
+        if (selection.on()) {
+            selection.moveCaretTo(caret.offset());
+        }
     }
 
 }

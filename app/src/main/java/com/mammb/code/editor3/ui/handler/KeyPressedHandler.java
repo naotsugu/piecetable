@@ -20,6 +20,7 @@ import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.util.Keys;
 import javafx.event.EventHandler;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 /**
@@ -44,7 +45,10 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
      * @param scrollBehavior the scroll behavior
      * @param fileChooseBehavior the file choose behavior
      */
-    private KeyPressedHandler(CaretBehavior caretBehavior, ScrollBehavior scrollBehavior, FileChooseBehavior fileChooseBehavior) {
+    private KeyPressedHandler(
+            CaretBehavior caretBehavior,
+            ScrollBehavior scrollBehavior,
+            FileChooseBehavior fileChooseBehavior) {
         this.caretBehavior = caretBehavior;
         this.scrollBehavior = scrollBehavior;
         this.fileChooseBehavior = fileChooseBehavior;
@@ -58,7 +62,10 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
      * @param fileChooseBehavior the file choose behavior
      * @return a new {@code KeyPressedHandler}
      */
-    public static EventHandler<KeyEvent> of(CaretBehavior caretBehavior, ScrollBehavior scrollBehavior, FileChooseBehavior fileChooseBehavior) {
+    public static EventHandler<KeyEvent> of(
+            CaretBehavior caretBehavior,
+            ScrollBehavior scrollBehavior,
+            FileChooseBehavior fileChooseBehavior) {
         return new KeyPressedHandler(caretBehavior, scrollBehavior, fileChooseBehavior);
     }
 
@@ -68,6 +75,8 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
 
         boolean handled = handleKeyCombination(e);
         if (handled) return;
+
+        handleSelection(e);
 
         switch (e.getCode()) {
             case LEFT       -> caretBehavior.left();
@@ -84,6 +93,7 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             case ESCAPE     -> System.out.println("esc");
             default -> { }
         }
+
     }
 
 
@@ -99,6 +109,24 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
         }
 
         return false;
+    }
+
+
+    private void handleSelection(KeyEvent e) {
+        if (e.isShiftDown() && isShiftSelectCombination(e)) {
+            caretBehavior.select();
+        } else if(!e.isShiftDown() && isShiftSelectCombination(e)) {
+            caretBehavior.clearSelect();
+        }
+    }
+
+
+    private boolean isShiftSelectCombination(KeyEvent e) {
+        final KeyCode code = e.getCode();
+        return code == KeyCode.LEFT    || code ==  KeyCode.RIGHT ||
+               code == KeyCode.UP      || code ==  KeyCode.DOWN ||
+               code == KeyCode.HOME    || code ==  KeyCode.END ||
+               code == KeyCode.PAGE_UP || code ==  KeyCode.PAGE_DOWN;
     }
 
 }
