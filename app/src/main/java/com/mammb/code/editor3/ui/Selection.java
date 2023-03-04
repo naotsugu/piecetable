@@ -50,8 +50,8 @@ public class Selection extends Path {
         this.textFlow = textFlow;
 
         setStrokeWidth(0);
-        setOpacity(0.4);
-        setFill(Color.DODGERBLUE);
+        setOpacity(0.2);
+        setFill(Color.DEEPSKYBLUE);
         setBlendMode(BlendMode.LIGHTEN);
         setManaged(false);
 
@@ -154,6 +154,9 @@ public class Selection extends Path {
     public boolean on() { return on; }
 
 
+    /**
+     * Draw selection.
+     */
     private void drawSelection() {
         if (on) {
             getElements().setAll(textFlow.rangeShape(

@@ -112,6 +112,10 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     }
 
 
+    /**
+     * Handle shift down key combination for selection.
+     * @param e the key event
+     */
     private void handleSelection(KeyEvent e) {
         if (e.isShiftDown() && isShiftSelectCombination(e)) {
             caretBehavior.select();
@@ -121,6 +125,11 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     }
 
 
+    /**
+     * Get whether the shift down key combination.
+     * @param e the key event
+     * @return {@code true}, if whether the shift down key combination
+     */
     private boolean isShiftSelectCombination(KeyEvent e) {
         final KeyCode code = e.getCode();
         return code == KeyCode.LEFT    || code ==  KeyCode.RIGHT ||

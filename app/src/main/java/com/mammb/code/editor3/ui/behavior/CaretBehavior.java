@@ -114,6 +114,9 @@ public class CaretBehavior {
     }
 
 
+    /**
+     * Start select.
+     */
     public void select() {
         if (!pointing.selectionOn()) {
             pointing.startSelection();
@@ -121,6 +124,9 @@ public class CaretBehavior {
     }
 
 
+    /**
+     * Clear select.
+     */
     public void clearSelect() {
         if (pointing.selectionOn()) {
             pointing.clearSelection();

@@ -49,6 +49,7 @@ public class Pointing extends Region {
         getChildren().setAll(selection, caret);
     }
 
+
     /**
      * Reset caret.
      */
@@ -58,6 +59,10 @@ public class Pointing extends Region {
     }
 
 
+    /**
+     * Shift this pointing.
+     * @param delta the shift of delta
+     */
     public void addOffset(int delta) {
         caret.shiftOffset(delta);
         selection.shiftOffset(delta);
@@ -160,21 +165,34 @@ public class Pointing extends Region {
     }
 
 
+    /**
+     * Start selection.
+     */
     public void startSelection() {
         selection.start(caret.offset());
     }
 
 
+    /**
+     * Clear this selection.
+     */
     public void clearSelection() {
         selection.clear();
     }
 
 
+    /**
+     * Get the selection on.
+     * @return the selection on
+     */
     public boolean selectionOn() {
         return selection.on();
     }
 
 
+    /**
+     * Post caret moved.
+     */
     private void postCaretMoved() {
         if (selection.on()) {
             selection.moveCaretTo(caret.offset());
