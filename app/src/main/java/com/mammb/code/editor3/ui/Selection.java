@@ -70,6 +70,20 @@ public class Selection extends Path {
 
 
     /**
+     * Move the selection caret.
+     * @param newOffset the new offset
+     */
+    public void moveCaretTo(int newOffset) {
+        if (on) {
+            closeOffset = newOffset;
+            getElements().setAll(textFlow.rangeShape(
+                Math.min(openOffset, closeOffset),
+                Math.max(openOffset, closeOffset)));
+        }
+    }
+
+
+    /**
      * Reset this selection.
      */
     public void reset() {
