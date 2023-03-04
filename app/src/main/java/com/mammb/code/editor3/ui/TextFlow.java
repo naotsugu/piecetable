@@ -105,6 +105,17 @@ public class TextFlow extends javafx.scene.text.TextFlow {
 
 
     /**
+     * Get the size of line at the specified offset of row.
+     * @param rowOffset the specified offset of row
+     * @return the size of line
+     */
+    public int lineSize(final int rowOffset) {
+        return (int) metrics().lines().stream()
+            .filter(l -> l.rowIndex() == rowOffset).count();
+    }
+
+
+    /**
      * Get the row index pair(start inclusive, end exclusive).
      * int[0] sol index
      * int[1] eol index (index of '\n' + 1, maybe)

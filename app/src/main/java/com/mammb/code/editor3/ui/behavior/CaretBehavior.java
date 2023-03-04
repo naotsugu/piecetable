@@ -39,7 +39,9 @@ public class CaretBehavior {
      * @param pointing the pointing
      * @param scrollBehavior the scroll behavior
      */
-    public CaretBehavior(Pointing pointing, ScrollBehavior scrollBehavior, ReadOnlyDoubleProperty viewHeight) {
+    public CaretBehavior(Pointing pointing,
+            ScrollBehavior scrollBehavior,
+            ReadOnlyDoubleProperty viewHeight) {
         this.pointing = pointing;
         this.scrollBehavior = scrollBehavior;
         this.viewHeight = viewHeight;
@@ -50,6 +52,7 @@ public class CaretBehavior {
      * Move the caret to the right.
      */
     public void right() {
+        scrollToCaretPoint();
         pointing.right();
         if (pointing.caretTop() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
@@ -61,6 +64,7 @@ public class CaretBehavior {
      * Move the caret to the left.
      */
     public void left() {
+        scrollToCaretPoint();
         pointing.left();
         if (pointing.caretTop() < 0) {
             scrollBehavior.scrollPrev();
@@ -72,6 +76,7 @@ public class CaretBehavior {
      * Move the caret up.
      */
     public void up() {
+        scrollToCaretPoint();
         if (pointing.caretTop() <= 0) {
             scrollBehavior.scrollPrev();
         }
@@ -83,6 +88,7 @@ public class CaretBehavior {
      * Move the caret down.
      */
     public void down() {
+        scrollToCaretPoint();
         int old = pointing.caretOffset();
         pointing.down();
         if (old == pointing.caretOffset()) return;
@@ -105,6 +111,17 @@ public class CaretBehavior {
      */
     public void home() {
         pointing.home();
+    }
+
+
+    /**
+     * If the caret is off-screen, scroll the screen to the caret position.
+     */
+    private void scrollToCaretPoint() {
+        while (pointing.caretOffset() < 0)
+            scrollBehavior.scrollPrev();
+        while (pointing.caretBottom() > viewHeight.get())
+            scrollBehavior.scrollNext();
     }
 
 }

@@ -88,7 +88,12 @@ public class ScrollBehavior {
             textFlow.translateLinePrev();
         } else {
             // Read previous rows from the backing model.
-            scrollPrev(1);
+            int shiftedOffset = scrollPrev(1);
+            if (shiftedOffset > 0) {
+                // If previous row was wrapped
+                int leadingLine = textFlow.lineSize(0);
+                for (int i = 1; i < leadingLine; i++) textFlow.translateLineNext();
+            }
         }
     }
 
@@ -139,8 +144,9 @@ public class ScrollBehavior {
     /**
      * Scroll previous.
      * @param n the number of row
+     * @return shifted offset
      */
-    private void scrollPrev(int n) {
+    private int scrollPrev(int n) {
         int shiftedOffset = model.scrollPrev(n);
         textFlow.clearTranslation();
         if (shiftedOffset > 0) {
@@ -148,6 +154,7 @@ public class ScrollBehavior {
             pointing.addOffset(shiftedOffset);
             rowsPanel.draw(model.originRowIndex());
         }
+        return shiftedOffset;
     }
 
 }
