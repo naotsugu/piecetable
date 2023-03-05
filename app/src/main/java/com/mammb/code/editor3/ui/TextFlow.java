@@ -62,6 +62,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * @param texts the text list
      */
     public void setAll(List<Text> texts) {
+System.out.println("getChildren():" + getChildren().size());
         getChildren().setAll(texts);
         metrics = null;
     }
@@ -237,6 +238,9 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     void setTextWrap(boolean wrap) {
         if (textWrap == wrap) return;
         textWrap = wrap;
+        getChildren().clear();
+        metrics = null;
+        metrics();
         if (textWrap) {
             setMinWidth(Region.USE_COMPUTED_SIZE);
             setMaxWidth(Region.USE_COMPUTED_SIZE);
@@ -246,8 +250,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
             setMinWidth(width);
             setMaxWidth(width);
             setPrefWidth(width);
+            setWidth(width);
         }
-        metrics = null;
     }
 
 

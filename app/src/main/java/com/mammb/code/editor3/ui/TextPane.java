@@ -137,6 +137,7 @@ public class TextPane extends StackPane {
         pointing.addOffset(caretOffset);
 
         rowsPanel.draw(model.originRowIndex());
+
     }
 
 
