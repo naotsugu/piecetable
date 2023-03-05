@@ -21,6 +21,8 @@ import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.util.Texts;
 
+import java.util.Objects;
+
 /**
  * ScrollBehavior.
  * @author Naotsugu Kobayashi
@@ -49,10 +51,10 @@ public class ScrollBehavior {
      */
     public ScrollBehavior(TextFlow textFlow, Pointing pointing,
             TextModel model, RowsPanel rowsPanel) {
-        this.textFlow = textFlow;
-        this.pointing = pointing;
-        this.model = model;
-        this.rowsPanel = rowsPanel;
+        this.textFlow = Objects.requireNonNull(textFlow);
+        this.pointing = Objects.requireNonNull(pointing);
+        this.model = Objects.requireNonNull(model);
+        this.rowsPanel = Objects.requireNonNull(rowsPanel);
     }
 
 

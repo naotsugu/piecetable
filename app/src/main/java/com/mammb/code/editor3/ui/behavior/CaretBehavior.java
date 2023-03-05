@@ -18,6 +18,8 @@ package com.mammb.code.editor3.ui.behavior;
 import com.mammb.code.editor3.ui.Pointing;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 
+import java.util.Objects;
+
 /**
  * CaretBehavior.
  * @author Naotsugu Kobayashi
@@ -42,9 +44,9 @@ public class CaretBehavior {
     public CaretBehavior(Pointing pointing,
             ScrollBehavior scrollBehavior,
             ReadOnlyDoubleProperty viewHeight) {
-        this.pointing = pointing;
-        this.scrollBehavior = scrollBehavior;
-        this.viewHeight = viewHeight;
+        this.pointing = Objects.requireNonNull(pointing);
+        this.scrollBehavior = Objects.requireNonNull(scrollBehavior);
+        this.viewHeight = Objects.requireNonNull(viewHeight);
     }
 
 

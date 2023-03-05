@@ -17,6 +17,7 @@ package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.behavior.CaretBehavior;
+import com.mammb.code.editor3.ui.behavior.ConfBehavior;
 import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.handler.DragDrop;
@@ -84,7 +85,9 @@ public class TextPane extends StackPane {
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
 
-        setOnKeyPressed(KeyPressedHandler.of(caretBehavior(), scrollBehavior(), fileChooseBehavior()));
+        setOnKeyPressed(KeyPressedHandler.of(
+            caretBehavior(), scrollBehavior(),
+            fileChooseBehavior(), confBehavior()));
         setOnScroll(ScrollHandler.of(scrollBehavior()));
     }
 
@@ -103,7 +106,7 @@ public class TextPane extends StackPane {
         model = new TextModel(path);
         initHandler();
         sync();
-        pointing.reset();
+        pointing.clear();
     }
 
 
@@ -128,6 +131,11 @@ public class TextPane extends StackPane {
         model.setupMaxRows(maxRows());
         textFlow.setAll(Texts.asText(model.text()));
         textFlow.clearTranslation();
+
+        int caretOffset = pointing.caretOffset();
+        pointing.clear();
+        pointing.addOffset(caretOffset);
+
         rowsPanel.draw(model.originRowIndex());
     }
 
@@ -154,6 +162,10 @@ public class TextPane extends StackPane {
 
     private CaretBehavior caretBehavior() {
         return new CaretBehavior(pointing, scrollBehavior(), heightProperty());
+    }
+
+    private ConfBehavior confBehavior() {
+        return new ConfBehavior(textFlow, pointing, rowsPanel);
     }
 
     private FileChooseBehavior fileChooseBehavior() {

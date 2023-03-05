@@ -16,14 +16,18 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.ui.util.TextMetrics;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
+
 import java.util.List;
 
 /**
@@ -39,6 +43,9 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     /** The translated line(not a row) offset. */
     private int translatedLineOffset = 0;
 
+    /** textWrap?. */
+    private boolean textWrap = true;
+
 
     /**
      * Constructor.
@@ -47,9 +54,6 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         setPadding(new Insets(0, 0, 0, 4));
         setTabSize(4);
         setCursor(Cursor.TEXT);
-
-        setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
-
     }
 
 
@@ -70,8 +74,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         if (translatedLineOffset >= metrics().lines().size() - 1) {
             return;
         }
-        setTranslateY(getTranslateY()
-            - metrics().lines().get(translatedLineOffset).height());
+        setTranslateY(getTranslateY() -
+            metrics().lines().get(translatedLineOffset).height());
         translatedLineOffset += 1;
     }
 
@@ -84,8 +88,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
             return;
         }
         translatedLineOffset -= 1;
-        setTranslateY(getTranslateY()
-            + metrics().lines().get(translatedLineOffset).height());
+        setTranslateY(getTranslateY() +
+            metrics().lines().get(translatedLineOffset).height());
     }
 
 
@@ -116,7 +120,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      */
     public int lineSize(final int rowOffset) {
         return (int) metrics().lines().stream()
-            .filter(l -> l.rowIndex() == rowOffset).count();
+            .filter(l -> l.rowIndex() == rowOffset)
+            .count();
     }
 
 
@@ -130,7 +135,8 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     int[] rowOffset(final int physicalRow) {
 
         List<TextMetrics.Line> line = metrics().lines().stream()
-            .filter(l -> l.rowIndex() == physicalRow).toList();
+            .filter(l -> l.rowIndex() == physicalRow)
+            .toList();
 
         int sol = line.stream().mapToInt(TextMetrics.Line::offset).min().orElse(-1);
         return new int[] {
@@ -220,6 +226,28 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      */
     public int translatedShiftRow() {
         return metrics().lines().get(translatedLineOffset).rowIndex();
+    }
+
+
+    public void toggleTextWrap() {
+        setTextWrap(!textWrap);
+    }
+
+
+    void setTextWrap(boolean wrap) {
+        if (textWrap == wrap) return;
+        textWrap = wrap;
+        if (textWrap) {
+            setMinWidth(Region.USE_COMPUTED_SIZE);
+            setMaxWidth(Region.USE_COMPUTED_SIZE);
+            setPrefWidth(Region.USE_COMPUTED_SIZE);
+        } else {
+            double width = Screen.getPrimary().getBounds().getWidth();
+            setMinWidth(width);
+            setMaxWidth(width);
+            setPrefWidth(width);
+        }
+        metrics = null;
     }
 
 

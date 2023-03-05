@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.handler;
 
 import com.mammb.code.editor3.ui.behavior.CaretBehavior;
+import com.mammb.code.editor3.ui.behavior.ConfBehavior;
 import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.util.Keys;
@@ -38,6 +39,9 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     /** The file choose behavior. */
     private final FileChooseBehavior fileChooseBehavior;
 
+    /** The conf behavior. */
+    private final ConfBehavior confBehavior;
+
 
     /**
      * Constructor.
@@ -48,10 +52,12 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     private KeyPressedHandler(
             CaretBehavior caretBehavior,
             ScrollBehavior scrollBehavior,
-            FileChooseBehavior fileChooseBehavior) {
+            FileChooseBehavior fileChooseBehavior,
+            ConfBehavior confBehavior) {
         this.caretBehavior = caretBehavior;
         this.scrollBehavior = scrollBehavior;
         this.fileChooseBehavior = fileChooseBehavior;
+        this.confBehavior = confBehavior;
     }
 
 
@@ -65,8 +71,10 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     public static EventHandler<KeyEvent> of(
             CaretBehavior caretBehavior,
             ScrollBehavior scrollBehavior,
-            FileChooseBehavior fileChooseBehavior) {
-        return new KeyPressedHandler(caretBehavior, scrollBehavior, fileChooseBehavior);
+            FileChooseBehavior fileChooseBehavior,
+            ConfBehavior confBehavior) {
+        return new KeyPressedHandler(caretBehavior, scrollBehavior,
+            fileChooseBehavior, confBehavior);
     }
 
 
@@ -107,7 +115,10 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             fileChooseBehavior.open();
             return true;
         }
-
+        if (Keys.SC_W.match(e)) {
+            confBehavior.toggleTextWrap();
+            return true;
+        }
         return false;
     }
 

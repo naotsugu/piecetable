@@ -51,10 +51,10 @@ public class Pointing extends Region {
 
 
     /**
-     * Reset caret.
+     * Clear pointing.
      */
-    public void reset() {
-        caret.reset();
+    public void clear() {
+        caret.clear();
         selection.clear();
     }
 

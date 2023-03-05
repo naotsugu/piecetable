@@ -81,8 +81,9 @@ public class Caret extends Path {
     /**
      * Reset caret.
      */
-    public void reset() {
-        moveToPoint(0, 0);
+    public void clear() {
+        offset = 0;
+        moveToOffset();
         logicalX = physicalX;
     }
 

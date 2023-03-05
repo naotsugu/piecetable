@@ -17,9 +17,6 @@ package com.mammb.code.editor3.ui.util;
 
 import com.mammb.code.editor3.lang.Strings;
 import javafx.geometry.Point2D;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
 public class TextMetrics {
 
     /** The metrics line. */
-    public record Line(int rowIndex, int offset, int length, double height) { }
+    public record Line(int rowIndex, int offset, int length, double height, double width) { }
 
     /** The row length. */
     private int rowSize = 0;
@@ -45,6 +42,10 @@ public class TextMetrics {
     /** The total height. */
     private double totalHeight = 0;
 
+    /** The max width. */
+    private double maxWidth = 0;
+
+    /** The metric lines. */
     private final List<Line> lines;
 
 
@@ -80,20 +81,22 @@ public class TextMetrics {
         while (offset < text.length()) {
             int tail = flow.hitTest(new Point2D(Double.MAX_VALUE, y + 1)).getInsertionIndex();
             double height = PathElements.height(flow.caretShape(tail, true));
+            double width = PathElements.width(flow.rangeShape(offset, tail));
             int eol = (tail >= text.length()) ? 0
                 : Strings.isLf(text.charAt(tail)) ? 1
                 : Strings.isCrLf(text.charAt(tail), text.charAt(tail + 1)) ? 2 : 0;
             tail += eol;
-            lines.add(new Line(row, offset, tail - offset, height));
+            lines.add(new Line(row, offset, tail - offset, height, width));
             if (eol > 0) row++;
             offset = tail;
             y += height;
+            if (width > maxWidth) maxWidth = width;
         }
 
         if (lines.isEmpty()) {
-            lines.add(new Line(0, 0, 0, Texts.height));
+            lines.add(new Line(0, 0, 0, Texts.height, 0));
         } else if (text.charAt(text.length() - 1) == '\n') {
-            lines.add(new Line(row, offset, 0, lines.get(lines.size() - 1).height()));
+            lines.add(new Line(row, offset, 0, lines.get(lines.size() - 1).height(), 0));
         }
 
         textString = text;
@@ -132,6 +135,13 @@ public class TextMetrics {
     public double totalHeight() {
         return totalHeight;
     }
+
+
+    /**
+     * Get the max width.
+     * @return the max width
+     */
+    public double maxWidth() { return maxWidth; }
 
 
     /**

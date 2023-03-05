@@ -17,6 +17,7 @@ package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.ui.TextPane;
 import java.io.File;
+import java.util.Objects;
 
 import static com.mammb.code.editor3.ui.util.FileChoosers.fileChooseOpen;
 
@@ -35,7 +36,7 @@ public class FileChooseBehavior {
      * @param textPane the text pane
      */
     public FileChooseBehavior(TextPane textPane) {
-        this.textPane = textPane;
+        this.textPane = Objects.requireNonNull(textPane);
     }
 
 

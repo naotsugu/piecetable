@@ -35,6 +35,9 @@ public class RowsPanel extends Pane {
     /** The text flow. */
     private final TextFlow flow;
 
+    /** The number of origin row index. */
+    private int origin = 0;
+
 
     /**
      * Constructor.
@@ -59,7 +62,7 @@ public class RowsPanel extends Pane {
      * @param origin the origin number(zero based)
      */
     public void draw(int origin) {
-
+        this.origin = origin;
         getChildren().clear();
         double y = 0;
         int n = -1;
@@ -70,6 +73,14 @@ public class RowsPanel extends Pane {
             }
             y += line.height();
         }
+    }
+
+
+    /**
+     * Redraw the row number.
+     */
+    public void redraw() {
+        draw(origin);
     }
 
 
