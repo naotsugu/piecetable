@@ -44,7 +44,7 @@ class TextMetricsTest {
         List<Line> lines = tm.lines();
 
         assertEquals(1, lines.size());
-        assertEquals(new Line(0, 0, 3, defaultHeight), lines.get(0));
+        assertEquals(new Line(0, 0, 3, defaultHeight, PathElements.width(text.rangeShape(0, 3))), lines.get(0));
     }
 
 
@@ -56,8 +56,8 @@ class TextMetricsTest {
         List<Line> lines = tm.lines();
 
         assertEquals(2, lines.size());
-        assertEquals(new Line(0, 0, 4, defaultHeight), lines.get(0));
-        assertEquals(new Line(1, 4, 3, defaultHeight), lines.get(1));
+        assertEquals(new Line(0, 0, 4, defaultHeight, PathElements.width(text.rangeShape(0, 3))), lines.get(0));
+        assertEquals(new Line(1, 4, 3, defaultHeight, PathElements.width(text.rangeShape(4, 7))), lines.get(1));
     }
 
 
@@ -69,9 +69,9 @@ class TextMetricsTest {
         List<Line> lines = tm.lines();
 
         assertEquals(3, lines.size());
-        assertEquals(new Line(0, 0, 4, defaultHeight), lines.get(0));
-        assertEquals(new Line(1, 4, 4, defaultHeight), lines.get(1));
-        assertEquals(new Line(2, 8, 0, defaultHeight), lines.get(2));
+        assertEquals(new Line(0, 0, 4, defaultHeight, PathElements.width(text.rangeShape(0, 3))), lines.get(0));
+        assertEquals(new Line(1, 4, 4, defaultHeight, PathElements.width(text.rangeShape(4, 7))), lines.get(1));
+        assertEquals(new Line(2, 8, 0, defaultHeight, PathElements.width(text.rangeShape(7, 8))), lines.get(2));
     }
 
 }
