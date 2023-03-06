@@ -21,6 +21,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -62,7 +63,6 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      * @param texts the text list
      */
     public void setAll(List<Text> texts) {
-System.out.println("getChildren():" + getChildren().size());
         getChildren().setAll(texts);
         metrics = null;
     }
@@ -238,13 +238,16 @@ System.out.println("getChildren():" + getChildren().size());
     void setTextWrap(boolean wrap) {
         if (textWrap == wrap) return;
         textWrap = wrap;
-        getChildren().clear();
         metrics = null;
-        metrics();
+        clearTranslation();
         if (textWrap) {
             setMinWidth(Region.USE_COMPUTED_SIZE);
             setMaxWidth(Region.USE_COMPUTED_SIZE);
             setPrefWidth(Region.USE_COMPUTED_SIZE);
+            Parent parent = getParent();
+            if (parent != null) {
+                setWidth(parent.getLayoutBounds().getWidth());
+            }
         } else {
             double width = Screen.getPrimary().getBounds().getWidth();
             setMinWidth(width);

@@ -20,6 +20,8 @@ import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
 import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
+import com.mammb.code.editor3.ui.control.ColScrollBar;
+import com.mammb.code.editor3.ui.control.RowScrollBar;
 import com.mammb.code.editor3.ui.handler.DragDrop;
 import com.mammb.code.editor3.ui.handler.KeyPressedHandler;
 import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
@@ -47,6 +49,12 @@ public class TextPane extends StackPane {
     /** The text flow pane. */
     private final TextFlow textFlow = new TextFlow();
 
+    /** The row scroll bar. */
+    private final RowScrollBar rowScroll = new RowScrollBar();
+
+    /** The col scroll bar. */
+    private final ColScrollBar colScroll = new ColScrollBar();
+
     /** The pointing. */
     private final Pointing pointing = new Pointing(textFlow);
 
@@ -69,11 +77,11 @@ public class TextPane extends StackPane {
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
 
-        setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
-        setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
+        setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         setAlignment(Pos.TOP_LEFT);
 
-        getChildren().addAll(textFlow, pointing);
+        getChildren().addAll(textFlow, pointing, rowScroll, colScroll);
         initHandler();
         initListener();
 
@@ -94,7 +102,9 @@ public class TextPane extends StackPane {
 
     private void initListener() {
         layoutBoundsProperty().addListener(this::layoutBoundsChanged);
-        stage.focusedProperty().addListener((ob, ov, nv) -> { if (nv) pointing.showCaret(); else pointing.hideCaret(); });
+        stage.focusedProperty().addListener((ob, ov, nv) -> {
+            if (nv) pointing.showCaret(); else pointing.hideCaret();
+        });
     }
 
 

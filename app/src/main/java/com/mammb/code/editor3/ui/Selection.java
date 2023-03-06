@@ -50,7 +50,7 @@ public class Selection extends Path {
         this.textFlow = textFlow;
 
         setStrokeWidth(0);
-        setOpacity(0.2);
+        setOpacity(0.3);
         setFill(Color.DEEPSKYBLUE);
         setBlendMode(BlendMode.LIGHTEN);
         setManaged(false);
@@ -161,9 +161,7 @@ public class Selection extends Path {
         if (on) {
             int start = Math.min(openOffset, closeOffset);
             int end   = Math.max(openOffset, closeOffset);
-            if (start >= 0 && end <= textFlow.textLength()) {
-                getElements().setAll(textFlow.rangeShape(start, end));
-            }
+            getElements().setAll(textFlow.rangeShape(start, end));
         } else {
             getElements().clear();
         }

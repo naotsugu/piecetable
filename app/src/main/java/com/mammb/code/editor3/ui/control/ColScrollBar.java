@@ -17,6 +17,10 @@ package com.mammb.code.editor3.ui.control;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.AccessibleRole;
+import javafx.scene.Parent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
 /**
@@ -31,6 +35,9 @@ public class ColScrollBar extends StackPane {
     /** The thumb. */
     private final ScrollThumb thumb = ScrollThumb.rowOf(HEIGHT);
 
+    /** The min value of scroll bar. */
+    private final DoubleProperty min = new SimpleDoubleProperty(0);
+
     /** The max value of scroll bar. */
     private final DoubleProperty max = new SimpleDoubleProperty(0);
 
@@ -42,7 +49,30 @@ public class ColScrollBar extends StackPane {
      * Constructor.
      */
     public ColScrollBar() {
+        setManaged(false);
+        setAccessibleRole(AccessibleRole.SCROLL_BAR);
+        setHeight(HEIGHT);
+        getChildren().add(thumb);
+        parentProperty().addListener(this::parentChanged);
+    }
 
+
+    private void parentChanged(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newValue) {
+        if (oldValue != newValue && newValue instanceof Region region) {
+            layoutYProperty().bind(region.heightProperty().subtract(HEIGHT + 2));
+            region.widthProperty().addListener((obs, prev, curr) -> setWidth(curr.doubleValue()));
+        }
+    }
+
+
+    private double computeThumbWidth() {
+        double thumbLength = getWidth();
+        return getWidth() * thumbLength / Math.max(max.get() - min.get(), thumbLength);
+    }
+
+
+    private double clamp(double value) {
+        return Math.min(Math.max(min.get(), value), max.get());
     }
 
 }

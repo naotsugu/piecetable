@@ -106,7 +106,6 @@ public class Caret extends Path {
     }
 
 
-
     public void shiftOffset(int delta) {
         if (delta == 0) return;
         offset += delta;

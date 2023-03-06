@@ -18,6 +18,7 @@ package com.mammb.code.editor3.ui.behavior;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
+import com.mammb.code.editor3.ui.util.Texts;
 import javafx.application.Platform;
 
 import java.util.Objects;
@@ -51,8 +52,15 @@ public class ConfBehavior {
     }
 
 
+    /**
+     * Toggle wrap of text.
+     */
     public void toggleTextWrap() {
         textFlow.toggleTextWrap();
+        int caretOffset = pointing.caretOffset();
+        pointing.clear();
+        pointing.addOffset(caretOffset);
+        rowsPanel.redraw();
     }
 
 }
