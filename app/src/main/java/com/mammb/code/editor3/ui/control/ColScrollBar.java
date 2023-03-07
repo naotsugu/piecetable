@@ -16,11 +16,10 @@
 package com.mammb.code.editor3.ui.control;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.AccessibleRole;
-import javafx.scene.Parent;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
 /**
@@ -39,10 +38,13 @@ public class ColScrollBar extends StackPane {
     private final DoubleProperty min = new SimpleDoubleProperty(0);
 
     /** The max value of scroll bar. */
-    private final DoubleProperty max = new SimpleDoubleProperty(0);
+    private final DoubleProperty max = new SimpleDoubleProperty(100);
 
     /** The value of scroll bar. */
     private final DoubleProperty value = new SimpleDoubleProperty(0);
+
+    /** The visible amount. */
+    private final DoubleProperty visibleAmount = new SimpleDoubleProperty(100);
 
 
     /**
@@ -53,21 +55,24 @@ public class ColScrollBar extends StackPane {
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
         setHeight(HEIGHT);
         getChildren().add(thumb);
-        parentProperty().addListener(this::parentChanged);
     }
 
 
-    private void parentChanged(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newValue) {
-        if (oldValue != newValue && newValue instanceof Region region) {
-            layoutYProperty().bind(region.heightProperty().subtract(HEIGHT + 2));
-            region.widthProperty().addListener((obs, prev, curr) -> setWidth(curr.doubleValue()));
-        }
+    /**
+     * Set scroll bar scale.
+     * @param maxSize the max value of scroll bar
+     * @param visibleSize the visible amount
+     */
+    public void setScale(double maxSize, double visibleSize) {
+        min.set(0);
+        max.set(maxSize);
+        visibleAmount.set(visibleSize);
     }
 
 
     private double computeThumbWidth() {
-        double thumbLength = getWidth();
-        return getWidth() * thumbLength / Math.max(max.get() - min.get(), thumbLength);
+        double length = visibleAmount.get();
+        return getWidth() * length / Math.max(max.get() - min.get(), length);
     }
 
 
