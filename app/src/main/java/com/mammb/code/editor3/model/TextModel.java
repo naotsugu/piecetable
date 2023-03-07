@@ -133,6 +133,15 @@ public class TextModel {
 
 
     /**
+     * Get the total row size.
+     * @return the total row size
+     */
+    public int totalRowSize() {
+        return textSlice.totalRowSize();
+    }
+
+
+    /**
      * Get the number of origin row index.
      * @return the number of origin row index
      */

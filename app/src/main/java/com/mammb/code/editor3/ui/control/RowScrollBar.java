@@ -60,7 +60,6 @@ public class RowScrollBar extends StackPane {
     private final DoubleProperty breadthHeight = new SimpleDoubleProperty(WIDTH);
 
 
-
     /**
      * Constructor.
      */
@@ -70,6 +69,18 @@ public class RowScrollBar extends StackPane {
         setWidth(WIDTH);
         getChildren().add(thumb);
         parentProperty().addListener(this::parentChanged);
+    }
+
+
+    /**
+     * Set scroll bar scale.
+     * @param maxSize the max value of scroll bar
+     * @param visibleSize the visible amount
+     */
+    public void setScale(int maxSize, int visibleSize) {
+        min.set(0);
+        max.set(maxSize);
+        visibleAmount.set(visibleSize);
     }
 
 

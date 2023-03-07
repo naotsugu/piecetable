@@ -76,7 +76,6 @@ public class TextPane extends StackPane {
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
-
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         setAlignment(Pos.TOP_LEFT);
@@ -105,6 +104,11 @@ public class TextPane extends StackPane {
         stage.focusedProperty().addListener((ob, ov, nv) -> {
             if (nv) pointing.showCaret(); else pointing.hideCaret();
         });
+    }
+
+
+    private void initListener(RowScrollBar rowScroll) {
+
     }
 
 

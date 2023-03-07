@@ -21,6 +21,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.AccessibleRole;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 /**
@@ -29,11 +30,16 @@ import javafx.scene.shape.Rectangle;
  */
 class ScrollThumb extends Rectangle {
 
+    private static final Paint color = Color.web("#626465", 0.5);
+
+    private static final Paint activeColor = Color.web("#828485", 0.9);
+
     /** The length of thumb. */
-    private final DoubleProperty length = new SimpleDoubleProperty(0);
+    private final DoubleProperty length = new SimpleDoubleProperty(10);
 
     /** active?. */
     private final BooleanProperty active = new SimpleBooleanProperty(false);
+
 
 
     /**
@@ -42,13 +48,15 @@ class ScrollThumb extends Rectangle {
      * @param height the height of thumb
      */
     private ScrollThumb(double width, double height) {
+        setManaged(false);
         setWidth(width);
         setHeight(height);
         setY(0);
         setArcHeight(4);
         setArcWidth(4);
+        setFill(color);
         setAccessibleRole(AccessibleRole.THUMB);
-        setManaged(false);
+
         initHandler();
         initListener();
     }
@@ -60,8 +68,7 @@ class ScrollThumb extends Rectangle {
 
 
     private void initListener() {
-        active.addListener((observable, oldValue, newValue) ->
-            setFill(newValue ? Color.web("#828485", 0.9) : Color.web("#626465", 0.5)));
+        active.addListener((observable, oldValue, newValue) -> setFill(newValue ? activeColor : color));
     }
 
 

@@ -168,4 +168,13 @@ public class TextSlice {
         return originRow + buffer.rowSize() < source.totalRowSize();
     }
 
+
+    /**
+     * Get the total row size.
+     * @return the total row size
+     */
+    public int totalRowSize() {
+        return source.totalRowSize();
+    }
+
 }
