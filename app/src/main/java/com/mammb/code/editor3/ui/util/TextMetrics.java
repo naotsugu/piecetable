@@ -145,6 +145,30 @@ public class TextMetrics {
 
 
     /**
+     * Get the max row width.
+     * The width is unwrapped row size
+     * @return the max row width
+     */
+    public double maxRowWidth() {
+        double ret = 0;
+        double width = 0;
+        int row = 0;
+        for (Line line : lines) {
+            if (line.rowIndex() == row) {
+                width += line.width();
+                continue;
+            }
+            if (width > ret) {
+                ret = width;
+            }
+            row = line.rowIndex();
+            width = line.width();
+        }
+        return ret;
+    }
+
+
+    /**
      * Get the text string.
      * @return the text string
      */

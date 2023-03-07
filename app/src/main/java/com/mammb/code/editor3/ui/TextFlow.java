@@ -16,19 +16,14 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.ui.util.TextMetrics;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
-import javafx.stage.Screen;
-
 import java.util.List;
 
 /**
@@ -65,6 +60,10 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     public void setAll(List<Text> texts) {
         getChildren().setAll(texts);
         metrics = null;
+        if (!textWrap) {
+            setWidthBulk(TextMetrics.of(this).maxRowWidth() +
+                getPadding().getLeft() + getPadding().getRight());
+        }
     }
 
 
@@ -238,22 +237,13 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     void setTextWrap(boolean wrap) {
         if (textWrap == wrap) return;
         textWrap = wrap;
+        double width = metrics().maxRowWidth();
         metrics = null;
         clearTranslation();
         if (textWrap) {
-            setMinWidth(Region.USE_COMPUTED_SIZE);
-            setMaxWidth(Region.USE_COMPUTED_SIZE);
-            setPrefWidth(Region.USE_COMPUTED_SIZE);
-            Parent parent = getParent();
-            if (parent != null) {
-                setWidth(parent.getLayoutBounds().getWidth());
-            }
+            setWidthBulk(Region.USE_COMPUTED_SIZE);
         } else {
-            double width = Screen.getPrimary().getBounds().getWidth();
-            setMinWidth(width);
-            setMaxWidth(width);
-            setPrefWidth(width);
-            setWidth(width);
+            setWidthBulk(width + getPadding().getLeft() + getPadding().getRight());
         }
     }
 
@@ -270,6 +260,17 @@ public class TextFlow extends javafx.scene.text.TextFlow {
         return value;
     }
 
+
+    private void setWidthBulk(double width) {
+        setMinWidth(width);
+        setMaxWidth(width);
+        setPrefWidth(width);
+        if (width == Region.USE_COMPUTED_SIZE && getParent() != null) {
+            setWidth(getParent().getLayoutBounds().getWidth());
+        } else {
+            setWidth(width);
+        }
+    }
 
     @Override
     public String toString() {
