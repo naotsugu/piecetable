@@ -53,8 +53,17 @@ public class RowScrollBar extends StackPane {
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
         setWidth(WIDTH);
         getChildren().add(thumb);
+
+        initListener();
     }
 
+    private void initListener() {
+
+    }
+
+    public void setLayoutHeight(double height) {
+        setHeight(height);
+    }
 
     /**
      * Set scroll bar scale.

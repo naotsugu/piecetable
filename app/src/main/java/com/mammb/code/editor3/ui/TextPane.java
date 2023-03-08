@@ -68,7 +68,7 @@ public class TextPane extends StackPane {
 
         this.stage = Objects.requireNonNull(stage);
         this.model = Objects.requireNonNull(model);
-        this.scrolling = new Scrolling();
+        this.scrolling = new Scrolling(new ScreenBound(this, textFlow));
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);

@@ -32,7 +32,7 @@ public class ColScrollBar extends StackPane {
     private final double HEIGHT = 8;
 
     /** The thumb. */
-    private final ScrollThumb thumb = ScrollThumb.rowOf(HEIGHT);
+    private final ScrollThumb thumb = ScrollThumb.colOf(HEIGHT);
 
     /** The min value of scroll bar. */
     private final DoubleProperty min = new SimpleDoubleProperty(0);
@@ -51,22 +51,18 @@ public class ColScrollBar extends StackPane {
      * Constructor.
      */
     public ColScrollBar() {
+
         setManaged(false);
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
         setHeight(HEIGHT);
         getChildren().add(thumb);
+
+        initListener();
     }
 
 
-    /**
-     * Set scroll bar scale.
-     * @param maxSize the max value of scroll bar
-     * @param visibleSize the visible amount
-     */
-    public void setScale(double maxSize, double visibleSize) {
-        min.set(0);
-        max.set(maxSize);
-        visibleAmount.set(visibleSize);
+    private void initListener() {
+        max.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbWidth()));
     }
 
 
@@ -75,9 +71,16 @@ public class ColScrollBar extends StackPane {
         return getWidth() * length / Math.max(max.get() - min.get(), length);
     }
 
+    public void setLayoutWidth(double width) {
+        setWidth(width);
+    }
 
     private double clamp(double value) {
         return Math.min(Math.max(min.get(), value), max.get());
     }
+
+    public DoubleProperty maxProperty() { return max; }
+    public DoubleProperty visibleAmountProperty() { return visibleAmount; }
+    public DoubleProperty valueProperty() { return value; }
 
 }

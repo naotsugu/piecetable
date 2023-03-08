@@ -33,12 +33,15 @@ public class Scrolling extends Region {
     /** The col scroll bar. */
     private final ColScrollBar colScroll;
 
+    /** The screen bound. */
+    private final ScreenBound screenBound;
+
 
     /**
      * Constructor.
      */
-    public Scrolling() {
-
+    public Scrolling(ScreenBound screenBound) {
+        this.screenBound = screenBound;
         this.rowScroll = new RowScrollBar();
         this.colScroll = new ColScrollBar();
         getChildren().addAll(rowScroll, colScroll);
@@ -56,17 +59,18 @@ public class Scrolling extends Region {
         rowScroll.visibleProperty().addListener((os, ov, nv) -> fitScrollBar());
         colScroll.visibleProperty().addListener((os, ov, nv) -> fitScrollBar());
 
+        // bind col scroll
+        colScroll.maxProperty().bind(screenBound.totalColSizeProperty());
+        colScroll.valueProperty().bind(screenBound.colOffsetProperty());
+        colScroll.visibleAmountProperty().bind(screenBound.visibleColSizeProperty());
+
+        // bind row scroll
+        rowScroll.visibleAmountProperty().bind(screenBound.visibleRowSizeProperty());
+
     }
 
-    public void setRowScale(int maxSize, int visibleSize) {
-        rowScroll.setScale(maxSize, visibleSize);
-    }
 
-
-    public void setColScale(double maxSize, double visibleSize) {
-        colScroll.setScale(maxSize, visibleSize);
-    }
-
+    public ScreenBound screenBound() { return screenBound; }
 
     // -- private -------------------------------------------------------------
 
@@ -84,8 +88,14 @@ public class Scrolling extends Region {
 
 
     private void fitScrollBar() {
-        rowScroll.setPrefHeight(getHeight() - (colScroll.isVisible() ? colScroll.getHeight() : 0));
-        colScroll.setPrefWidth(getWidth() - (rowScroll.isVisible() ? rowScroll.getWidth() : 0));
+        double height = getHeight() - (colScroll.isVisible() ? colScroll.getHeight() : 0);
+        rowScroll.setPrefHeight(height);
+        rowScroll.setMinHeight(height);
+        rowScroll.setMaxHeight(height);
+        rowScroll.setLayoutHeight(height);
+
+        double width = getWidth() - (rowScroll.isVisible() ? rowScroll.getWidth() : 0);
+        colScroll.setLayoutWidth(width);
     }
 
 }

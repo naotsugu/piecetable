@@ -68,7 +68,8 @@ class ScrollThumb extends Rectangle {
 
 
     private void initListener() {
-        active.addListener((observable, oldValue, newValue) -> setFill(newValue ? activeColor : color));
+        active.addListener((ob, ov, nv) -> setFill(nv ? activeColor : color));
+        widthProperty().bind(lengthProperty());
     }
 
 
