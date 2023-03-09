@@ -25,8 +25,8 @@ import javafx.scene.shape.Path;
  */
 public class Selection extends Path {
 
-    /** The TextFlow. */
-    private final TextFlow textFlow;
+    /** The ScreenText. */
+    private final ScreenText text;
 
     /** The selection open offset. */
     private int openOffset = -1;
@@ -43,11 +43,11 @@ public class Selection extends Path {
 
     /**
      * Constructor.
-     * @param textFlow the TextFlow
+     * @param text the ScreenText
      */
-    public Selection(TextFlow textFlow) {
+    public Selection(ScreenText text) {
 
-        this.textFlow = textFlow;
+        this.text = text;
 
         setStrokeWidth(0);
         setOpacity(0.3);
@@ -161,7 +161,7 @@ public class Selection extends Path {
         if (on) {
             int start = Math.min(openOffset, closeOffset);
             int end   = Math.max(openOffset, closeOffset);
-            getElements().setAll(textFlow.rangeShape(start, end));
+            getElements().setAll(text.rangeShape(start, end));
         } else {
             getElements().clear();
         }

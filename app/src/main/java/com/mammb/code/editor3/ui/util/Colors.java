@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.util;
 
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 /**
  * Color utilities.
@@ -29,7 +30,11 @@ public class Colors {
 
     public static final Color foregroundModest = Color.web("#939ea9");
 
-
     public static final Color panel = Color.web("#313335");
+
+
+    public static final Color scrollTrack = Color.web("#626465", 0.2);
+    public static final Paint thumb = Color.web("#626465", 0.5);
+    public static final Paint thumbActive = Color.web("#828485", 0.9);
 
 }

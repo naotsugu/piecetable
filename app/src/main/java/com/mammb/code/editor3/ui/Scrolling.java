@@ -33,24 +33,19 @@ public class Scrolling extends Region {
     /** The col scroll bar. */
     private final ColScrollBar colScroll;
 
-    /** The screen bound. */
-    private final ScreenBound screenBound;
-
-
     /**
      * Constructor.
      */
     public Scrolling(ScreenBound screenBound) {
-        this.screenBound = screenBound;
         this.rowScroll = new RowScrollBar();
         this.colScroll = new ColScrollBar();
         getChildren().addAll(rowScroll, colScroll);
 
-        initHandler();
+        initHandler(screenBound);
     }
 
 
-    private void initHandler() {
+    private void initHandler(ScreenBound screenBound) {
 
         // locate the scroll bars at the edge.
         layoutBoundsProperty().addListener(this::boundsChanged);
@@ -65,12 +60,12 @@ public class Scrolling extends Region {
         colScroll.visibleAmountProperty().bind(screenBound.visibleColSizeProperty());
 
         // bind row scroll
+        rowScroll.maxProperty().bind(screenBound.totalRowSizeProperty());
+        rowScroll.valueProperty().bind(screenBound.rowOffsetProperty());
         rowScroll.visibleAmountProperty().bind(screenBound.visibleRowSizeProperty());
 
     }
 
-
-    public ScreenBound screenBound() { return screenBound; }
 
     // -- private -------------------------------------------------------------
 

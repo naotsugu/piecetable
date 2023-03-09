@@ -15,11 +15,12 @@
  */
 package com.mammb.code.editor3.ui.control;
 
+import com.mammb.code.editor3.ui.util.Colors;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.AccessibleRole;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 
 /**
@@ -54,6 +55,7 @@ public class ColScrollBar extends StackPane {
 
         setManaged(false);
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
+        setBackground(new Background(new BackgroundFill(Colors.scrollTrack, null, null)));
         setHeight(HEIGHT);
         getChildren().add(thumb);
 
@@ -66,10 +68,17 @@ public class ColScrollBar extends StackPane {
     }
 
 
+    /**
+     * Compute thumb width.
+     * @return thumb width
+     */
     private double computeThumbWidth() {
         double length = visibleAmount.get();
-        return getWidth() * length / Math.max(max.get() - min.get(), length);
+        double thumbWidth = getWidth() * length / Math.max(max.get() - min.get(), length);
+        setVisible(thumbWidth != getWidth());
+        return Math.max(thumbWidth, HEIGHT);
     }
+
 
     public void setLayoutWidth(double width) {
         setWidth(width);

@@ -15,9 +15,12 @@
  */
 package com.mammb.code.editor3.ui.control;
 
+import com.mammb.code.editor3.ui.util.Colors;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.AccessibleRole;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 
 /**
@@ -51,6 +54,8 @@ public class RowScrollBar extends StackPane {
     public RowScrollBar() {
         setManaged(false);
         setAccessibleRole(AccessibleRole.SCROLL_BAR);
+        setBackground(new Background(new BackgroundFill(Colors.scrollTrack, null, null)));
+
         setWidth(WIDTH);
         getChildren().add(thumb);
 
@@ -58,28 +63,23 @@ public class RowScrollBar extends StackPane {
     }
 
     private void initListener() {
-
+        max.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbHeight()));
     }
 
     public void setLayoutHeight(double height) {
         setHeight(height);
     }
 
+
     /**
-     * Set scroll bar scale.
-     * @param maxSize the max value of scroll bar
-     * @param visibleSize the visible amount
+     * Compute thumb height.
+     * @return thumb height
      */
-    public void setScale(int maxSize, int visibleSize) {
-        min.set(0);
-        max.set(maxSize);
-        visibleAmount.set(visibleSize);
-    }
-
-
     private double computeThumbHeight() {
         int length = visibleAmount.get();
-        return getHeight() * length / Math.max(max.get() - min.get(), length);
+        double thumbHeight = getHeight() * length / Math.max(max.get() - min.get(), length);
+        setVisible(thumbHeight != getHeight());
+        return thumbHeight;
     }
 
 

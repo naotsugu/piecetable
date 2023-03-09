@@ -15,13 +15,12 @@
  */
 package com.mammb.code.editor3.ui.control;
 
+import com.mammb.code.editor3.ui.util.Colors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.AccessibleRole;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 /**
@@ -30,16 +29,11 @@ import javafx.scene.shape.Rectangle;
  */
 class ScrollThumb extends Rectangle {
 
-    private static final Paint color = Color.web("#626465", 0.5);
-
-    private static final Paint activeColor = Color.web("#828485", 0.9);
-
     /** The length of thumb. */
     private final DoubleProperty length = new SimpleDoubleProperty(10);
 
     /** active?. */
     private final BooleanProperty active = new SimpleBooleanProperty(false);
-
 
 
     /**
@@ -54,7 +48,7 @@ class ScrollThumb extends Rectangle {
         setY(0);
         setArcHeight(4);
         setArcWidth(4);
-        setFill(color);
+        setFill(Colors.thumb);
         setAccessibleRole(AccessibleRole.THUMB);
 
         initHandler();
@@ -68,7 +62,7 @@ class ScrollThumb extends Rectangle {
 
 
     private void initListener() {
-        active.addListener((ob, ov, nv) -> setFill(nv ? activeColor : color));
+        active.addListener((ob, ov, nv) -> setFill(nv ? Colors.thumbActive : Colors.thumb));
         widthProperty().bind(lengthProperty());
     }
 

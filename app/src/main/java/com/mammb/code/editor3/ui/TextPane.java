@@ -53,8 +53,8 @@ public class TextPane extends StackPane {
     /** The rows panel. */
     private final RowsPanel rowsPanel = new RowsPanel(textFlow);
 
-    /** The scrolling. */
-    private final Scrolling scrolling;
+    /** The screen bound. */
+    private final ScreenBound screenBound;
 
     /** The text model. */
     private TextModel model;
@@ -68,7 +68,7 @@ public class TextPane extends StackPane {
 
         this.stage = Objects.requireNonNull(stage);
         this.model = Objects.requireNonNull(model);
-        this.scrolling = new Scrolling(new ScreenBound(this, textFlow));
+        this.screenBound = new ScreenBound(this, textFlow);
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
@@ -76,6 +76,7 @@ public class TextPane extends StackPane {
         setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         setAlignment(Pos.TOP_LEFT);
 
+        Scrolling scrolling = new Scrolling(screenBound);
         getChildren().addAll(textFlow, pointing, scrolling);
         initHandler();
         initListener();
@@ -84,14 +85,17 @@ public class TextPane extends StackPane {
 
 
     private void initHandler() {
-        setOnKeyTyped(KeyTypedHandler.of());
-        setOnDragOver(DragDrop.dragOverHandler());
-        setOnDragDropped(DragDrop.droppedHandler(this::open));
 
+        setOnKeyTyped(KeyTypedHandler.of());
         setOnKeyPressed(KeyPressedHandler.of(
             caretBehavior(), scrollBehavior(),
             fileChooseBehavior(), confBehavior()));
+
         setOnScroll(ScrollHandler.of(scrollBehavior()));
+
+        setOnDragOver(DragDrop.dragOverHandler());
+        setOnDragDropped(DragDrop.droppedHandler(this::open));
+
     }
 
 
@@ -115,7 +119,8 @@ public class TextPane extends StackPane {
     }
 
 
-    private void layoutBoundsChanged(ObservableValue<? extends Bounds> observable,
+    private void layoutBoundsChanged(
+            ObservableValue<? extends Bounds> observable,
             Bounds oldValue, Bounds newValue) {
         if (oldValue.getHeight() != newValue.getHeight() ||
             oldValue.getWidth()  != newValue.getWidth()) sync();
@@ -142,6 +147,9 @@ public class TextPane extends StackPane {
         pointing.addOffset(caretOffset);
 
         rowsPanel.draw(model.originRowIndex());
+
+        screenBound.setTotalRowSize(model.totalRowSize() + textFlow.wrappedLines());
+        screenBound.setRowOffset(model.originRowIndex() + textFlow.translatedLineOffset());
 
     }
 

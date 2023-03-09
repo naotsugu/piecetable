@@ -35,8 +35,8 @@ public class Caret extends Path {
     /** The default height of caret. */
     private static double DEFAULT_HEIGHT = Texts.height;
 
-    /** The textFlow. */
-    private final TextFlow textFlow;
+    /** The screenText. */
+    private final ScreenText text;
 
     /** The timeline. */
     private final Timeline timeline = new Timeline();
@@ -60,13 +60,13 @@ public class Caret extends Path {
     /**
      * Constructor.
      */
-    public Caret(TextFlow textFlow) {
+    public Caret(ScreenText text) {
 
         setStrokeWidth(2);
         setStroke(Color.ORANGE);
         setManaged(false);
 
-        this.textFlow = textFlow;
+        this.text = text;
 
         timeline.setCycleCount(-1);
         timeline.getKeyFrames().add(
@@ -117,7 +117,7 @@ public class Caret extends Path {
      * Move the caret to the right.
      */
     public void right() {
-        if (Character.isHighSurrogate(textFlow.charAt(++offset))) {
+        if (Character.isHighSurrogate(text.charAt(++offset))) {
             offset++;
         }
         moveToOffsetSyncLogical();
@@ -129,7 +129,7 @@ public class Caret extends Path {
      */
     public void left() {
         if (offset == 0) return;
-        if (Character.isLowSurrogate(textFlow.charAt(--offset))) {
+        if (Character.isLowSurrogate(text.charAt(--offset))) {
             offset--;
         }
         moveToOffsetSyncLogical();
@@ -150,9 +150,9 @@ public class Caret extends Path {
      */
     public void home() {
         if (physicalX == 0) {
-            if (Character.isWhitespace(textFlow.charAt(offset))) {
-                while (offset < textFlow.textLength() &&
-                    Character.isWhitespace(textFlow.charAt(offset))) {
+            if (Character.isWhitespace(text.charAt(offset))) {
+                while (offset < text.textLength() &&
+                    Character.isWhitespace(text.charAt(offset))) {
                     offset++;
                 }
                 moveToOffset();
@@ -220,7 +220,7 @@ public class Caret extends Path {
 
         timeline.stop();
         setVisible(false);
-        if (offset >= 0 && offset <= textFlow.textLength()) {
+        if (offset >= 0 && offset <= text.textLength()) {
             getElements().setAll(elements);
             setVisible(true);
             timeline.play();
@@ -252,21 +252,21 @@ public class Caret extends Path {
     private boolean moveToOffset() {
         double oldX = physicalX;
         double oldY = physicalY;
-        setShape(textFlow.caretShape(offset, true));
+        setShape(text.caretShape(offset, true));
         return oldX != physicalX || oldY != physicalY;
     }
 
 
     private int moveToPoint(double x, double y) {
-        offset = textFlow.insertionIndexAt(x, y);
-        setShape(textFlow.caretShape(offset, true));
+        offset = text.insertionIndexAt(x, y);
+        setShape(text.caretShape(offset, true));
         return offset;
     }
 
 
     private int moveToPointRow(double y) {
-        int indexAt = textFlow.insertionIndexAt(logicalX, y);
-        PathElement[] pathElements = textFlow.caretShape(indexAt, true);
+        int indexAt = text.insertionIndexAt(logicalX, y);
+        PathElement[] pathElements = text.caretShape(indexAt, true);
         if (PathElements.getY(pathElements[0]) != physicalY) {
             offset = indexAt;
             setShape(pathElements);

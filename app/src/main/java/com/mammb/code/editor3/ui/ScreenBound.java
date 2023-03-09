@@ -82,8 +82,9 @@ public class ScreenBound {
         rowOffset.set(value);
     }
 
-
+    public IntegerProperty rowOffsetProperty() { return rowOffset; }
     public IntegerProperty visibleRowSizeProperty() { return visibleRowSize; }
+    public IntegerProperty totalRowSizeProperty() { return totalRowSize; }
 
     public DoubleProperty colOffsetProperty() { return colOffset; }
     public DoubleProperty visibleColSizeProperty() { return visibleColSize; }

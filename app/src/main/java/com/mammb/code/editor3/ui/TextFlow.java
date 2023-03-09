@@ -31,7 +31,7 @@ import java.util.List;
  * Extended {@link javafx.scene.text.TextFlow} components.
  * @author Naotsugu Kobayashi
  */
-public class TextFlow extends javafx.scene.text.TextFlow {
+public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
 
     /** The text metrics. */
     private TextMetrics metrics;
@@ -102,12 +102,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     }
 
 
-    /**
-     * Get the insertion index.
-     * @param x the specified point x
-     * @param y the specified point y
-     * @return the index of the insertion position
-     */
+    @Override
     public int insertionIndexAt(double x, double y) {
         return hitTest(new Point2D(x, y)).getInsertionIndex();
     }
@@ -146,12 +141,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     }
 
 
-    /**
-     * Get the char value at the specified index.
-     * The first char value is at index 0.
-     * @param index the index of the char value
-     * @return the char value at the specified index of this string.
-     */
+    @Override
     public char charAt(int index) {
         return metrics().textString().charAt(index);
     }
@@ -168,10 +158,7 @@ public class TextFlow extends javafx.scene.text.TextFlow {
     }
 
 
-    /**
-     * Get the length of the text string contained in the text flow.
-     * @return the length of the text string contained in the text flow
-     */
+    @Override
     public int textLength() {
         return metrics().textLength();
     }
@@ -201,6 +188,16 @@ public class TextFlow extends javafx.scene.text.TextFlow {
      */
     public int rowSize() {
         return metrics().rowSize();
+    }
+
+
+    /**
+     * Get the number of wrapped lines.
+     * i.e. {@code lineSize() - rowSize()}
+     * @return the number of wrapped lines
+     */
+    public int wrappedLines() {
+        return lineSize() - rowSize();
     }
 
 
