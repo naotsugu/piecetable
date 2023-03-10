@@ -49,13 +49,11 @@ public class EditorPane extends BorderPane {
      * Initialize garter.
      */
     private void initGarter() {
-        TopGarter topGarter = new TopGarter();
-        LeftGarter leftGarter = new LeftGarter(textPane.rowsPanel());
-        setTop(topGarter);
-        setLeft(leftGarter);
-        topGarter.leftWidthProperty().bind(leftGarter.widthProperty());
-        textPane.prefHeightProperty().bind(heightProperty().subtract(topGarter.heightProperty()));
-        textPane.prefWidthProperty().bind(widthProperty().subtract(leftGarter.widthProperty()));
+        Garter garter = new Garter();
+        garter.addLeft(textPane.rowsPanel());
+        garter.apply(this);
+        textPane.prefHeightProperty().bind(heightProperty().subtract(garter.top().heightProperty()));
+        textPane.prefWidthProperty().bind(widthProperty().subtract(garter.left().widthProperty()));
     }
 
 

@@ -16,10 +16,11 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.ui.util.Colors;
-import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -31,18 +32,62 @@ import javafx.scene.shape.Rectangle;
  */
 public class Garter {
 
-    private final Pane left;
-    private final Pane top;
+    /** The left garter. */
+    private final LeftGarter left;
+
+    /** The top garter. */
+    private final TopGarter top;
 
 
     /**
      * Constructor.
-     * @param leftPanel the left panel
      */
-    public Garter(Pane leftPanel) {
-        left = new LeftGarter(leftPanel);
+    public Garter() {
+        left = new LeftGarter();
         top = new TopGarter(left);
     }
+
+
+    /**
+     * Add node in the left garter.
+     * @param node the node
+     */
+    public void addLeft(Node node) {
+        left.add(node);
+    }
+
+
+    /**
+     * Add node in the top garter.
+     * @param node the node
+     */
+    public void addTop(Node node) {
+        top.add(node);
+    }
+
+
+    /**
+     * Apply to the BorderPane.
+     * @param borderPane the BorderPane
+     */
+    public void apply(BorderPane borderPane) {
+        borderPane.setTop(top);
+        borderPane.setLeft(left);
+    }
+
+
+    /**
+     * Get the left garter.
+     * @return the left garter
+     */
+    public Region left() { return left; }
+
+
+    /**
+     * Get the top garter.
+     * @return the top garter
+     */
+    public Region top() { return top; }
 
 
     /**
@@ -52,11 +97,14 @@ public class Garter {
 
         static final double MIN_WIDTH = 50;
 
-        public LeftGarter(Pane leftPanel) {
+        public LeftGarter() {
             setPrefWidth(MIN_WIDTH);
             setMaxSize(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE);
             setBackground(new Background(new BackgroundFill(Colors.panel, null, null)));
-            getChildren().add(leftPanel);
+        }
+
+        public void add(Node node) {
+            getChildren().add(node);
         }
 
     }
@@ -69,16 +117,23 @@ public class Garter {
 
         private static final double HEIGHT = 4.0;
 
+        private final Rectangle left;
+
         public TopGarter(Pane leftPane) {
             setPrefHeight(HEIGHT);
             setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
             setAlignment(Pos.TOP_LEFT);
             setBackground(new Background(new BackgroundFill(Colors.background, null, null)));
 
-            Rectangle left = new Rectangle(LeftGarter.MIN_WIDTH, HEIGHT, Colors.panel);
+            left = new Rectangle(LeftGarter.MIN_WIDTH, HEIGHT, Colors.panel);
             left.heightProperty().bind(heightProperty());
             left.widthProperty().bind(leftPane.widthProperty());
             getChildren().add(left);
+        }
+
+        public void add(Node node) {
+            node.layoutXProperty().bind(left.widthProperty());
+            getChildren().add(node);
         }
 
     }
