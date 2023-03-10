@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.ui.Pointing;
+import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 
 import java.util.Objects;
@@ -35,18 +36,25 @@ public class CaretBehavior {
     /** The height of view port. */
     private final ReadOnlyDoubleProperty viewHeight;
 
+    /** The width of view port. */
+    private final ReadOnlyDoubleProperty viewWidth;
+
 
     /**
      * Constructor.
      * @param pointing the pointing
      * @param scrollBehavior the scroll behavior
+     * @param viewHeight the height of view port
+     * @param viewWidth the width of view port
      */
     public CaretBehavior(Pointing pointing,
             ScrollBehavior scrollBehavior,
-            ReadOnlyDoubleProperty viewHeight) {
+            ReadOnlyDoubleProperty viewHeight,
+            ReadOnlyDoubleProperty viewWidth) {
         this.pointing = Objects.requireNonNull(pointing);
         this.scrollBehavior = Objects.requireNonNull(scrollBehavior);
         this.viewHeight = Objects.requireNonNull(viewHeight);
+        this.viewWidth = Objects.requireNonNull(viewWidth);
     }
 
 
@@ -59,6 +67,7 @@ public class CaretBehavior {
         if (pointing.caretTop() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
+        scrollColToCaretPoint();
     }
 
 
@@ -71,6 +80,7 @@ public class CaretBehavior {
         if (pointing.caretTop() < 0) {
             scrollBehavior.scrollPrev();
         }
+        scrollColToCaretPoint();
     }
 
 
@@ -83,6 +93,7 @@ public class CaretBehavior {
             scrollBehavior.scrollPrev();
         }
         pointing.up();
+        scrollColToCaretPoint();
     }
 
 
@@ -97,6 +108,7 @@ public class CaretBehavior {
         if (pointing.caretBottom() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
+        scrollColToCaretPoint();
     }
 
 
@@ -105,6 +117,7 @@ public class CaretBehavior {
      */
     public void end() {
         pointing.end();
+        scrollColToCaretPoint();
     }
 
 
@@ -113,6 +126,7 @@ public class CaretBehavior {
      */
     public void home() {
         pointing.home();
+        scrollColToCaretPoint();
     }
 
 
@@ -144,6 +158,19 @@ public class CaretBehavior {
             scrollBehavior.scrollPrev();
         while (pointing.caretBottom() > viewHeight.get())
             scrollBehavior.scrollNext();
+    }
+
+
+    /**
+     * Scroll horizontally to display the caret.
+     */
+    private void scrollColToCaretPoint() {
+        if (pointing.caretX() > (viewWidth.get() - Texts.width * 2)) {
+            double delta = pointing.caretX() - (viewWidth.get() - Texts.width * 2);
+            pointing.setTranslateX(pointing.getTranslateX() - delta);
+        } else if (pointing.caretX() < 0) {
+            pointing.setTranslateX(pointing.getTranslateX() - pointing.caretX());
+        }
     }
 
 }

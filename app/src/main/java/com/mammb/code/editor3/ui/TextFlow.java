@@ -99,6 +99,7 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
     public void clearTranslation() {
         translatedLineOffset = 0;
         setTranslateY(0);
+        setTranslateX(0);
     }
 
 

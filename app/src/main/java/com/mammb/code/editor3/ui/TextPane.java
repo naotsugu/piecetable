@@ -179,7 +179,7 @@ public class TextPane extends StackPane {
     }
 
     private CaretBehavior caretBehavior() {
-        return new CaretBehavior(pointing, scrollBehavior(), heightProperty());
+        return new CaretBehavior(pointing, scrollBehavior(), heightProperty(), widthProperty());
     }
 
     private ConfBehavior confBehavior() {

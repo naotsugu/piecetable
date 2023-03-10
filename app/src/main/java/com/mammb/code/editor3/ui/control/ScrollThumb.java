@@ -46,23 +46,20 @@ class ScrollThumb extends Rectangle {
         setWidth(width);
         setHeight(height);
         setY(0);
-        setArcHeight(4);
-        setArcWidth(4);
+        setArcHeight(8);
+        setArcWidth(8);
         setFill(Colors.thumb);
         setAccessibleRole(AccessibleRole.THUMB);
 
-        initHandler();
         initListener();
     }
 
 
-    private void initHandler() {
-    }
-
-
+    /**
+     * Initialize listener.
+     */
     private void initListener() {
         active.addListener((ob, ov, nv) -> setFill(nv ? Colors.thumbActive : Colors.thumb));
-        widthProperty().bind(lengthProperty());
     }
 
 
@@ -91,11 +88,11 @@ class ScrollThumb extends Rectangle {
 
     // <editor-fold desc="properties">
 
-    public final void setLength(double value) { lengthProperty().set(value); }
+    /**
+     * The property of thumb length.
+     * @return the property of thumb length
+     */
     public final DoubleProperty lengthProperty() { return length; }
-
-    public final void setActive(boolean value) { activeProperty().set(value); }
-    public final BooleanProperty activeProperty() { return active; }
 
     // </editor-fold>
 

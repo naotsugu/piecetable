@@ -82,6 +82,7 @@ public class ScreenBound {
         rowOffset.set(value);
     }
 
+    // <editor-fold desc="properties">
 
     public IntegerProperty rowOffsetProperty() { return rowOffset; }
     public IntegerProperty visibleRowSizeProperty() { return visibleRowSize; }
@@ -90,5 +91,7 @@ public class ScreenBound {
     public DoubleProperty colOffsetProperty() { return colOffset; }
     public DoubleProperty visibleColSizeProperty() { return visibleColSize; }
     public DoubleProperty totalColSizeProperty() { return totalColSize; }
+
+    // </editor-fold>
 
 }

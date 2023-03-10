@@ -18,7 +18,7 @@ package com.mammb.code.editor3.ui;
 import javafx.scene.layout.Region;
 
 /**
- * Pointing.
+ * The layer of caret and selection.
  * @author Naotsugu Kobayashi
  */
 public class Pointing extends Region {
@@ -40,11 +40,11 @@ public class Pointing extends Region {
         this.selection = new Selection(textFlow);
 
         setManaged(false);
-        translateXProperty().bind(textFlow.translateXProperty());
-        translateYProperty().bind(textFlow.translateYProperty());
-
         layoutXProperty().bind(textFlow.layoutXProperty().add(textFlow.getPadding().getLeft()));
         layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()).subtract(1));
+
+        translateYProperty().bind(textFlow.translateYProperty());
+        translateXProperty().bindBidirectional(textFlow.translateXProperty());
 
         getChildren().setAll(selection, caret);
     }
@@ -68,12 +68,13 @@ public class Pointing extends Region {
         selection.shiftOffset(delta);
     }
 
+
     /**
      * Move the caret to the right.
      */
     public void right() {
         caret.right();
-        postCaretMoved();
+        selection.moveCaretTo(caret.offset());
     }
 
 
@@ -82,7 +83,7 @@ public class Pointing extends Region {
      */
     public void left() {
         caret.left();
-        postCaretMoved();
+        selection.moveCaretTo(caret.offset());
     }
 
 
@@ -91,7 +92,7 @@ public class Pointing extends Region {
      */
     public void end() {
         caret.end();
-        postCaretMoved();
+        selection.moveCaretTo(caret.offset());
     }
 
 
@@ -100,7 +101,7 @@ public class Pointing extends Region {
      */
     public void home() {
         caret.home();
-        postCaretMoved();
+        selection.moveCaretTo(caret.offset());
     }
 
 
@@ -109,7 +110,7 @@ public class Pointing extends Region {
      */
     public void down() {
         caret.down();
-        postCaretMoved();
+        selection.moveCaretTo(caret.offset());
     }
 
 
@@ -118,7 +119,7 @@ public class Pointing extends Region {
      */
     public void up() {
         caret.up();
-        postCaretMoved();
+        selection.moveCaretTo(caret.offset());
     }
 
 
@@ -166,6 +167,15 @@ public class Pointing extends Region {
 
 
     /**
+     * Get the caret x position.
+     * @return the caret x position
+     */
+    public double caretX() {
+        return getTranslateX() + caret.physicalX();
+    }
+
+
+    /**
      * Start selection.
      */
     public void startSelection() {
@@ -187,16 +197,6 @@ public class Pointing extends Region {
      */
     public boolean selectionOn() {
         return selection.on();
-    }
-
-
-    /**
-     * Post caret moved.
-     */
-    private void postCaretMoved() {
-        if (selection.on()) {
-            selection.moveCaretTo(caret.offset());
-        }
     }
 
 }

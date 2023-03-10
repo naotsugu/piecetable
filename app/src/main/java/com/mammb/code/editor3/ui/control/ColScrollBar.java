@@ -90,9 +90,9 @@ public class ColScrollBar extends StackPane {
      * @param newValue the new value
      */
     private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        double val = clamp(newValue.doubleValue());
-        double x = (visibleAmount.get() - thumb.getWidth()) * (val - min.get()) / max.get() - min.get();
-        thumb.setX(clamp(x));
+        double val = clamp(-newValue.doubleValue());
+        double x = visibleAmount.get() * (val - min.get()) / max.get() - min.get();
+        thumb.setX(x);
     }
 
 
