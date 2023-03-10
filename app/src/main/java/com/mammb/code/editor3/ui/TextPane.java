@@ -45,16 +45,16 @@ public class TextPane extends StackPane {
     private final Stage stage;
 
     /** The text flow pane. */
-    private final TextFlow textFlow = new TextFlow();
+    private final TextFlow textFlow;
 
     /** The pointing. */
-    private final Pointing pointing = new Pointing(textFlow);
-
-    /** The rows panel. */
-    private final RowsPanel rowsPanel = new RowsPanel(textFlow);
+    private final Pointing pointing;
 
     /** The screen bound. */
     private final ScreenBound screenBound;
+
+    /** The rows panel. */
+    private final RowsPanel rowsPanel;
 
     /** The text model. */
     private TextModel model;
@@ -68,7 +68,11 @@ public class TextPane extends StackPane {
 
         this.stage = Objects.requireNonNull(stage);
         this.model = Objects.requireNonNull(model);
+
+        this.textFlow = new TextFlow();
+        this.pointing = new Pointing(textFlow);
         this.screenBound = new ScreenBound(this, textFlow);
+        this.rowsPanel = new RowsPanel(textFlow);
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
@@ -171,7 +175,7 @@ public class TextPane extends StackPane {
 
 
     private ScrollBehavior scrollBehavior() {
-        return new ScrollBehavior(textFlow, pointing, model, rowsPanel);
+        return new ScrollBehavior(textFlow, pointing, model, screenBound, rowsPanel);
     }
 
     private CaretBehavior caretBehavior() {

@@ -57,7 +57,6 @@ class ScrollThumb extends Rectangle {
 
 
     private void initHandler() {
-
     }
 
 

@@ -18,6 +18,7 @@ package com.mammb.code.editor3.ui.control;
 import com.mammb.code.editor3.ui.util.Colors;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.AccessibleRole;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -65,6 +66,8 @@ public class ColScrollBar extends StackPane {
 
     private void initListener() {
         max.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbWidth()));
+        visibleAmount.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbWidth()));
+        value.addListener(this::handleValueChanged);
     }
 
 
@@ -77,6 +80,19 @@ public class ColScrollBar extends StackPane {
         double thumbWidth = getWidth() * length / Math.max(max.get() - min.get(), length);
         setVisible(thumbWidth != getWidth());
         return Math.max(thumbWidth, HEIGHT);
+    }
+
+
+    /**
+     * The value change handler.
+     * @param observable the ObservableValue which value changed
+     * @param oldValue the old value
+     * @param newValue the new value
+     */
+    private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        double val = clamp(newValue.doubleValue());
+        double x = (visibleAmount.get() - thumb.getWidth()) * (val - min.get()) / max.get() - min.get();
+        thumb.setX(clamp(x));
     }
 
 

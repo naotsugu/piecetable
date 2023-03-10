@@ -18,6 +18,7 @@ package com.mammb.code.editor3.ui.control;
 import com.mammb.code.editor3.ui.util.Colors;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.AccessibleRole;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -64,6 +65,8 @@ public class RowScrollBar extends StackPane {
 
     private void initListener() {
         max.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbHeight()));
+        visibleAmount.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbHeight()));
+        value.addListener(this::handleValueChanged);
     }
 
     public void setLayoutHeight(double height) {
@@ -82,6 +85,17 @@ public class RowScrollBar extends StackPane {
         return thumbHeight;
     }
 
+    /**
+     * The value change handler.
+     * @param observable the ObservableValue which value changed
+     * @param oldValue the old value
+     * @param newValue the new value
+     */
+    private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        double val = clamp(newValue.intValue());
+        double y = getHeight() * (val - min.get()) / max.get() - min.get();
+        thumb.setY(y);
+    }
 
     private int clamp(int value) {
         return Math.min(Math.max(min.get(), value), max.get());
