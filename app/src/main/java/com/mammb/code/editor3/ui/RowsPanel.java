@@ -43,17 +43,13 @@ public class RowsPanel extends Pane {
      * Constructor.
      * @param flow the text flow
      */
-    public RowsPanel(TextFlow flow) {
+    public RowsPanel(TextFlow flow, ScreenBound screenBound) {
         this.flow = flow;
-        initListener();
-    }
 
-
-    /**
-     * Initialize listener.
-     */
-    private void initListener() {
+        // the panel scrolls in sync with the text flow.
         translateYProperty().bind(flow.translateYProperty());
+        // The starting row number is sync with screen bound row offset.
+        screenBound.rowOffsetProperty().addListener((os, ov, nv) -> draw(nv.intValue()));
     }
 
 
@@ -61,7 +57,7 @@ public class RowsPanel extends Pane {
      * Draw the row number.
      * @param origin the origin number(zero based)
      */
-    public void draw(int origin) {
+    private void draw(int origin) {
         this.origin = origin;
         getChildren().clear();
         double y = 0;

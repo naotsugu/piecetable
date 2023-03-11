@@ -42,9 +42,6 @@ public class ScrollBehavior {
     /** The screen bound. */
     private final ScreenBound screenBound;
 
-    /** The rows panel. */
-    private final RowsPanel rowsPanel;
-
 
     /**
      * Constructor.
@@ -52,15 +49,13 @@ public class ScrollBehavior {
      * @param pointing the pointing
      * @param model the text model
      * @param screenBound the screen bound
-     * @param rowsPanel the rows panel
      */
     public ScrollBehavior(TextFlow textFlow, Pointing pointing,
-            TextModel model, ScreenBound screenBound, RowsPanel rowsPanel) {
+            TextModel model, ScreenBound screenBound) {
         this.textFlow = Objects.requireNonNull(textFlow);
         this.pointing = Objects.requireNonNull(pointing);
         this.model = Objects.requireNonNull(model);
         this.screenBound = Objects.requireNonNull(screenBound);
-        this.rowsPanel = Objects.requireNonNull(rowsPanel);
     }
 
 
@@ -80,7 +75,7 @@ public class ScrollBehavior {
             // If there are enough lines to read (if the text is wrapped),
             // only the Y-axis coordinate transformation is performed.
             textFlow.translateLineNext();
-            screenBound.setRowOffset(model.originRowIndex() + textFlow.translatedLineOffset());
+            screenBound.setRowOffset(model.originRowIndex(), textFlow.translatedLineOffset());
         } else {
             // Read next rows from the backing model.
             scrollNext(textFlow.translatedShiftRow() + 1);
@@ -95,7 +90,7 @@ public class ScrollBehavior {
         if (textFlow.translatedLineOffset() > 0) {
             // If row scrolling by Y-axis transformation is possible.
             textFlow.translateLinePrev();
-            screenBound.setRowOffset(model.originRowIndex() + textFlow.translatedLineOffset());
+            screenBound.setRowOffset(model.originRowIndex(), textFlow.translatedLineOffset());
         } else {
             // Read previous rows from the backing model.
             int shiftedOffset = scrollPrev(1);
@@ -163,9 +158,8 @@ public class ScrollBehavior {
         if (shiftedOffset != 0) {
             textFlow.setAll(Texts.asText(model.text()));
             pointing.addOffset(shiftedOffset);
-            rowsPanel.draw(model.originRowIndex());
             screenBound.setTotalRowSize(model.totalRowSize() + textFlow.wrappedLines());
-            screenBound.setRowOffset(model.originRowIndex() + textFlow.translatedLineOffset());
+            screenBound.setRowOffset(model.originRowIndex(), textFlow.translatedLineOffset());
         }
     }
 

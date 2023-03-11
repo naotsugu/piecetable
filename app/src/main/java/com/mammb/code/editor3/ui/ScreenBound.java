@@ -30,6 +30,8 @@ public class ScreenBound {
 
     /** The row offset. */
     private final IntegerProperty rowOffset = new SimpleIntegerProperty(0);
+    /** The row slip offset. */
+    private final IntegerProperty rowSlipOffset = new SimpleIntegerProperty(0);
     /** The col offset. */
     private final DoubleProperty colOffset = new SimpleDoubleProperty(0);
 
@@ -77,14 +79,17 @@ public class ScreenBound {
     /**
      * Set the row offset.
      * @param value the row offset
+     * @param slipLine the number of slip line
      */
-    public void setRowOffset(int value) {
+    public void setRowOffset(int value, int slipLine) {
         rowOffset.set(value);
+        rowSlipOffset.set(value + slipLine);
     }
 
     // <editor-fold desc="properties">
 
     public IntegerProperty rowOffsetProperty() { return rowOffset; }
+    public IntegerProperty rowSlipOffsetProperty() { return rowSlipOffset; }
     public IntegerProperty visibleRowSizeProperty() { return visibleRowSize; }
     public IntegerProperty totalRowSizeProperty() { return totalRowSize; }
 

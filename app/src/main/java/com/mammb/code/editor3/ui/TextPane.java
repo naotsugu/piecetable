@@ -72,7 +72,7 @@ public class TextPane extends StackPane {
         this.textFlow = new TextFlow();
         this.pointing = new Pointing(textFlow);
         this.screenBound = new ScreenBound(this, textFlow);
-        this.rowsPanel = new RowsPanel(textFlow);
+        this.rowsPanel = new RowsPanel(textFlow, screenBound);
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
@@ -150,11 +150,9 @@ public class TextPane extends StackPane {
         pointing.clear();
         pointing.addOffset(caretOffset);
 
-        rowsPanel.draw(model.originRowIndex());
-
         screenBound.setTotalRowSize(model.totalRowSize() + textFlow.wrappedLines());
-        screenBound.setRowOffset(model.originRowIndex() + textFlow.translatedLineOffset());
-
+        screenBound.setRowOffset(model.originRowIndex(), textFlow.translatedLineOffset());
+        rowsPanel.redraw();
     }
 
 
@@ -175,7 +173,7 @@ public class TextPane extends StackPane {
 
 
     private ScrollBehavior scrollBehavior() {
-        return new ScrollBehavior(textFlow, pointing, model, screenBound, rowsPanel);
+        return new ScrollBehavior(textFlow, pointing, model, screenBound);
     }
 
     private CaretBehavior caretBehavior() {
