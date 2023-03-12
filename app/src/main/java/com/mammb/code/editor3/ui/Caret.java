@@ -182,8 +182,8 @@ public class Caret extends Path {
 
 
     /**
-     * Get the caret offset.
-     * @return the caret offset
+     * Get the text flow based caret offset.
+     * @return the text flow based caret offset
      */
     public int offset() { return offset; }
 

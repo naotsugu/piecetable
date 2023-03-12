@@ -19,6 +19,7 @@ import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
 import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
+import com.mammb.code.editor3.ui.behavior.EditBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.handler.DragDrop;
 import com.mammb.code.editor3.ui.handler.KeyPressedHandler;
@@ -90,9 +91,9 @@ public class TextPane extends StackPane {
 
     private void initHandler() {
 
-        setOnKeyTyped(KeyTypedHandler.of());
+        setOnKeyTyped(KeyTypedHandler.of(editBehavior()));
         setOnKeyPressed(KeyPressedHandler.of(
-            caretBehavior(), scrollBehavior(),
+            caretBehavior(), scrollBehavior(), editBehavior(),
             fileChooseBehavior(), confBehavior()));
 
         setOnScroll(ScrollHandler.of(scrollBehavior()));
@@ -186,6 +187,10 @@ public class TextPane extends StackPane {
 
     private FileChooseBehavior fileChooseBehavior() {
         return new FileChooseBehavior(this);
+    }
+
+    private EditBehavior editBehavior() {
+        return new EditBehavior(model, pointing, textFlow, caretBehavior());
     }
 
     RowsPanel rowsPanel() { return rowsPanel; }

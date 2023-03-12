@@ -70,6 +70,12 @@ public class Scrolling extends Region {
 
     // -- private -------------------------------------------------------------
 
+    /**
+     * The handler of bounds changed.
+     * @param observable the ObservableValue which value changed
+     * @param oldValue the old value newValue
+     * @param newValue the new value
+     */
     private void boundsChanged(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
         if (oldValue.getWidth() != newValue.getWidth()) {
             rowScroll.setLayoutX(newValue.getWidth() - (rowScroll.getWidth() + 2));

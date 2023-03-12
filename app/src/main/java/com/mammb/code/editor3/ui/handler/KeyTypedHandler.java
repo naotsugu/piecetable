@@ -15,6 +15,8 @@
  */
 package com.mammb.code.editor3.ui.handler;
 
+import com.mammb.code.editor3.ui.behavior.EditBehavior;
+import com.mammb.code.editor3.ui.util.Keys;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 
@@ -24,10 +26,15 @@ import javafx.scene.input.KeyEvent;
  */
 public class KeyTypedHandler implements EventHandler<KeyEvent> {
 
+    /** The input behavior. */
+    private final EditBehavior editBehavior;
+
+
     /**
      * Constructor.
      */
-    private KeyTypedHandler() {
+    private KeyTypedHandler(EditBehavior editBehavior) {
+        this.editBehavior = editBehavior;
     }
 
 
@@ -35,14 +42,31 @@ public class KeyTypedHandler implements EventHandler<KeyEvent> {
      * Create a new {@code EventHandler<KeyEvent>}.
      * @return a new {@code EventHandler<KeyEvent>}
      */
-    public static EventHandler<KeyEvent> of() {
-        return new KeyTypedHandler();
+    public static EventHandler<KeyEvent> of(EditBehavior editBehavior) {
+        return new KeyTypedHandler(editBehavior);
     }
 
 
     @Override
     public void handle(KeyEvent e) {
-        System.out.println(e.getCharacter());
+
+        if (e.getCode().isFunctionKey() || e.getCode().isNavigationKey() ||
+            e.getCode().isArrowKey() || e.getCode().isModifierKey() ||
+            e.getCode().isMediaKey() || !Keys.controlKeysFilter.test(e) ||
+            e.getCharacter().length() == 0) {
+            return;
+        }
+        int ascii = e.getCharacter().getBytes()[0];
+        if (ascii < 32 || ascii == 127) {
+            // 127:DEL
+            if (ascii != 9 && ascii != 10 && ascii != 13) {
+                // 9:HT 10:LF 13:CR
+                return;
+            }
+        }
+
+        editBehavior.input(e.getCharacter());
+
     }
 
 }

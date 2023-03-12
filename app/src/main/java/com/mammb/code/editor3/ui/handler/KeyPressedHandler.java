@@ -17,6 +17,7 @@ package com.mammb.code.editor3.ui.handler;
 
 import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
+import com.mammb.code.editor3.ui.behavior.EditBehavior;
 import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.util.Keys;
@@ -36,6 +37,9 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     /** The scroll behavior. */
     private final ScrollBehavior scrollBehavior;
 
+    /** The edit behavior. */
+    private final EditBehavior editBehavior;
+
     /** The file choose behavior. */
     private final FileChooseBehavior fileChooseBehavior;
 
@@ -47,15 +51,19 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
      * Constructor.
      * @param caretBehavior the caret behavior
      * @param scrollBehavior the scroll behavior
+     * @param editBehavior the edit behavior
      * @param fileChooseBehavior the file choose behavior
+     * @param confBehavior the conf behavior
      */
     private KeyPressedHandler(
             CaretBehavior caretBehavior,
             ScrollBehavior scrollBehavior,
+            EditBehavior editBehavior,
             FileChooseBehavior fileChooseBehavior,
             ConfBehavior confBehavior) {
         this.caretBehavior = caretBehavior;
         this.scrollBehavior = scrollBehavior;
+        this.editBehavior = editBehavior;
         this.fileChooseBehavior = fileChooseBehavior;
         this.confBehavior = confBehavior;
     }
@@ -65,15 +73,18 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
      * Create a new {@code KeyPressedHandler}.
      * @param caretBehavior the caret behavior
      * @param scrollBehavior the scroll behavior
+     * @param editBehavior the edit behavior
      * @param fileChooseBehavior the file choose behavior
+     * @param confBehavior the conf behavior
      * @return a new {@code KeyPressedHandler}
      */
     public static EventHandler<KeyEvent> of(
             CaretBehavior caretBehavior,
             ScrollBehavior scrollBehavior,
+            EditBehavior editBehavior,
             FileChooseBehavior fileChooseBehavior,
             ConfBehavior confBehavior) {
-        return new KeyPressedHandler(caretBehavior, scrollBehavior,
+        return new KeyPressedHandler(caretBehavior, scrollBehavior, editBehavior,
             fileChooseBehavior, confBehavior);
     }
 
@@ -95,8 +106,8 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             case END        -> caretBehavior.end();
             case PAGE_UP    -> scrollBehavior.pageUp();
             case PAGE_DOWN  -> scrollBehavior.pageDown();
-            case DELETE     -> System.out.println("del");
-            case BACK_SPACE -> System.out.println("bs");
+            case DELETE     -> editBehavior.delete();
+            case BACK_SPACE -> editBehavior.backspace();
             case F1         -> System.out.println("f1");
             case ESCAPE     -> System.out.println("esc");
             default -> { }

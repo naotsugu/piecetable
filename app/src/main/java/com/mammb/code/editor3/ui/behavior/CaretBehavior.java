@@ -131,6 +131,15 @@ public class CaretBehavior {
 
 
     /**
+     * Scroll the screen to the caret position, if the caret is off-screen.
+     */
+    public void at() {
+        scrollToCaretPoint();
+        scrollColToCaretPoint();
+    }
+
+
+    /**
      * Start select.
      */
     public void select() {
