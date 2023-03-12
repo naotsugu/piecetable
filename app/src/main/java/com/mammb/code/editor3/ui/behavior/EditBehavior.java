@@ -92,8 +92,11 @@ public class EditBehavior {
         textFlow.setAll(Texts.asText(model.text()));
     }
 
-    private void selectionDelete() {
 
+    private void selectionDelete() {
+        int[] range = pointing.selectionOffsets();
+        model.delete(range[0], range[1] - range[0]);
+        pointing.clearSelection();
     }
 
 }

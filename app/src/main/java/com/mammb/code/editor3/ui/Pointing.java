@@ -184,6 +184,19 @@ public class Pointing extends Region {
 
 
     /**
+     * Get the selection offsets.
+     * @return the selection offsets
+     */
+    public int[] selectionOffsets() {
+        int start = selection.openOffset();
+        int end   = selection.closeOffset();
+        return new int[] {
+            Math.min(start, end),
+            Math.max(start, end) };
+    }
+
+
+    /**
      * Clear this selection.
      */
     public void clearSelection() {

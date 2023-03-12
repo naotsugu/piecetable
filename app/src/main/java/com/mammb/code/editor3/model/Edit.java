@@ -94,7 +94,7 @@ public class Edit {
     }
 
     public Edit marge(Edit other) {
-        return new Edit(this.type, this.position, this.string + other.string, other.occurredOn);
+        return new Edit(other.type, other.position, this.string + other.string, other.occurredOn);
     }
 
     /**

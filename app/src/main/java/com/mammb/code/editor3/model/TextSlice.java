@@ -67,6 +67,9 @@ public class TextSlice {
 
     public void delete(int offset, int length) {
         String deleted = buffer.delete(offset, length);
+        if (length > buffer.length()) {
+            deleted = source.substring(offset + originOffset, length);
+        }
         source.handle(Edit.delete(offset, deleted));
         fitRow();
     }

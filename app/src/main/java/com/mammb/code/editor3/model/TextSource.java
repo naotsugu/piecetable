@@ -98,6 +98,21 @@ public class TextSource implements EventListener<Edit> {
 
 
     /**
+     * Get the string.
+     * @param charOffset the char offset
+     * @param charLength the char length
+     * @return the string
+     */
+    public String substring(int charOffset, int charLength) {
+        int offsetCodePoint = asCodePointCount(charOffset);
+        flush();
+        return new String(
+            source.bytes(offset + offsetCodePoint, Until.charLength(charLength)),
+            charset);
+    }
+
+
+    /**
      * Get the rows from content head.
      * @param rowCount the number of rows to retrieve
      * @return the before row

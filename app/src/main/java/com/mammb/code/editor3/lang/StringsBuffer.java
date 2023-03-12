@@ -95,8 +95,9 @@ public class StringsBuffer {
      * @return the deleted string
      */
     public String delete(int offset, int length) {
-        String deleted = value.substring(offset, offset + length);
-        value.delete(offset, offset + length);
+        int end = Math.min(offset + length, value.length());
+        String deleted = value.substring(offset, end);
+        value.delete(offset, end);
         metrics.clear();
         if (rowSizeCache > -1) {
             rowSizeCache -= Strings.countLf(deleted);
