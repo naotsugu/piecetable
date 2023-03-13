@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor.Strings;
 import com.mammb.code.editor3.lang.StringsBuffer;
 import java.util.Objects;
 
@@ -59,19 +58,26 @@ public class TextSlice {
      * @param string
      */
     public void insert(int offset, String string) {
+        int beforeRowSize = buffer.rowSize();
         buffer.insert(offset, string);
         source.handle(Edit.insert(offset, string));
-        fitRow();
+        if (beforeRowSize < buffer.rowSize()) {
+            buffer.truncateRows(buffer.rowSize() - beforeRowSize);
+        }
     }
 
 
     public void delete(int offset, int length) {
+        int beforeRowSize = buffer.rowSize();
         String deleted = buffer.delete(offset, length);
         if (length > buffer.length()) {
             deleted = source.substring(offset + originOffset, length);
         }
         source.handle(Edit.delete(offset, deleted));
-        fitRow();
+
+        if (beforeRowSize > buffer.rowSize()) {
+            buffer.append(source.afterRow(buffer.length(), beforeRowSize - buffer.rowSize()));
+        }
     }
 
 
@@ -89,7 +95,6 @@ public class TextSlice {
             int n = source.shiftRow(rowDelta);
             originOffset += buffer.shiftAppend(tail);
             originRow += n;
-
         } else if (rowDelta < 0) {
             // scroll prev (i.e. arrow up)
             if (originRow == 0) return;
@@ -106,15 +111,6 @@ public class TextSlice {
 
     public void refresh() {
         buffer.set(source.rows(maxRowSize));
-    }
-
-
-    private void fitRow() {
-        if (maxRowSize > buffer.rowSize() && source.totalRowSize() > maxRowSize) {
-            buffer.append(source.afterRow(buffer.length()));
-        } else if (buffer.rowSize() > maxRowSize) {
-            buffer.truncateRows(buffer.rowSize() - maxRowSize);
-        }
     }
 
 

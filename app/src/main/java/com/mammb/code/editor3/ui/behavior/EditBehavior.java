@@ -63,12 +63,9 @@ public class EditBehavior {
             // Enter key : 13:CR -> replace to 10:LF
             value = value.replace('\r', '\n');
         }
-
         model.add(pointing.caretOffset(), value);
-        caretBehavior.right();
-
         textFlow.setAll(Texts.asText(model.text()));
-
+        caretBehavior.right();
     }
 
 

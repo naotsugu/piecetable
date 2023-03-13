@@ -91,6 +91,7 @@ public class ScrollBehavior {
             // If row scrolling by Y-axis transformation is possible.
             textFlow.translateLinePrev();
             screenBound.setRowOffset(model.originRowIndex(), textFlow.translatedLineOffset());
+
         } else {
             // Read previous rows from the backing model.
             int shiftedOffset = scrollPrev(1);
