@@ -71,7 +71,8 @@ public class ScrollBehavior {
             return;
         }
         if (!model.hasNextSlice() ||
-            textFlow.lineSize() - model.capacityOfRows() > textFlow.translatedLineOffset() + 1) {
+            //textFlow.wrappedLines() > textFlow.translatedLineOffset() ||
+            textFlow.lineSize(textFlow.translatedShiftRow()) > textFlow.translatedLineOffset() + 1) {
             // If there are enough lines to read (if the text is wrapped),
             // only the Y-axis coordinate transformation is performed.
             textFlow.translateLineNext();

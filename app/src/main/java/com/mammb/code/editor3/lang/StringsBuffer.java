@@ -65,7 +65,7 @@ public class StringsBuffer {
      */
     public void truncateRows(int n) {
         for (int i = 0; i < n; i++) {
-            value.delete(rowIndex(rowSize() - 1), value.length());
+            value.delete(rowIndex(rowSize() - (1 + tailGap())), value.length());
         }
         metrics.clear();
         if (rowSizeCache > -1) {
@@ -132,8 +132,7 @@ public class StringsBuffer {
         if (cs.isEmpty()) return 0;
         int lf = Strings.countLf(cs);
         int rowIndex = rowIndex(row);
-        int gap = (value.charAt(value.length() - 1) == '\n') ? 1 : 0;
-        int len = IntStream.range(rowSize() - (lf + gap), rowSize())
+        int len = IntStream.range(rowSize() - (lf + tailGap()), rowSize())
             .map(this::rowLength).sum();
         if (len > 0) value.delete(value.length() - len, value.length());
         else if (rowSizeCache > -1) rowSizeCache += lf;
@@ -243,6 +242,12 @@ public class StringsBuffer {
     }
 
     // -- private -------------------------------------------------------------
+
+
+    private int tailGap() {
+        return (value.charAt(value.length() - 1) == '\n') ? 1 : 0;
+    }
+
 
     /**
      * Get the initialized metrics.
