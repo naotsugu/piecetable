@@ -64,9 +64,7 @@ public class StringsBuffer {
      * @param n the number of row to truncate
      */
     public void truncateRows(int n) {
-        for (int i = 0; i < n; i++) {
-            value.delete(rowIndex(rowSize() - (1 + tailGap())), value.length());
-        }
+        value.delete(rowIndex(rowSize() - (n + tailGap())), value.length());
         metrics.clear();
         if (rowSizeCache > -1) {
             rowSizeCache -= n;

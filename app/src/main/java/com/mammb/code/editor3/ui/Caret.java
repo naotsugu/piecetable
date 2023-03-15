@@ -33,7 +33,7 @@ import javafx.util.Duration;
 public class Caret extends Path {
 
     /** The default height of caret. */
-    private static double DEFAULT_HEIGHT = Texts.height;
+    private static final double DEFAULT_HEIGHT = Texts.height;
 
     /** The screenText. */
     private final ScreenText text;

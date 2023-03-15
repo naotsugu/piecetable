@@ -190,7 +190,7 @@ public class TextPane extends StackPane {
     }
 
     private EditBehavior editBehavior() {
-        return new EditBehavior(model, pointing, textFlow, caretBehavior());
+        return new EditBehavior(model, pointing, textFlow, rowsPanel, caretBehavior());
     }
 
     RowsPanel rowsPanel() { return rowsPanel; }

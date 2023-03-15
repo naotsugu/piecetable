@@ -61,7 +61,7 @@ public class TextSlice {
         int beforeRowSize = buffer.rowSize();
         buffer.insert(offset, string);
         source.handle(Edit.insert(offset, string));
-        if (beforeRowSize < buffer.rowSize()) {
+        if (hasNext() && beforeRowSize < buffer.rowSize()) {
             buffer.truncateRows(buffer.rowSize() - beforeRowSize);
         }
     }

@@ -17,6 +17,7 @@ package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
+import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.util.Texts;
 
@@ -35,6 +36,9 @@ public class EditBehavior {
     /** The text flow pane. */
     private final TextFlow textFlow;
 
+    /** The rows panel. */
+    private final RowsPanel rowsPanel;
+
     /** The caret behavior. */
     private final CaretBehavior caretBehavior;
 
@@ -44,13 +48,16 @@ public class EditBehavior {
      * @param model the text model
      * @param pointing the pointing
      * @param textFlow the text flow pane
+     * @param rowsPanel the rows panel
      * @param caretBehavior the caret behavior
      */
     public EditBehavior(TextModel model, Pointing pointing,
-            TextFlow textFlow, CaretBehavior caretBehavior) {
+            TextFlow textFlow, RowsPanel rowsPanel,
+            CaretBehavior caretBehavior) {
         this.model = model;
         this.pointing = pointing;
         this.textFlow = textFlow;
+        this.rowsPanel = rowsPanel;
         this.caretBehavior = caretBehavior;
     }
 
@@ -66,6 +73,7 @@ public class EditBehavior {
         model.add(pointing.caretOffset(), value);
         textFlow.setAll(Texts.asText(model.text()));
         caretBehavior.right();
+        rowsPanel.redraw();
     }
 
 
@@ -76,6 +84,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
+        rowsPanel.redraw();
     }
 
 
@@ -87,6 +96,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
+        rowsPanel.redraw();
     }
 
 

@@ -17,11 +17,9 @@ package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
-import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.ScreenBound;
 import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.util.Texts;
-
 import java.util.Objects;
 
 /**
@@ -63,16 +61,20 @@ public class ScrollBehavior {
      * Scroll next (i.e. arrow down).
      */
     public void scrollNext() {
-        if (!model.hasNextSlice() &&
-            textFlow.translatedLineOffset() >= textFlow.lineSize() - 1) {
+
+        boolean tailOfSlice = !model.hasNextSlice();
+
+        if (tailOfSlice && textFlow.translatedLineOffset() >= textFlow.lineSize() - 1) {
             // Do not scroll anymore, when if the end of row is reached
             // and the minimum number of rows has been reached.
             // Retain the last '1' line of display.
             return;
         }
-        if (!model.hasNextSlice() ||
-            //textFlow.wrappedLines() > textFlow.translatedLineOffset() ||
-            textFlow.lineSize(textFlow.translatedShiftRow()) > textFlow.translatedLineOffset() + 1) {
+
+        int nextHeight = textFlow.lineSize(textFlow.translatedShiftRow() + 1);
+        int extra = textFlow.wrappedLines() - textFlow.translatedLineOffset();
+
+        if (tailOfSlice || extra >= nextHeight) {
             // If there are enough lines to read (if the text is wrapped),
             // only the Y-axis coordinate transformation is performed.
             textFlow.translateLineNext();
