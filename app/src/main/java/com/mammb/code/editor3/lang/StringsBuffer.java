@@ -93,8 +93,10 @@ public class StringsBuffer {
      * @return the deleted string
      */
     public String delete(int offset, int length) {
+
         int end = Math.min(offset + length, value.length());
         String deleted = value.substring(offset, end);
+
         value.delete(offset, end);
         metrics.clear();
         if (rowSizeCache > -1) {
@@ -110,10 +112,13 @@ public class StringsBuffer {
      * @return the number of deleted character
      */
     public int shiftAppend(CharSequence tail) {
+
         int lf = Strings.countLf(tail);
         int len = IntStream.range(0, lf).map(this::rowLength).sum();
+
         if (len > 0) value.delete(0, len);
         else if (rowSizeCache > -1) rowSizeCache += lf;
+
         value.append(tail);
         metrics.clear();
         return len;
@@ -127,15 +132,21 @@ public class StringsBuffer {
      * @return the number of deleted character
      */
     public int shiftInsert(int row, CharSequence cs) {
+
         if (cs.isEmpty()) return 0;
-        int lf = Strings.countLf(cs);
+
         int rowIndex = rowIndex(row);
+        int lf = Strings.countLf(cs);
+
         int len = IntStream.range(rowSize() - (lf + tailGap()), rowSize())
             .map(this::rowLength).sum();
+
         if (len > 0) value.delete(value.length() - len, value.length());
         else if (rowSizeCache > -1) rowSizeCache += lf;
+
         value.insert(rowIndex, cs);
         metrics.clear();
+
         return len;
     }
 
@@ -242,6 +253,18 @@ public class StringsBuffer {
     // -- private -------------------------------------------------------------
 
 
+    /**
+     * Get the tail gap.
+     * <pre>
+     *     gap:1       gap:0       gap:1
+     *     --------    --------    --------
+     *     xxx$        xxx$        xxx$
+     *     xx$         xx|        |
+     *    |
+     *     --------    --------    --------
+     * </pre>
+     * @return
+     */
     private int tailGap() {
         return (value.charAt(value.length() - 1) == '\n') ? 1 : 0;
     }
