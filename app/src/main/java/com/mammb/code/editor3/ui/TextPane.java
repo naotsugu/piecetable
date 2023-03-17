@@ -24,6 +24,8 @@ import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.handler.DragDrop;
 import com.mammb.code.editor3.ui.handler.KeyPressedHandler;
 import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
+import com.mammb.code.editor3.ui.handler.MouseClickedHandler;
+import com.mammb.code.editor3.ui.handler.MouseDraggedHandler;
 import com.mammb.code.editor3.ui.handler.ScrollHandler;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.value.ObservableValue;
@@ -100,6 +102,9 @@ public class TextPane extends StackPane {
 
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
+
+        setOnMouseClicked(MouseClickedHandler.of(caretBehavior()));
+        setOnMouseDragged(MouseDraggedHandler.of());
 
     }
 

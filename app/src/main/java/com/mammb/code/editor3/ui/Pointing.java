@@ -124,6 +124,24 @@ public class Pointing extends Region {
 
 
     /**
+     * Move the caret to the specified point.
+     * @param x point of x
+     * @param y point of y
+     */
+    public void caretAt(double x, double y) {
+        caret.at(x, y);
+    }
+
+
+    /**
+     * Select text around the caret.
+     */
+    public void selectAround() {
+        selection.selectAround();
+    }
+
+
+    /**
      * Hide caret.
      */
     public void hideCaret() {

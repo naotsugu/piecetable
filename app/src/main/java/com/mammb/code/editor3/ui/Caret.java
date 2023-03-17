@@ -176,6 +176,17 @@ public class Caret extends Path {
     public void up() { moveToPointRow(physicalY - 1); }
 
 
+    /**
+     * Move the caret to the specified point.
+     * @param x point of x
+     * @param y point of y
+     */
+    public void at(double x, double y) {
+        moveToPoint(x, y);
+        logicalX = physicalX;
+    }
+
+
     public double physicalYInParent() {
         return physicalY + getTranslateY();
     }

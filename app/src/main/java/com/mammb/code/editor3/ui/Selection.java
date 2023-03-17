@@ -94,6 +94,14 @@ public class Selection extends Path {
 
 
     /**
+     * Select text around the caret.
+     */
+    public void selectAround() {
+        // TODO
+    }
+
+
+    /**
      * Start drag selection.
      * @param offset the start position
      */

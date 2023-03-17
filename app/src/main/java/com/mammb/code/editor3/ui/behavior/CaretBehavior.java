@@ -131,19 +131,34 @@ public class CaretBehavior {
 
 
     /**
+     * Move the caret position.
+     * @param x position x
+     * @param y position y
+     */
+    public void click(double x, double y) {
+        clearSelect();
+        pointing.caretAt(x, y);
+    }
+
+
+    /**
+     * Move the caret position and select word.
+     * @param x position x
+     * @param y position y
+     */
+    public void clickDouble(double x, double y) {
+        clearSelect();
+        pointing.caretAt(x, y);
+        pointing.selectAround();
+    }
+
+
+    /**
      * Scroll the screen to the caret position, if the caret is off-screen.
      */
     public void at() {
         scrollToCaretRow();
         scrollToCaretCol();
-    }
-
-
-    /**
-     * Shift caret offset to the selection start position.
-     */
-    public void normalizeSelectionCaret() {
-        pointing.normalizeSelectionCaret();
     }
 
 
