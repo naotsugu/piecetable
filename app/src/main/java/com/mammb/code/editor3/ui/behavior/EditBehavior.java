@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
+import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.RowsPanel;
@@ -62,25 +63,38 @@ public class EditBehavior {
     }
 
 
+    /**
+     * Insert text.
+     * @param value the insertion text
+     */
     public void input(String value) {
+
         if (pointing.selectionOn()) {
             selectionDelete();
         }
+
         if (value.contains("\r")) {
             // Enter key : 13:CR -> replace to 10:LF
             value = value.replace('\r', '\n');
         }
+        caretBehavior.at();
         model.add(pointing.caretOffset(), value);
         textFlow.setAll(Texts.asText(model.text()));
-        caretBehavior.right();
+        for (int i = 0; i < Strings.codePointCount(value); i++)
+            caretBehavior.right();
         rowsPanel.redraw();
     }
 
 
+    /**
+     * Delete text.
+     */
     public void delete() {
+
         if (pointing.selectionOn()) {
             selectionDelete();
         } else {
+            caretBehavior.at();
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
@@ -100,7 +114,14 @@ public class EditBehavior {
     }
 
 
+    /**
+     * Delete the selecting text.
+     */
     private void selectionDelete() {
+        if (!pointing.selectionOn()) return;
+
+        pointing.normalizeSelectionCaret();
+        caretBehavior.at();
         int[] range = pointing.selectionOffsets();
         model.delete(range[0], range[1] - range[0]);
         pointing.clearSelection();

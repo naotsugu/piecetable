@@ -62,12 +62,12 @@ public class CaretBehavior {
      * Move the caret to the right.
      */
     public void right() {
-        scrollToCaretPoint();
+        scrollToCaretRow();
         pointing.right();
         if (pointing.caretTop() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
-        scrollColToCaretPoint();
+        scrollToCaretCol();
     }
 
 
@@ -75,12 +75,12 @@ public class CaretBehavior {
      * Move the caret to the left.
      */
     public void left() {
-        scrollToCaretPoint();
+        scrollToCaretRow();
         pointing.left();
         if (pointing.caretTop() < 0) {
             scrollBehavior.scrollPrev();
         }
-        scrollColToCaretPoint();
+        scrollToCaretCol();
     }
 
 
@@ -88,12 +88,12 @@ public class CaretBehavior {
      * Move the caret up.
      */
     public void up() {
-        scrollToCaretPoint();
+        scrollToCaretRow();
         if (pointing.caretTop() <= 0) {
             scrollBehavior.scrollPrev();
         }
         pointing.up();
-        scrollColToCaretPoint();
+        scrollToCaretCol();
     }
 
 
@@ -101,14 +101,14 @@ public class CaretBehavior {
      * Move the caret down.
      */
     public void down() {
-        scrollToCaretPoint();
+        scrollToCaretRow();
         int old = pointing.caretOffset();
         pointing.down();
         if (old == pointing.caretOffset()) return;
         if (pointing.caretBottom() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
-        scrollColToCaretPoint();
+        scrollToCaretCol();
     }
 
 
@@ -117,7 +117,7 @@ public class CaretBehavior {
      */
     public void end() {
         pointing.end();
-        scrollColToCaretPoint();
+        scrollToCaretCol();
     }
 
 
@@ -126,7 +126,7 @@ public class CaretBehavior {
      */
     public void home() {
         pointing.home();
-        scrollColToCaretPoint();
+        scrollToCaretCol();
     }
 
 
@@ -134,8 +134,16 @@ public class CaretBehavior {
      * Scroll the screen to the caret position, if the caret is off-screen.
      */
     public void at() {
-        scrollToCaretPoint();
-        scrollColToCaretPoint();
+        scrollToCaretRow();
+        scrollToCaretCol();
+    }
+
+
+    /**
+     * Shift caret offset to the selection start position.
+     */
+    public void normalizeSelectionCaret() {
+        pointing.normalizeSelectionCaret();
     }
 
 
@@ -162,7 +170,7 @@ public class CaretBehavior {
     /**
      * Scroll the screen to the caret position, if the caret is off-screen.
      */
-    private void scrollToCaretPoint() {
+    private void scrollToCaretRow() {
         while (pointing.caretOffset() < 0)
             scrollBehavior.scrollPrev();
         while (pointing.caretBottom() > viewHeight.get())
@@ -173,7 +181,7 @@ public class CaretBehavior {
     /**
      * Scroll horizontally to display the caret.
      */
-    private void scrollColToCaretPoint() {
+    private void scrollToCaretCol() {
         if (pointing.caretX() > (viewWidth.get() - Texts.width * 2)) {
             double delta = pointing.caretX() - (viewWidth.get() - Texts.width * 2);
             pointing.setTranslateX(pointing.getTranslateX() - delta);

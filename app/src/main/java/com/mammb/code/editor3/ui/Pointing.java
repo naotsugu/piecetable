@@ -197,6 +197,20 @@ public class Pointing extends Region {
 
 
     /**
+     * Normalize selection caret.
+     * Shift caret offset to the selection start position.
+     */
+    public void normalizeSelectionCaret() {
+        if (selectionOn()) {
+            int selectionHeadOffset = Math.min(
+                selection.openOffset(),
+                selection.closeOffset());
+            caret.shiftOffset(selectionHeadOffset - caret.offset());
+        }
+    }
+
+
+    /**
      * Clear this selection.
      */
     public void clearSelection() {

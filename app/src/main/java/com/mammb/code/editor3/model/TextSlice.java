@@ -53,9 +53,9 @@ public class TextSlice {
 
 
     /**
-     *
-     * @param offset
-     * @param string
+     * Insert string.
+     * @param offset the char offset on buffer
+     * @param string the inserting string
      */
     public void insert(int offset, String string) {
         int beforeRowSize = buffer.rowSize();
@@ -67,6 +67,11 @@ public class TextSlice {
     }
 
 
+    /**
+     * Delete string.
+     * @param offset the char offset(not code point) on buffer
+     * @param length the length of deletion
+     */
     public void delete(int offset, int length) {
         int beforeRowSize = buffer.rowSize();
         String deleted = buffer.delete(offset, length);
