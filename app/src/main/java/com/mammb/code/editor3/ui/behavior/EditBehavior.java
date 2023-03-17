@@ -118,9 +118,38 @@ public class EditBehavior {
     }
 
 
+    /**
+     * Paste the text from the clipboard.
+     */
+    public void pasteFromClipboard() {
+        String text = Clipboards.get();
+        if (!text.isEmpty()) {
+            input(text);
+        }
+    }
 
+
+    /**
+     * Copy the selection text to the clipboard.
+     */
     public void copyToClipboard() {
+        copyToClipboard(false);
+    }
 
+
+    /**
+     * Cut the selection text to the clipboard.
+     */
+    public void cutToClipboard() {
+        copyToClipboard(true);
+    }
+
+
+    /**
+     * Copy the selection text to the clipboard.
+     * @param cut need cut?
+     */
+    private void copyToClipboard(boolean cut) {
         if (!pointing.selectionOn()) return;
 
         int[] range = pointing.selectionOffsets();
@@ -129,18 +158,13 @@ public class EditBehavior {
             String text = model.substring(range[0], len);
             if (text != null && !text.isEmpty()) {
                 Clipboards.put(text);
+                if (cut) {
+                    selectionDelete();
+                    textFlow.setAll(Texts.asText(model.text()));
+                    rowsPanel.redraw();
+                }
             }
         }
-    }
-
-
-    public void pasteFromClipboard() {
-
-    }
-
-
-    public void cutToClipboard() {
-
     }
 
 
