@@ -126,6 +126,21 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             fileChooseBehavior.open();
             return true;
         }
+
+        // clipboard operations
+        if (Keys.SC_C.match(e)) {
+            editBehavior.copyToClipboard();
+            return true;
+        }
+        if (Keys.SC_V.match(e)) {
+            editBehavior.pasteFromClipboard();
+            return true;
+        }
+        if (Keys.SC_X.match(e)) {
+            editBehavior.cutToClipboard();
+            return true;
+        }
+
         if (Keys.SC_W.match(e)) {
             confBehavior.toggleTextWrap();
             return true;

@@ -114,6 +114,17 @@ public class TextSlice {
     }
 
 
+    /**
+     * Get the sub string.
+     * @param offset the char offset(not codepoint) on the slice
+     * @param length the char length(not codepoint)
+     * @return the string
+     */
+    public String substring(int offset, int length) {
+        return source.substring(offset + originOffset, length);
+    }
+
+
     public void refresh() {
         buffer.set(source.rows(maxRowSize));
     }

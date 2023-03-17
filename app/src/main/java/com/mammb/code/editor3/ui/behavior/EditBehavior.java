@@ -20,6 +20,7 @@ import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
+import com.mammb.code.editor3.ui.util.Clipboards;
 import com.mammb.code.editor3.ui.util.Texts;
 
 /**
@@ -90,7 +91,6 @@ public class EditBehavior {
      * Delete text.
      */
     public void delete() {
-
         if (pointing.selectionOn()) {
             selectionDelete();
         } else {
@@ -102,15 +102,45 @@ public class EditBehavior {
     }
 
 
+    /**
+     * Delete text with backspace.
+     */
     public void backspace() {
         if (pointing.selectionOn()) {
             selectionDelete();
         } else {
-            caretBehavior.right();
+            caretBehavior.at();
+            caretBehavior.left();
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
         rowsPanel.redraw();
+    }
+
+
+
+    public void copyToClipboard() {
+
+        if (!pointing.selectionOn()) return;
+
+        int[] range = pointing.selectionOffsets();
+        int len = range[1] - range[0];
+        if (len > 0) {
+            String text = model.substring(range[0], len);
+            if (text != null && !text.isEmpty()) {
+                Clipboards.put(text);
+            }
+        }
+    }
+
+
+    public void pasteFromClipboard() {
+
+    }
+
+
+    public void cutToClipboard() {
+
     }
 
 
