@@ -76,7 +76,7 @@ public class TextSlice {
         int beforeRowSize = buffer.rowSize();
         String deleted = buffer.delete(offset, length);
         if (length > buffer.length()) {
-            deleted = source.substring(offset + originOffset, length);
+            deleted = source.substring(offset, length);
         }
         source.handle(Edit.delete(offset, deleted));
 
@@ -121,7 +121,7 @@ public class TextSlice {
      * @return the string
      */
     public String substring(int offset, int length) {
-        return source.substring(offset + originOffset, length);
+        return source.substring(offset, length);
     }
 
 
