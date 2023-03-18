@@ -137,7 +137,10 @@ public class Pointing extends Region {
      * Select text around the caret.
      */
     public void selectAround() {
-        selection.selectAround();
+        selection.selectAround(caret.offset());
+        if (selectionOn()) {
+            caret.shiftOffset(selection.closeOffset() - caret.offset());
+        }
     }
 
 

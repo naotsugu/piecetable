@@ -95,9 +95,31 @@ public class Selection extends Path {
 
     /**
      * Select text around the caret.
+     * @param offset the base offset
      */
-    public void selectAround() {
-        // TODO
+    public void selectAround(int offset) {
+
+        int type = Character.getType(Character.toLowerCase(text.charAt(offset)));
+        int start = offset;
+        int end = offset;
+
+        for (int i = offset; i >= 0; i--) {
+            if (type != Character.getType(Character.toLowerCase(text.charAt(i)))) {
+                break;
+            } else {
+                start = i;
+            }
+        }
+        for (int i = offset; i < text.textLength(); i++) {
+            if (type != Character.getType(Character.toLowerCase(text.charAt(i)))) {
+                end = i;
+                break;
+            }
+        }
+        if (start != end) {
+            start(start);
+            moveCaretTo(end);
+        }
     }
 
 
