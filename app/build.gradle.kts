@@ -20,7 +20,6 @@ application {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-
 }
 
 tasks.compileJava.configure { options.encoding = Charsets.UTF_8.name() }

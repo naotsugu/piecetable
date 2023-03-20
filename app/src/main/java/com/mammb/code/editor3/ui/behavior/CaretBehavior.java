@@ -154,6 +154,16 @@ public class CaretBehavior {
 
 
     /**
+     *
+     * @param x position x
+     * @param y position y
+     */
+    public void dragged(double x, double y) {
+        pointing.dragged(x, y);
+    }
+
+
+    /**
      * Scroll the screen to the caret position, if the caret is off-screen.
      */
     public void at() {

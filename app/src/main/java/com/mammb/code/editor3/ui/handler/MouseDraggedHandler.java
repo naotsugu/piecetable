@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.handler;
 
+import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseButton;
@@ -27,11 +28,16 @@ import javafx.scene.text.HitInfo;
  */
 public class MouseDraggedHandler implements EventHandler<MouseEvent> {
 
+    /** The caret behavior. */
+    private final CaretBehavior caretBehavior;
+
+
     /**
      * Constructor.
+     * @param caretBehavior the CaretBehavior
      */
-    private MouseDraggedHandler() {
-
+    private MouseDraggedHandler(CaretBehavior caretBehavior) {
+        this.caretBehavior = caretBehavior;
     }
 
 
@@ -39,22 +45,15 @@ public class MouseDraggedHandler implements EventHandler<MouseEvent> {
      * Create a new {@code EventHandler<MouseEvent>}.
      * @return a new {@code EventHandler<MouseEvent>}
      */
-    public static EventHandler<MouseEvent> of() {
-        return new MouseDraggedHandler();
+    public static EventHandler<MouseEvent> of(CaretBehavior caretBehavior) {
+        return new MouseDraggedHandler(caretBehavior);
     }
 
 
     @Override
     public void handle(MouseEvent event) {
-//        if (imePalette.getImeOn()) {
-//            return;
-//        }
-//        if (!e.getButton().equals(MouseButton.PRIMARY)) return;
-//        HitInfo hit = textFlow.hitTest(textFlow.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY())));
-//        screenBuffer.moveCaret(hit.getInsertionIndex());
-//        if (!selection.isDragging()) {
-//            selection.startDrag(hit.getInsertionIndex());
-//        }
+        if (!event.getButton().equals(MouseButton.PRIMARY)) return;
+        caretBehavior.dragged(event.getX(), event.getY());
     }
 
 }

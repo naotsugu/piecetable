@@ -104,7 +104,7 @@ public class TextPane extends StackPane {
         setOnDragDropped(DragDrop.droppedHandler(this::open));
 
         setOnMouseClicked(MouseClickedHandler.of(caretBehavior()));
-        setOnMouseDragged(MouseDraggedHandler.of());
+        setOnMouseDragged(MouseDraggedHandler.of(caretBehavior()));
 
     }
 

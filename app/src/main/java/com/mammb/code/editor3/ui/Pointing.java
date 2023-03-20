@@ -133,6 +133,16 @@ public class Pointing extends Region {
     }
 
 
+    public void dragged(double x, double y) {
+        caret.at(x, y);
+        if (selection.isDragging()) {
+            selection.moveCaretTo(caret.offset());
+        } else {
+            selection.startDragging(caret.offset());
+        }
+    }
+
+
     /**
      * Select text around the caret.
      */
@@ -235,7 +245,11 @@ public class Pointing extends Region {
      * Clear this selection.
      */
     public void clearSelection() {
-        selection.clear();
+        if (selection.isDragging()) {
+            selection.releaseDragging();
+        } else {
+            selection.clear();
+        }
     }
 
 

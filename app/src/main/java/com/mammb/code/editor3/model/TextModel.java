@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor3.model.specifics.ContentImpl;
 import java.nio.file.Path;
 import java.util.List;
 

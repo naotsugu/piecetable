@@ -139,7 +139,7 @@ public class ScrollBehavior {
      * Scroll next.
      * @param n the number of row
      */
-    private void scrollNext(int n) {
+    public void scrollNext(int n) {
         int shiftedOffset = model.scrollNext(n);
         scroll(-shiftedOffset);
     }
@@ -150,7 +150,7 @@ public class ScrollBehavior {
      * @param n the number of row
      * @return shifted offset
      */
-    private int scrollPrev(int n) {
+    public int scrollPrev(int n) {
         int shiftedOffset = model.scrollPrev(n);
         scroll(shiftedOffset);
         return shiftedOffset;
