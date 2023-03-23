@@ -141,6 +141,16 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             return true;
         }
 
+        // undo redo
+        if (Keys.SC_Z.match(e)) {
+            editBehavior.undo();
+            return true;
+        }
+        if (Keys.SC_Y.match(e) || Keys.SC_SZ.match(e)) {
+            editBehavior.redo();
+            return true;
+        }
+
         if (Keys.SC_W.match(e)) {
             confBehavior.toggleTextWrap();
             return true;

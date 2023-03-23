@@ -79,6 +79,22 @@ public class TextModel {
     }
 
 
+    /**
+     * Undo.
+     */
+    public void undo() {
+        textSlice.undo();
+    }
+
+
+    /**
+     * Redo.
+     */
+    public void redo() {
+        textSlice.redo();
+    }
+
+
     public int scrollNext(int delta) {
         int old = textSlice.originOffset();
         textSlice.shiftRow(delta);

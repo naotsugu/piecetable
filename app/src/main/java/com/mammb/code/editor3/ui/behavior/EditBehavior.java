@@ -118,6 +118,22 @@ public class EditBehavior {
     }
 
 
+    public void undo() {
+        pointing.clearSelection();
+        model.undo();
+        textFlow.setAll(Texts.asText(model.text()));
+        rowsPanel.redraw();
+    }
+
+
+    public void redo() {
+        pointing.clearSelection();
+        model.redo();
+        textFlow.setAll(Texts.asText(model.text()));
+        rowsPanel.redraw();
+    }
+
+
     /**
      * Paste the text from the clipboard.
      */

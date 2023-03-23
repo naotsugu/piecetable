@@ -87,6 +87,30 @@ public class TextSlice {
 
 
     /**
+     * Undo.
+     * @return the position of redo
+     */
+    public int undo() {
+        Edit edited = source.undo();
+        // TODO scroll to edit and optimize refresh
+        refresh();
+        return edited.position();
+    }
+
+
+    /**
+     * Redo.
+     * @return the position of redo
+     */
+    public int redo() {
+        Edit edited = source.redo();
+        // TODO scroll to edit and optimize refresh
+        refresh();
+        return edited.position();
+    }
+
+
+    /**
      * Shift the row.
      * @param rowDelta the delta of row
      */

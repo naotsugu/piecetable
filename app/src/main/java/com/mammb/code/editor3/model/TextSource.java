@@ -15,12 +15,10 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor.Strings;
 import com.mammb.code.editor3.lang.Until;
 import com.mammb.code.editor3.lang.EventListener;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Predicate;
 
 /**
  * TextSource.
@@ -40,8 +38,8 @@ public class TextSource implements EventListener<Edit> {
     /** The code point offset index on the source. */
     private int offset;
 
-    /** The buffered edit. */
-    private Edit bufferedEdit = Edit.empty;
+    /** The edit queue. */
+    private final EditQueue editQueue;
 
 
     /**
@@ -51,6 +49,7 @@ public class TextSource implements EventListener<Edit> {
     public TextSource(Content source) {
         this.source = source;
         this.offset = 0;
+        this.editQueue = new EditQueue(source);
     }
 
 
@@ -66,7 +65,7 @@ public class TextSource implements EventListener<Edit> {
         if (newValue < 0 || newValue > totalSize()) {
             throw new IndexOutOfBoundsException();
         }
-        flush();
+        editQueue.flush();
         offset += newValue;
     }
 
@@ -78,7 +77,7 @@ public class TextSource implements EventListener<Edit> {
      */
     public int shiftRow(int rowDelta) {
         if (rowDelta == 0) return 0;
-        flush();
+        editQueue.flush();
 
         byte[] row = (rowDelta > 0)
             ? source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)))   // scroll next (i.e. arrow down)
@@ -105,7 +104,7 @@ public class TextSource implements EventListener<Edit> {
      */
     public String substring(int charOffset, int charLength) {
         int offsetCodePoint = asCodePointCount(charOffset);
-        flush();
+        editQueue.flush();
         return new String(
             source.bytes(offset + offsetCodePoint, Until.charLength(charLength)),
             charset);
@@ -118,7 +117,7 @@ public class TextSource implements EventListener<Edit> {
      * @return the before row
      */
     String rows(int rowCount) {
-        flush();
+        editQueue.flush();
         byte[] tailRow = source.bytes(offset, Until.lfInclusive(rowCount));
         return new String(tailRow, charset);
     }
@@ -129,7 +128,7 @@ public class TextSource implements EventListener<Edit> {
      * @return the before row
      */
     String beforeRow() {
-        flush();
+        editQueue.flush();
         byte[] headRow = source.bytesBefore(offset, Until.lf(2));
         return new String(headRow, charset);
     }
@@ -151,7 +150,7 @@ public class TextSource implements EventListener<Edit> {
      */
     String afterRow(int charOffset, int n) {
         int offsetCodePoint = asCodePointCount(charOffset);
-        flush();
+        editQueue.flush();
         byte[] tailRow = source.bytes(offset + offsetCodePoint, Until.lfInclusive(n));
         return new String(tailRow, charset);
     }
@@ -162,10 +161,7 @@ public class TextSource implements EventListener<Edit> {
      * @return the total row size
      */
     public int totalRowSize() {
-        int pend = bufferedEdit.isDelete() ? -Strings.countLf(bufferedEdit.string())
-                 : bufferedEdit.isInsert() ? +Strings.countLf(bufferedEdit.string())
-                 : 0;
-        return source.rowSize() + pend;
+        return source.rowSize() + editQueue.pendingLfCountDelta();
     }
 
 
@@ -174,10 +170,7 @@ public class TextSource implements EventListener<Edit> {
      * @return the total code point counts
      */
     public int totalSize() {
-        int pend = bufferedEdit.isDelete() ? -bufferedEdit.codePointCount()
-                 : bufferedEdit.isInsert() ? +bufferedEdit.codePointCount()
-                 : 0;
-        return source.length() + pend;
+        return source.length() + editQueue.pendingCodePointCountDelta();
     }
 
 
@@ -187,12 +180,29 @@ public class TextSource implements EventListener<Edit> {
             return;
         }
         Edit edit = event.withPosition(offset + asCodePointCount(event.position()));
-        if (bufferedEdit.canMarge(edit)) {
-            bufferedEdit = bufferedEdit.marge(edit);
-        } else {
-            flush();
-            bufferedEdit = edit;
-        }
+        editQueue.push(edit);
+    }
+
+
+    /**
+     * Undo.
+     * @return the undone edit.
+     */
+    public Edit undo() {
+        Edit edit = editQueue.undo();
+        // TODO code point position to char offset
+        return edit.withPosition(edit.position());
+    }
+
+
+    /**
+     * Redo.
+     * @return the redone edit.
+     */
+    public Edit redo() {
+        Edit edit = editQueue.redo();
+        // TODO code point position to char offset
+        return edit.withPosition(edit.position());
     }
 
 
@@ -212,18 +222,6 @@ public class TextSource implements EventListener<Edit> {
      */
     private int asCodePointCount(int length) {
         return source.count(offset, Until.charLength(length));
-    }
-
-
-    /**
-     * Flush buffered edit.
-     */
-    private void flush() {
-        if (bufferedEdit.isEmpty()) {
-            return;
-        }
-        source.handle(bufferedEdit);
-        bufferedEdit = Edit.empty;
     }
 
 }

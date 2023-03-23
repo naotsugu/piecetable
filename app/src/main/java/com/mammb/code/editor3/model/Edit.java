@@ -38,7 +38,8 @@ public class Edit {
     /** The occurred on. */
     private final long occurredOn;
     /** The code point count of edited string. */
-    private int codePointCount;
+    private int codePointCount = -1;
+
 
     /**
      * Constructor.
@@ -54,35 +55,42 @@ public class Edit {
         this.occurredOn = occurredOn;
     }
 
+
     /**
      * Create the insert edit.
      * @param position the position of edit
      * @param string the edited string
-     * @return
+     * @return the Edit
      */
     public static Edit insert(int position, String string) {
         return new Edit(Type.INSERT, position, string, System.currentTimeMillis());
     }
 
+
     /**
      * Create the deleted edit.
      * @param position the position of edit
      * @param string the edited string
-     * @return
+     * @return the Edit
      */
     public static Edit delete(int position, String string) {
         return new Edit(Type.DELETE, position, string, System.currentTimeMillis());
     }
 
+
     public boolean isInsert() { return type == Type.INSERT; }
+
 
     public boolean isDelete() { return type == Type.DELETE; }
 
+
     public boolean isEmpty() { return type == Type.NIL; }
+
 
     public Edit withPosition(int newPosition) {
         return new Edit(type, newPosition, string, occurredOn);
     }
+
 
     public boolean canMarge(Edit other) {
         if (this.type == Type.NIL) {
@@ -93,9 +101,26 @@ public class Edit {
             this.position + codePointCount() == other.position;
     }
 
+
     public Edit marge(Edit other) {
-        return new Edit(other.type, other.position, this.string + other.string, other.occurredOn);
+        return isEmpty() ? other
+            : new Edit(other.type, this.position, this.string + other.string, other.occurredOn);
     }
+
+
+    public Edit flip() {
+        return new Edit(flippedType(), position, string, occurredOn);
+    }
+
+
+    private Type flippedType() {
+        return switch (type) {
+            case INSERT -> Type.DELETE;
+            case DELETE -> Type.INSERT;
+            case NIL -> Type.NIL;
+        };
+    }
+
 
     /**
      * Get the position of edit.
@@ -119,6 +144,7 @@ public class Edit {
      */
     public int codePointCount() {
         if (codePointCount < 0) {
+System.out.println("string:" + string);
             codePointCount = Strings.codePointCount(string);
         }
         return codePointCount;
