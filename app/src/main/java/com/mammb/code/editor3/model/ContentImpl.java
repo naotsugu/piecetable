@@ -97,10 +97,10 @@ public class ContentImpl implements Content {
     @Override
     public void handle(Edit edit) {
         if (edit.isInsert()) {
-            pt.insert(edit.position(), edit.string());
+            pt.insert(edit.codePointPosition(), edit.string());
             rowSize += Strings.countLf(edit.string());
         } else if (edit.isDelete()) {
-            pt.delete(edit.position(), Strings.codePointCount(edit.string()));
+            pt.delete(edit.codePointPosition(), Strings.codePointCount(edit.string()));
             rowSize -= Strings.countLf(edit.string());
         }
     }

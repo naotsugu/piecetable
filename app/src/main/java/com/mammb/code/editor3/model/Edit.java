@@ -24,7 +24,7 @@ import com.mammb.code.editor3.lang.Strings;
 public class Edit {
 
     /** The empty edit. */
-    public static Edit empty = new Edit(Type.NIL, 0, "", 0);
+    public static Edit empty = new Edit(Type.NIL, 0, 0, "", 0);
 
     /** The type of edit. */
     private enum Type { INSERT, DELETE, NIL }
@@ -33,6 +33,8 @@ public class Edit {
     private final Type type;
     /** The position of edit. */
     private final int position;
+    /** The code point position. */
+    private final int codePointPosition;
     /** The edited string. */
     private final String string;
     /** The occurred on. */
@@ -45,12 +47,14 @@ public class Edit {
      * Constructor.
      * @param type the type of edit
      * @param position the position of edit
+     * @param codePointPosition the code point position of edit
      * @param string the edited string
      * @param occurredOn the occurred on
      */
-    private Edit(Type type, int position, String string, long occurredOn) {
+    private Edit(Type type, int position, int codePointPosition, String string, long occurredOn) {
         this.type = type;
         this.position = position;
+        this.codePointPosition = codePointPosition;
         this.string = string;
         this.occurredOn = occurredOn;
     }
@@ -63,7 +67,7 @@ public class Edit {
      * @return the Edit
      */
     public static Edit insert(int position, String string) {
-        return new Edit(Type.INSERT, position, string, System.currentTimeMillis());
+        return new Edit(Type.INSERT, position, -1, string, System.currentTimeMillis());
     }
 
 
@@ -74,7 +78,7 @@ public class Edit {
      * @return the Edit
      */
     public static Edit delete(int position, String string) {
-        return new Edit(Type.DELETE, position, string, System.currentTimeMillis());
+        return new Edit(Type.DELETE, position, -1, string, System.currentTimeMillis());
     }
 
 
@@ -87,8 +91,8 @@ public class Edit {
     public boolean isEmpty() { return type == Type.NIL; }
 
 
-    public Edit withPosition(int newPosition) {
-        return new Edit(type, newPosition, string, occurredOn);
+    public Edit withCodePointPosition(int codePointPosition) {
+        return new Edit(type, position, codePointPosition, string, occurredOn);
     }
 
 
@@ -96,20 +100,23 @@ public class Edit {
         if (this.type == Type.NIL) {
             return true;
         }
-        return this.type == other.type &&
-            other.occurredOn - this.occurredOn < 2000 &&
-            this.position + codePointCount() == other.position;
+        if (this.type != other.type || other.occurredOn - this.occurredOn > 2000) {
+            return false;
+        }
+        return isInsert()
+            ? this.position + string.length() == other.position
+            : this.position == other.position;
     }
 
 
     public Edit marge(Edit other) {
         return isEmpty() ? other
-            : new Edit(other.type, this.position, this.string + other.string, other.occurredOn);
+            : new Edit(other.type, this.position, this.codePointPosition, this.string + other.string, other.occurredOn);
     }
 
 
     public Edit flip() {
-        return new Edit(flippedType(), position, string, occurredOn);
+        return new Edit(flippedType(), position, codePointPosition, string, occurredOn);
     }
 
 
@@ -130,6 +137,16 @@ public class Edit {
         return position;
     }
 
+
+    /**
+     * Get the code point position of edit.
+     * @return the code point position of edit
+     */
+    public int codePointPosition() {
+        return codePointPosition;
+    }
+
+
     /**
      * Get the edited string.
      * @return the edited string
@@ -138,13 +155,13 @@ public class Edit {
         return string;
     }
 
+
     /**
      * Get the code point count of edited string.
      * @return the code point count of edited string
      */
     public int codePointCount() {
         if (codePointCount < 0) {
-System.out.println("string:" + string);
             codePointCount = Strings.codePointCount(string);
         }
         return codePointCount;
