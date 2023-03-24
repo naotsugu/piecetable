@@ -52,7 +52,6 @@ public class EditQueue {
      * @param edit the edit
      */
     public void push(Edit edit) {
-System.out.println("buffer.canMarge(edit):" + buffer.canMarge(edit));
         if (buffer.canMarge(edit)) {
             buffer = buffer.marge(edit);
         } else {

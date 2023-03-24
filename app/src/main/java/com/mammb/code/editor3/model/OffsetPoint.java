@@ -21,6 +21,9 @@ package com.mammb.code.editor3.model;
  */
 public record OffsetPoint(int origin, int offset) {
 
+    /** The zero offset point. */
+    public static final OffsetPoint zero = new OffsetPoint(0, 0);
+
     /**
      * Get the position.
      * @return the position
