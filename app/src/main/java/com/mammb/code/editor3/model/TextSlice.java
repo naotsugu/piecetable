@@ -60,7 +60,7 @@ public class TextSlice {
     public void insert(int offset, String string) {
         int beforeRowSize = buffer.rowSize();
         buffer.insert(offset, string);
-        source.handle(Edit.insert(offset, string));
+        source.handle(Edit.insert(originOffset, offset, string));
         if (hasNext() && beforeRowSize < buffer.rowSize()) {
             buffer.truncateRows(buffer.rowSize() - beforeRowSize);
         }
@@ -78,7 +78,7 @@ public class TextSlice {
         if (length > buffer.length()) {
             deleted = source.substring(offset, length);
         }
-        source.handle(Edit.delete(offset, deleted));
+        source.handle(Edit.delete(originOffset, offset, deleted));
 
         if (beforeRowSize > buffer.rowSize()) {
             buffer.append(source.afterRow(buffer.length(), beforeRowSize - buffer.rowSize()));
@@ -90,11 +90,10 @@ public class TextSlice {
      * Undo.
      * @return the position of redo
      */
-    public int undo() {
+    public OffsetPoint undo() {
         Edit edited = source.undo();
-        // TODO scroll to edit and optimize refresh
         refresh();
-        return edited.position();
+        return edited.offsetPoint();
     }
 
 
@@ -102,11 +101,10 @@ public class TextSlice {
      * Redo.
      * @return the position of redo
      */
-    public int redo() {
+    public OffsetPoint redo() {
         Edit edited = source.redo();
-        // TODO scroll to edit and optimize refresh
         refresh();
-        return edited.position();
+        return edited.offsetPoint();
     }
 
 

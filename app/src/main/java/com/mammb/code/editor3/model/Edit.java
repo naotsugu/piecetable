@@ -24,15 +24,14 @@ import com.mammb.code.editor3.lang.Strings;
 public class Edit {
 
     /** The empty edit. */
-    public static Edit empty = new Edit(Type.NIL, 0, 0, "", 0);
+    public static Edit empty = new Edit(EditType.NIL, new OffsetPoint(0, 0), 0, "", 0);
 
     /** The type of edit. */
-    private enum Type { INSERT, DELETE, NIL }
+    private final EditType type;
 
-    /** The type of edit. */
-    private final Type type;
-    /** The position of edit. */
-    private final int position;
+    /** The offset point of edit. */
+    private final OffsetPoint offsetPoint;
+
     /** The code point position. */
     private final int codePointPosition;
     /** The edited string. */
@@ -46,14 +45,14 @@ public class Edit {
     /**
      * Constructor.
      * @param type the type of edit
-     * @param position the position of edit
+     * @param offsetPoint the offset point of edit
      * @param codePointPosition the code point position of edit
      * @param string the edited string
      * @param occurredOn the occurred on
      */
-    private Edit(Type type, int position, int codePointPosition, String string, long occurredOn) {
+    private Edit(EditType type, OffsetPoint offsetPoint, int codePointPosition, String string, long occurredOn) {
         this.type = type;
-        this.position = position;
+        this.offsetPoint = offsetPoint;
         this.codePointPosition = codePointPosition;
         this.string = string;
         this.occurredOn = occurredOn;
@@ -62,70 +61,80 @@ public class Edit {
 
     /**
      * Create the insert edit.
+     * @param originOffset the origin offset of edit
      * @param position the position of edit
      * @param string the edited string
      * @return the Edit
      */
-    public static Edit insert(int position, String string) {
-        return new Edit(Type.INSERT, position, -1, string, System.currentTimeMillis());
+    public static Edit insert(int originOffset, int position, String string) {
+        return new Edit(EditType.INSERT, new OffsetPoint(originOffset, position), -1, string, System.currentTimeMillis());
     }
 
 
     /**
      * Create the deleted edit.
+     * @param originOffset the origin offset of edit
      * @param position the position of edit
      * @param string the edited string
      * @return the Edit
      */
-    public static Edit delete(int position, String string) {
-        return new Edit(Type.DELETE, position, -1, string, System.currentTimeMillis());
+    public static Edit delete(int originOffset, int position, String string) {
+        return new Edit(EditType.DELETE, new OffsetPoint(originOffset, position), -1, string, System.currentTimeMillis());
     }
 
 
-    public boolean isInsert() { return type == Type.INSERT; }
+    public boolean isInsert() { return type.isInsert(); }
 
 
-    public boolean isDelete() { return type == Type.DELETE; }
+    public boolean isDelete() { return type.isDelete(); }
 
 
-    public boolean isEmpty() { return type == Type.NIL; }
+    public boolean isEmpty() { return type.isNil(); }
 
 
     public Edit withCodePointPosition(int codePointPosition) {
-        return new Edit(type, position, codePointPosition, string, occurredOn);
+        return new Edit(type, offsetPoint, codePointPosition, string, occurredOn);
     }
 
 
     public boolean canMarge(Edit other) {
-        if (this.type == Type.NIL) {
+        if (this.type.isNil()) {
             return true;
         }
         if (this.type != other.type || other.occurredOn - this.occurredOn > 2000) {
             return false;
         }
         return isInsert()
-            ? this.position + string.length() == other.position
-            : this.position == other.position;
+            ? offsetPoint.position() + string.length() == other.offsetPoint.position()
+            : offsetPoint.position() == other.offsetPoint.position();
     }
 
 
     public Edit marge(Edit other) {
         return isEmpty() ? other
-            : new Edit(other.type, this.position, this.codePointPosition, this.string + other.string, other.occurredOn);
+            : new Edit(other.type,
+                this.offsetPoint,
+                this.codePointPosition,
+                this.string + other.string,
+                other.occurredOn);
     }
 
 
+    /**
+     * Flip this edit.
+     * @return the flipped edit.
+     */
     public Edit flip() {
-        return new Edit(flippedType(), position, codePointPosition, string, occurredOn);
+        return new Edit(type.flip(), offsetPoint, codePointPosition, string, occurredOn);
     }
 
 
-    private Type flippedType() {
-        return switch (type) {
-            case INSERT -> Type.DELETE;
-            case DELETE -> Type.INSERT;
-            case NIL -> Type.NIL;
-        };
+    /**
+     * Get the offset point of edit.
+     * @return the offset point of edit
+     */
+    public OffsetPoint offsetPoint() {
+        return offsetPoint;
     }
 
 
@@ -133,8 +142,17 @@ public class Edit {
      * Get the position of edit.
      * @return the position of edit
      */
+    public int offset() {
+        return offsetPoint.offset();
+    }
+
+
+    /**
+     * Get the whole position of edit.
+     * @return the whole position of edit
+     */
     public int position() {
-        return position;
+        return offsetPoint.position();
     }
 
 

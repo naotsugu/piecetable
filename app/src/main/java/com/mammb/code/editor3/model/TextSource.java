@@ -179,7 +179,7 @@ public class TextSource implements EventListener<Edit> {
         if (event.isEmpty()) {
             return;
         }
-        Edit edit = event.withCodePointPosition(offset + asCodePointCount(event.position()));
+        Edit edit = event.withCodePointPosition(offset + asCodePointCount(event.offset()));
         editQueue.push(edit);
     }
 
@@ -189,8 +189,6 @@ public class TextSource implements EventListener<Edit> {
      * @return the undone edit.
      */
     public Edit undo() {
-        Edit edit = editQueue.undo();
-        // TODO code point position to char offset
         return editQueue.undo();
     }
 
@@ -200,9 +198,7 @@ public class TextSource implements EventListener<Edit> {
      * @return the redone edit.
      */
     public Edit redo() {
-        Edit edit = editQueue.redo();
-        // TODO code point position to char offset
-        return edit;
+        return editQueue.redo();
     }
 
 
