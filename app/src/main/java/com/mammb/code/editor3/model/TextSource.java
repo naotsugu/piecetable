@@ -179,7 +179,8 @@ public class TextSource implements EventListener<Edit> {
         if (event.isEmpty()) {
             return;
         }
-        Edit edit = event.withCodePointPosition(offset, asCodePointCount(event.offset()));
+        Edit edit = event.withCodePointPosition(
+            offset + asCodePointCount(event.offsetPoint().offset()));
         editQueue.push(edit);
     }
 

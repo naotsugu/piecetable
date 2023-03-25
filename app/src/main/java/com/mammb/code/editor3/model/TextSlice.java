@@ -92,7 +92,9 @@ public class TextSlice {
      */
     public OffsetPoint undo() {
         Edit edited = source.undo();
-        refresh();
+        if (!edited.isEmpty()) {
+            refresh();
+        }
         return edited.offsetPoint();
     }
 
@@ -103,7 +105,9 @@ public class TextSlice {
      */
     public OffsetPoint redo() {
         Edit edited = source.redo();
-        refresh();
+        if (!edited.isEmpty()) {
+            refresh();
+        }
         return edited.offsetPoint();
     }
 
@@ -147,6 +151,9 @@ public class TextSlice {
     }
 
 
+    /**
+     * Refresh buffer.
+     */
     public void refresh() {
         buffer.set(source.rows(maxRowSize));
     }
