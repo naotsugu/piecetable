@@ -21,8 +21,8 @@ package com.mammb.code.editor3.model;
  */
 public record OffsetPoint(int origin, int offset) {
 
-    /** The zero offset point. */
-    public static final OffsetPoint zero = new OffsetPoint(0, 0);
+    /** The empty offset point. */
+    public static final OffsetPoint empty = new OffsetPoint(-1, -1);
 
     /**
      * Get the position.
@@ -30,6 +30,11 @@ public record OffsetPoint(int origin, int offset) {
      */
     public int position() {
         return origin + offset;
+    }
+
+
+    public boolean isEmpty() {
+        return this == empty;
     }
 
 }

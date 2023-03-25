@@ -80,6 +80,24 @@ public class TextModel {
 
 
     /**
+     * Peek undo offset.
+     * @return the position of undo
+     */
+    public OffsetPoint undoPeek() {
+        return textSlice.undoPeek();
+    }
+
+
+    /**
+     * Peek redo offset.
+     * @return the position of redo
+     */
+    public OffsetPoint redoPeek() {
+        return textSlice.redoPeek();
+    }
+
+
+    /**
      * Undo.
      */
     public void undo() {

@@ -186,6 +186,26 @@ public class TextSource implements EventListener<Edit> {
 
 
     /**
+     * Peek undo.
+     * @return the undone edit.
+     */
+    public Edit undoPeek() {
+        editQueue.flush();
+        return editQueue.undoPeek();
+    }
+
+
+    /**
+     * Peek redo.
+     * @return the redone edit.
+     */
+    public Edit redoPeek() {
+        editQueue.flush();
+        return editQueue.redoPeek();
+    }
+
+
+    /**
      * Undo.
      * @return the undone edit.
      */

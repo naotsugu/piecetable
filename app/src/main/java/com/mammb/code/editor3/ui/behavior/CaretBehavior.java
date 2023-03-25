@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
+import com.mammb.code.editor3.model.OffsetPoint;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -160,6 +161,26 @@ public class CaretBehavior {
      */
     public void dragged(double x, double y) {
         pointing.dragged(x, y);
+    }
+
+
+    /**
+     * Scroll the screen to the offset point.
+     * @param point the offset point
+     */
+    public void at(OffsetPoint point) {
+        scrollBehavior.scrollAt(point.origin());
+        if (pointing.caretOffset() > point.offset()) {
+            for (;;) {
+                left();
+                if (pointing.caretOffset() <= point.offset()) break;
+            }
+        } else if (pointing.caretOffset() < point.offset()) {
+            for (;;) {
+                right();
+                if (pointing.caretOffset() >= point.offset()) break;
+            }
+        }
     }
 
 

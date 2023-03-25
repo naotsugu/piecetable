@@ -87,6 +87,24 @@ public class TextSlice {
 
 
     /**
+     * Peek undo.
+     * @return the position of undo
+     */
+    public OffsetPoint undoPeek() {
+        return source.undoPeek().offsetPoint();
+    }
+
+
+    /**
+     * Peek redo.
+     * @return the position of redo
+     */
+    public OffsetPoint redoPeek() {
+        return source.redoPeek().offsetPoint();
+    }
+
+
+    /**
      * Undo.
      * @return the position of redo
      */

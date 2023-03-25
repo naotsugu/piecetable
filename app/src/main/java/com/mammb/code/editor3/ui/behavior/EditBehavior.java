@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.lang.Strings;
+import com.mammb.code.editor3.model.OffsetPoint;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.RowsPanel;
@@ -118,7 +119,14 @@ public class EditBehavior {
     }
 
 
+    /**
+     * Undo.
+     */
     public void undo() {
+        OffsetPoint peek = model.undoPeek();
+        if (peek.isEmpty()) return;
+        caretBehavior.at(peek);
+
         pointing.clearSelection();
         model.undo();
         textFlow.setAll(Texts.asText(model.text()));
@@ -126,7 +134,14 @@ public class EditBehavior {
     }
 
 
+    /**
+     * Redo.
+     */
     public void redo() {
+        OffsetPoint peek = model.redoPeek();
+        if (peek.isEmpty()) return;
+        caretBehavior.at(peek);
+
         pointing.clearSelection();
         model.redo();
         textFlow.setAll(Texts.asText(model.text()));

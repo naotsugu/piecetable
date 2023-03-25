@@ -24,7 +24,7 @@ import com.mammb.code.editor3.lang.Strings;
 public class Edit {
 
     /** The empty edit. */
-    public static Edit empty = new Edit(EditType.NIL, OffsetPoint.zero, 0, "", 0);
+    public static Edit empty = new Edit(EditType.NIL, OffsetPoint.empty, 0, "", 0);
 
     /** The type of edit. */
     private final EditType type;

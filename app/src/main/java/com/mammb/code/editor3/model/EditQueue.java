@@ -18,6 +18,7 @@ package com.mammb.code.editor3.model;
 import com.mammb.code.editor.Strings;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 
 /**
  * The edit queue.
@@ -58,6 +59,26 @@ public class EditQueue {
             flush();
             buffer = edit;
         }
+    }
+
+
+    /**
+     * Peek undo.
+     * @return the undone edit.
+     */
+    public Edit undoPeek() {
+        Edit edit = undo.peek();
+        return Objects.isNull(edit) ? Edit.empty : edit;
+    }
+
+
+    /**
+     * Peek redo.
+     * @return the redone edit.
+     */
+    public Edit redoPeek() {
+        Edit edit = redo.peek();
+        return Objects.isNull(edit) ? Edit.empty : edit;
     }
 
 

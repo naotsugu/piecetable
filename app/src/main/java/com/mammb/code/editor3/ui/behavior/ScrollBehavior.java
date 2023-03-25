@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
+import com.mammb.code.editor3.model.OffsetPoint;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.ScreenBound;
@@ -154,6 +155,22 @@ public class ScrollBehavior {
         int shiftedOffset = model.scrollPrev(n);
         scroll(shiftedOffset);
         return shiftedOffset;
+    }
+
+
+    public void scrollAt(int offset) {
+
+        if (model.originRowIndex() < offset) {
+            for (;;) {
+                scrollNext(1);
+                if (model.originRowIndex() >= offset) break;
+            }
+        } else if (model.originRowIndex() > offset) {
+            for (;;) {
+                scrollPrev(1);
+                if (model.originRowIndex() <= offset) break;
+            }
+        }
     }
 
 
