@@ -59,6 +59,8 @@ public class TextPane extends StackPane {
     /** The rows panel. */
     private final RowsPanel rowsPanel;
 
+    private final ImePalette imePalette;
+
     /** The text model. */
     private TextModel model;
 
@@ -76,6 +78,7 @@ public class TextPane extends StackPane {
         this.pointing = new Pointing(textFlow);
         this.screenBound = new ScreenBound(this, textFlow);
         this.rowsPanel = new RowsPanel(textFlow, screenBound);
+        this.imePalette = new ImePalette(textFlow, pointing.caret());
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
@@ -93,9 +96,11 @@ public class TextPane extends StackPane {
 
     private void initHandler() {
 
-        setOnKeyTyped(KeyTypedHandler.of(editBehavior()));
+        EditBehavior editBehavior = editBehavior();
+
+        setOnKeyTyped(KeyTypedHandler.of(editBehavior));
         setOnKeyPressed(KeyPressedHandler.of(
-            caretBehavior(), scrollBehavior(), editBehavior(),
+            caretBehavior(), scrollBehavior(), editBehavior,
             fileChooseBehavior(), confBehavior()));
 
         setOnScroll(ScrollHandler.of(scrollBehavior()));
@@ -106,6 +111,9 @@ public class TextPane extends StackPane {
         setOnMouseClicked(MouseClickedHandler.of(caretBehavior()));
         setOnMouseDragged(MouseDraggedHandler.of(caretBehavior()));
 
+        setInputMethodRequests(imePalette.createInputMethodRequests());
+        setOnInputMethodTextChanged(imePalette::handleInputMethod);
+        imePalette.bindBehavior(editBehavior);
     }
 
 

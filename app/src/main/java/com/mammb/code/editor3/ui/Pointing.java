@@ -261,4 +261,8 @@ public class Pointing extends Region {
         return selection.on();
     }
 
+    Caret caret() {
+        return caret;
+    }
+
 }

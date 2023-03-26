@@ -93,4 +93,15 @@ public class Texts {
         return strings.stream().map(Texts::asText).toList();
     }
 
+
+    public static double width(Text text) {
+        return PathElements.width(text.rangeShape(0, text.getText().length()));
+    }
+
+    public static double width(String string, Font font) {
+        Text text = new Text(string);
+        text.setFont(font);
+        return width(text);
+    }
+
 }
