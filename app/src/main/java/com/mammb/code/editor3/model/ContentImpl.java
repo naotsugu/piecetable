@@ -95,6 +95,17 @@ public class ContentImpl implements Content {
     }
 
     @Override
+    public void save() {
+        pt.write(path);
+    }
+
+    @Override
+    public void saveAs(Path path) {
+        pt.write(path);
+        this.path = path;
+    }
+
+    @Override
     public void handle(Edit edit) {
         if (edit.isInsert()) {
             pt.insert(edit.codePointPosition(), edit.string());

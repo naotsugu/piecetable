@@ -55,6 +55,9 @@ public class EditQueue {
     public void push(Edit edit) {
         if (buffer.canMarge(edit)) {
             buffer = buffer.marge(edit);
+            if (Strings.countLf(buffer.string()) > 0) {
+                flush();
+            }
         } else {
             flush();
             buffer = edit;
@@ -139,6 +142,15 @@ public class EditQueue {
         flush();
         undo.clear();
         redo.clear();
+    }
+
+
+    /**
+     * Get whether this edit is nil type.
+     * @return {@code true}, if this edit is nil type
+     */
+    public boolean isBufferEmpty() {
+        return buffer.isEmpty();
     }
 
 

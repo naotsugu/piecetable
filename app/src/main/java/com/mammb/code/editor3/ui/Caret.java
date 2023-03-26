@@ -117,7 +117,11 @@ public class Caret extends Path {
      * Move the caret to the right.
      */
     public void right() {
-        if (Character.isHighSurrogate(text.charAt(++offset))) {
+        if (text.textLength() > offset) {
+            ++offset;
+        }
+        if (text.textLength() > offset &&
+            Character.isHighSurrogate(text.charAt(offset))) {
             offset++;
         }
         moveToOffsetSyncLogical();

@@ -19,6 +19,8 @@ import com.mammb.code.editor3.lang.Until;
 import com.mammb.code.editor3.lang.EventListener;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.Objects;
 
 /**
  * TextSource.
@@ -39,7 +41,7 @@ public class TextSource implements EventListener<Edit> {
     private int offset;
 
     /** The edit queue. */
-    private final EditQueue editQueue;
+    private EditQueue editQueue;
 
 
     /**
@@ -48,6 +50,16 @@ public class TextSource implements EventListener<Edit> {
      */
     public TextSource(Content source) {
         this.source = source;
+        this.offset = 0;
+        this.editQueue = new EditQueue(source);
+    }
+
+
+    public void as(Path path) {
+        if (!editQueue.isBufferEmpty()) {
+            throw new IllegalStateException();
+        }
+        this.source = new ContentImpl(path);
         this.offset = 0;
         this.editQueue = new EditQueue(source);
     }
@@ -225,12 +237,32 @@ public class TextSource implements EventListener<Edit> {
     }
 
 
+    public void save() {
+        source.save();
+    }
+
+
+    public void saveAs(Path path) {
+        source.saveAs(path);
+    }
+
+
+
     /**
      * Get the source index.
      * @return the source index
      */
     public int offset() {
         return offset;
+    }
+
+
+    /**
+     * Get the content path.
+     * @return the content path. {@code null} if content path is empty
+     */
+    public Path contentPath() {
+        return source.path();
     }
 
 

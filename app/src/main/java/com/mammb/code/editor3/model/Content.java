@@ -77,4 +77,8 @@ public interface Content extends EditListener {
      */
     byte[] bytesBefore(int startPos, Predicate<byte[]> until);
 
+    void save();
+
+    void saveAs(Path path);
+
 }

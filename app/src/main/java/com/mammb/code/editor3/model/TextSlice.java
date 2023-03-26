@@ -16,6 +16,8 @@
 package com.mammb.code.editor3.model;
 
 import com.mammb.code.editor3.lang.StringsBuffer;
+
+import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -49,6 +51,27 @@ public class TextSlice {
         this.originRow = 0;
         this.originOffset = 0;
         this.maxRowSize = 10;
+    }
+
+
+    /**
+     * Open the path content.
+     * @param path the content path
+     */
+    public void open(Path path) {
+        this.originRow = 0;
+        this.originOffset = 0;
+        source.as(path);
+        refresh();
+    }
+
+    public void save() {
+        source.save();
+    }
+
+
+    public void saveAs(Path path) {
+        source.saveAs(path);
     }
 
 
@@ -237,6 +260,14 @@ public class TextSlice {
      */
     public int totalRowSize() {
         return source.totalRowSize();
+    }
+
+    /**
+     * Get the content path.
+     * @return the content path. {@code null} if content path is empty
+     */
+    public Path contentPath() {
+        return source.contentPath();
     }
 
 }

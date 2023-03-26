@@ -16,16 +16,15 @@
 package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.ui.TextPane;
+import com.mammb.code.editor3.ui.util.FileChoosers;
 import java.io.File;
 import java.util.Objects;
 
-import static com.mammb.code.editor3.ui.util.FileChoosers.fileChooseOpen;
-
 /**
- * FileChooseBehavior.
+ * FileBehavior.
  * @author Naotsugu Kobayashi
  */
-public class FileChooseBehavior {
+public class FileBehavior {
 
     /** The text pane. */
     private final TextPane textPane;
@@ -35,7 +34,7 @@ public class FileChooseBehavior {
      * Constructor.
      * @param textPane the text pane
      */
-    public FileChooseBehavior(TextPane textPane) {
+    public FileBehavior(TextPane textPane) {
         this.textPane = Objects.requireNonNull(textPane);
     }
 
@@ -47,9 +46,35 @@ public class FileChooseBehavior {
         if (textPane.isDirty()) {
             // TODO
         }
-        File file = fileChooseOpen(textPane.stage(), null);
+        File file = FileChoosers.fileChooseOpen(textPane.stage(), null);
         if (file != null) {
             textPane.open(file.toPath());
+        }
+    }
+
+
+    /**
+     * Save
+     */
+    public void save() {
+        if (textPane.contentPath() == null) {
+            File file = FileChoosers.fileChooseSave(textPane.stage(), null);
+            if (file != null) {
+                textPane.saveAs(file.toPath());
+            }
+        } else {
+            textPane.save();
+        }
+    }
+
+
+    /**
+     * Save as
+     */
+    public void saveAs() {
+        File file = FileChoosers.fileChooseSave(textPane.stage(), null);
+        if (file != null) {
+            textPane.saveAs(file.toPath());
         }
     }
 

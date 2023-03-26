@@ -57,6 +57,26 @@ public class TextModel {
     }
 
 
+    public void open(Path path) {
+        if (dirty) {
+            throw new IllegalStateException();
+        }
+        textSlice.open(path);
+    }
+
+
+    public void save() {
+        textSlice.save();
+        dirty = false;
+    }
+
+
+    public void saveAs(Path path) {
+        textSlice.saveAs(path);
+        dirty = false;
+    }
+
+
     /**
      * Add text.
      * @param offset the offset to add
@@ -180,6 +200,15 @@ public class TextModel {
      */
     public int originRowIndex() {
         return textSlice.originRow();
+    }
+
+
+    /**
+     * Get the content path.
+     * @return the content path. {@code null} if content path is empty
+     */
+    public Path contentPath() {
+        return textSlice.contentPath();
     }
 
 

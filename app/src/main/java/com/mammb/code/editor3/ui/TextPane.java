@@ -18,7 +18,7 @@ package com.mammb.code.editor3.ui;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
-import com.mammb.code.editor3.ui.behavior.FileChooseBehavior;
+import com.mammb.code.editor3.ui.behavior.FileBehavior;
 import com.mammb.code.editor3.ui.behavior.EditBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.handler.DragDrop;
@@ -59,6 +59,7 @@ public class TextPane extends StackPane {
     /** The rows panel. */
     private final RowsPanel rowsPanel;
 
+    /** The ime palette. */
     private final ImePalette imePalette;
 
     /** The text model. */
@@ -130,10 +131,19 @@ public class TextPane extends StackPane {
      * @param path the file content path
      */
     public void open(Path path) {
-        model = new TextModel(path);
-        initHandler();
+        model.open(path);
         sync();
         pointing.clear();
+    }
+
+
+    public void save() {
+        model.save();
+    }
+
+
+    public void saveAs(Path path) {
+        model.saveAs(path);
     }
 
 
@@ -167,6 +177,16 @@ public class TextPane extends StackPane {
         screenBound.setTotalRowSize(model.totalRowSize() + textFlow.wrappedLines());
         screenBound.setRowOffset(model.originRowIndex(), textFlow.translatedLineOffset());
         rowsPanel.redraw();
+
+        setupStageTitle();
+    }
+
+
+    private void setupStageTitle() {
+        Path path = model.contentPath();
+        String title = (path == null) ? "untitled" : path.toString();
+        title += model.isDirty() ? " *" : "";
+        stage.setTitle(title);
     }
 
 
@@ -175,6 +195,15 @@ public class TextPane extends StackPane {
      * @return {@code true} if text is dirty.
      */
     public boolean isDirty() { return model.isDirty(); }
+
+
+    /**
+     * Get the content path.
+     * @return the content path. {@code null} if content path is empty
+     */
+    public Path contentPath() {
+        return model.contentPath();
+    }
 
 
     /**
@@ -198,8 +227,8 @@ public class TextPane extends StackPane {
         return new ConfBehavior(textFlow, pointing, rowsPanel);
     }
 
-    private FileChooseBehavior fileChooseBehavior() {
-        return new FileChooseBehavior(this);
+    private FileBehavior fileChooseBehavior() {
+        return new FileBehavior(this);
     }
 
     private EditBehavior editBehavior() {
