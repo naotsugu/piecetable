@@ -19,6 +19,7 @@ import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
 import com.mammb.code.editor3.ui.behavior.EditBehavior;
 import com.mammb.code.editor3.ui.behavior.FileBehavior;
+import com.mammb.code.editor3.ui.behavior.ImeBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.util.Keys;
 import javafx.event.EventHandler;
@@ -40,6 +41,9 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
     /** The edit behavior. */
     private final EditBehavior editBehavior;
 
+    /** The edit behavior. */
+    private final ImeBehavior imeBehavior;
+
     /** The file choose behavior. */
     private final FileBehavior fileBehavior;
 
@@ -52,6 +56,7 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
      * @param caretBehavior the caret behavior
      * @param scrollBehavior the scroll behavior
      * @param editBehavior the edit behavior
+     * @param imeBehavior the ime behavior
      * @param fileBehavior the file choose behavior
      * @param confBehavior the conf behavior
      */
@@ -59,11 +64,13 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             CaretBehavior caretBehavior,
             ScrollBehavior scrollBehavior,
             EditBehavior editBehavior,
+            ImeBehavior imeBehavior,
             FileBehavior fileBehavior,
             ConfBehavior confBehavior) {
         this.caretBehavior = caretBehavior;
         this.scrollBehavior = scrollBehavior;
         this.editBehavior = editBehavior;
+        this.imeBehavior = imeBehavior;
         this.fileBehavior = fileBehavior;
         this.confBehavior = confBehavior;
     }
@@ -74,6 +81,7 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
      * @param caretBehavior the caret behavior
      * @param scrollBehavior the scroll behavior
      * @param editBehavior the edit behavior
+     * @param imeBehavior the ime behavior
      * @param fileBehavior the file choose behavior
      * @param confBehavior the conf behavior
      * @return a new {@code KeyPressedHandler}
@@ -82,15 +90,18 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             CaretBehavior caretBehavior,
             ScrollBehavior scrollBehavior,
             EditBehavior editBehavior,
+            ImeBehavior imeBehavior,
             FileBehavior fileBehavior,
             ConfBehavior confBehavior) {
-        return new KeyPressedHandler(caretBehavior, scrollBehavior, editBehavior,
-            fileBehavior, confBehavior);
+        return new KeyPressedHandler(
+            caretBehavior, scrollBehavior, editBehavior, imeBehavior, fileBehavior, confBehavior);
     }
 
 
     @Override
     public void handle(KeyEvent e) {
+
+        if (imeBehavior.doing()) return;
 
         boolean handled = handleKeyCombination(e);
         if (handled) return;

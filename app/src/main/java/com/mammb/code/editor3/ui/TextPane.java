@@ -20,8 +20,10 @@ import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
 import com.mammb.code.editor3.ui.behavior.FileBehavior;
 import com.mammb.code.editor3.ui.behavior.EditBehavior;
+import com.mammb.code.editor3.ui.behavior.ImeBehavior;
 import com.mammb.code.editor3.ui.behavior.ScrollBehavior;
 import com.mammb.code.editor3.ui.handler.DragDrop;
+import com.mammb.code.editor3.ui.handler.ImeTextHandler;
 import com.mammb.code.editor3.ui.handler.KeyPressedHandler;
 import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
 import com.mammb.code.editor3.ui.handler.MouseClickedHandler;
@@ -59,9 +61,6 @@ public class TextPane extends StackPane {
     /** The rows panel. */
     private final RowsPanel rowsPanel;
 
-    /** The ime palette. */
-    private final ImePalette imePalette;
-
     /** The text model. */
     private TextModel model;
 
@@ -79,7 +78,6 @@ public class TextPane extends StackPane {
         this.pointing = new Pointing(textFlow);
         this.screenBound = new ScreenBound(this, textFlow);
         this.rowsPanel = new RowsPanel(textFlow, screenBound);
-        this.imePalette = new ImePalette(textFlow, pointing.caret());
 
         setFocusTraversable(true);
         setAccessibleRole(AccessibleRole.TEXT_AREA);
@@ -97,14 +95,16 @@ public class TextPane extends StackPane {
 
     private void initHandler() {
 
-        EditBehavior editBehavior = editBehavior();
-        ScrollBehavior scrollBehavior = scrollBehavior();
-        CaretBehavior caretBehavior = caretBehavior();
-        FileBehavior fileBehavior = fileBehavior();
-        ConfBehavior confBehavior = confBehavior();
+        ScrollBehavior scrollBehavior = new ScrollBehavior(textFlow, pointing, model, screenBound);
+        CaretBehavior caretBehavior = new CaretBehavior(pointing, scrollBehavior, heightProperty(), widthProperty());
+        EditBehavior editBehavior = new EditBehavior(model, pointing, textFlow, rowsPanel, caretBehavior);
+        FileBehavior fileBehavior = new FileBehavior(this);
+        ConfBehavior confBehavior = new ConfBehavior(textFlow, pointing, rowsPanel);
+        ImeBehavior imeBehavior = new ImeBehavior(textFlow, pointing, editBehavior);
 
         setOnKeyTyped(KeyTypedHandler.of(editBehavior));
-        setOnKeyPressed(KeyPressedHandler.of(caretBehavior, scrollBehavior, editBehavior, fileBehavior, confBehavior));
+        setOnKeyPressed(KeyPressedHandler.of(
+            caretBehavior, scrollBehavior, editBehavior, imeBehavior, fileBehavior, confBehavior));
 
         setOnScroll(ScrollHandler.of(scrollBehavior));
 
@@ -114,9 +114,8 @@ public class TextPane extends StackPane {
         setOnMouseClicked(MouseClickedHandler.of(caretBehavior));
         setOnMouseDragged(MouseDraggedHandler.of(caretBehavior));
 
-        setInputMethodRequests(imePalette.createInputMethodRequests());
-        setOnInputMethodTextChanged(imePalette::handleInputMethod);
-        imePalette.bindBehavior(editBehavior);
+        setInputMethodRequests(imeBehavior.inputMethodRequests());
+        setOnInputMethodTextChanged(ImeTextHandler.of(imeBehavior));
     }
 
 
@@ -217,26 +216,6 @@ public class TextPane extends StackPane {
         return (int) Math.ceil(getHeight() / Texts.height);
     }
 
-
-    private ScrollBehavior scrollBehavior() {
-        return new ScrollBehavior(textFlow, pointing, model, screenBound);
-    }
-
-    private CaretBehavior caretBehavior() {
-        return new CaretBehavior(pointing, scrollBehavior(), heightProperty(), widthProperty());
-    }
-
-    private ConfBehavior confBehavior() {
-        return new ConfBehavior(textFlow, pointing, rowsPanel);
-    }
-
-    private FileBehavior fileBehavior() {
-        return new FileBehavior(this);
-    }
-
-    private EditBehavior editBehavior() {
-        return new EditBehavior(model, pointing, textFlow, rowsPanel, caretBehavior());
-    }
 
     RowsPanel rowsPanel() { return rowsPanel; }
 

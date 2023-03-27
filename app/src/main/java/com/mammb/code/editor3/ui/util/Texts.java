@@ -89,6 +89,19 @@ public class Texts {
     }
 
 
+    /**
+     * Create the copy of text.
+     * @param source the source
+     * @return the copy
+     */
+    public static Text copy(Text source) {
+        Text copy = new Text(source.getText());
+        copy.setFont(source.getFont());
+        copy.setFill(source.getFill());
+        return copy;
+    }
+
+
     public static double width(Text text) {
         return PathElements.width(text.rangeShape(0, text.getText().length()));
     }

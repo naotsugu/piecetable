@@ -264,8 +264,13 @@ public class Pointing extends Region {
         return selection.on();
     }
 
-    Caret caret() {
-        return caret;
+
+    /**
+     * Slip caret.
+     * @param translateX slip x
+     */
+    public void slipCaret(double translateX) {
+        caret.setTranslateX(translateX);
     }
 
 }
