@@ -52,9 +52,9 @@ public class MouseClickedHandler implements EventHandler<MouseEvent> {
     @Override
     public void handle(MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
-            caretBehavior.click(event.getX(), event.getY());
+            caretBehavior.click(event.getSceneX(), event.getSceneY());
         } else if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-            caretBehavior.clickDouble(event.getX(), event.getY());
+            caretBehavior.clickDouble(event.getSceneX(), event.getSceneY());
         }
     }
 

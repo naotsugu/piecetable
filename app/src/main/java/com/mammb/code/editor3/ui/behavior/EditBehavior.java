@@ -77,7 +77,7 @@ public class EditBehavior {
 
         if (value.contains("\r")) {
             // Enter key : 13:CR -> replace to 10:LF
-            value = value.replace('\r', '\n');
+            value = Strings.unifyLf(value);
         }
         caretBehavior.at();
         model.add(pointing.caretOffset(), value);

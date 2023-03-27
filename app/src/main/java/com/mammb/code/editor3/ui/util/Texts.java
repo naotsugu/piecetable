@@ -15,15 +15,10 @@
  */
 package com.mammb.code.editor3.ui.util;
 
-import com.mammb.code.editor3.lang.Strings;
 import javafx.geometry.Point2D;
-import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-
 import java.util.List;
 
 /**
@@ -32,7 +27,7 @@ import java.util.List;
  */
 public class Texts {
 
-    private static final Font DEFAULT = new Font("Consolas", 15);
+    private static final Font DEFAULT = new Font("Consolas", 16);
 
     public static final Text bit = new Text("X");
     static {

@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
+import javafx.geometry.Point2D;
 import javafx.scene.layout.Region;
 
 /**
@@ -129,12 +130,14 @@ public class Pointing extends Region {
      * @param y point of y
      */
     public void caretAt(double x, double y) {
-        caret.at(x, y);
+        Point2D p = sceneToLocal(new Point2D(x, y));
+        caret.at(p.getX(), p.getY());
     }
 
 
     public void dragged(double x, double y) {
-        caret.at(x, y);
+        Point2D p = sceneToLocal(new Point2D(x, y));
+        caret.at(p.getX(), p.getY());
         if (selection.isDragging()) {
             selection.moveCaretTo(caret.offset());
         } else {

@@ -98,19 +98,21 @@ public class TextPane extends StackPane {
     private void initHandler() {
 
         EditBehavior editBehavior = editBehavior();
+        ScrollBehavior scrollBehavior = scrollBehavior();
+        CaretBehavior caretBehavior = caretBehavior();
+        FileBehavior fileBehavior = fileBehavior();
+        ConfBehavior confBehavior = confBehavior();
 
         setOnKeyTyped(KeyTypedHandler.of(editBehavior));
-        setOnKeyPressed(KeyPressedHandler.of(
-            caretBehavior(), scrollBehavior(), editBehavior,
-            fileChooseBehavior(), confBehavior()));
+        setOnKeyPressed(KeyPressedHandler.of(caretBehavior, scrollBehavior, editBehavior, fileBehavior, confBehavior));
 
-        setOnScroll(ScrollHandler.of(scrollBehavior()));
+        setOnScroll(ScrollHandler.of(scrollBehavior));
 
         setOnDragOver(DragDrop.dragOverHandler());
         setOnDragDropped(DragDrop.droppedHandler(this::open));
 
-        setOnMouseClicked(MouseClickedHandler.of(caretBehavior()));
-        setOnMouseDragged(MouseDraggedHandler.of(caretBehavior()));
+        setOnMouseClicked(MouseClickedHandler.of(caretBehavior));
+        setOnMouseDragged(MouseDraggedHandler.of(caretBehavior));
 
         setInputMethodRequests(imePalette.createInputMethodRequests());
         setOnInputMethodTextChanged(imePalette::handleInputMethod);
@@ -144,6 +146,7 @@ public class TextPane extends StackPane {
 
     public void saveAs(Path path) {
         model.saveAs(path);
+        setupStageTitle();
     }
 
 
@@ -227,7 +230,7 @@ public class TextPane extends StackPane {
         return new ConfBehavior(textFlow, pointing, rowsPanel);
     }
 
-    private FileBehavior fileChooseBehavior() {
+    private FileBehavior fileBehavior() {
         return new FileBehavior(this);
     }
 

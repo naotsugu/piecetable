@@ -139,6 +139,29 @@ public class Strings {
 
 
     /**
+     * Unify line breaks in the given string to LF line breaks.
+     * @param string the given string
+     * @return the unified string
+     */
+    public static String unifyLf(String string) {
+        int len = 0;
+        char[] chars = new char[string.length()];
+        for (int i = 0; i < string.length(); i++) {
+            char ch = string.charAt(i);
+            if (ch == CR) {
+                if (i + 1 < string.length() && string.charAt(i + 1) == LF) {
+                    // just skip
+                } else {
+                    chars[len++] = LF;
+                }
+            } else {
+                chars[len++] = ch;
+            }
+        }
+        return new String(chars, 0, len);
+    }
+
+    /**
      * Get the number of bytes from the first byte of UTF-8 when expressed in UTF-16.
      * @param utf8FirstByte the first byte of UTF-8
      * @return the number of bytes when expressed in UTF-16

@@ -83,6 +83,7 @@ public class ImePalette {
 
                     pendingText = copy(text);
                     pendingText.setText("");
+                    pendingText.setUnderline(true);
                     texts.add(pendingText);
 
                     Text right = copy(text);
@@ -90,8 +91,10 @@ public class ImePalette {
                     texts.add(right);
 
                 } else if (pendingText == null && caretIndex == count + length) {
+                    texts.add(text);
                     pendingText = copy(text);
                     pendingText.setText("");
+                    pendingText.setUnderline(true);
                     texts.add(pendingText);
                 } else {
                     texts.add(text);
@@ -119,9 +122,7 @@ public class ImePalette {
             pendingText.setText(e.getComposed().stream()
                 .map(InputMethodTextRun::getText).collect(Collectors.joining()));
             caret.setTranslateX(caretXOriginal + Texts.width(pendingText.getText(), pendingText.getFont()));
-        }
-
-        if (e.getCommitted().isEmpty() && e.getComposed().isEmpty()) {
+        } else {
             clear();
         }
 
