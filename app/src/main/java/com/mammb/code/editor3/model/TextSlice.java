@@ -16,7 +16,6 @@
 package com.mammb.code.editor3.model;
 
 import com.mammb.code.editor3.lang.StringsBuffer;
-
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -26,11 +25,8 @@ import java.util.Objects;
  */
 public class TextSlice {
 
-    /** The origin row number(zero based). */
-    private int originRow;
-
-    /** The origin offset(not code point counts). */
-    private int originOffset;
+    /** The origin point. */
+    private RowPoint origin;
 
     /** The row size of slice. */
     private int maxRowSize;
@@ -48,8 +44,7 @@ public class TextSlice {
      */
     public TextSlice(TextSource source) {
         this.source = Objects.requireNonNull(source);
-        this.originRow = 0;
-        this.originOffset = 0;
+        this.origin = RowPoint.zero;
         this.maxRowSize = 10;
     }
 
@@ -59,8 +54,7 @@ public class TextSlice {
      * @param path the content path
      */
     public void open(Path path) {
-        this.originRow = 0;
-        this.originOffset = 0;
+        this.origin = RowPoint.zero;
         source.as(path);
         refresh();
     }
@@ -83,7 +77,7 @@ public class TextSlice {
     public void insert(int offset, String string) {
         int beforeRowSize = buffer.rowSize();
         buffer.insert(offset, string);
-        source.handle(Edit.insert(originOffset, offset, string));
+        source.handle(Edit.insert(origin.offset(), offset, string));
         if (hasNext() && beforeRowSize < buffer.rowSize()) {
             buffer.truncateRows(buffer.rowSize() - beforeRowSize);
         }
@@ -101,7 +95,7 @@ public class TextSlice {
         if (length > buffer.length()) {
             deleted = source.substring(offset, length);
         }
-        source.handle(Edit.delete(originOffset, offset, deleted));
+        source.handle(Edit.delete(origin.offset(), offset, deleted));
 
         if (beforeRowSize > buffer.rowSize()) {
             buffer.append(source.afterRow(buffer.length(), beforeRowSize - buffer.rowSize()));
@@ -165,17 +159,15 @@ public class TextSlice {
             String tail = source.afterRow(buffer.length(), rowDelta);
             if (tail.isEmpty()) return;
             int n = source.shiftRow(rowDelta);
-            originOffset += buffer.shiftAppend(tail);
-            originRow += n;
+            origin = origin.plus(n, buffer.shiftAppend(tail));
         } else if (rowDelta < 0) {
             // scroll prev (i.e. arrow up)
-            if (originRow == 0) return;
+            if (origin.row() == 0) return;
             int n = source.shiftRow(rowDelta);
             if (n == 0) return;
             String head = source.rows(Math.abs(rowDelta));
             buffer.shiftInsert(0, head);
-            originOffset -= head.length();
-            originRow -= n;
+            origin = origin.minus(n, head.length());
         }
 
     }
@@ -232,7 +224,7 @@ public class TextSlice {
      * @return the origin row number(zero based)
      */
     public int originRow() {
-        return originRow;
+        return origin.row();
     }
 
 
@@ -241,7 +233,7 @@ public class TextSlice {
      * @return the origin offset(not code point counts)
      */
     public int originOffset() {
-        return originOffset;
+        return origin.offset();
     }
 
 
@@ -250,7 +242,7 @@ public class TextSlice {
      * @return {@code true} if exists next
      */
     public boolean hasNext() {
-        return originRow + buffer.rowSize() < source.totalRowSize();
+        return origin.row() + buffer.rowSize() < source.totalRowSize();
     }
 
 
@@ -261,6 +253,7 @@ public class TextSlice {
     public int totalRowSize() {
         return source.totalRowSize();
     }
+
 
     /**
      * Get the content path.
