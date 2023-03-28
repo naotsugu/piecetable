@@ -53,7 +53,7 @@ public class MouseDraggedHandler implements EventHandler<MouseEvent> {
     @Override
     public void handle(MouseEvent event) {
         if (!event.getButton().equals(MouseButton.PRIMARY)) return;
-        caretBehavior.dragged(event.getX(), event.getY());
+        caretBehavior.dragged(event.getSceneX(), event.getSceneY());
     }
 
 }
