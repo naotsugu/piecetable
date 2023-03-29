@@ -15,22 +15,28 @@
  */
 package com.mammb.code.editor3.syntax;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 /**
- * Tokenizer.
+ * Lexer.
  * @author Naotsugu Kobayashi
  */
-public class Tokenizer {
+public class Lexer {
 
-    /** input string. */
+    /** The input string. */
     private InputStream input;
 
-    /** current position in input (points to current char). */
-    private int position;
+    /** The current position in input (points to current char). */
+    private int position = 0;
 
-    /** current reading position in input (after current char). */
-    private int readPosition;
 
+    private Lexer(InputStream input) {
+        this.input = input.markSupported() ? input : new BufferedInputStream(input);
+    }
+
+    public static Lexer of(InputStream input) {
+        return new Lexer(input);
+    }
 
 }
