@@ -16,12 +16,16 @@
 package com.mammb.code.editor3.syntax;
 
 /**
- * Token.
- * @param type the type
- * @param position the position
- * @param length the length
+ * TokenType.
  * @author Naotsugu Kobayashi
  */
-public record Token(int type, int position, int length) {
-
+public enum TokenType {
+    ANY,
+    EMPTY,
+    SP,
+    KEYWORD,
+    LITERAL,
+    TEXT,
+    LINE_COMMENT,
+    BLOCK_COMMENT,
 }

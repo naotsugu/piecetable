@@ -15,28 +15,10 @@
  */
 package com.mammb.code.editor3.syntax;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-
 /**
  * Lexer.
  * @author Naotsugu Kobayashi
  */
-public class Lexer {
-
-    /** The input string. */
-    private InputStream input;
-
-    /** The current position in input (points to current char). */
-    private int position = 0;
-
-
-    private Lexer(InputStream input) {
-        this.input = input.markSupported() ? input : new BufferedInputStream(input);
-    }
-
-    public static Lexer of(InputStream input) {
-        return new Lexer(input);
-    }
-
+public interface Lexer {
+    Token nextToken();
 }
