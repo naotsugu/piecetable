@@ -101,4 +101,10 @@ public class LexerSourceBasic implements LexerSource {
         return position;
     }
 
+
+    @Override
+    public int length() {
+        return string.length();
+    }
+
 }

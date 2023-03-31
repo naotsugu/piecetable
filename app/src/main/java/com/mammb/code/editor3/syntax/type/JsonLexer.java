@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.syntax.json;
+package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
@@ -24,19 +24,19 @@ import com.mammb.code.editor3.syntax.TokenType;
  * Lexer.
  * @author Naotsugu Kobayashi
  */
-public class LexerJson implements Lexer {
+public class JsonLexer implements Lexer {
 
     /** The input string. */
     private LexerSource source;
 
 
-    private LexerJson(LexerSource source) {
+    private JsonLexer(LexerSource source) {
         this.source = source;
     }
 
 
     public static Lexer of(LexerSource source) {
-        return new LexerJson(source);
+        return new JsonLexer(source);
     }
 
 

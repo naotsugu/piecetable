@@ -1,4 +1,4 @@
-package com.mammb.code.editor3.syntax.java;
+package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.syntax.LexerSource;
 import com.mammb.code.editor3.syntax.Token;
@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LexerJavaTest {
+class JavaLexerTest {
 
     @Test
     void nextToken() {
 
-        var lexer = LexerJava.of(LexerSource.of("public static void main(String... args) {"));
+        var lexer = JavaLexer.of(LexerSource.of("public static void main(String... args) {"));
         assertEquals(new Token(TokenType.KEYWORD.ordinal(), 0, 6), lexer.nextToken());
         assertEquals(new Token(TokenType.SP.ordinal(), 6, 1), lexer.nextToken());
         assertEquals(new Token(TokenType.KEYWORD.ordinal(), 7, 6), lexer.nextToken());

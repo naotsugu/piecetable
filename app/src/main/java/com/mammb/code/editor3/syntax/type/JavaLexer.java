@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.syntax.java;
+package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
@@ -23,10 +23,10 @@ import com.mammb.code.editor3.syntax.Trie;
 import java.util.stream.Stream;
 
 /**
- * Lexer.
+ * JavaLexer.
  * @author Naotsugu Kobayashi
  */
-public class LexerJava implements Lexer {
+public class JavaLexer implements Lexer {
 
     /** The syntax keywords. */
     private static final Trie keywords = keywords();
@@ -35,13 +35,22 @@ public class LexerJava implements Lexer {
     private LexerSource source;
 
 
-    private LexerJava(LexerSource source) {
+    /**
+     * Constructor.
+     * @param source the {@link LexerSource}
+     */
+    private JavaLexer(LexerSource source) {
         this.source = source;
     }
 
 
+    /**
+     * Create a new lexer.
+     * @param source the {@link LexerSource}
+     * @return a lexer
+     */
     public static Lexer of(LexerSource source) {
-        return new LexerJava(source);
+        return new JavaLexer(source);
     }
 
 
@@ -69,7 +78,7 @@ public class LexerJava implements Lexer {
             if (!Character.isJavaIdentifierPart(ch)) {
                 source.rollbackPeek();
                 String str = sb.toString();
-                TokenType type = keywords.search(str) ? TokenType.KEYWORD : TokenType.ANY;
+                TokenType type = keywords.match(str) ? TokenType.KEYWORD : TokenType.ANY;
                 return new Token(type.ordinal(), pos, str.length());
             }
             sb.append(source.readChar());

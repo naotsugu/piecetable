@@ -37,4 +37,13 @@ public class Colors {
     public static final Paint thumb = Color.web("#626465", 0.5);
     public static final Paint thumbActive = Color.web("#828485", 0.9);
 
+
+    public static Color of(int index) {
+        if (index <= 0) {
+            return Colors.foreground;
+        }
+        // TODO
+        return Color.ORANGE;
+    }
+
 }

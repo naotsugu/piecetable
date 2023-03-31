@@ -35,14 +35,14 @@ class TrieTest {
         trie.put("ruber");
         trie.put("rubicon");
 
-        assertTrue(trie.search("romane"));
-        assertTrue(trie.search("romanus"));
+        assertTrue(trie.match("romane"));
+        assertTrue(trie.match("romanus"));
 
-        assertFalse(trie.search("roma"));
-        assertFalse(trie.search("roman"));
-        assertFalse(trie.search("apple"));
-        assertFalse(trie.search("romules"));
-        assertFalse(trie.search("rubicundus"));
+        assertFalse(trie.match("roma"));
+        assertFalse(trie.match("roman"));
+        assertFalse(trie.match("apple"));
+        assertFalse(trie.match("romules"));
+        assertFalse(trie.match("rubicundus"));
 
 
         assertTrue(trie.startsWith("roma"));
@@ -56,9 +56,9 @@ class TrieTest {
         trie.remove("romanus");
         trie.remove("romulus");
 
-        assertTrue(trie.search("romane"));
-        assertFalse(trie.search("romanus"));
-        assertFalse(trie.search("romulus"));
+        assertTrue(trie.match("romane"));
+        assertFalse(trie.match("romanus"));
+        assertFalse(trie.match("romulus"));
     }
 
 }

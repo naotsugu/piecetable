@@ -15,9 +15,12 @@
  */
 package com.mammb.code.editor3.ui.util;
 
+import com.mammb.code.editor3.model.DecoratedText;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import java.util.List;
 
@@ -76,6 +79,31 @@ public class Texts {
     }
 
 
+    public static List<Text> asText(List<DecoratedText> texts) {
+        return texts.stream().map(Texts::asText).toList();
+    }
+
+
+    public static Text asText(DecoratedText txt) {
+
+        Text text = new Text(txt.text());
+        if (txt.size() == font.getSize() && txt.normal()) {
+            text.setFont(font);
+        } else {
+            text.setFont(Font.font(
+                font.getName(),
+                txt.bold() ? FontWeight.BOLD : FontWeight.MEDIUM,
+                txt.italic() ? FontPosture.ITALIC : FontPosture.REGULAR,
+                txt.size()));
+            if (txt.underLine()) {
+                text.setUnderline(true);
+            }
+        }
+        text.setFill(Colors.of(txt.color()));
+        return text;
+    }
+
+
     public static Text asText(String string, Color color) {
         Text text = new Text(string);
         text.setFont(font);
@@ -84,7 +112,7 @@ public class Texts {
     }
 
 
-    public static List<Text> asText(List<String> strings) {
+    public static List<Text> asTextPlain(List<String> strings) {
         return strings.stream().map(Texts::asText).toList();
     }
 

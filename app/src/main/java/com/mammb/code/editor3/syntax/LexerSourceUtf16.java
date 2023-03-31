@@ -18,6 +18,7 @@ package com.mammb.code.editor3.syntax;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 /**
@@ -39,12 +40,15 @@ public class LexerSourceUtf16 implements LexerSource {
     private char currentChar = 0;
 
     /** little endian?. */
-    private boolean littleEndian = false;
+    private Boolean littleEndian = null;
+
+    /** length(cached). */
+    private int length = -1;
 
 
     private LexerSourceUtf16(InputStream input) {
         this.input = input.markSupported() ? input : new BufferedInputStream(input);
-        try {
+        try {input.readAllBytes();
             input.mark(2);
             char high = (char) input.read();
             char low  = (char) input.read();
@@ -121,6 +125,27 @@ public class LexerSourceUtf16 implements LexerSource {
     }
 
 
+    @Override
+    public int length() {
+        if (length < 0) {
+            if (peekCount > 0) {
+                throw new IllegalStateException("peeking in process");
+            }
+            try {
+                input.mark(Integer.MAX_VALUE);
+                length = input.readAllBytes().length / 2;
+                input.reset();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (Objects.nonNull(littleEndian)) {
+                length -= 2;
+            }
+        }
+        return length;
+    }
+
+
     private int read() {
         try {
             if (peekCount > 0) {
@@ -161,7 +186,7 @@ public class LexerSourceUtf16 implements LexerSource {
         if (b.length != 2) {
             return 0;
         }
-        if (littleEndian) {
+        if (Objects.nonNull(littleEndian) && littleEndian) {
             return (char) ((b[1] << 8) & 0xFF00 | (b[0] & 0x00FF));
         } else {
             return (char) ((b[0] << 8) & 0xFF00 | (b[1] & 0x00FF));

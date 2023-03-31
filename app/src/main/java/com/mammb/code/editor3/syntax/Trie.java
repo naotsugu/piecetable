@@ -23,12 +23,22 @@ import java.util.List;
  */
 public class Trie {
 
+    /** The node. */
     private final TrieNode root;
 
+
+    /**
+     * Constructor.
+     */
     public Trie() {
         root = new TrieNode(null);
     }
 
+
+    /**
+     * Put the word.
+     * @param word the word
+     */
     public void put(String word) {
         TrieNode node = root;
         for (int i = 0; i < word.length();) {
@@ -39,6 +49,11 @@ public class Trie {
         node.setEndOfWord();
     }
 
+
+    /**
+     * Remove the word.
+     * @param word the word
+     */
     public void remove(String word) {
         TrieNode node = searchPrefix(word);
         if (node == null || !node.isEndOfWord()) {
@@ -48,14 +63,17 @@ public class Trie {
         node.removeIfEmpty();
     }
 
-    public boolean search(String word) {
+
+    public boolean match(String word) {
         TrieNode node = searchPrefix(word);
         return node != null && node.isEndOfWord();
     }
 
+
     public boolean startsWith(String prefix) {
         return searchPrefix(prefix) != null;
     }
+
 
     private TrieNode searchPrefix(String word) {
         TrieNode node = root;
@@ -84,4 +102,5 @@ public class Trie {
         }
         return node.childKeys();
     }
+
 }

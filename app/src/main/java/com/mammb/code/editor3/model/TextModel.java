@@ -57,6 +57,10 @@ public class TextModel {
     }
 
 
+    /**
+     * Open file with specified path.
+     * @param path the path of opening file
+     */
     public void open(Path path) {
         if (dirty) {
             throw new IllegalStateException();
@@ -65,12 +69,19 @@ public class TextModel {
     }
 
 
+    /**
+     * Save.
+     */
     public void save() {
         textSlice.save();
         dirty = false;
     }
 
 
+    /**
+     * Save as the specified path.
+     * @param path the specified path
+     */
     public void saveAs(Path path) {
         textSlice.saveAs(path);
         dirty = false;
@@ -223,9 +234,12 @@ public class TextModel {
     }
 
 
-    public List<String> text() {
-        // TODO token string
-        return List.of(textSlice.string());
+    /**
+     * Gst the decorated text list.
+     * @return the decorated text list
+     */
+    public List<DecoratedText> text() {
+        return List.of(DecoratedText.of(textSlice.string()));
     }
 
 }

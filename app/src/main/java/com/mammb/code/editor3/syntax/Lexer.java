@@ -20,5 +20,11 @@ package com.mammb.code.editor3.syntax;
  * @author Naotsugu Kobayashi
  */
 public interface Lexer {
+
+    /**
+     * Gets the next token.
+     * @return the next token
+     */
     Token nextToken();
+
 }

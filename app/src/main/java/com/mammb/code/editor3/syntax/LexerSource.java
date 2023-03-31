@@ -58,6 +58,12 @@ public interface LexerSource {
     int position();
 
     /**
+     * Gets the length.
+     * @return the length
+     */
+    int length();
+
+    /**
      * Create a new LexerSource.
      * @param string the source string
      * @return a new LexerSource
