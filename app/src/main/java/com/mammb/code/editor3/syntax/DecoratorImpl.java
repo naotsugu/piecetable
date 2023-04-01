@@ -18,6 +18,8 @@ package com.mammb.code.editor3.syntax;
 import com.mammb.code.editor3.model.DecoratedText;
 import com.mammb.code.editor3.model.Decorator;
 import com.mammb.code.editor3.model.RowPoint;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,9 +28,53 @@ import java.util.List;
  */
 public class DecoratorImpl implements Decorator {
 
+    /** The lexer .*/
+    private final Lexer lexer;
+
+
+    /**
+     * Constructor.
+     * @param lexer the lexer
+     */
+    private DecoratorImpl(Lexer lexer) {
+        this.lexer = lexer;
+    }
+
+
+    /**
+     * Create a new Decorator.
+     * @param ext the extension name
+     * @return a new Decorator
+     */
+    public static Decorator of(String ext) {
+        return new DecoratorImpl(Lexer.of(ext));
+    }
+
+
     @Override
     public List<DecoratedText> apply(RowPoint origin, String string) {
-        return List.of(DecoratedText.of(string));
+
+        lexer.setSource(LexerSource.of(string));
+
+        List<DecoratedText> list = new ArrayList<>();
+
+        for (Token token = lexer.nextToken(); !token.isEmpty(); token = lexer.nextToken()) {
+            if (token.length() == 0) break;
+
+            int pos = token.position();
+            String str = string.substring(pos, pos + token.length());
+
+            DecoratedText text;
+            if (token.type() == TokenType.KEYWORD.ordinal()) {
+                text = DecoratedText.of(str, 1);
+            } else {
+                text = DecoratedText.of(str);
+            }
+
+            list.add(text);
+        }
+
+        return list;
     }
 
 }

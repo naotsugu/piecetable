@@ -65,7 +65,9 @@ public class TextSlice {
 
 
     public void saveAs(Path path) {
+        origin = RowPoint.zero;
         source.saveAs(path);
+        refresh();
     }
 
 

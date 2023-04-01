@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.lang;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,6 +179,20 @@ public class Strings {
         } else {
             return 0;
         }
+    }
+
+
+    /**
+     * Get the extension name.
+     * @param path the source path
+     * @return the extension name
+     */
+    public static String getExtension(Path path) {
+        if (path == null || !path.toFile().isFile()) {
+            return "";
+        }
+        String fileName = path.getFileName().toString();
+        return fileName.substring(fileName.lastIndexOf('.') + 1);
     }
 
 }

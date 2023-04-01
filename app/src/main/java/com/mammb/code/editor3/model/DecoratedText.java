@@ -37,6 +37,7 @@ public interface DecoratedText {
         return !bold() && !underLine() && !italic();
     }
 
+
     static DecoratedText of(String text) {
         return new DecoratedText() {
             @Override
@@ -47,6 +48,29 @@ public interface DecoratedText {
 
             @Override
             public int color() { return 0; }
+
+            @Override
+            public boolean bold() { return false; }
+
+            @Override
+            public boolean underLine() { return false; }
+
+            @Override
+            public boolean italic() { return false; }
+        };
+    }
+
+
+    static DecoratedText of(String text, int color) {
+        return new DecoratedText() {
+            @Override
+            public String text() { return text; }
+
+            @Override
+            public int size() { return 16; }
+
+            @Override
+            public int color() { return color; }
 
             @Override
             public boolean bold() { return false; }

@@ -24,4 +24,12 @@ package com.mammb.code.editor3.syntax;
  */
 public record Token(int type, int position, int length) {
 
+    /**
+     * Get whether this type is empty.
+     * @return {@code true}, if this type is empty
+     */
+    public boolean isEmpty() {
+        return TokenType.EMPTY.ordinal() == type;
+    }
+
 }
