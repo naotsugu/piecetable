@@ -15,6 +15,8 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.syntax.DecoratorImpl;
+
 import java.nio.file.Path;
 import java.util.List;
 
@@ -27,6 +29,9 @@ public class TextModel {
     /** The text slice. */
     private final TextSlice textSlice;
 
+    /** The text decorator. */
+    private final Decorator decorator;
+
     /** dirty?. */
     private boolean dirty;
 
@@ -37,6 +42,7 @@ public class TextModel {
      */
     public TextModel(TextSlice textSlice) {
         this.textSlice = textSlice;
+        this.decorator = new DecoratorImpl();
     }
 
 
@@ -239,7 +245,7 @@ public class TextModel {
      * @return the decorated text list
      */
     public List<DecoratedText> text() {
-        return List.of(DecoratedText.of(textSlice.string()));
+        return decorator.apply(textSlice.origin(), textSlice.string());
     }
 
 }

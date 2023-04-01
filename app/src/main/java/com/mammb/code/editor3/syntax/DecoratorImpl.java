@@ -15,30 +15,20 @@
  */
 package com.mammb.code.editor3.syntax;
 
-import com.mammb.code.editor3.syntax.type.JavaLexer;
-import com.mammb.code.editor3.syntax.type.JsonLexer;
-import com.mammb.code.editor3.syntax.type.PassThroughLexer;
+import com.mammb.code.editor3.model.DecoratedText;
+import com.mammb.code.editor3.model.Decorator;
+import com.mammb.code.editor3.model.RowPoint;
+import java.util.List;
 
 /**
- * Lexer.
+ * Decorator.
  * @author Naotsugu Kobayashi
  */
-public interface Lexer {
+public class DecoratorImpl implements Decorator {
 
-    /**
-     * Gets the next token.
-     * @return the next token
-     */
-    Token nextToken();
-
-
-    static Lexer of(String ext, String text) {
-        LexerSource source = LexerSource.of(text);
-        return switch (ext) {
-            case "java" -> JavaLexer.of(source);
-            case "json" -> JsonLexer.of(source);
-            default -> PassThroughLexer.of(source);
-        };
+    @Override
+    public List<DecoratedText> apply(RowPoint origin, String string) {
+        return List.of(DecoratedText.of(string));
     }
 
 }

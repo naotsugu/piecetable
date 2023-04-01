@@ -13,32 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.syntax;
+package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor3.syntax.type.JavaLexer;
-import com.mammb.code.editor3.syntax.type.JsonLexer;
-import com.mammb.code.editor3.syntax.type.PassThroughLexer;
+import java.util.List;
 
 /**
- * Lexer.
+ * Decorator.
  * @author Naotsugu Kobayashi
  */
-public interface Lexer {
+public interface Decorator {
 
     /**
-     * Gets the next token.
-     * @return the next token
+     * Apply decoration
+     * @param origin the row point
+     * @param string the string
+     * @return the decorated text
      */
-    Token nextToken();
-
-
-    static Lexer of(String ext, String text) {
-        LexerSource source = LexerSource.of(text);
-        return switch (ext) {
-            case "java" -> JavaLexer.of(source);
-            case "json" -> JsonLexer.of(source);
-            default -> PassThroughLexer.of(source);
-        };
-    }
+    List<DecoratedText> apply(RowPoint origin, String string);
 
 }
