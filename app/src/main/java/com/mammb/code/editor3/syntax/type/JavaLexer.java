@@ -54,8 +54,28 @@ public class JavaLexer implements Lexer {
     }
 
 
+    /**
+     * Create a new lexer.
+     * @return a lexer
+     */
+    public static Lexer of() {
+        return new JavaLexer(null);
+    }
+
+
+    @Override
+    public void setSource(LexerSource source) {
+        this.source = source;
+    }
+
+
     @Override
     public Token nextToken() {
+
+        if (source == null) {
+            return new Token(TokenType.EMPTY.ordinal(), 0, 0);
+        }
+
         char ch = source.readChar();
         return switch (ch) {
             case ' ', '\t', '\n', '\r' -> whitespace(source);

@@ -32,12 +32,18 @@ public interface Lexer {
     Token nextToken();
 
 
-    static Lexer of(String ext, String text) {
-        LexerSource source = LexerSource.of(text);
+    /**
+     * Set the source.
+     * @param source the source.
+     */
+    void setSource(LexerSource source);
+
+
+    static Lexer of(String ext) {
         return switch (ext) {
-            case "java" -> JavaLexer.of(source);
-            case "json" -> JsonLexer.of(source);
-            default -> PassThroughLexer.of(source);
+            case "java" -> JavaLexer.of();
+            case "json" -> JsonLexer.of();
+            default -> PassThroughLexer.of();
         };
     }
 

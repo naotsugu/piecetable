@@ -30,18 +30,47 @@ public class JsonLexer implements Lexer {
     private LexerSource source;
 
 
+    /**
+     * Constructor.
+     * @param source the {@link LexerSource}
+     */
     private JsonLexer(LexerSource source) {
         this.source = source;
     }
 
 
+    /**
+     * Create a new lexer.
+     * @param source the {@link LexerSource}
+     * @return a lexer
+     */
     public static Lexer of(LexerSource source) {
         return new JsonLexer(source);
     }
 
 
+    /**
+     * Create a new lexer.
+     * @return a lexer
+     */
+    public static Lexer of() {
+        return new JsonLexer(null);
+    }
+
+
+    @Override
+    public void setSource(LexerSource source) {
+        this.source = source;
+    }
+
+
     @Override
     public Token nextToken() {
+
+        if (source == null) {
+            return new Token(TokenType.EMPTY.ordinal(), 0, 0);
+        }
+
         char ch = source.readChar();
         return switch (ch) {
             case ' ', '\t', '\n', '\r' -> whitespace(source);

@@ -48,7 +48,7 @@ public class LexerSourceUtf16 implements LexerSource {
 
     private LexerSourceUtf16(InputStream input) {
         this.input = input.markSupported() ? input : new BufferedInputStream(input);
-        try {input.readAllBytes();
+        try {
             input.mark(2);
             char high = (char) input.read();
             char low  = (char) input.read();
