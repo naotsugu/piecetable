@@ -16,21 +16,37 @@
 package com.mammb.code.editor3.syntax;
 
 /**
- * Token.
- * @param type the type
- * @param scope the scope
- * @param position the position
- * @param length the length
+ * ScopeType.
  * @author Naotsugu Kobayashi
  */
-public record Token(int type, ScopeType scope, int position, int length) {
+public enum ScopeType {
 
-    /**
-     * Get whether this type is empty.
-     * @return {@code true}, if this type is empty
-     */
-    public boolean isEmpty() {
-        return TokenType.EMPTY.ordinal() == type || length <= 0;
+    NEUTRAL,
+    BLOCK_START,
+    BLOCK_END,
+    INLINE_START,
+    INLINE_END,
+    ;
+
+    public boolean isNeutral() {
+        return this == NEUTRAL;
+    }
+
+    public boolean isBlock() {
+        return this == BLOCK_START || this == BLOCK_END;
+    }
+
+    public boolean isInline() {
+        return this == INLINE_START || this == INLINE_END;
+    }
+
+    public boolean isStart() {
+        return this == BLOCK_START || this == INLINE_START;
+    }
+
+    public boolean isEnd() {
+        return this == BLOCK_END || this == INLINE_END;
     }
 
 }
+

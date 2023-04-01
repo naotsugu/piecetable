@@ -39,11 +39,10 @@ public class Colors {
 
 
     public static Color of(int index) {
-        if (index <= 0) {
-            return Colors.foreground;
-        }
-        // TODO
-        return Color.ORANGE;
+        return switch (index) {
+            case 3 -> Color.ORANGE;
+            default -> Colors.foreground;
+        };
     }
 
 }

@@ -17,6 +17,7 @@ package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
+import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
 import com.mammb.code.editor3.syntax.TokenType;
 import com.mammb.code.editor3.syntax.Trie;
@@ -73,17 +74,33 @@ public class JavaLexer implements Lexer {
     public Token nextToken() {
 
         if (source == null) {
-            return new Token(TokenType.EMPTY.ordinal(), 0, 0);
+            return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
         }
 
         char ch = source.readChar();
         return switch (ch) {
-            case ' ', '\t', '\n', '\r' -> whitespace(source);
-            case 0 -> empty(source);
+            case ' ', '\t' -> Lexer.whitespace(source);
+            case '\n', '\r' -> Lexer.lineEnd(source);
+            case '/' -> readComment(source);
+            case 0 -> Lexer.empty(source);
             default -> Character.isJavaIdentifierStart(ch)
                 ? readIdentifier(source)
-                : any(source);
+                : Lexer.any(source);
         };
+    }
+
+
+    private Token readComment(LexerSource source) {
+        char ch = source.peekChar();
+        if (ch == '/') {
+            source.commitPeek();
+            return new Token(TokenType.COMMENT.ordinal(), ScopeType.INLINE_START, source.position(), 2);
+        } else if (ch == '*') {
+            source.commitPeek();
+            return new Token(TokenType.COMMENT.ordinal(), ScopeType.BLOCK_START, source.position(), 2);
+        } else {
+            return Lexer.any(source);
+        }
     }
 
 
@@ -99,23 +116,10 @@ public class JavaLexer implements Lexer {
                 source.rollbackPeek();
                 String str = sb.toString();
                 TokenType type = keywords.match(str) ? TokenType.KEYWORD : TokenType.ANY;
-                return new Token(type.ordinal(), pos, str.length());
+                return new Token(type.ordinal(), ScopeType.NEUTRAL, pos, str.length());
             }
             sb.append(source.readChar());
         }
-    }
-
-
-    private static Token any(LexerSource source) {
-        return new Token(TokenType.ANY.ordinal(), source.position(), 1);
-    }
-
-    private static Token empty(LexerSource source) {
-        return new Token(TokenType.EMPTY.ordinal(), source.position(), 0);
-    }
-
-    private static Token whitespace(LexerSource source) {
-        return new Token(TokenType.SP.ordinal(), source.position(), 1);
     }
 
 

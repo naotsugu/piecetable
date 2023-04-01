@@ -17,6 +17,7 @@ package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
+import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
 import com.mammb.code.editor3.syntax.TokenType;
 
@@ -67,9 +68,9 @@ public class PassThroughLexer implements Lexer {
     public Token nextToken() {
 
         if (source == null) {
-            return new Token(TokenType.EMPTY.ordinal(), 0, 0);
+            return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
         }
-        return new Token(TokenType.ANY.ordinal(), 0, source.length());
+        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, 0, source.length());
     }
 
 }

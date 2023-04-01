@@ -17,6 +17,7 @@ package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
+import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
 import com.mammb.code.editor3.syntax.TokenType;
 
@@ -68,7 +69,7 @@ public class JsonLexer implements Lexer {
     public Token nextToken() {
 
         if (source == null) {
-            return new Token(TokenType.EMPTY.ordinal(), 0, 0);
+            return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
         }
 
         char ch = source.readChar();
@@ -83,15 +84,15 @@ public class JsonLexer implements Lexer {
 
 
     private static Token any(LexerSource source) {
-        return new Token(TokenType.ANY.ordinal(), source.position(), 1);
+        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
     }
 
     private static Token empty(LexerSource source) {
-        return new Token(TokenType.EMPTY.ordinal(), source.position(), 0);
+        return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, source.position(), 0);
     }
 
     private static Token whitespace(LexerSource source) {
-        return new Token(TokenType.SP.ordinal(), source.position(), 1);
+        return new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
     }
 
 
@@ -105,10 +106,10 @@ public class JsonLexer implements Lexer {
             source.peekChar() == 'u' &&
             source.peekChar() == 'e') {
             source.commitPeek();
-            return new Token(TokenType.LITERAL.ordinal(), source.position() - 4, 4);
+            return new Token(TokenType.LITERAL.ordinal(), ScopeType.NEUTRAL, source.position() - 4, 4);
         }
         source.rollbackPeek();
-        return new Token(TokenType.ANY.ordinal(), source.position(), 1);
+        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
     }
 
 
@@ -118,10 +119,10 @@ public class JsonLexer implements Lexer {
             source.peekChar() == 's' &&
             source.peekChar() == 'e') {
             source.commitPeek();
-            return new Token(TokenType.LITERAL.ordinal(), source.position() - 5, 5);
+            return new Token(TokenType.LITERAL.ordinal(), ScopeType.NEUTRAL, source.position() - 5, 5);
         }
         source.rollbackPeek();
-        return new Token(TokenType.ANY.ordinal(), source.position(), 1);
+        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
     }
 
 
@@ -130,10 +131,10 @@ public class JsonLexer implements Lexer {
             source.peekChar() == 'l' &&
             source.peekChar() == 'l') {
             source.commitPeek();
-            return new Token(TokenType.LITERAL.ordinal(), source.position() - 4, 4);
+            return new Token(TokenType.LITERAL.ordinal(), ScopeType.NEUTRAL, source.position() - 4, 4);
         }
         source.rollbackPeek();
-        return new Token(TokenType.ANY.ordinal(), source.position(), 1);
+        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
     }
 
 }

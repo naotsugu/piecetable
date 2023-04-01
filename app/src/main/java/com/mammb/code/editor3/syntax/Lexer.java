@@ -47,4 +47,27 @@ public interface Lexer {
         };
     }
 
+    static Token any(LexerSource source) {
+        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+    }
+
+    static Token empty(LexerSource source) {
+        return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, source.position(), 0);
+    }
+
+    static Token whitespace(LexerSource source) {
+        return new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+    }
+
+    static Token lineEnd(LexerSource source) {
+        char ch = source.peekChar();
+        if (source.currentChar() == '\r' && ch == '\n' ||
+            source.currentChar() == '\n' && ch == '\r') {
+            source.commitPeek();
+            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 2);
+        } else {
+            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 1);
+        }
+    }
+
 }
