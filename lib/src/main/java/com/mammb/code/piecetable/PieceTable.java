@@ -53,6 +53,9 @@ public class PieceTable {
     /** The redo queue. */
     private final Deque<PieceEdit> redo;
 
+    /** undo enable?. */
+    private boolean undoEnable = false;
+
 
     /**
      * Constructor.
@@ -278,24 +281,6 @@ public class PieceTable {
     }
 
 
-    /**
-     * Get the size of undo stack.
-     * @return the size of undo stack
-     */
-    public int undoSize() {
-        return undo.size();
-    }
-
-    public Edited undoFuture() {
-        if (undo.isEmpty()) return Edited.empty;
-        return asEdited(undo.peek());
-    }
-
-    public Edited redoFuture() {
-        if (redo.isEmpty()) return Edited.empty;
-        return asEdited(redo.peek());
-    }
-
     public Edited undo() {
         if (undo.isEmpty()) return Edited.empty;
         PieceEdit pieceEdit = undo.pop();
@@ -313,6 +298,7 @@ public class PieceTable {
     }
 
     private void pushToUndo(PieceEdit edit, boolean readyForRedo) {
+        if (!undoEnable) return;
         undo.push(edit);
         if (!readyForRedo) redo.clear();
     }
@@ -350,18 +336,13 @@ public class PieceTable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        // pieces.join();
-        // buffer.clear();
-        // undo.clear();
-        // redo.clear();
-        // if (buffer instanceof Closeable closeable) {
-        //     try {
-        //         closeable.close();
-        //     } catch (IOException e) {
-        //         throw new RuntimeException(e);
-        //     }
-        // }
     }
+
+
+    public void enableUndo() {
+        undoEnable = true;
+    }
+
 
     @Override
     public String toString() {

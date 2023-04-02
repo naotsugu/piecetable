@@ -92,6 +92,7 @@ class PieceTableTest {
     void testUndoRedo() {
 
         var table = PieceTable.of("abc");
+        table.enableUndo();
         // |a|b|c|
         // |0|1|2|
         assertEquals("abc", table.toString());
