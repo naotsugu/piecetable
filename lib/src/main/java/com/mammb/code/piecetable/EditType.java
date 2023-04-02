@@ -21,10 +21,38 @@ package com.mammb.code.piecetable;
  */
 public enum EditType {
 
-    INS, DEL, NIL;
+    /** Insert. */
+    INS,
+    /** Deletion. */
+    DEL,
+    /** Nil. */
+    NIL,
+    ;
 
-    public boolean isInsert() { return this == INS; }
-    public boolean isDelete() { return this == DEL; }
-    public boolean isNil()    { return this == NIL; }
+    /**
+     * Get whether this edit is an insert or not.
+     * @return {@code true}, if this edit is an insert
+     */
+    public boolean isInsert() {
+        return this == INS;
+    }
+
+
+    /**
+     * Get whether this edit is a deletion or not.
+     * @return {@code true}, if this edit is a deletion
+     */
+    public boolean isDelete() {
+        return this == DEL;
+    }
+
+
+    /**
+     * Get whether this edit is empty or not.
+     * @return {@code true}, if this edit is empty
+     */
+    public boolean isNil() {
+        return this == NIL;
+    }
 
 }

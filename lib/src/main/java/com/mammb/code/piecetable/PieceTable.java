@@ -281,6 +281,10 @@ public class PieceTable {
     }
 
 
+    /**
+     * Undo.
+     * @return the edit of undo
+     */
     public Edited undo() {
         if (undo.isEmpty()) return Edited.empty;
         PieceEdit pieceEdit = undo.pop();
@@ -289,6 +293,11 @@ public class PieceTable {
         return asEdited(pieceEdit);
     }
 
+
+    /**
+     * redo.
+     * @return the edit of redo
+     */
     public Edited redo() {
         if (redo.isEmpty()) return Edited.empty;
         PieceEdit pieceEdit = redo.pop();
@@ -297,37 +306,11 @@ public class PieceTable {
         return asEdited(pieceEdit);
     }
 
-    private void pushToUndo(PieceEdit edit, boolean readyForRedo) {
-        if (!undoEnable) return;
-        undo.push(edit);
-        if (!readyForRedo) redo.clear();
-    }
 
-    private PieceEdit applyEdit(PieceEdit edit) {
-        for (int i = 0; i < edit.org().length; i++) {
-            pieces.remove(edit.index());
-        }
-        if (edit.mod().length > 0) {
-            pieces.add(edit.index(), edit.mod());
-        }
-        return edit.flip();
-    }
-
-    private Edited asEdited(PieceEdit edit) {
-
-        int from = 0;
-        for (int i = 0; i < edit.index(); i++) {
-            Piece p = pieces.get(i);
-            from += p.length();
-        }
-        return edit.asEdited(from);
-    }
-
-    private int btoi(boolean bool) {
-        return bool ? 1 : 0;
-    }
-
-
+    /**
+     * Writes the contents of the PieceTable to the specified path.
+     * @param path the specified path
+     */
     public void write(Path path) {
         try (FileChannel channel = FileChannel.open(path,
             StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
@@ -339,6 +322,9 @@ public class PieceTable {
     }
 
 
+    /**
+     * Enable undo.
+     */
     public void enableUndo() {
         undoEnable = true;
     }
@@ -349,6 +335,40 @@ public class PieceTable {
         return pieces.stream()
             .map(p -> p.target().subBuffer(p.bufIndex(), p.end()).toString())
             .collect(Collectors.joining());
+    }
+
+
+    private void pushToUndo(PieceEdit edit, boolean readyForRedo) {
+        if (!undoEnable) return;
+        undo.push(edit);
+        if (!readyForRedo) redo.clear();
+    }
+
+
+    private PieceEdit applyEdit(PieceEdit edit) {
+        for (int i = 0; i < edit.org().length; i++) {
+            pieces.remove(edit.index());
+        }
+        if (edit.mod().length > 0) {
+            pieces.add(edit.index(), edit.mod());
+        }
+        return edit.flip();
+    }
+
+
+    private Edited asEdited(PieceEdit edit) {
+
+        int from = 0;
+        for (int i = 0; i < edit.index(); i++) {
+            Piece p = pieces.get(i);
+            from += p.length();
+        }
+        return edit.asEdited(from);
+    }
+
+
+    private int btoi(boolean bool) {
+        return bool ? 1 : 0;
     }
 
 }

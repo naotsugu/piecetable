@@ -27,31 +27,46 @@ import java.util.Objects;
  */
 public record Edited(EditType type, int pos, int len, byte[] bytes) {
 
+    /** The empty edited. */
     public static final Edited empty = new Edited(EditType.NIL, 0, 0, new byte[0]);
 
+    /**
+     * Constructor.
+     * @param type edit type
+     * @param pos edit start point
+     * @param len length
+     * @param bytes edited bytes
+     */
     public Edited {
         Objects.requireNonNull(type);
         Objects.requireNonNull(bytes);
     }
 
+
+    /**
+     * Get whether this edit is an insert or not.
+     * @return {@code true}, if this edit is an insert
+     */
     public boolean isInserted() {
         return type.isInsert();
     }
 
+
+    /**
+     * Get whether this edit is a deletion or not.
+     * @return {@code true}, if this edit is a deletion
+     */
     public boolean isDeleted() {
         return type.isDelete();
     }
 
+
+    /**
+     * Get whether this edit is empty or not.
+     * @return {@code true}, if this edit is empty
+     */
     public boolean isEmpty() {
         return type.isNil();
     }
 
-    public int lineCount() {
-        if (bytes.length == 0) return 0;
-        int count = 1;
-        for (byte b : bytes) {
-            if (b == '\n') count++;
-        }
-        return count;
-    }
 }

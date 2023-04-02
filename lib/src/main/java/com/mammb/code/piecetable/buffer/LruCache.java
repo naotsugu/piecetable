@@ -25,22 +25,47 @@ import java.util.Optional;
  */
 class LruCache {
 
+    /** The size of cache. */
     private final int cacheSize;
+
+    /** The caches. */
     private final Deque<Entry> cache;
 
+
+    /**
+     * Constructor.
+     * @param cacheSize the size of cache
+     */
     private LruCache(int cacheSize) {
         this.cacheSize = cacheSize;
         this.cache = new ArrayDeque<>(cacheSize);
     }
 
+
+    /**
+     * Create a new LRU cache
+     * @return a new LRU cache
+     */
     static LruCache of() {
         return new LruCache(16);
     }
 
+
+    /**
+     * Create a new LRU cache
+     * @param cacheSize the size of cache
+     * @return a new LRU cache
+     */
     static LruCache of(int cacheSize) {
         return new LruCache(cacheSize);
     }
 
+
+    /**
+     * Put the entry to this cache.
+     * @param key the key of entry
+     * @param value the value of entry
+     */
     void put(int key, int value) {
         var e = new Entry(key, value);
         cache.remove(e);
@@ -50,6 +75,12 @@ class LruCache {
         cache.addFirst(e);
     }
 
+
+    /**
+     * Get the entry from this cache.
+     * @param key the key of entry
+     * @return the entry
+     */
     Optional<Integer> get(int key) {
         // this cache is very small, so we do iterate.
         for (Entry entry : cache) {
@@ -60,10 +91,20 @@ class LruCache {
         return Optional.empty();
     }
 
+
+    /**
+     * Clear this cache.
+     */
     void clear() {
         cache.clear();
     }
 
-    record Entry(int key, int value) {}
+
+    /**
+     * Entry
+     * @param key the key
+     * @param value the value
+     */
+    record Entry(int key, int value) { }
 
 }

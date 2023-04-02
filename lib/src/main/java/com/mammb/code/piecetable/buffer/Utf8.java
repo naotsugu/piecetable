@@ -24,13 +24,28 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class Utf8 {
 
+    /**
+     * Private constructor.
+     */
     private Utf8() { }
 
+
+    /**
+     * Get whether the given byte is a utf-8 lower.
+     * @param b the byte to be checked
+     * @return {@code true}, if given byte is a utf-8 lower
+     */
     public static boolean isLower(byte b) {
         // 10.. ....
         return (b & 0xC0) == 0x80;
     }
 
+
+    /**
+     * Get the number of bytes of utf-8 code following a given byte.
+     * @param b the byte to be checked
+     * @return the number of bytes of utf-8 code following a given byte
+     */
     public static short followsCount(byte b) {
         if ((b & 0x80) == 0x00) {
             // 0... ....
@@ -49,6 +64,13 @@ public abstract class Utf8 {
         }
     }
 
+
+    /**
+     * Gets a utf-8 byte array from the given byte array.
+     * @param bytes the byte array
+     * @param index the index of byte array
+     * @return a utf-8 byte array
+     */
     public static byte[] asCharBytes(byte[] bytes, int index) {
         byte b = bytes[index];
         return switch (followsCount(b)) {

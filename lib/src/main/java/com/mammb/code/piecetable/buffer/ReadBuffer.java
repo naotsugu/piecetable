@@ -24,15 +24,32 @@ import java.util.Arrays;
  */
 public class ReadBuffer implements Buffer {
 
+    /** The default size of pitch. */
     private static final short DEFAULT_PITCH = 100;
 
+    /** The elements of buffer. */
     private final byte[] elements;
+
+    /** The length of code point counts. */
     private final int length;
 
+    /** The size of pitch. */
     private final short pilePitch;
+
+    /** The piles. */
     private final int[] piles;
+
+    /** The cache. */
     private final LruCache cache;
 
+
+    /**
+     * Constructor.
+     * @param elements the elements of buffer
+     * @param length the length of code point counts
+     * @param pilePitch the size of pitch
+     * @param piles the piles
+     */
     private ReadBuffer(byte[] elements, int length, short pilePitch, int[] piles) {
         this.elements = elements;
         this.length = length;
@@ -41,10 +58,23 @@ public class ReadBuffer implements Buffer {
         this.cache = LruCache.of();
     }
 
+
+    /**
+     * Create a new buffer.
+     * @param elements the elements of buffer
+     * @return a new buffer
+     */
     public static ReadBuffer of(byte[] elements) {
         return of(elements, DEFAULT_PITCH);
     }
 
+
+    /**
+     * Create a new buffer.
+     * @param elements the elements of buffer
+     * @param pitch the pitch
+     * @return a new buffer
+     */
     static ReadBuffer of(byte[] elements, short pitch) {
         int charCount = 0;
         IntArray array = IntArray.of();
@@ -56,6 +86,7 @@ public class ReadBuffer implements Buffer {
         }
         return new ReadBuffer(elements, charCount, pitch, array.get());
     }
+
 
     @Override
     public int length() {
@@ -100,14 +131,14 @@ public class ReadBuffer implements Buffer {
         return i;
     }
 
-    String dump() {
-        return "elements: %s\npiles: %s"
-            .formatted(Arrays.toString(elements), Arrays.toString(piles));
-    }
-
     @Override
     public String toString() {
         return new String(bytes(0, elements.length), Utf8.charset());
+    }
+
+    String dump() {
+        return "elements: %s\npiles: %s"
+            .formatted(Arrays.toString(elements), Arrays.toString(piles));
     }
 
 }

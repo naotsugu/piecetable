@@ -26,15 +26,32 @@ import java.util.Arrays;
  */
 public class GrowBuffer implements AppendBuffer {
 
+    /** The default size of pitch. */
     private static final short DEFAULT_PITCH = 100;
 
+    /** The elements of buffer. */
     private final ByteArray elements;
+
+    /** The length of code point counts. */
     private int length;
 
+    /** The size of pitch. */
     private final short pilePitch;
+
+    /** The piles. */
     private final IntArray piles;
+
+    /** The cache. */
     private final LruCache cache;
 
+
+    /**
+     * Constructor.
+     * @param elements the elements of buffer
+     * @param length the length of code point counts
+     * @param pilePitch the size of pitch
+     * @param piles the piles
+     */
     private GrowBuffer(ByteArray elements, int length, short pilePitch, IntArray piles) {
         this.elements = elements;
         this.length = length;
@@ -43,13 +60,25 @@ public class GrowBuffer implements AppendBuffer {
         this.cache = LruCache.of();
     }
 
-    public static GrowBuffer of() {
+
+    /**
+     * Create a new buffer.
+     * @return a new buffer
+     */
+    public static AppendBuffer of() {
         return new GrowBuffer(ByteArray.of(), 0, DEFAULT_PITCH, IntArray.of());
     }
 
-    static GrowBuffer of(short pitch) {
+
+    /**
+     * Create a new buffer.
+     * @param pitch the pitch
+     * @return a new buffer
+     */
+    static AppendBuffer of(short pitch) {
         return new GrowBuffer(ByteArray.of(), 0, pitch, IntArray.of());
     }
+
 
     @Override
     public void append(CharSequence cs) {
@@ -59,6 +88,7 @@ public class GrowBuffer implements AppendBuffer {
             append(cs.toString());
         }
     }
+
 
     @Override
     public void append(Buffer buffer) {
@@ -70,6 +100,7 @@ public class GrowBuffer implements AppendBuffer {
             }
         }
     }
+
 
     @Override
     public void append(byte[] bytes) {
@@ -83,6 +114,7 @@ public class GrowBuffer implements AppendBuffer {
             }
         }
     }
+
 
     @Override
     public void clear() {
@@ -135,13 +167,13 @@ public class GrowBuffer implements AppendBuffer {
         return length;
     }
 
-    String dump() {
-        return "elements: %s\npiles: %s".formatted(elements, piles);
-    }
-
     @Override
     public String toString() {
         return new String(bytes(0, elements.length()), StandardCharsets.UTF_8);
+    }
+
+    String dump() {
+        return "elements: %s\npiles: %s".formatted(elements, piles);
     }
 
 }
