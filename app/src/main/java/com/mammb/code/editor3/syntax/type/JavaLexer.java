@@ -73,9 +73,7 @@ public class JavaLexer implements Lexer {
     @Override
     public Token nextToken() {
 
-        if (source == null) {
-            return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
-        }
+        if (source == null) return Lexer.empty();
 
         char ch = source.readChar();
         return switch (ch) {

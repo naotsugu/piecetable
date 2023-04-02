@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.editor3.syntax.DecoratorImpl;
 import com.mammb.code.editor3.lang.Paths;
 import java.nio.file.Path;

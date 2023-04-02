@@ -26,6 +26,7 @@ public enum TokenType {
     KEYWORD,
     LITERAL,
     TEXT,
+    LINE_COMMENT,
     COMMENT,
     ATTR,
     EOL,

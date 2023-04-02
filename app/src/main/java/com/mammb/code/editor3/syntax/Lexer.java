@@ -55,6 +55,10 @@ public interface Lexer {
         return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, source.position(), 0);
     }
 
+    static Token empty() {
+        return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
+    }
+
     static Token whitespace(LexerSource source) {
         return new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
     }

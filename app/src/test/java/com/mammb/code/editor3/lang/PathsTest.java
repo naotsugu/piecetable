@@ -15,39 +15,21 @@
  */
 package com.mammb.code.editor3.lang;
 
+import org.junit.jupiter.api.Test;
+
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * The path utilities.
+ * Test of {@link Paths}.
  * @author Naotsugu Kobayashi
  */
-public class Paths {
+class PathsTest {
 
-    /**
-     * Get the extension name.
-     * @param path the source path
-     * @return the extension name
-     */
-    public static String getExtension(Path path) {
-        if (path == null) {
-            return "";
-        }
-        String fileName = path.getFileName().toString();
-        return fileName.substring(fileName.lastIndexOf('.') + 1);
-    }
-
-
-    /**
-     * Get the extension name.
-     * @param path the source path
-     * @return the extension name
-     */
-    public static String getExtensionExact(Path path) {
-        if (path == null || !path.toFile().isFile()) {
-            return "";
-        }
-        return getExtension(path);
+    @Test
+    void testGetExtension() {
+        assertEquals("txt", Paths.getExtension(Path.of("foo/bar.txt")));
     }
 
 }
-

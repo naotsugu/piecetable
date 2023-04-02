@@ -68,38 +68,41 @@ public class JsonLexer implements Lexer {
     @Override
     public Token nextToken() {
 
-        if (source == null) {
-            return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
-        }
+        if (source == null) return Lexer.empty();
 
         char ch = source.readChar();
         return switch (ch) {
-            case ' ', '\t', '\n', '\r' -> whitespace(source);
-            case 0 -> empty(source);
-            default -> Character.isJavaIdentifierStart(ch)
-                ? readIdentifier(source)
-                : any(source);
+            case ' ', '\t' -> Lexer.whitespace(source);
+            case '\n', '\r' -> Lexer.lineEnd(source);
+            case '"' -> readString(source);
+            case 't' -> readTrue(source);
+            case 'f' -> readFalse(source);
+            case 'n' -> readNull(source);
+            case 0 -> Lexer.empty(source);
+            default -> new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
         };
     }
 
 
-    private static Token any(LexerSource source) {
+    private Token readString(LexerSource source) {
+        int pos = source.position();
+        char prev = 0;
+        for (;;) {
+            char ch = source.peekChar();
+            if (ch < ' ' || (prev != '\\' && ch == '"')) {
+                source.commitPeek();
+                return new Token(TokenType.TEXT.ordinal(), ScopeType.NEUTRAL, pos, source.position() - pos);
+            }
+            prev = ch;
+        }
+    }
+
+
+    private Token readNumber(LexerSource source) {
+        // TODO
         return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
     }
 
-    private static Token empty(LexerSource source) {
-        return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, source.position(), 0);
-    }
-
-    private static Token whitespace(LexerSource source) {
-        return new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
-    }
-
-
-
-    private Token readIdentifier(LexerSource source) {
-        return null;
-    }
 
     public static Token readTrue(LexerSource source) {
         if (source.peekChar() == 'r' &&
