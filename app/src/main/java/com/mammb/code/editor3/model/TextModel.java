@@ -17,7 +17,7 @@ package com.mammb.code.editor3.model;
 
 import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.editor3.syntax.DecoratorImpl;
-
+import com.mammb.code.editor3.lang.Paths;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class TextModel {
             throw new IllegalStateException();
         }
         textSlice.open(path);
-        decorator = DecoratorImpl.of(Strings.getExtension(path));
+        decorator = DecoratorImpl.of(Paths.getExtension(path));
     }
 
 
@@ -92,7 +92,7 @@ public class TextModel {
      */
     public void saveAs(Path path) {
         textSlice.saveAs(path);
-        decorator = DecoratorImpl.of(Strings.getExtension(path));
+        decorator = DecoratorImpl.of(Paths.getExtension(path));
         dirty = false;
     }
 

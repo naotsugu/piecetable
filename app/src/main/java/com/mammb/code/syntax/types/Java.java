@@ -72,6 +72,7 @@ public class Java implements Highlighter {
 
     }
 
+
     @Override
     public String inspect() {
         return scope.inspect();

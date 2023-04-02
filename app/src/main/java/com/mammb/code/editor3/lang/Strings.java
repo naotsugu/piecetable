@@ -118,6 +118,7 @@ public class Strings {
         return (cs == null) ? 0 : (int) cs.subSequence(beginIndex, endIndex).codePoints().count();
     }
 
+
     /**
      * Get whether the given byte is a carriage return.
      * @param ch the byte to be checked
@@ -162,6 +163,7 @@ public class Strings {
         return new String(chars, 0, len);
     }
 
+
     /**
      * Get the number of bytes from the first byte of UTF-8 when expressed in UTF-16.
      * @param utf8FirstByte the first byte of UTF-8
@@ -179,20 +181,6 @@ public class Strings {
         } else {
             return 0;
         }
-    }
-
-
-    /**
-     * Get the extension name.
-     * @param path the source path
-     * @return the extension name
-     */
-    public static String getExtension(Path path) {
-        if (path == null || !path.toFile().isFile()) {
-            return "";
-        }
-        String fileName = path.getFileName().toString();
-        return fileName.substring(fileName.lastIndexOf('.') + 1);
     }
 
 }

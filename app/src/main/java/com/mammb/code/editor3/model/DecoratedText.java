@@ -21,46 +21,57 @@ package com.mammb.code.editor3.model;
  */
 public interface DecoratedText {
 
+    /**
+     * Get the text.
+     * @return the text
+     */
     String text();
 
+    /**
+     * Get the size.
+     * @return the size
+     */
     int size();
 
+    /**
+     * Get the color.
+     * @return the color
+     */
     int color();
 
+    /**
+     * Get the bold.
+     * @return the bold
+     */
     boolean bold();
 
+    /**
+     * Get the underline.
+     * @return the underline
+     */
     boolean underLine();
 
+    /**
+     * Get the italic.
+     * @return the italic
+     */
     boolean italic();
 
+    /**
+     * Get whether this text is normal.
+     * @return {@code true}, if this text is normal
+     */
     default boolean normal() {
         return !bold() && !underLine() && !italic();
     }
 
 
-    static DecoratedText of(String text) {
-        return new DecoratedText() {
-            @Override
-            public String text() { return text; }
-
-            @Override
-            public int size() { return 16; }
-
-            @Override
-            public int color() { return 0; }
-
-            @Override
-            public boolean bold() { return false; }
-
-            @Override
-            public boolean underLine() { return false; }
-
-            @Override
-            public boolean italic() { return false; }
-        };
-    }
-
-
+    /**
+     * Create a new DecoratedText.
+     * @param text the text
+     * @param color the color
+     * @return a new DecoratedText
+     */
     static DecoratedText of(String text, int color) {
         return new DecoratedText() {
             @Override

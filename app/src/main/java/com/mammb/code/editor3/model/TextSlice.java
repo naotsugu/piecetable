@@ -59,11 +59,18 @@ public class TextSlice {
         refresh();
     }
 
+    /**
+     * Save.
+     */
     public void save() {
         source.save();
     }
 
 
+    /**
+     * Save as the specified path.
+     * @param path the specified path
+     */
     public void saveAs(Path path) {
         origin = RowPoint.zero;
         source.saveAs(path);

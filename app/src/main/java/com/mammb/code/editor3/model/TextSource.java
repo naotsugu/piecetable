@@ -237,12 +237,19 @@ public class TextSource implements EventListener<Edit> {
     }
 
 
+    /**
+     * Save.
+     */
     public void save() {
         editQueue.flush();
         source.save();
     }
 
 
+    /**
+     * Save as the specified path.
+     * @param path the specified path
+     */
     public void saveAs(Path path) {
         editQueue.flush();
         source.saveAs(path);

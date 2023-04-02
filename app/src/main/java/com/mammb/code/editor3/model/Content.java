@@ -77,8 +77,15 @@ public interface Content extends EditListener {
      */
     byte[] bytesBefore(int startPos, Predicate<byte[]> until);
 
+    /**
+     * Save.
+     */
     void save();
 
+    /**
+     * Save as the specified path.
+     * @param path the specified path
+     */
     void saveAs(Path path);
 
 }
