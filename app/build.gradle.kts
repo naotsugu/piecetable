@@ -14,8 +14,8 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.mammb.code.editor.App")
-    mainModule.set("com.mammb.code.editor")
+    mainClass.set("com.mammb.code.editor3.App")
+    mainModule.set("com.mammb.code.editor3")
 }
 
 tasks.named<Test>("test") {

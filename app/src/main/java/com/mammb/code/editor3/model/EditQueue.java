@@ -15,7 +15,7 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor.Strings;
+import com.mammb.code.editor3.lang.Strings;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
