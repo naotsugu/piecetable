@@ -33,6 +33,7 @@ public class IntArray implements Serializable {
     /** The length of array. */
     private int length;
 
+
     /**
      * Create a new {@code IntArray}.
      * @param ints the source int array
@@ -43,6 +44,7 @@ public class IntArray implements Serializable {
         this.length = length;
     }
 
+
     /**
      * Create a new {@code IntArray}.
      * @return a new {@code IntArray}
@@ -50,6 +52,7 @@ public class IntArray implements Serializable {
     public static IntArray of() {
         return new IntArray(EMPTY, 0);
     }
+
 
     /**
      * Create a new {@code IntArray} from the given int value.
@@ -60,6 +63,7 @@ public class IntArray implements Serializable {
         return new IntArray(new int[]{ value }, 1);
     }
 
+
     /**
      * Create a new {@code IntArray} from the given int array.
      * @param values the given int array
@@ -68,6 +72,7 @@ public class IntArray implements Serializable {
     public static IntArray of(int[] values) {
         return new IntArray(Arrays.copyOf(values, values.length), values.length);
     }
+
 
     /**
      * Add int value to this array.
@@ -79,6 +84,7 @@ public class IntArray implements Serializable {
         }
         ints[length++] = value;
     }
+
 
     /**
      * Add int array to this array.
@@ -92,6 +98,7 @@ public class IntArray implements Serializable {
         length += values.length;
     }
 
+
     /**
      * Get int at the specified index position.
      * @param index the specified index position
@@ -101,6 +108,7 @@ public class IntArray implements Serializable {
         return ints[index];
     }
 
+
     /**
      * Get the copies of int array.
      * @return the copies of int array
@@ -108,6 +116,7 @@ public class IntArray implements Serializable {
     public int[] get() {
         return Arrays.copyOf(ints, length);
     }
+
 
     /**
      * Clear this array.
@@ -117,6 +126,7 @@ public class IntArray implements Serializable {
         length = 0;
     }
 
+
     /**
      * Get the length of int array.
      * @return the length of int array
@@ -125,6 +135,7 @@ public class IntArray implements Serializable {
         return length;
     }
 
+
     /**
      * Get the capacity of int array.
      * @return the capacity of int array
@@ -132,6 +143,7 @@ public class IntArray implements Serializable {
     public int capacity() {
         return ints.length;
     }
+
 
     /**
      * Grow this int array buffer.

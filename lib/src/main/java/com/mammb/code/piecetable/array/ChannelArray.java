@@ -63,6 +63,7 @@ public class ChannelArray implements Closeable {
         this.offset = 0;
     }
 
+
     /**
      * Create a new {@code ChannelArray} from the given {@code SeekableByteChannel}.
      * @param ch the given {@code SeekableByteChannel}
@@ -71,6 +72,7 @@ public class ChannelArray implements Closeable {
     public static ChannelArray of(SeekableByteChannel ch) {
         return new ChannelArray(ch);
     }
+
 
     /**
      * Get byte at the specified index position.
@@ -87,6 +89,7 @@ public class ChannelArray implements Closeable {
         }
         return buffer[index - offset];
     }
+
 
     /**
      * Get copies the specified range of this array.
@@ -112,6 +115,7 @@ public class ChannelArray implements Closeable {
         return Arrays.copyOfRange(buffer, from - offset, to - offset);
     }
 
+
     /**
      * Clear this array.
      */
@@ -119,6 +123,7 @@ public class ChannelArray implements Closeable {
         this.buffer = EMPTY;
         this.offset = 0;
     }
+
 
     /**
      * Get the length of byte array.
@@ -128,10 +133,12 @@ public class ChannelArray implements Closeable {
         return chSize;
     }
 
+
     @Override
     public void close() throws IOException {
         ch.close();
     }
+
 
     /**
      * Fill buffer.

@@ -60,6 +60,12 @@ public abstract class Utf8 {
         };
     }
 
+
+    /**
+     * Get the utf-8 byte array from the code point value.
+     * @param cp the code point value
+     * @return the utf-8 byte array
+     */
     public static byte[] fromCodePoint(int cp) {
 
         int mask = 0x3F; // 6bit mask 0011 1111
@@ -90,6 +96,11 @@ public abstract class Utf8 {
 
     }
 
+
+    /**
+     * Get the utf-8 charset.
+     * @return the utf-8 charset
+     */
     public static Charset charset() {
         return StandardCharsets.UTF_8;
     }

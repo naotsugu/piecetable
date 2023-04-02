@@ -24,6 +24,7 @@ public class ArraySupport {
     /** The max length of array. */
     private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 
+
     /**
      * Create new capacity size.
      * @param oldLength the old length

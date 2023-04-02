@@ -33,6 +33,7 @@ public class ByteArray implements Serializable {
     /** The length of array. */
     private int length;
 
+
     /**
      * Create a new {@code ByteArray}.
      * @param bytes the source byte array
@@ -43,6 +44,7 @@ public class ByteArray implements Serializable {
         this.length = length;
     }
 
+
     /**
      * Create a new {@code ByteArray}.
      * @return a new {@code ByteArray}
@@ -50,6 +52,7 @@ public class ByteArray implements Serializable {
     public static ByteArray of() {
         return new ByteArray(EMPTY, 0);
     }
+
 
     /**
      * Create a new {@code ByteArray} from the given byte array.
@@ -59,6 +62,7 @@ public class ByteArray implements Serializable {
     public static ByteArray of(byte[] bytes) {
         return new ByteArray(Arrays.copyOf(bytes, bytes.length), bytes.length);
     }
+
 
     /**
      * Add byte value to this array.
@@ -71,6 +75,7 @@ public class ByteArray implements Serializable {
         bytes[length++] = value;
     }
 
+
     /**
      * Add byte array to this array.
      * @param values byte array to be added
@@ -82,6 +87,7 @@ public class ByteArray implements Serializable {
         System.arraycopy(values, 0, bytes, length, values.length);
         length += values.length;
     }
+
 
     /**
      * Get byte at the specified index position.
@@ -96,6 +102,7 @@ public class ByteArray implements Serializable {
         return bytes[index];
     }
 
+
     /**
      * Get the copies of byte array.
      * @return the copies of byte array
@@ -103,6 +110,7 @@ public class ByteArray implements Serializable {
     public byte[] get() {
         return Arrays.copyOf(bytes, length);
     }
+
 
     /**
      * Get copies the specified range of this array.
@@ -118,6 +126,7 @@ public class ByteArray implements Serializable {
         return Arrays.copyOfRange(bytes, from, to);
     }
 
+
     /**
      * Get the new reversed {@code ByteArray}.
      * @return the new reversed {@code ByteArray}
@@ -132,6 +141,7 @@ public class ByteArray implements Serializable {
         return new ByteArray(ret, length);
     }
 
+
     /**
      * Clear this array.
      */
@@ -139,6 +149,7 @@ public class ByteArray implements Serializable {
         bytes = EMPTY;
         length = 0;
     }
+
 
     /**
      * Get the length of byte array.
@@ -148,6 +159,7 @@ public class ByteArray implements Serializable {
         return length;
     }
 
+
     /**
      * Get the capacity of byte array.
      * @return the capacity of byte array
@@ -155,6 +167,7 @@ public class ByteArray implements Serializable {
     public int capacity() {
         return bytes.length;
     }
+
 
     /**
      * Grow this byte array buffer.

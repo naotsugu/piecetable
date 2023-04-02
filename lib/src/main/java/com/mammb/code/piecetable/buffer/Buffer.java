@@ -26,25 +26,64 @@ import java.nio.channels.WritableByteChannel;
 public interface Buffer {
 
     /**
-     * count of code point.
-     * @return
+     * Get the length of buffer.
+     * @return the count of code point
      */
     int length();
 
+    /**
+     * Gets the char value at the specified index.
+     * @param index the index(code point) of the char value
+     * @return the char value at the specified index of this string
+     */
     byte[] charAt(int index);
 
+    /**
+     * Get the byte array at the specified index.
+     * @param rawStart the start raw index of the byte value
+     * @param rawEnd the end raw index of the byte value
+     * @return the byte array at the specified index
+     */
     byte[] bytes(int rawStart, int rawEnd);
 
+    /**
+     * Get the byte array.
+     * @return the byte array
+     */
     byte[] bytes();
 
+    /**
+     * Get the buffer that is the subBuffer of this buffer.
+     * @param start the beginning index, inclusive
+     * @param end the ending index, exclusive
+     * @return the subBuffer of this buffer
+     */
     Buffer subBuffer(int start, int end);
 
+    /**
+     * Get the raw index from the specified code point based index.
+     * @param index the specified code point based index
+     * @return the raw index
+     */
     int asIndex(int index);
 
+    /**
+     * Get whether this buffer is empty.
+     * @return {@code true}, if this buffer is empty
+     */
     default boolean isEmpty() {
         return this.length() == 0;
     }
 
+    /**
+     * Write this buffer values to the specified channel.
+     * @param channel the byte channel
+     * @param buf the buffer used for writing
+     * @param offset the code point based offset
+     * @param length the code point based length
+     * @return the written Length
+     * @throws IOException if some other I/O error occurs
+     */
     default int write(WritableByteChannel channel, ByteBuffer buf,
             int offset, int length) throws IOException {
 

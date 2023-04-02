@@ -21,12 +21,27 @@ package com.mammb.code.piecetable.buffer;
  */
 public interface AppendBuffer extends Buffer {
 
+    /**
+     * Add a char sequence to this buffer.
+     * @param cs char sequence to be appended
+     */
     void append(CharSequence cs);
 
+    /**
+     * Add the other buffer to this buffer.
+     * @param buffer buffer to be appended
+     */
     void append(Buffer buffer);
 
+    /**
+     * Add the byte array to this buffer.
+     * @param bytes the byte array to be appended
+     */
     void append(byte[] bytes);
 
+    /**
+     * Clear the buffer.
+     */
     void clear();
 
 }
