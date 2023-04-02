@@ -84,6 +84,7 @@ public class PiecePoint {
         return index;
     }
 
+
     /**
      * Get the position on the target buffer.
      * @return the position on the target buffer

@@ -25,17 +25,24 @@ import java.util.Objects;
 
 /**
  * Piece edit.
- * @param index The index of buffer
- * @param org The original pieces
- * @param mod The modified pieces
- * @param place
+ * @param index the index of buffer
+ * @param org the original pieces
+ * @param mod the modified pieces
+ * @param place the place
  */
 public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
 
-    /** The edit palce. */
+    /** The edit place. */
     public enum Place { HEAD, MID, TAIL }
 
 
+    /**
+     * Constructor.
+     * @param index the index of buffer
+     * @param org the original pieces
+     * @param mod the modified pieces
+     * @param place the place
+     */
     public PieceEdit {
         Objects.requireNonNull(org);
         Objects.requireNonNull(mod);
@@ -51,10 +58,20 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
         return new PieceEdit(index, mod, org, place);
     }
 
+
+    /**
+     * Get the total length of the original pieces
+     * @return the total length of the original pieces
+     */
     public int totalOrgLength() {
         return Arrays.stream(org()).mapToInt(Piece::length).sum();
     }
 
+
+    /**
+     * Get the total length of the modified pieces
+     * @return the total length of the modified pieces
+     */
     public int totalModLength() {
         return Arrays.stream(mod()).mapToInt(Piece::length).sum();
     }
@@ -217,10 +234,10 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
      * |0|1|2|  len:3           |c|d|e|         |c|d|
      * </pre>
      *
-     * @param pieces
-     * @param startPos
-     * @param endPos
-     * @return
+     * @param pieces the pieces
+     * @param startPos the start position
+     * @param endPos the end position
+     * @return the byte array
      */
     private static ByteArray bytes(Piece[] pieces, int startPos, int endPos) {
         ByteArray byteArray = ByteArray.of();
