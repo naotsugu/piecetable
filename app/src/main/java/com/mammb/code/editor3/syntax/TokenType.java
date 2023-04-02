@@ -29,7 +29,6 @@ public enum TokenType {
     COMMENT,
     ATTR,
     EOL,
-    EOF,
     H1,
     H2,
     H3,

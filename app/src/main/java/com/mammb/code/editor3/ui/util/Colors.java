@@ -40,7 +40,8 @@ public class Colors {
 
     public static Color of(int index) {
         return switch (index) {
-            case 3 -> Color.ORANGE;
+            case 3 -> Color.web("#eb8a3a");
+            case 6 -> Color.web("#629755");
             default -> Colors.foreground;
         };
     }

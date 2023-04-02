@@ -18,7 +18,6 @@ package com.mammb.code.editor3.syntax;
 import com.mammb.code.editor3.model.DecoratedText;
 import com.mammb.code.editor3.model.Decorator;
 import com.mammb.code.editor3.model.RowPoint;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,7 +65,8 @@ public class DecoratorImpl implements Decorator {
     public List<DecoratedText> apply(RowPoint origin, String string) {
 
         tokens.subMap(origin.offset(), Integer.MAX_VALUE).clear();
-        Map<Integer, Deque<Token>> scopes = currentScopes();
+        Map<Integer, Deque<Token>> blockScopes = currentScopes();
+        Deque<Token> inlineScopes = new ArrayDeque<>();
         lexer.setSource(LexerSource.of(string));
 
         int prevType = -1;
@@ -78,17 +78,23 @@ public class DecoratorImpl implements Decorator {
 
             if (token.scope().isBlock()) {
                 tokens.put(origin.offset() + token.position(), token);
+                if (token.scope().isStart()) {
+                    blockScopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);
+                } else if (token.scope().isEnd() && blockScopes.containsKey(token.type())) {
+                    blockScopes.get(token.type()).poll();
+                }
+            } else if (token.scope().isInline()) {
+                if (token.scope().isStart()) {
+                    inlineScopes.push(token);
+                } else if (token.scope().isEnd()) {
+                    inlineScopes.clear();
+                }
             }
 
-            if (token.scope().isStart()) {
-                scopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);
-            } else if (token.scope().isEnd()) {
-                scopes.getOrDefault(token.type(), new ArrayDeque<>()).poll();
-            }
-
-            Optional<Token> currentScope = scopes.values().stream()
+            Optional<Token> currentScope = blockScopes.values().stream()
                 .flatMap(Collection::stream)
-                .min(Comparator.comparing(Token::type));
+                .min(Comparator.comparing(Token::type))
+                .or(() -> Optional.ofNullable(inlineScopes.peek()));
 
             if (currentScope.isPresent()) {
                 if (prevType < 0) {
@@ -96,16 +102,14 @@ public class DecoratorImpl implements Decorator {
                     beginIndex = token.position();
                 } else if (prevType != currentScope.get().type()) {
                     list.add(DecoratedText.of(
-                        string.substring(beginIndex, token.position() + token.length() - 1),
-                        prevType));
+                        string.substring(beginIndex, token.position()), prevType));
                     prevType = currentScope.get().type();
                     beginIndex = token.position();
                 }
                 continue;
             } else if (prevType > 0) {
                 list.add(DecoratedText.of(
-                    string.substring(beginIndex, token.position() + token.length() - 1),
-                    prevType));
+                    string.substring(beginIndex, token.position()), prevType));
                 prevType = -1;
             }
 
@@ -114,17 +118,26 @@ public class DecoratorImpl implements Decorator {
                 token.type()));
         }
 
+        if (prevType > 0) {
+            list.add(DecoratedText.of(string.substring(beginIndex), prevType));
+        }
+
         return list;
     }
 
 
+    /**
+     * Get the scope map.
+     * key: token type
+     * @return the scope map
+     */
     private Map<Integer, Deque<Token>> currentScopes() {
         Map<Integer, Deque<Token>> scopes = new HashMap<>();
         for (Map.Entry<Integer, Token> entry : tokens.entrySet()) {
             if (entry.getValue().scope().isStart()) {
-                scopes.computeIfAbsent(entry.getKey(), ArrayDeque::new).push(entry.getValue());
-            } else if (entry.getValue().scope().isEnd()) {
-                scopes.getOrDefault(entry.getKey(), new ArrayDeque<>()).poll();
+                scopes.computeIfAbsent(entry.getValue().type(), ArrayDeque::new).push(entry.getValue());
+            } else if (entry.getValue().scope().isEnd() && scopes.containsKey(entry.getValue().type())) {
+                scopes.get(entry.getValue().type()).poll();
             }
         }
         return scopes;
