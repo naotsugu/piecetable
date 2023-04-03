@@ -139,7 +139,7 @@ public class CursoredList {
         if (index < 0 || index >= length()) {
             throw new IndexOutOfBoundsException(
                 "index[%d], length[%d]".formatted(index, length()));
-        }raw.remove(1);
+        }
         get(index);
         moveTo(index);
         cursor.remove();
