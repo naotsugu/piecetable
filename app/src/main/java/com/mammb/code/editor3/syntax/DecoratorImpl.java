@@ -19,7 +19,6 @@ import com.mammb.code.editor3.model.DecoratedText;
 import com.mammb.code.editor3.model.Decorator;
 import com.mammb.code.editor3.model.RowPoint;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
@@ -72,7 +71,7 @@ public class DecoratorImpl implements Decorator {
         int prevType = -1;
         int beginIndex = 0;
 
-        List<DecoratedText> list = new ArrayList<>();
+        Cutup cutup = new Cutup();
 
         for (Token token = lexer.nextToken(); !token.isEmpty(); token = lexer.nextToken()) {
 
@@ -101,28 +100,24 @@ public class DecoratorImpl implements Decorator {
                     prevType = currentScope.get().type();
                     beginIndex = token.position();
                 } else if (prevType != currentScope.get().type()) {
-                    list.add(DecoratedText.of(
-                        string.substring(beginIndex, token.position()), prevType));
+                    cutup.add(beginIndex, token.position(), prevType);
                     prevType = currentScope.get().type();
                     beginIndex = token.position();
                 }
                 continue;
             } else if (prevType > 0) {
-                list.add(DecoratedText.of(
-                    string.substring(beginIndex, token.position()), prevType));
+                cutup.add(beginIndex, token.position(), prevType);
                 prevType = -1;
             }
 
-            list.add(DecoratedText.of(
-                string.substring(token.position(), token.position() + token.length()),
-                token.type()));
+            cutup.add(token.position(), token.position() + token.length(), token.type());
         }
 
         if (prevType > 0) {
-            list.add(DecoratedText.of(string.substring(beginIndex), prevType));
+            cutup.add(beginIndex, string.length(), prevType);
         }
 
-        return list;
+        return cutup.getList(string);
     }
 
 
