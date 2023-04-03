@@ -36,24 +36,49 @@ import java.util.stream.Stream;
  */
 public class CursoredList {
 
+    /** The raw list of piece. */
     private final List<Piece> raw;
+
+    /** The cursor of list. */
     private final ListIterator<Piece> cursor;
+
+    /** The point of cursor. */
     private final PiecePoint point;
 
+
+    /**
+     * Constructor.
+     * @param raw the raw list of piece
+     */
     public CursoredList(List<Piece> raw) {
         this.raw = raw;
         this.cursor = raw.listIterator();
         this.point = new PiecePoint();
     }
 
+
+    /**
+     * Constructor.
+     */
     public CursoredList() {
         this(new LinkedList<>());
     }
 
+
+    /**
+     * Create a new CursoredList.
+     * @return a new CursoredList
+     */
     public static CursoredList of() {
-        return new CursoredList();
+        return new CursoredList(new LinkedList<>());
     }
 
+
+    /**
+     * Get the piece.
+     * @param index the index
+     * @return the piece
+     */
     public Piece get(int index) {
         if (index < 0 || index >= length()) {
             throw new IndexOutOfBoundsException(
@@ -63,6 +88,12 @@ public class CursoredList {
         return next();
     }
 
+
+    /**
+     * Move cursor to the specified position.
+     * @param pos the specified position
+     * @return the moved point
+     */
     public PiecePoint at(int pos) {
         if (point.position() < pos) {
             while (cursor.hasNext() && point.position() < pos) {
@@ -81,6 +112,12 @@ public class CursoredList {
         return point.copy();
     }
 
+
+    /**
+     * Add the specified element at the specified position in this list.
+     * @param index at which the specified element is to be inserted element
+     * @param pieces to be inserted
+     */
     public void add(int index, Piece... pieces) {
         if (index < 0 || index > length()) {
             throw new IndexOutOfBoundsException();
@@ -93,20 +130,37 @@ public class CursoredList {
         }
     }
 
+
+    /**
+     * Removes the element at the specified position in this list.
+     * @param index the index of the element to be removed
+     */
     public void remove(int index) {
         if (index < 0 || index >= length()) {
             throw new IndexOutOfBoundsException(
                 "index[%d], length[%d]".formatted(index, length()));
-        }
+        }raw.remove(1);
         get(index);
         moveTo(index);
         cursor.remove();
     }
 
+
+    /**
+     * Gets the number of elements in this list.
+     * @return the number of elements in this list
+     */
     public int length() {
         return raw.size();
     }
 
+
+    /**
+     * Get the bytes at the specified position.
+     * @param startPos the start position
+     * @param endPos the end position
+     * @return the bytes at the specified position
+     */
     public ByteArray bytes(int startPos, int endPos) {
         ByteArray byteArray = ByteArray.of();
         PiecePoint from = at(startPos);
@@ -120,6 +174,13 @@ public class CursoredList {
         return byteArray;
     }
 
+
+    /**
+     * Get the bytes at the specified position.
+     * @param startPos the start position
+     * @param until the Conditions for Termination
+     * @return the bytes at the specified position
+     */
     public ByteArray bytes(int startPos, Predicate<byte[]> until) {
         ByteArray byteArray = ByteArray.of();
         PiecePoint from = at(startPos);
@@ -147,6 +208,12 @@ public class CursoredList {
     }
 
 
+    /**
+     * Get the count up to the specified condition.
+     * @param startPos the start position
+     * @param until the conditions for termination
+     * @return the number of count
+     */
     public int count(int startPos, Predicate<byte[]> until) {
         int count = 0;
         PiecePoint from = at(startPos);
@@ -174,6 +241,13 @@ public class CursoredList {
     }
 
 
+    /**
+     * Get the bytes at the specified position.
+     * Inspects the forward direction from the designated position
+     * @param startPosExclude the start position
+     * @param until the conditions for termination
+     * @return the bytes at the specified position
+     */
     public ByteArray bytesBefore(int startPosExclude, Predicate<byte[]> until) {
         if (startPosExclude <= 0) throw new IndexOutOfBoundsException();
         ByteArray byteArray = ByteArray.of();
@@ -206,6 +280,13 @@ public class CursoredList {
     }
 
 
+    /**
+     * Get the count up to the specified range.
+     * @param startPos the start position
+     * @param endPos the end position
+     * @param predicate the count-up conditions
+     * @return the number of count
+     */
     public int count(int startPos, int endPos, Predicate<byte[]> predicate) {
         int count = 0;
         PiecePoint from = at(startPos);
@@ -233,6 +314,40 @@ public class CursoredList {
     }
 
 
+    /**
+     * Writes the piece held by this list to the specified channel.
+     * @param channel the destination channel
+     * @return the number of bytes written, possibly zero
+     * @throws IOException If some other I/O error occurs
+     */
+    public int writeTo(WritableByteChannel channel) throws IOException {
+        int size = 0;
+        ByteBuffer buf = ByteBuffer.allocate(1024);
+        for (Piece piece : raw) {
+            size += piece.writeTo(channel, buf);
+        }
+        return size;
+    }
+
+
+    /**
+     * Get a sequential Stream with this list as its source.
+     * @return a sequential stream over the elements in this collection
+     */
+    public Stream<Piece> stream() {
+        return raw.stream();
+    }
+
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        sb.append("point:").append(point.toString()).append("\n");
+        raw.forEach(sb::append);
+        return sb.toString();
+    }
+
+
     private Piece next() {
         if (cursor.hasNext()) {
             var piece = cursor.next();
@@ -242,6 +357,7 @@ public class CursoredList {
         return null;
     }
 
+
     private Piece prev() {
         if (cursor.hasPrevious()) {
             var piece = cursor.previous();
@@ -250,6 +366,7 @@ public class CursoredList {
         }
         return null;
     }
+
 
     private void moveTo(int index) {
         while (cursor.hasNext() && cursor.nextIndex() < index)  {
@@ -261,27 +378,6 @@ public class CursoredList {
         if (cursor.nextIndex() != index) {
             throw new IndexOutOfBoundsException();
         }
-    }
-
-    public int writeTo(WritableByteChannel channel) throws IOException {
-        int size = 0;
-        ByteBuffer buf = ByteBuffer.allocate(1024);
-        for (Piece piece : raw) {
-            size += piece.writeTo(channel, buf);
-        }
-        return size;
-    }
-
-    public Stream<Piece> stream() {
-        return raw.stream();
-    }
-
-    @Override
-    public String toString() {
-        var sb = new StringBuilder();
-        sb.append("point:").append(point.toString()).append("\n");
-        raw.forEach(sb::append);
-        return sb.toString();
     }
 
 }
