@@ -78,6 +78,7 @@ public class JsonLexer implements Lexer {
             case 't' -> readTrue(source);
             case 'f' -> readFalse(source);
             case 'n' -> readNull(source);
+            case '0','1','2','3','4','5','6','7','8','9','-' -> readNumber(source);
             case 0 -> Lexer.empty(source);
             default -> new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
         };
@@ -99,8 +100,54 @@ public class JsonLexer implements Lexer {
 
 
     private Token readNumber(LexerSource source) {
-        // TODO
-        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+
+        int pos = source.position();
+        char ch = source.currentChar();
+
+        if (ch == '-') {
+            ch = source.peekChar();
+            if (ch < '0' || ch > '9') {
+                source.rollbackPeek();
+                return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, pos, 1);
+            }
+        }
+
+        if (ch == '0') {
+            ch = source.peekChar();
+        } else {
+            do {
+                ch = source.peekChar();
+            } while (ch >= '0' && ch <= '9');
+        }
+
+        if (ch == '.') {
+            int count = 0;
+            do {
+                ch = source.peekChar();
+                count++;
+            } while (ch >= '0' && ch <= '9');
+            if (count == 1) {
+                source.rollbackPeek();
+                return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, pos, 1);
+            }
+        }
+
+        if (ch == 'e' || ch == 'E') {
+            ch = source.peekChar();
+            if (ch == '+' || ch == '-') {
+                ch = source.peekChar();
+            }
+            int count;
+            for (count = 0; ch >= '0' && ch <= '9'; count++) {
+                ch = source.peekChar();
+            }
+            if (count == 0) {
+                source.rollbackPeek();
+                return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, pos, 1);
+            }
+        }
+        source.commitPeekBefore();
+        return new Token(TokenType.NUMBER.ordinal(), ScopeType.NEUTRAL, pos, source.position() - pos);
     }
 
 

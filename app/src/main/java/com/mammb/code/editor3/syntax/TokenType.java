@@ -24,6 +24,7 @@ public enum TokenType {
     EMPTY,
     SP,
     KEYWORD,
+    NUMBER,
     LITERAL,
     TEXT,
     LINE_COMMENT,

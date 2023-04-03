@@ -47,6 +47,11 @@ public interface LexerSource {
     void commitPeek();
 
     /**
+     * Forward the read position to the (one step before)peeked position.
+     */
+    void commitPeekBefore();
+
+    /**
      * Rollback the peeked position.
      */
     void rollbackPeek();
@@ -56,6 +61,7 @@ public interface LexerSource {
      * @return {@code -1} if loading has not started.
      */
     int position();
+
 
     /**
      * Gets the length.

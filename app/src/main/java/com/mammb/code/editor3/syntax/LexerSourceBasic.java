@@ -91,6 +91,13 @@ public class LexerSourceBasic implements LexerSource {
 
 
     @Override
+    public void commitPeekBefore() {
+        position += Math.max(peekCount - 1, 0);
+        peekCount = 0;
+    }
+
+
+    @Override
     public void rollbackPeek() {
         peekCount = 0;
     }
@@ -100,7 +107,6 @@ public class LexerSourceBasic implements LexerSource {
     public int position() {
         return position;
     }
-
 
     @Override
     public int length() {

@@ -109,6 +109,20 @@ public class LexerSourceUtf16 implements LexerSource {
 
 
     @Override
+    public void commitPeekBefore() {
+        try {
+            if (peekCount > 0) {
+                input.reset();
+                input.skipNBytes(Math.max(peekCount - 1, 0) * 2L);
+                peekCount = 0;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
     public void rollbackPeek() {
         try {
             input.reset();
