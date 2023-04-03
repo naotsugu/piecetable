@@ -81,7 +81,15 @@ public class DecoratorImpl implements Decorator {
                     blockScopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);
                 } else if (token.scope().isEnd() && blockScopes.containsKey(token.type())) {
                     blockScopes.get(token.type()).poll();
+                } else if (token.scope().isAny()) {
+                    Deque<Token> deque = blockScopes.get(token.type());
+                    if (deque == null || deque.isEmpty()) {
+                        blockScopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);
+                    } else {
+                        blockScopes.get(token.type()).poll();
+                    }
                 }
+
             } else if (token.scope().isInline()) {
                 if (token.scope().isStart()) {
                     inlineScopes.push(token);
@@ -113,10 +121,6 @@ public class DecoratorImpl implements Decorator {
             cutup.add(token.position(), token.position() + token.length(), token.type());
         }
 
-        if (prevType > 0) {
-            cutup.add(beginIndex, string.length(), prevType);
-        }
-
         return cutup.getList(string);
     }
 
@@ -129,10 +133,22 @@ public class DecoratorImpl implements Decorator {
     private Map<Integer, Deque<Token>> currentScopes() {
         Map<Integer, Deque<Token>> scopes = new HashMap<>();
         for (Map.Entry<Integer, Token> entry : tokens.entrySet()) {
-            if (entry.getValue().scope().isStart()) {
-                scopes.computeIfAbsent(entry.getValue().type(), ArrayDeque::new).push(entry.getValue());
-            } else if (entry.getValue().scope().isEnd() && scopes.containsKey(entry.getValue().type())) {
-                scopes.get(entry.getValue().type()).poll();
+            Token token = entry.getValue();
+            if (!token.scope().isBlock()) {
+                throw new IllegalStateException(token.scope().toString());
+            }
+            if (token.scope().isStart()) {
+                scopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);
+            } else if (token.scope().isEnd() && scopes.containsKey(token.type())) {
+                scopes.get(token.type()).poll();
+            } else if (token.scope().isAny()) {
+                // Toggle scope if any
+                Deque<Token> deque = scopes.get(token.type());
+                if (deque == null || deque.isEmpty()) {
+                    scopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);
+                } else {
+                    scopes.get(token.type()).poll();
+                }
             }
         }
         return scopes;

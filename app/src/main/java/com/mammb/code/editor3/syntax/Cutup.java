@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Cutup.
+ * Reduce memory cost for substring operation.
  * @author Naotsugu Kobayashi
  */
 public class Cutup {
@@ -52,9 +53,15 @@ public class Cutup {
      * @return the {@link DecoratedText} list
      */
     public List<DecoratedText> getList(String string) {
+
         List<DecoratedText> ret = list.stream()
             .map(e -> DecoratedText.of(string.substring(e.beginIndex, e.endIndex), e.type))
             .collect(Collectors.toList());
+
+        Entry last = list.isEmpty() ? null : list.get(list.size() - 1);
+        if (last != null && last.endIndex < string.length()) {
+            ret.add(DecoratedText.of(string.substring(last.endIndex), last.type));
+        }
         list.clear();
         return ret;
     }

@@ -38,11 +38,15 @@ public class Colors {
     public static final Paint thumbActive = Color.web("#828485", 0.9);
 
 
+    private static final Color green = Color.web("#629755");
+    private static final Color orange = Color.web("#eb8a3a");
+    private static final Color gray = Color.web("#808080");
+
     public static Color of(int index) {
         return switch (index) {
-            case 3 -> Color.web("#eb8a3a");
-            case 7 -> Color.web("#808080");
-            case 8 -> Color.web("#629755");
+            case 3 -> orange;
+            case 7 -> gray;
+            case 6, 8 -> green;
             default -> Colors.foreground;
         };
     }

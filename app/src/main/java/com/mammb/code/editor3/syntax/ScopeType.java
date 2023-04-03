@@ -23,8 +23,10 @@ public enum ScopeType {
 
     NEUTRAL,
     BLOCK_START,
+    BLOCK_ANY,
     BLOCK_END,
     INLINE_START,
+    INLINE_ANY,
     INLINE_END,
     ;
 
@@ -33,11 +35,11 @@ public enum ScopeType {
     }
 
     public boolean isBlock() {
-        return this == BLOCK_START || this == BLOCK_END;
+        return this == BLOCK_START || this == BLOCK_ANY || this == BLOCK_END;
     }
 
     public boolean isInline() {
-        return this == INLINE_START || this == INLINE_END;
+        return this == INLINE_START || this == INLINE_ANY || this == INLINE_END;
     }
 
     public boolean isStart() {
@@ -46,6 +48,10 @@ public enum ScopeType {
 
     public boolean isEnd() {
         return this == BLOCK_END || this == INLINE_END;
+    }
+
+    public boolean isAny() {
+        return this == BLOCK_ANY || this == INLINE_ANY;
     }
 
 }

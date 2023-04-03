@@ -81,6 +81,7 @@ public class JavaLexer implements Lexer {
             case '\n', '\r' -> Lexer.lineEnd(source);
             case '/' -> readComment(source);
             case '*'  -> readCommentBlockClosed(source);
+            case '"'  -> readText(source);
             case 0 -> Lexer.empty(source);
             default -> Character.isJavaIdentifierStart(ch)
                 ? readIdentifier(source)
@@ -89,12 +90,17 @@ public class JavaLexer implements Lexer {
     }
 
 
+    /**
+     * Read comment.
+     * @param source the lexer source
+     * @return the token
+     */
     private Token readComment(LexerSource source) {
         int pos = source.position();
         char ch = source.peekChar();
         if (ch == '/') {
             source.commitPeek();
-            return new Token(TokenType.COMMENT.ordinal(), ScopeType.INLINE_START, pos, 2);
+            return new Token(TokenType.LINE_COMMENT.ordinal(), ScopeType.INLINE_START, pos, 2);
         } else if (ch == '*') {
             source.commitPeek();
             return new Token(TokenType.COMMENT.ordinal(), ScopeType.BLOCK_START, pos, 2);
@@ -104,6 +110,11 @@ public class JavaLexer implements Lexer {
     }
 
 
+    /**
+     * Read block comment.
+     * @param source the lexer source
+     * @return the token
+     */
     private Token readCommentBlockClosed(LexerSource source) {
         int pos = source.position();
         char ch = source.peekChar();
@@ -116,7 +127,46 @@ public class JavaLexer implements Lexer {
     }
 
 
+    /**
+     * Read text.
+     * @param source the lexer source
+     * @return the token
+     */
+    private Token readText(LexerSource source) {
+        if (source.peekChar() == '"' &&
+            source.peekChar() == '"') {
+            source.commitPeek();
+            return new Token(TokenType.TEXT.ordinal(), ScopeType.BLOCK_ANY, source.position() - 3, 3);
+        }
+        source.rollbackPeek();
+        return readString(source);
+    }
 
+
+    /**
+     * Read string.
+     * @param source the lexer source
+     * @return the token
+     */
+    private Token readString(LexerSource source) {
+        int pos = source.position();
+        char prev = 0;
+        for (;;) {
+            char ch = source.peekChar();
+            if (ch < ' ' || (prev != '\\' && ch == '"')) {
+                source.commitPeek();
+                return new Token(TokenType.TEXT.ordinal(), ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
+            }
+            prev = ch;
+        }
+    }
+
+
+    /**
+     * Read identifier.
+     * @param source the lexer source
+     * @return the token
+     */
     private Token readIdentifier(LexerSource source) {
 
         int pos = source.position();
@@ -136,6 +186,10 @@ public class JavaLexer implements Lexer {
     }
 
 
+    /**
+     * Get the keyword trie.
+     * @return the keyword trie
+     */
     private static Trie keywords() {
         Trie trie = new Trie();
         Stream.of("""
