@@ -30,7 +30,7 @@ public record Token(int type, ScopeType scope, int position, int length) {
      * @return {@code true}, if this type is empty
      */
     public boolean isEmpty() {
-        return TokenType.EMPTY.ordinal() == type || length <= 0;
+        return length <= 0;
     }
 
 }

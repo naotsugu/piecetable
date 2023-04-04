@@ -15,42 +15,19 @@
  */
 package com.mammb.code.editor3.syntax;
 
-import com.mammb.code.editor3.syntax.type.JavaLexer;
-import com.mammb.code.editor3.syntax.type.JsonLexer;
-import com.mammb.code.editor3.syntax.type.PassThroughLexer;
+import com.mammb.code.editor3.model.Coloring;
 
 /**
- * Lexer.
+ * ColoringTo.
+ * Type to Coloring mapper function.
  * @author Naotsugu Kobayashi
  */
-public interface Lexer {
+public interface ColoringTo {
 
     /**
-     * Gets the next token.
-     * @return the next token
+     * Get the coloring from the type.
+     * @param type the type
+     * @return the coloring
      */
-    Token nextToken();
-
-
-    /**
-     * Gets the ColoringTo.
-     * @return the ColoringTo
-     */
-    ColoringTo coloringTo();
-
-    /**
-     * Set the source.
-     * @param source the source.
-     */
-    void setSource(LexerSource source);
-
-
-    static Lexer of(String ext) {
-        return switch (ext) {
-            case "java" -> JavaLexer.of();
-            case "json" -> JsonLexer.of();
-            default -> PassThroughLexer.of();
-        };
-    }
-
+    Coloring apply(int type);
 }

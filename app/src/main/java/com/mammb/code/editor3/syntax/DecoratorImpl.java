@@ -71,7 +71,7 @@ public class DecoratorImpl implements Decorator {
         int prevType = -1;
         int beginIndex = 0;
 
-        Cutup cutup = new Cutup();
+        Cutup cutup = new Cutup(lexer.coloringTo());
 
         for (Token token = lexer.nextToken(); !token.isEmpty(); token = lexer.nextToken()) {
 
@@ -142,7 +142,7 @@ public class DecoratorImpl implements Decorator {
             } else if (token.scope().isEnd() && scopes.containsKey(token.type())) {
                 scopes.get(token.type()).poll();
             } else if (token.scope().isAny()) {
-                // Toggle scope if any
+                // toggle scope if any
                 Deque<Token> deque = scopes.get(token.type());
                 if (deque == null || deque.isEmpty()) {
                     scopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);

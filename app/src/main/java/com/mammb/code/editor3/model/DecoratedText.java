@@ -37,7 +37,7 @@ public interface DecoratedText {
      * Get the color.
      * @return the color
      */
-    int color();
+    Coloring color();
 
     /**
      * Get the bold.
@@ -72,7 +72,7 @@ public interface DecoratedText {
      * @param color the color
      * @return a new DecoratedText
      */
-    static DecoratedText of(String text, int color) {
+    static DecoratedText of(String text, Coloring color) {
         return new DecoratedText() {
             @Override
             public String text() { return text; }
@@ -81,7 +81,7 @@ public interface DecoratedText {
             public int size() { return 16; }
 
             @Override
-            public int color() { return color; }
+            public Coloring color() { return color; }
 
             @Override
             public boolean bold() { return false; }

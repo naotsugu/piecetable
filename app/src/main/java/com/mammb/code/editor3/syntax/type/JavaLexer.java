@@ -15,11 +15,12 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
+import com.mammb.code.editor3.model.Coloring;
+import com.mammb.code.editor3.syntax.ColoringTo;
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
 import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
-import com.mammb.code.editor3.syntax.TokenType;
 import com.mammb.code.editor3.syntax.Trie;
 import java.util.stream.Stream;
 
@@ -28,6 +29,9 @@ import java.util.stream.Stream;
  * @author Naotsugu Kobayashi
  */
 public class JavaLexer implements Lexer {
+
+    /** Token type. */
+    public enum TokenType { ANY, EMPTY, SP, KEYWORD, TEXT, LINE_COMMENT, COMMENT, EOL }
 
     /** The syntax keywords. */
     private static final Trie keywords = keywords();
@@ -73,19 +77,19 @@ public class JavaLexer implements Lexer {
     @Override
     public Token nextToken() {
 
-        if (source == null) return Lexer.empty();
+        if (source == null) return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
 
         char ch = source.readChar();
         return switch (ch) {
-            case ' ', '\t' -> Lexer.whitespace(source);
-            case '\n', '\r' -> Lexer.lineEnd(source);
+            case ' ', '\t' -> new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+            case '\n', '\r' -> lineEnd(source);
             case '/' -> readComment(source);
             case '*'  -> readCommentBlockClosed(source);
             case '"'  -> readText(source);
-            case 0 -> Lexer.empty(source);
+            case 0 -> new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, source.position(), 0);
             default -> Character.isJavaIdentifierStart(ch)
                 ? readIdentifier(source)
-                : Lexer.any(source);
+                : any(source);
         };
     }
 
@@ -105,7 +109,7 @@ public class JavaLexer implements Lexer {
             source.commitPeek();
             return new Token(TokenType.COMMENT.ordinal(), ScopeType.BLOCK_START, pos, 2);
         } else {
-            return Lexer.any(source);
+            return any(source);
         }
     }
 
@@ -122,7 +126,7 @@ public class JavaLexer implements Lexer {
             source.commitPeek();
             return new Token(TokenType.COMMENT.ordinal(), ScopeType.BLOCK_END, pos, 2);
         } else {
-            return Lexer.any(source);
+            return any(source);
         }
     }
 
@@ -185,6 +189,22 @@ public class JavaLexer implements Lexer {
         }
     }
 
+    private static Token any(LexerSource source) {
+        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+    }
+
+
+    private static Token lineEnd(LexerSource source) {
+        char ch = source.peekChar();
+        if (source.currentChar() == '\r' && ch == '\n' ||
+            source.currentChar() == '\n' && ch == '\r') {
+            source.commitPeek();
+            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 2);
+        } else {
+            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 1);
+        }
+    }
+
 
     /**
      * Get the keyword trie.
@@ -199,6 +219,14 @@ public class JavaLexer implements Lexer {
         strictfp,volatile,const,float,native,super,while,var,record,sealed,with,yield,to,transitive,uses"""
             .split("[,\\s]")).forEach(trie::put);
         return trie;
+    }
+
+
+    public ColoringTo coloringTo() {
+        return type ->
+            (type == TokenType.COMMENT.ordinal()) ? Coloring.DarkGreen :
+            (type == TokenType.LINE_COMMENT.ordinal()) ? Coloring.DarkGray :
+            (type == TokenType.KEYWORD.ordinal()) ? Coloring.DarkOrange : null;
     }
 
 }

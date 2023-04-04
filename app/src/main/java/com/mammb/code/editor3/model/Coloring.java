@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.syntax;
+package com.mammb.code.editor3.model;
 
 /**
- * TokenType.
+ * Coloring.
  * @author Naotsugu Kobayashi
  */
-public enum TokenType {
-    ANY,
-    EMPTY,
-    SP,
-    KEYWORD,
-    NUMBER,
-    LITERAL,
-    TEXT,
-    LINE_COMMENT,
-    COMMENT,
-    ATTR,
-    EOL,
-    H1,
-    H2,
-    H3,
-    H4,
-    H5,
-    ;
+public interface Coloring {
+
+    Coloring DarkOrange = new ColoringRec("#eb8a3a", 1.0);
+    Coloring DarkGreen = new ColoringRec("#629755", 1.0);
+    Coloring DarkGray = new ColoringRec("#808080", 1.0);
+    Coloring DarkYellow = new ColoringRec("#d7d02f", 1.0);
+    Coloring DarkSkyBlue = new ColoringRec("#78aed7", 1.0);
+
+    String colorString();
+
+    double opacity();
+
+    record ColoringRec(String colorString, double opacity) implements Coloring { }
+
 }

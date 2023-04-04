@@ -15,17 +15,21 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
+import com.mammb.code.editor3.model.Coloring;
+import com.mammb.code.editor3.syntax.ColoringTo;
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
 import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
-import com.mammb.code.editor3.syntax.TokenType;
 
 /**
  * Lexer.
  * @author Naotsugu Kobayashi
  */
 public class JsonLexer implements Lexer {
+
+    /** Token type. */
+    public enum TokenType {ANY, EMPTY, SP, EOL, TEXT, NUMBER, LITERAL;}
 
     /** The input string. */
     private LexerSource source;
@@ -68,18 +72,18 @@ public class JsonLexer implements Lexer {
     @Override
     public Token nextToken() {
 
-        if (source == null) return Lexer.empty();
+        if (source == null) return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
 
         char ch = source.readChar();
         return switch (ch) {
-            case ' ', '\t' -> Lexer.whitespace(source);
-            case '\n', '\r' -> Lexer.lineEnd(source);
+            case ' ', '\t' -> new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+            case '\n', '\r' -> lineEnd(source);
             case '"' -> readString(source);
             case 't' -> readTrue(source);
             case 'f' -> readFalse(source);
             case 'n' -> readNull(source);
-            case '0','1','2','3','4','5','6','7','8','9','-' -> readNumber(source);
-            case 0 -> Lexer.empty(source);
+            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' -> readNumber(source);
+            case 0 -> new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
             default -> new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
         };
     }
@@ -88,11 +92,11 @@ public class JsonLexer implements Lexer {
     private Token readString(LexerSource source) {
         int pos = source.position();
         char prev = 0;
-        for (;;) {
+        for (; ; ) {
             char ch = source.peekChar();
             if (ch < ' ' || (prev != '\\' && ch == '"')) {
                 source.commitPeek();
-                return new Token(TokenType.TEXT.ordinal(), ScopeType.NEUTRAL, pos, source.position() - pos);
+                return new Token(TokenType.TEXT.ordinal(), ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
             }
             prev = ch;
         }
@@ -151,7 +155,7 @@ public class JsonLexer implements Lexer {
     }
 
 
-    public static Token readTrue(LexerSource source) {
+    private static Token readTrue(LexerSource source) {
         if (source.peekChar() == 'r' &&
             source.peekChar() == 'u' &&
             source.peekChar() == 'e') {
@@ -163,7 +167,7 @@ public class JsonLexer implements Lexer {
     }
 
 
-    public static Token readFalse(LexerSource source) {
+    private static Token readFalse(LexerSource source) {
         if (source.peekChar() == 'a' &&
             source.peekChar() == 'l' &&
             source.peekChar() == 's' &&
@@ -176,7 +180,7 @@ public class JsonLexer implements Lexer {
     }
 
 
-    public static Token readNull(LexerSource source) {
+    private static Token readNull(LexerSource source) {
         if (source.peekChar() == 'u' &&
             source.peekChar() == 'l' &&
             source.peekChar() == 'l') {
@@ -185,6 +189,27 @@ public class JsonLexer implements Lexer {
         }
         source.rollbackPeek();
         return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+    }
+
+
+    private static Token lineEnd(LexerSource source) {
+        char ch = source.peekChar();
+        if (source.currentChar() == '\r' && ch == '\n' ||
+            source.currentChar() == '\n' && ch == '\r') {
+            source.commitPeek();
+            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 2);
+        } else {
+            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 1);
+        }
+    }
+
+
+    @Override
+    public ColoringTo coloringTo() {
+        return type ->
+            (type == TokenType.TEXT.ordinal()) ? Coloring.DarkGreen :
+            (type == TokenType.NUMBER.ordinal()) ? Coloring.DarkSkyBlue :
+            (type == TokenType.LITERAL.ordinal()) ? Coloring.DarkOrange : null;
     }
 
 }

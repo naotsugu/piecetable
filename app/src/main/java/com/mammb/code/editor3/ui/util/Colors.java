@@ -15,8 +15,13 @@
  */
 package com.mammb.code.editor3.ui.util;
 
+import com.mammb.code.editor3.model.Coloring;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Color utilities.
@@ -37,18 +42,12 @@ public class Colors {
     public static final Paint thumb = Color.web("#626465", 0.5);
     public static final Paint thumbActive = Color.web("#828485", 0.9);
 
+    public static final Map<Coloring, Color> map = new ConcurrentHashMap<>();
 
-    private static final Color green = Color.web("#629755");
-    private static final Color orange = Color.web("#eb8a3a");
-    private static final Color gray = Color.web("#808080");
-
-    public static Color of(int index) {
-        return switch (index) {
-            case 3 -> orange;
-            case 7 -> gray;
-            case 6, 8 -> green;
-            default -> Colors.foreground;
-        };
+    public static Color of(Coloring c) {
+        return Objects.isNull(c)
+            ? foreground
+            : map.computeIfAbsent(c, co -> Color.web(co.colorString(), co.opacity()));
     }
 
 }

@@ -15,11 +15,11 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
+import com.mammb.code.editor3.syntax.ColoringTo;
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
 import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
-import com.mammb.code.editor3.syntax.TokenType;
 
 /**
  * PassThrough Lexer.
@@ -68,9 +68,14 @@ public class PassThroughLexer implements Lexer {
     public Token nextToken() {
 
         if (source == null) {
-            return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
+            return new Token(0, ScopeType.NEUTRAL, 0, 0);
         }
-        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, 0, source.length());
+        return new Token(0, ScopeType.NEUTRAL, 0, source.length());
+    }
+
+    @Override
+    public ColoringTo coloringTo() {
+        return type -> null;
     }
 
 }
