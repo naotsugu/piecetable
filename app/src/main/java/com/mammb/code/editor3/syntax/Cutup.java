@@ -18,6 +18,7 @@ package com.mammb.code.editor3.syntax;
 import com.mammb.code.editor3.model.DecoratedText;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +40,7 @@ public class Cutup {
      * @param coloringTo the ColoringTo
      */
     public Cutup(ColoringTo coloringTo) {
-        this.coloringTo = coloringTo;
+        this.coloringTo = Objects.isNull(coloringTo) ? ColoringTo.empty : coloringTo;
     }
 
 

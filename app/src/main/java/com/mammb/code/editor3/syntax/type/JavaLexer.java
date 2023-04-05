@@ -28,10 +28,15 @@ import java.util.stream.Stream;
  * JavaLexer.
  * @author Naotsugu Kobayashi
  */
-public class JavaLexer implements Lexer {
+public class JavaLexer implements Lexer, ColoringTo {
 
     /** Token type. */
-    public enum TokenType { ANY, EMPTY, SP, KEYWORD, TEXT, LINE_COMMENT, COMMENT, EOL }
+    protected interface Type extends TokenType {
+        int KEYWORD = TokenType.serial.getAndIncrement();
+        int TEXT = TokenType.serial.getAndIncrement();
+        int LINE_COMMENT = TokenType.serial.getAndIncrement();
+        int COMMENT = TokenType.serial.getAndIncrement();
+    }
 
     /** The syntax keywords. */
     private static final Trie keywords = keywords();
@@ -77,16 +82,16 @@ public class JavaLexer implements Lexer {
     @Override
     public Token nextToken() {
 
-        if (source == null) return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
+        if (source == null) return new Token(Type.EMPTY, ScopeType.NEUTRAL, 0, 0);
 
         char ch = source.readChar();
         return switch (ch) {
-            case ' ', '\t' -> new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+            case ' ', '\t' -> new Token(Type.SP, ScopeType.NEUTRAL, source.position(), 1);
             case '\n', '\r' -> lineEnd(source);
             case '/' -> readComment(source);
             case '*'  -> readCommentBlockClosed(source);
             case '"'  -> readText(source);
-            case 0 -> new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, source.position(), 0);
+            case 0 -> new Token(Type.EMPTY, ScopeType.NEUTRAL, source.position(), 0);
             default -> Character.isJavaIdentifierStart(ch)
                 ? readIdentifier(source)
                 : any(source);
@@ -104,10 +109,10 @@ public class JavaLexer implements Lexer {
         char ch = source.peekChar();
         if (ch == '/') {
             source.commitPeek();
-            return new Token(TokenType.LINE_COMMENT.ordinal(), ScopeType.INLINE_START, pos, 2);
+            return new Token(Type.LINE_COMMENT, ScopeType.INLINE_START, pos, 2);
         } else if (ch == '*') {
             source.commitPeek();
-            return new Token(TokenType.COMMENT.ordinal(), ScopeType.BLOCK_START, pos, 2);
+            return new Token(Type.COMMENT, ScopeType.BLOCK_START, pos, 2);
         } else {
             return any(source);
         }
@@ -124,7 +129,7 @@ public class JavaLexer implements Lexer {
         char ch = source.peekChar();
         if (ch == '/') {
             source.commitPeek();
-            return new Token(TokenType.COMMENT.ordinal(), ScopeType.BLOCK_END, pos, 2);
+            return new Token(Type.COMMENT, ScopeType.BLOCK_END, pos, 2);
         } else {
             return any(source);
         }
@@ -140,7 +145,7 @@ public class JavaLexer implements Lexer {
         if (source.peekChar() == '"' &&
             source.peekChar() == '"') {
             source.commitPeek();
-            return new Token(TokenType.TEXT.ordinal(), ScopeType.BLOCK_ANY, source.position() - 3, 3);
+            return new Token(Type.TEXT, ScopeType.BLOCK_ANY, source.position() - 3, 3);
         }
         source.rollbackPeek();
         return readString(source);
@@ -159,7 +164,7 @@ public class JavaLexer implements Lexer {
             char ch = source.peekChar();
             if (ch < ' ' || (prev != '\\' && ch == '"')) {
                 source.commitPeek();
-                return new Token(TokenType.TEXT.ordinal(), ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
+                return new Token(Type.TEXT, ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
             }
             prev = ch;
         }
@@ -182,15 +187,15 @@ public class JavaLexer implements Lexer {
             if (!Character.isJavaIdentifierPart(ch)) {
                 source.rollbackPeek();
                 String str = sb.toString();
-                TokenType type = keywords.match(str) ? TokenType.KEYWORD : TokenType.ANY;
-                return new Token(type.ordinal(), ScopeType.NEUTRAL, pos, str.length());
+                int type = keywords.match(str) ? Type.KEYWORD : Type.ANY;
+                return new Token(type, ScopeType.NEUTRAL, pos, str.length());
             }
             sb.append(source.readChar());
         }
     }
 
     private static Token any(LexerSource source) {
-        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+        return new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
     }
 
 
@@ -199,9 +204,9 @@ public class JavaLexer implements Lexer {
         if (source.currentChar() == '\r' && ch == '\n' ||
             source.currentChar() == '\n' && ch == '\r') {
             source.commitPeek();
-            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 2);
+            return new Token(Type.EOL, ScopeType.INLINE_END, source.position(), 2);
         } else {
-            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 1);
+            return new Token(Type.EOL, ScopeType.INLINE_END, source.position(), 1);
         }
     }
 
@@ -222,11 +227,11 @@ public class JavaLexer implements Lexer {
     }
 
 
-    public ColoringTo coloringTo() {
-        return type ->
-            (type == TokenType.COMMENT.ordinal()) ? Coloring.DarkGreen :
-            (type == TokenType.LINE_COMMENT.ordinal()) ? Coloring.DarkGray :
-            (type == TokenType.KEYWORD.ordinal()) ? Coloring.DarkOrange : null;
+    @Override
+    public Coloring apply(int type) {
+        return (type == Type.COMMENT) ? Coloring.DarkGreen :
+               (type == Type.LINE_COMMENT) ? Coloring.DarkGray :
+               (type == Type.KEYWORD) ? Coloring.DarkOrange : null;
     }
 
 }

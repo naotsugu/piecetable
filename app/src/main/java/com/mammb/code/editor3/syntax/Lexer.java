@@ -31,13 +31,6 @@ public interface Lexer {
      */
     Token nextToken();
 
-
-    /**
-     * Gets the ColoringTo.
-     * @return the ColoringTo
-     */
-    ColoringTo coloringTo();
-
     /**
      * Set the source.
      * @param source the source.

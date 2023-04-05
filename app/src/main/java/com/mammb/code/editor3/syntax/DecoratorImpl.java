@@ -71,7 +71,7 @@ public class DecoratorImpl implements Decorator {
         int prevType = -1;
         int beginIndex = 0;
 
-        Cutup cutup = new Cutup(lexer.coloringTo());
+        Cutup cutup = new Cutup((lexer instanceof ColoringTo c) ? c : null);
 
         for (Token token = lexer.nextToken(); !token.isEmpty(); token = lexer.nextToken()) {
 

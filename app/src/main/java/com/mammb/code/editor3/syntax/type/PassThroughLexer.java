@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
+import com.mammb.code.editor3.model.Coloring;
 import com.mammb.code.editor3.syntax.ColoringTo;
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
@@ -25,7 +26,7 @@ import com.mammb.code.editor3.syntax.Token;
  * PassThrough Lexer.
  * @author Naotsugu Kobayashi
  */
-public class PassThroughLexer implements Lexer {
+public class PassThroughLexer implements Lexer, ColoringTo {
 
     /** The input string. */
     private LexerSource source;
@@ -74,8 +75,8 @@ public class PassThroughLexer implements Lexer {
     }
 
     @Override
-    public ColoringTo coloringTo() {
-        return type -> null;
+    public Coloring apply(int type) {
+        return null;
     }
 
 }

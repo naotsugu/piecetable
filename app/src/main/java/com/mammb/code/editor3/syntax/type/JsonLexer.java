@@ -26,10 +26,14 @@ import com.mammb.code.editor3.syntax.Token;
  * Lexer.
  * @author Naotsugu Kobayashi
  */
-public class JsonLexer implements Lexer {
+public class JsonLexer implements Lexer, ColoringTo {
 
     /** Token type. */
-    public enum TokenType {ANY, EMPTY, SP, EOL, TEXT, NUMBER, LITERAL;}
+    protected interface Type extends TokenType {
+        int TEXT = TokenType.serial.getAndIncrement();
+        int NUMBER = TokenType.serial.getAndIncrement();
+        int LITERAL = TokenType.serial.getAndIncrement();
+    }
 
     /** The input string. */
     private LexerSource source;
@@ -72,19 +76,19 @@ public class JsonLexer implements Lexer {
     @Override
     public Token nextToken() {
 
-        if (source == null) return new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
+        if (source == null) return new Token(Type.EMPTY, ScopeType.NEUTRAL, 0, 0);
 
         char ch = source.readChar();
         return switch (ch) {
-            case ' ', '\t' -> new Token(TokenType.SP.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+            case ' ', '\t' -> new Token(Type.SP, ScopeType.NEUTRAL, source.position(), 1);
             case '\n', '\r' -> lineEnd(source);
             case '"' -> readString(source);
             case 't' -> readTrue(source);
             case 'f' -> readFalse(source);
             case 'n' -> readNull(source);
             case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' -> readNumber(source);
-            case 0 -> new Token(TokenType.EMPTY.ordinal(), ScopeType.NEUTRAL, 0, 0);
-            default -> new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+            case 0 -> new Token(Type.EMPTY, ScopeType.NEUTRAL, 0, 0);
+            default -> new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
         };
     }
 
@@ -96,7 +100,7 @@ public class JsonLexer implements Lexer {
             char ch = source.peekChar();
             if (ch < ' ' || (prev != '\\' && ch == '"')) {
                 source.commitPeek();
-                return new Token(TokenType.TEXT.ordinal(), ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
+                return new Token(Type.TEXT, ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
             }
             prev = ch;
         }
@@ -112,7 +116,7 @@ public class JsonLexer implements Lexer {
             ch = source.peekChar();
             if (ch < '0' || ch > '9') {
                 source.rollbackPeek();
-                return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, pos, 1);
+                return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
             }
         }
 
@@ -132,7 +136,7 @@ public class JsonLexer implements Lexer {
             } while (ch >= '0' && ch <= '9');
             if (count == 1) {
                 source.rollbackPeek();
-                return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, pos, 1);
+                return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
             }
         }
 
@@ -147,11 +151,11 @@ public class JsonLexer implements Lexer {
             }
             if (count == 0) {
                 source.rollbackPeek();
-                return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, pos, 1);
+                return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
             }
         }
         source.commitPeekBefore();
-        return new Token(TokenType.NUMBER.ordinal(), ScopeType.NEUTRAL, pos, source.position() - pos);
+        return new Token(Type.NUMBER, ScopeType.NEUTRAL, pos, source.position() - pos);
     }
 
 
@@ -160,10 +164,10 @@ public class JsonLexer implements Lexer {
             source.peekChar() == 'u' &&
             source.peekChar() == 'e') {
             source.commitPeek();
-            return new Token(TokenType.LITERAL.ordinal(), ScopeType.NEUTRAL, source.position() - 4, 4);
+            return new Token(Type.LITERAL, ScopeType.NEUTRAL, source.position() - 4, 4);
         }
         source.rollbackPeek();
-        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+        return new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
     }
 
 
@@ -173,10 +177,10 @@ public class JsonLexer implements Lexer {
             source.peekChar() == 's' &&
             source.peekChar() == 'e') {
             source.commitPeek();
-            return new Token(TokenType.LITERAL.ordinal(), ScopeType.NEUTRAL, source.position() - 5, 5);
+            return new Token(Type.LITERAL, ScopeType.NEUTRAL, source.position() - 5, 5);
         }
         source.rollbackPeek();
-        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+        return new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
     }
 
 
@@ -185,10 +189,10 @@ public class JsonLexer implements Lexer {
             source.peekChar() == 'l' &&
             source.peekChar() == 'l') {
             source.commitPeek();
-            return new Token(TokenType.LITERAL.ordinal(), ScopeType.NEUTRAL, source.position() - 4, 4);
+            return new Token(Type.LITERAL, ScopeType.NEUTRAL, source.position() - 4, 4);
         }
         source.rollbackPeek();
-        return new Token(TokenType.ANY.ordinal(), ScopeType.NEUTRAL, source.position(), 1);
+        return new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
     }
 
 
@@ -197,19 +201,18 @@ public class JsonLexer implements Lexer {
         if (source.currentChar() == '\r' && ch == '\n' ||
             source.currentChar() == '\n' && ch == '\r') {
             source.commitPeek();
-            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 2);
+            return new Token(Type.EOL, ScopeType.INLINE_END, source.position(), 2);
         } else {
-            return new Token(TokenType.EOL.ordinal(), ScopeType.INLINE_END, source.position(), 1);
+            return new Token(Type.EOL, ScopeType.INLINE_END, source.position(), 1);
         }
     }
 
 
     @Override
-    public ColoringTo coloringTo() {
-        return type ->
-            (type == TokenType.TEXT.ordinal()) ? Coloring.DarkGreen :
-            (type == TokenType.NUMBER.ordinal()) ? Coloring.DarkSkyBlue :
-            (type == TokenType.LITERAL.ordinal()) ? Coloring.DarkOrange : null;
+    public Coloring apply(int type) {
+        return (type == Type.TEXT) ? Coloring.DarkGreen :
+               (type == Type.NUMBER) ? Coloring.DarkSkyBlue :
+               (type == Type.LITERAL) ? Coloring.DarkOrange : null;
     }
 
 }

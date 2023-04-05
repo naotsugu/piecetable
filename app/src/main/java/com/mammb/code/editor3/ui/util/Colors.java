@@ -31,7 +31,7 @@ public class Colors {
 
     public static final Color background = Color.web("#2B2B2B");
 
-    public static final Color foreground = Color.web("#DDDDDD");
+    public static final Color foreground = Color.web("#A9B7C6");
 
     public static final Color foregroundModest = Color.web("#939ea9");
 

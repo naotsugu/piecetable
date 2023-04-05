@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor3.syntax;
+package com.mammb.code.editor3.syntax.type;
 
-import com.mammb.code.editor3.model.Coloring;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * ColoringTo.
- * Type to Coloring mapper function.
+ * Lexer.
  * @author Naotsugu Kobayashi
  */
-public interface ColoringTo {
-
-    /**
-     * Empty.
-     */
-    ColoringTo empty = type -> null;
-
-    /**
-     * Get the coloring from the type.
-     * @param type the type
-     * @return the coloring
-     */
-    Coloring apply(int type);
+public interface TokenType {
+    AtomicInteger serial = new AtomicInteger(0);
+    int ANY = serial.getAndIncrement();
+    int EMPTY = serial.getAndIncrement();
+    int SP = serial.getAndIncrement();
+    int EOL = serial.getAndIncrement();
 }
+
