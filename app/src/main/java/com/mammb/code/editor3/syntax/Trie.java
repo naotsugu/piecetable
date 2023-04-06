@@ -64,12 +64,22 @@ public class Trie {
     }
 
 
+    /**
+     * Gets whether the specified word matches.
+     * @param word the words to be inspected
+     * @return {@code true}, if the specified word matches
+     */
     public boolean match(String word) {
         TrieNode node = searchPrefix(word);
         return node != null && node.isEndOfWord();
     }
 
 
+    /**
+     * Gets whether the specified word left-hand matches.
+     * @param prefix the text to be inspected
+     * @return {@code true}, if the specified word left-hand matches
+     */
     public boolean startsWith(String prefix) {
         return searchPrefix(prefix) != null;
     }
@@ -88,6 +98,7 @@ public class Trie {
         }
         return node;
     }
+
 
     public List<String> suggestion(String word) {
         TrieNode node = root;

@@ -46,6 +46,10 @@ public class LexerSourceUtf16 implements LexerSource {
     private int length = -1;
 
 
+    /**
+     * Constructor.
+     * @param input the source of stream
+     */
     private LexerSourceUtf16(InputStream input) {
         this.input = input.markSupported() ? input : new BufferedInputStream(input);
         try {
@@ -68,6 +72,11 @@ public class LexerSourceUtf16 implements LexerSource {
     }
 
 
+    /**
+     * Create the new lexer source.
+     * @param input the source of stream
+     * @return the new lexer source
+     */
     public static LexerSource of(InputStream input) {
         return new LexerSourceUtf16(input);
     }
@@ -195,6 +204,7 @@ public class LexerSourceUtf16 implements LexerSource {
             throw new RuntimeException(e);
         }
     }
+
 
     public char bytesToChar(byte[] b) {
         if (b.length != 2) {

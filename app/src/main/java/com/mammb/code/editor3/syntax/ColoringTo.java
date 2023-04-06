@@ -24,9 +24,7 @@ import com.mammb.code.editor3.model.Coloring;
  */
 public interface ColoringTo {
 
-    /**
-     * Empty.
-     */
+    /** The empty ColoringTo. */
     ColoringTo empty = type -> null;
 
     /**

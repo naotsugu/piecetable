@@ -23,30 +23,45 @@ import java.util.*;
  */
 class TrieNode {
 
+    /** The parent node. */
     private final TrieNode parent;
+
+    /** The children. */
     private final Map<Integer, TrieNode> children;
+
+    /** The marker of end of word. */
     private boolean endOfWord;
 
+
+    /**
+     * Constructor.
+     * @param parent the parent node
+     */
     TrieNode(TrieNode parent) {
         this.parent = parent;
         this.children = new HashMap<>();
     }
 
+
     TrieNode createIfAbsent(Integer key) {
         return children.computeIfAbsent(key, k -> new TrieNode(this));
     }
+
 
     boolean contains(int codePoint) {
         return children.containsKey(codePoint);
     }
 
+
     TrieNode get(int codePoint) {
         return children.get(codePoint);
     }
 
+
     void put(int codePoint, TrieNode node) {
         children.put(codePoint, node);
     }
+
 
     void removeIfEmpty() {
         if (parent == null) {
@@ -57,6 +72,7 @@ class TrieNode {
             parent.removeIfEmpty();
         }
     }
+
 
     private Integer key() {
         if (parent == null) {
@@ -69,11 +85,16 @@ class TrieNode {
             .orElse(null);
     }
 
+
     List<String> childKeys() {
         return children.keySet().stream().map(Character::toString).toList();
     }
 
+
     void setEndOfWord() { endOfWord = true; }
+
     void setEndOfWord(boolean endOfWord) { this.endOfWord = endOfWord; }
+
     boolean isEndOfWord() { return endOfWord; }
+
 }
