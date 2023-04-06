@@ -27,14 +27,32 @@ import java.nio.channels.SeekableByteChannel;
  */
 public class ChannelBuffer implements Buffer, Closeable {
 
-    private static final short PILE_PITCH = 256;
+    /** The default size of pitch. */
+    private static final short DEFAULT_PITCH = 256;
 
+    /** The channel array. */
     private final ChannelArray ch;
+
+    /** The length of code point counts. */
     private final int length;
+
+    /** The size of pitch. */
     private final short pilePitch;
+
+    /** The piles. */
     private final int[] piles;
+
+    /** The lru cache. */
     private final LruCache cache;
 
+
+    /**
+     * Constructor.
+     * @param ch the ChannelArray
+     * @param length the length of code point counts
+     * @param pilePitch the size of pitch
+     * @param piles the piles
+     */
     private ChannelBuffer(ChannelArray ch, int length, short pilePitch, int[] piles) {
         this.ch = ch;
         this.length = length;
@@ -43,11 +61,24 @@ public class ChannelBuffer implements Buffer, Closeable {
         this.cache = LruCache.of();
     }
 
-    public static ChannelBuffer of(SeekableByteChannel channel) {
-        return of(channel, PILE_PITCH);
+
+    /**
+     * Create a new Buffer.
+     * @param channel the byte channel
+     * @return a created buffer
+     */
+    public static Buffer of(SeekableByteChannel channel) {
+        return of(channel, DEFAULT_PITCH);
     }
 
-    static ChannelBuffer of(SeekableByteChannel channel, short pitch) {
+
+    /**
+     * Create a new Buffer.
+     * @param channel the byte channel
+     * @param pitch the pitch
+     * @return a created buffer
+     */
+    static Buffer of(SeekableByteChannel channel, short pitch) {
         var ch = ChannelArray.of(channel);
         var charCount = 0;
         var piles = IntArray.of();
@@ -60,10 +91,12 @@ public class ChannelBuffer implements Buffer, Closeable {
         return new ChannelBuffer(ch, charCount, pitch, piles.get());
     }
 
+
     @Override
     public int length() {
         return length;
     }
+
 
     @Override
     public byte[] charAt(int index) {
@@ -71,20 +104,24 @@ public class ChannelBuffer implements Buffer, Closeable {
         return Utf8.asCharBytes(ch.get(rawIndex, Math.min(rawIndex + 4, ch.length())), 0);
     }
 
+
     @Override
     public byte[] bytes(int rawStart, int rawEnd) {
         return ch.get(rawStart, rawEnd);
     }
+
 
     @Override
     public byte[] bytes() {
         return ch.get(0, ch.length());
     }
 
+
     @Override
     public Buffer subBuffer(int start, int end) {
         return ReadBuffer.of(ch.get(asIndex(start), asIndex(end)));
     }
+
 
     @Override
     public int asIndex(int index) {
@@ -103,6 +140,7 @@ public class ChannelBuffer implements Buffer, Closeable {
         cache.put(index, i);
         return i;
     }
+
 
     @Override
     public void close() throws IOException {

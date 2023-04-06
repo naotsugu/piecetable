@@ -20,7 +20,6 @@ import com.mammb.code.editor3.lang.EventListener;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Objects;
 
 /**
  * TextSource.

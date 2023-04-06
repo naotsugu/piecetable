@@ -16,8 +16,6 @@
 package com.mammb.code.editor3.model;
 
 import com.mammb.code.editor3.lang.Strings;
-import com.mammb.code.editor3.model.Content;
-import com.mammb.code.editor3.model.Edit;
 import com.mammb.code.piecetable.PieceTable;
 import java.nio.file.Path;
 import java.util.function.Predicate;
@@ -66,44 +64,53 @@ public class ContentImpl implements Content {
         this.rowSize = pt.count(bytes -> bytes[0] == '\n') + 1;
     }
 
+
     @Override
     public Path path() {
         return path;
     }
+
 
     @Override
     public int length() {
         return pt.length();
     }
 
+
     @Override
     public int rowSize() { return rowSize; }
+
 
     @Override
     public byte[] bytes(int startPos, Predicate<byte[]> until) {
         return pt.bytes(startPos, until);
     }
 
+
     @Override
     public int count(int startPos, Predicate<byte[]> until) {
         return pt.count(startPos, until);
     }
+
 
     @Override
     public byte[] bytesBefore(int startPos, Predicate<byte[]> until) {
         return pt.bytesBefore(startPos, until);
     }
 
+
     @Override
     public void save() {
         pt.write(path);
     }
+
 
     @Override
     public void saveAs(Path path) {
         pt.write(path);
         this.path = path;
     }
+
 
     @Override
     public void handle(Edit edit) {

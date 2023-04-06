@@ -124,25 +124,30 @@ public class GrowBuffer implements AppendBuffer {
         cache.clear();
     }
 
+
     @Override
     public Buffer subBuffer(int start, int end) {
         return ReadBuffer.of(Arrays.copyOfRange(elements.get(), asIndex(start), asIndex(end)));
     }
+
 
     @Override
     public byte[] bytes(int rawStart, int rawEnd) {
         return elements.get(rawStart, rawEnd);
     }
 
+
     @Override
     public byte[] bytes() {
         return elements.get();
     }
 
+
     @Override
     public byte[] charAt(int index) {
         return Utf8.asCharBytes(elements.get(), asIndex(index));
     }
+
 
     @Override
     public int asIndex(int index) {
@@ -162,15 +167,18 @@ public class GrowBuffer implements AppendBuffer {
         return i;
     }
 
+
     @Override
     public int length() {
         return length;
     }
 
+
     @Override
     public String toString() {
         return new String(bytes(0, elements.length()), StandardCharsets.UTF_8);
     }
+
 
     String dump() {
         return "elements: %s\npiles: %s".formatted(elements, piles);

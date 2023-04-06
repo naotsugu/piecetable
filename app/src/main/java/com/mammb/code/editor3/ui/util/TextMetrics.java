@@ -182,8 +182,10 @@ public class TextMetrics {
      */
     private String text(TextFlow flow) {
         return flow.getChildren().stream()
-            .filter(Text.class::isInstance).map(Text.class::cast)
-            .map(Text::getText).collect(Collectors.joining());
+            .filter(Text.class::isInstance)
+            .map(Text.class::cast)
+            .map(Text::getText)
+            .collect(Collectors.joining());
     }
 
 }
