@@ -126,8 +126,8 @@ public class Pointing extends Region {
 
     /**
      * Move the caret to the specified point.
-     * @param x point of x
-     * @param y point of y
+     * @param x point of x on scene
+     * @param y point of y on scene
      */
     public void caretAt(double x, double y) {
         Point2D p = sceneToLocal(new Point2D(x, y));
@@ -135,6 +135,20 @@ public class Pointing extends Region {
     }
 
 
+    /**
+     * Move the caret to the specified point.
+     * @param y point of y on local
+     */
+    public void caretRawAt(double y) {
+        caret.moveToPointRow(y);
+    }
+
+
+    /**
+     * Move the caret to the specified point on dragged.
+     * @param x point of x on local
+     * @param y point of y on local
+     */
     public void dragged(double x, double y) {
         Point2D p = sceneToLocal(new Point2D(x, y));
         caret.at(p.getX(), p.getY());

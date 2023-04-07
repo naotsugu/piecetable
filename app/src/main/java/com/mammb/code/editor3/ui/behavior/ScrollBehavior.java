@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
-import com.mammb.code.editor3.model.OffsetPoint;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.ScreenBound;
@@ -112,6 +111,10 @@ public class ScrollBehavior {
      * Scroll down to the next page.
      */
     public void pageDown() {
+
+        double caretY = pointing.caretTop();
+        pointing.clearSelection();
+
         int rows = textFlow.rowSize();
         if (rows == textFlow.lineSize()) {
             // if the text is not wrapped
@@ -119,6 +122,7 @@ public class ScrollBehavior {
         } else {
             for (int i = 1; i < rows; i++) scrollNext();
         }
+        pointing.caretRawAt(caretY);
     }
 
 
@@ -126,6 +130,10 @@ public class ScrollBehavior {
      * Scroll up to the previous page.
      */
     public void pageUp() {
+
+        double caretY = pointing.caretTop();
+        pointing.clearSelection();
+
         int rows = textFlow.rowSize();
         if (rows == textFlow.lineSize()) {
             // if the text is not wrapping
@@ -133,6 +141,7 @@ public class ScrollBehavior {
         } else {
             for (int i = 1; i < rows; i++) scrollPrev();
         }
+        pointing.caretRawAt(caretY);
     }
 
 

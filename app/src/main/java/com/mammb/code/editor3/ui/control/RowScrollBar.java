@@ -63,6 +63,10 @@ public class RowScrollBar extends StackPane {
         initListener();
     }
 
+
+    /**
+     * Initialize listener.
+     */
     private void initListener() {
         max.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbHeight()));
         visibleAmount.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbHeight()));

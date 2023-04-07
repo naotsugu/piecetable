@@ -64,6 +64,9 @@ public class ColScrollBar extends StackPane {
     }
 
 
+    /**
+     * Initialize listener.
+     */
     private void initListener() {
         max.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbWidth()));
         visibleAmount.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbWidth()));

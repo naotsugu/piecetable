@@ -202,12 +202,25 @@ public class Caret extends Path {
      */
     public int offset() { return offset; }
 
+
+    /**
+     * Get the physical caret position x.
+     * @return the physical caret position x
+     */
     public double physicalX() { return physicalX; }
 
-    public double physicalY() { return physicalY; }
 
+    /**
+     * Get the height of caret.
+     * @return the height of caret
+     */
     public double height() { return height; }
 
+
+    /**
+     * Get the caret bottom position y.
+     * @return the caret bottom position y
+     */
     public double bottom() { return physicalY + height; }
 
     // -- private -------------------------------------------------------------
@@ -272,14 +285,14 @@ public class Caret extends Path {
     }
 
 
-    private int moveToPoint(double x, double y) {
+    public int moveToPoint(double x, double y) {
         offset = text.insertionIndexAt(x, y);
         setShape(text.caretShape(offset, true));
         return offset;
     }
 
 
-    private int moveToPointRow(double y) {
+    public  int moveToPointRow(double y) {
         int indexAt = text.insertionIndexAt(logicalX, y);
         PathElement[] pathElements = text.caretShape(indexAt, true);
         if (PathElements.getY(pathElements[0]) != physicalY) {

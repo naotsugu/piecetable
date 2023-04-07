@@ -19,7 +19,6 @@ import com.mammb.code.piecetable.EditType;
 import com.mammb.code.piecetable.Edited;
 import com.mammb.code.piecetable.array.ByteArray;
 import com.mammb.code.piecetable.buffer.Buffer;
-
 import java.util.Arrays;
 import java.util.Objects;
 

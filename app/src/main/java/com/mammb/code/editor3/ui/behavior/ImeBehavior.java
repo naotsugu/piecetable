@@ -43,6 +43,7 @@ public class ImeBehavior {
     /** The pending text. */
     private Text pendingText = null;
 
+    /** the x positions before ime conversion starts. */
     private Double originalTranslateX = null;
 
 
@@ -59,25 +60,33 @@ public class ImeBehavior {
     }
 
 
+    /**
+     * Apply the committed text.
+     * @param text the committed text
+     */
     public void committed(String text) {
         exit();
         editBehavior.input(text);
     }
 
 
+    /**
+     * Apply the composed text in the process of conversion..
+     * @param text the composed text
+     */
     public void composed(String text) {
-
         if (text == null || text.isEmpty()) return;
-
         if (!doing()) {
             on(pointing.caretOffset());
         }
         pendingText.setText(text);
         pointing.slipCaret(originalTranslateX + Texts.width(pendingText.getText(), pendingText.getFont()));
-
     }
 
 
+    /**
+     * Exit ime.
+     */
     public void exit() {
         if (pendingText != null) {
             flow.getChildren().remove(pendingText);
@@ -138,6 +147,10 @@ public class ImeBehavior {
     }
 
 
+    /**
+     * Get the palette location.
+     * @return the palette location
+     */
     public Point2D paletteLocation() {
         return pointing.localToScreen(
             pointing.caretX() - pointing.getTranslateX(),

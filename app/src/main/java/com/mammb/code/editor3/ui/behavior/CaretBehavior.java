@@ -19,7 +19,6 @@ import com.mammb.code.editor3.model.OffsetPoint;
 import com.mammb.code.editor3.ui.Pointing;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-
 import java.util.Objects;
 
 /**
@@ -155,9 +154,9 @@ public class CaretBehavior {
 
 
     /**
-     *
-     * @param x position x
-     * @param y position y
+     * Move the caret to the specified point on dragged.
+     * @param x point of x on local
+     * @param y point of y on local
      */
     public void dragged(double x, double y) {
         pointing.dragged(x, y);
