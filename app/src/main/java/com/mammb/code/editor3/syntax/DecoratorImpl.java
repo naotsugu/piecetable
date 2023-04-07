@@ -121,6 +121,10 @@ public class DecoratorImpl implements Decorator {
             cutup.add(token.position(), token.position() + token.length(), token.type());
         }
 
+        if (prevType > 0) {
+            cutup.add(beginIndex, string.length(), prevType);
+        }
+
         return cutup.getList(string);
     }
 
