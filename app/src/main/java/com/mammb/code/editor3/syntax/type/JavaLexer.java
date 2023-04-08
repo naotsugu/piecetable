@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
+import com.mammb.code.editor3.lang.Numbers;
 import com.mammb.code.editor3.model.Coloring;
 import com.mammb.code.editor3.syntax.ColoringTo;
 import com.mammb.code.editor3.syntax.Lexer;
@@ -34,6 +35,7 @@ public class JavaLexer implements Lexer, ColoringTo {
     protected interface Type extends TokenType {
         int KEYWORD = TokenType.serial.getAndIncrement();
         int TEXT = TokenType.serial.getAndIncrement();
+        int NUMBER = TokenType.serial.getAndIncrement();
         int LINE_COMMENT = TokenType.serial.getAndIncrement();
         int COMMENT = TokenType.serial.getAndIncrement();
     }
@@ -91,6 +93,7 @@ public class JavaLexer implements Lexer, ColoringTo {
             case '/' -> readComment(source);
             case '*'  -> readCommentBlockClosed(source);
             case '"'  -> readText(source);
+            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' -> readNumber(source);
             case 0 -> new Token(Type.EMPTY, ScopeType.NEUTRAL, source.position(), 0);
             default -> Character.isJavaIdentifierStart(ch)
                 ? readIdentifier(source)
@@ -172,6 +175,32 @@ public class JavaLexer implements Lexer, ColoringTo {
 
 
     /**
+     * Read the number.
+     * @param source the lexer source
+     * @return the token
+     */
+    private Token readNumber(LexerSource source) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(source.currentChar());
+        int pos = source.position();
+        for (;;) {
+            char ch = source.peekChar();
+            if (Numbers.isJavaNumberPart(ch)) {
+                sb.append(ch);
+            } else {
+                break;
+            }
+        }
+        if (Numbers.isJavaNumber(sb.toString())) {
+            source.commitPeekBefore();
+            return new Token(Type.NUMBER, ScopeType.NEUTRAL, pos, sb.length());
+        } else {
+            return any(source);
+        }
+    }
+
+
+    /**
      * Read identifier.
      * @param source the lexer source
      * @return the token
@@ -229,7 +258,8 @@ public class JavaLexer implements Lexer, ColoringTo {
 
     @Override
     public Coloring apply(int type) {
-        return (type == Type.COMMENT) ? Coloring.DarkGreen :
+        return (type == Type.NUMBER) ? Coloring.DarkSkyBlue :
+               (type == Type.COMMENT) ? Coloring.DarkGreen :
                (type == Type.LINE_COMMENT) ? Coloring.DarkGray :
                (type == Type.KEYWORD) ? Coloring.DarkOrange : null;
     }
