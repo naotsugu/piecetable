@@ -17,15 +17,21 @@ package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.util.Colors;
+import com.mammb.code.editor3.ui.util.Keys;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import java.lang.System.Logger;
+import java.lang.System.Logger.*;
 
 /**
  * EditorPane.
  * @author Naotsugu Kobayashi
  */
 public class EditorPane extends BorderPane {
+
+    /** The logger. */
+    private static final Logger log = System.getLogger(EditorPane.class.getName());
 
     /** The stage. */
     private final Stage stage;
@@ -42,6 +48,7 @@ public class EditorPane extends BorderPane {
         this.textPane = new TextPane(stage, new TextModel());
         setCenter(textPane);
         initGarter();
+        setOnKeyPressed(e -> { if (Keys.SC_N.match(e)) newPane(); });
     }
 
 
@@ -65,6 +72,18 @@ public class EditorPane extends BorderPane {
         scene.setFill(Colors.background);
         stage.setScene(scene);
         stage.show();
+    }
+
+
+    /**
+     * Create the new pane.
+     */
+    public void newPane() {
+        Stage newStage = new Stage();
+        log.log(Level.INFO, "invoked newPane[{}]", newStage);
+        newStage.setX(stage.getX() + 15);
+        newStage.setY(stage.getY() + 15);
+        new EditorPane(newStage).show();
     }
 
 }
