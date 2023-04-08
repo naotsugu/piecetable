@@ -30,9 +30,12 @@ public class JsonLexer implements Lexer, ColoringTo {
 
     /** Token type. */
     protected interface Type extends TokenType {
+        int KEY = TokenType.serial.getAndIncrement();
         int TEXT = TokenType.serial.getAndIncrement();
         int NUMBER = TokenType.serial.getAndIncrement();
         int LITERAL = TokenType.serial.getAndIncrement();
+        int LINE_COMMENT = TokenType.serial.getAndIncrement();
+        int COMMENT = TokenType.serial.getAndIncrement();
     }
 
     /** The input string. */
@@ -82,6 +85,7 @@ public class JsonLexer implements Lexer, ColoringTo {
         return switch (ch) {
             case ' ', '\t' -> new Token(Type.SP, ScopeType.NEUTRAL, source.position(), 1);
             case '\n', '\r' -> lineEnd(source);
+            case '/' -> readComment(source);
             case '"' -> readString(source);
             case 't' -> readTrue(source);
             case 'f' -> readFalse(source);
@@ -93,20 +97,54 @@ public class JsonLexer implements Lexer, ColoringTo {
     }
 
 
+    /**
+     * Read comment.
+     * @param source the lexer source
+     * @return the token
+     */
+    private Token readComment(LexerSource source) {
+        int pos = source.position();
+        char ch = source.peekChar();
+        if (ch == '/') {
+            source.commitPeek();
+            return new Token(Type.LINE_COMMENT, ScopeType.INLINE_START, pos, 2);
+        } else if (ch == '*') {
+            source.commitPeek();
+            return new Token(JavaLexer.Type.COMMENT, ScopeType.BLOCK_START, pos, 2);
+        } else {
+            return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
+        }
+    }
+
+
+    /**
+     * Read the string.
+     * @param source the lexer source
+     * @return the token
+     */
     private Token readString(LexerSource source) {
         int pos = source.position();
         char prev = 0;
-        for (; ; ) {
+        for (;;) {
             char ch = source.peekChar();
             if (ch < ' ' || (prev != '\\' && ch == '"')) {
                 source.commitPeek();
-                return new Token(Type.TEXT, ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
+                if (peekNextChar(source) == ':') {
+                    return new Token(Type.KEY, ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
+                } else {
+                    return new Token(Type.TEXT, ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
+                }
             }
             prev = ch;
         }
     }
 
 
+    /**
+     * Read the number.
+     * @param source the lexer source
+     * @return the token
+     */
     private Token readNumber(LexerSource source) {
 
         int pos = source.position();
@@ -159,6 +197,11 @@ public class JsonLexer implements Lexer, ColoringTo {
     }
 
 
+    /**
+     * Read true.
+     * @param source the lexer source
+     * @return the token
+     */
     private static Token readTrue(LexerSource source) {
         if (source.peekChar() == 'r' &&
             source.peekChar() == 'u' &&
@@ -171,6 +214,11 @@ public class JsonLexer implements Lexer, ColoringTo {
     }
 
 
+    /**
+     * Read false.
+     * @param source the lexer source
+     * @return the token
+     */
     private static Token readFalse(LexerSource source) {
         if (source.peekChar() == 'a' &&
             source.peekChar() == 'l' &&
@@ -184,6 +232,11 @@ public class JsonLexer implements Lexer, ColoringTo {
     }
 
 
+    /**
+     * Read null.
+     * @param source the lexer source
+     * @return the token
+     */
     private static Token readNull(LexerSource source) {
         if (source.peekChar() == 'u' &&
             source.peekChar() == 'l' &&
@@ -196,6 +249,11 @@ public class JsonLexer implements Lexer, ColoringTo {
     }
 
 
+    /**
+     * Read line end.
+     * @param source the lexer source
+     * @return the token
+     */
     private static Token lineEnd(LexerSource source) {
         char ch = source.peekChar();
         if (source.currentChar() == '\r' && ch == '\n' ||
@@ -208,11 +266,31 @@ public class JsonLexer implements Lexer, ColoringTo {
     }
 
 
+    /**
+     * Peek the next char.
+     * @param source the lexer source
+     * @return the next char
+     */
+    private char peekNextChar(LexerSource source) {
+        char ch;
+        for (;;) {
+            ch = source.peekChar();
+            if (ch == 0) break;
+            if (!Character.isWhitespace(ch)) break;
+        }
+        source.rollbackPeek();
+        return ch;
+    }
+
+
     @Override
     public Coloring apply(int type) {
-        return (type == Type.TEXT) ? Coloring.DarkGreen :
+        return (type == Type.KEY) ? Coloring.DarkYellow :
+               (type == Type.TEXT) ? Coloring.DarkGreen :
                (type == Type.NUMBER) ? Coloring.DarkSkyBlue :
-               (type == Type.LITERAL) ? Coloring.DarkOrange : null;
+               (type == Type.LITERAL) ? Coloring.DarkOrange :
+               (type == Type.COMMENT) ? Coloring.DarkGray :
+               (type == Type.LINE_COMMENT) ? Coloring.DarkGray : null;
     }
 
 }
