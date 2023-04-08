@@ -99,10 +99,20 @@ public class ColScrollBar extends StackPane {
     }
 
 
+    /**
+     * Set the layout width.
+     * @param width the layout width
+     */
     public void setLayoutWidth(double width) {
         setWidth(width);
     }
 
+
+    /**
+     * Clamp the value.
+     * @param value the value
+     * @return the clamped value
+     */
     private double clamp(double value) {
         return Math.min(Math.max(min.get(), value), max.get());
     }

@@ -73,10 +73,6 @@ public class RowScrollBar extends StackPane {
         value.addListener(this::handleValueChanged);
     }
 
-    public void setLayoutHeight(double height) {
-        setHeight(height);
-    }
-
 
     /**
      * Compute thumb height.
@@ -86,8 +82,9 @@ public class RowScrollBar extends StackPane {
         int length = visibleAmount.get();
         double thumbHeight = getHeight() * length / Math.max(max.get() - min.get(), length);
         setVisible(thumbHeight != getHeight());
-        return thumbHeight;
+        return Math.max(thumbHeight, WIDTH);
     }
+
 
     /**
      * The value change handler.
@@ -101,6 +98,21 @@ public class RowScrollBar extends StackPane {
         thumb.setY(y);
     }
 
+
+    /**
+     * Set the layout height.
+     * @param height the layout height
+     */
+    public void setLayoutHeight(double height) {
+        setHeight(height);
+    }
+
+
+    /**
+     * Clamp the value.
+     * @param value the value
+     * @return the clamped value
+     */
     private int clamp(int value) {
         return Math.min(Math.max(min.get(), value), max.get());
     }
