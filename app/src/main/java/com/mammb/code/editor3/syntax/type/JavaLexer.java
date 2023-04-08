@@ -93,7 +93,7 @@ public class JavaLexer implements Lexer, ColoringTo {
             case '/' -> readComment(source);
             case '*'  -> readCommentBlockClosed(source);
             case '"'  -> readText(source);
-            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' -> readNumber(source);
+            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-' -> readNumber(source);
             case 0 -> new Token(Type.EMPTY, ScopeType.NEUTRAL, source.position(), 0);
             default -> Character.isJavaIdentifierStart(ch)
                 ? readIdentifier(source)
