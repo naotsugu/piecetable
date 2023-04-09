@@ -29,21 +29,36 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Colors {
 
+    /** The background color. */
     public static final Color background = Color.web("#2B2B2B");
 
+    /** The foreground color. */
     public static final Color foreground = Color.web("#A9B7C6");
 
+    /** The foreground modest color. */
     public static final Color foregroundModest = Color.web("#939ea9");
 
+    /** The color of panel. */
     public static final Color panel = Color.web("#313335");
 
-
+    /** The color of scroll track. */
     public static final Color scrollTrack = Color.web("#626465", 0.2);
+
+    /** The color of thumb. */
     public static final Paint thumb = Color.web("#626465", 0.5);
+
+    /** The color of active thumb. */
     public static final Paint thumbActive = Color.web("#828485", 0.9);
 
+    /** The cache of color. */
     public static final Map<Coloring, Color> map = new ConcurrentHashMap<>();
 
+
+    /**
+     * Get the color by the specified coloring.
+     * @param c the specified coloring
+     * @return the color
+     */
     public static Color of(Coloring c) {
         return Objects.isNull(c)
             ? foreground

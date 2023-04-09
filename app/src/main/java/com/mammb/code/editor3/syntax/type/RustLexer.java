@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
-import com.mammb.code.editor3.lang.Numbers;
 import com.mammb.code.editor3.model.Coloring;
 import com.mammb.code.editor3.syntax.ColoringTo;
 import com.mammb.code.editor3.syntax.Lexer;
@@ -26,10 +25,10 @@ import com.mammb.code.editor3.syntax.Trie;
 import java.util.stream.Stream;
 
 /**
- * JavaLexer.
+ * Lexer.
  * @author Naotsugu Kobayashi
  */
-public class JavaLexer implements Lexer, ColoringTo {
+public class RustLexer implements Lexer, ColoringTo {
 
     /** Token type. */
     protected interface Type extends TokenType {
@@ -38,6 +37,7 @@ public class JavaLexer implements Lexer, ColoringTo {
         int NUMBER = serial.getAndIncrement();
         int LINE_COMMENT = serial.getAndIncrement();
         int COMMENT = serial.getAndIncrement();
+        int DOC_COMMENT = serial.getAndIncrement();
     }
 
     /** The syntax keywords. */
@@ -51,18 +51,8 @@ public class JavaLexer implements Lexer, ColoringTo {
      * Constructor.
      * @param source the {@link LexerSource}
      */
-    private JavaLexer(LexerSource source) {
+    private RustLexer(LexerSource source) {
         this.source = source;
-    }
-
-
-    /**
-     * Create a new lexer.
-     * @param source the {@link LexerSource}
-     * @return a lexer
-     */
-    public static Lexer of(LexerSource source) {
-        return new JavaLexer(source);
     }
 
 
@@ -71,7 +61,7 @@ public class JavaLexer implements Lexer, ColoringTo {
      * @return a lexer
      */
     public static Lexer of() {
-        return new JavaLexer(null);
+        return new RustLexer(null);
     }
 
 
@@ -86,17 +76,18 @@ public class JavaLexer implements Lexer, ColoringTo {
 
         if (source == null) return TokenType.empty(null);
 
-        char ch = source.readChar();
+        int ch = source.readChar();
+        if (Character.isHighSurrogate((char) ch)) {
+            ch = Character.toCodePoint((char) ch, source.currentChar());
+        }
         return switch (ch) {
             case ' ', '\t' -> TokenType.whitespace(source);
             case '\n', '\r' -> TokenType.lineEnd(source);
             case '/' -> readComment(source);
             case '*'  -> readCommentBlockClosed(source);
-            case '"'  -> readText(source);
-            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-' -> readNumber(source);
             case 0 -> TokenType.empty(source);
-            default -> Character.isJavaIdentifierStart(ch)
-                ? readIdentifier(source)
+            default -> isIdentifierStart(ch)
+                ? readIdentifier(source, ch)
                 : TokenType.any(source);
         };
     }
@@ -111,8 +102,14 @@ public class JavaLexer implements Lexer, ColoringTo {
         int pos = source.position();
         char ch = source.peekChar();
         if (ch == '/') {
-            source.commitPeek();
-            return new Token(Type.LINE_COMMENT, ScopeType.INLINE_START, pos, 2);
+            char nch = source.peekChar();
+            if (nch == '/' || nch == '!') {
+                source.commitPeek();
+                return new Token(Type.DOC_COMMENT, ScopeType.INLINE_START, pos, 3);
+            } else {
+                source.commitPeek();
+                return new Token(Type.LINE_COMMENT, ScopeType.INLINE_START, pos, 2);
+            }
         } else if (ch == '*') {
             source.commitPeek();
             return new Token(Type.COMMENT, ScopeType.BLOCK_START, pos, 2);
@@ -140,75 +137,15 @@ public class JavaLexer implements Lexer, ColoringTo {
 
 
     /**
-     * Read text.
-     * @param source the lexer source
-     * @return the token
-     */
-    private Token readText(LexerSource source) {
-        if (source.peekChar() == '"' && source.peekChar() == '"') {
-            source.commitPeek();
-            return new Token(Type.TEXT, ScopeType.BLOCK_ANY, source.position() - 3, 3);
-        }
-        source.rollbackPeek();
-        return readString(source);
-    }
-
-
-    /**
-     * Read string.
-     * @param source the lexer source
-     * @return the token
-     */
-    private Token readString(LexerSource source) {
-        int pos = source.position();
-        char prev = 0;
-        for (;;) {
-            char ch = source.peekChar();
-            if (ch < ' ' || (prev != '\\' && ch == '"')) {
-                source.commitPeek();
-                return new Token(Type.TEXT, ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
-            }
-            prev = ch;
-        }
-    }
-
-
-    /**
-     * Read the number.
-     * @param source the lexer source
-     * @return the token
-     */
-    private Token readNumber(LexerSource source) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(source.currentChar());
-        int pos = source.position();
-        for (;;) {
-            char ch = source.peekChar();
-            if (Numbers.isJavaNumberPart(ch)) {
-                sb.append(ch);
-            } else {
-                break;
-            }
-        }
-        if (Numbers.isJavaNumber(sb.toString())) {
-            source.commitPeekBefore();
-            return new Token(Type.NUMBER, ScopeType.NEUTRAL, pos, sb.length());
-        } else {
-            return TokenType.any(source);
-        }
-    }
-
-
-    /**
      * Read identifier.
      * @param source the lexer source
      * @return the token
      */
-    private Token readIdentifier(LexerSource source) {
+    private Token readIdentifier(LexerSource source, int cp) {
 
         int pos = source.position();
         StringBuilder sb = new StringBuilder();
-        sb.append(source.currentChar());
+        sb.append(Character.toChars(cp));
 
         for (;;) {
             char ch = source.peekChar();
@@ -223,18 +160,35 @@ public class JavaLexer implements Lexer, ColoringTo {
             }
             sb.append(source.readChar());
         }
-
     }
 
 
     /**
-     * Determines if the specified character may be part of a Java identifier
-     * as other than the first character.
-     * @param ch the character to be tested
-     * @return {@code true}, if the character may be part of a Java identifier
+     * Determines if the character (Unicode code point) is permissible as the first character in an identifier.
+     * @param cp the character (Unicode code point) to be tested
+     * @return {@code true}, if the character may start an identifier
      */
-    private boolean isIdentifierPart(char ch) {
-        return Character.isJavaIdentifierPart(ch);
+    private boolean isIdentifierStart(int cp) {
+        int type = Character.getType(cp);
+        return (type == Character.UPPERCASE_LETTER || type == Character.LOWERCASE_LETTER ||
+                type == Character.TITLECASE_LETTER || type == Character.MODIFIER_LETTER ||
+                type == Character.OTHER_LETTER ||  type == Character.LETTER_NUMBER);
+    }
+
+
+    /**
+     * Determines if the specified character may be part of a rust identifier
+     * as other than the first character.
+     * @param cp the character to be tested
+     * @return {@code true}, if the character may be part of a rust identifier
+     */
+    private boolean isIdentifierPart(int cp) {
+        int type = Character.getType(cp);
+        return (type == Character.UPPERCASE_LETTER || type == Character.LOWERCASE_LETTER ||
+                type == Character.TITLECASE_LETTER || type == Character.MODIFIER_LETTER ||
+                type == Character.OTHER_LETTER ||  type == Character.LETTER_NUMBER ||
+                type == Character.NON_SPACING_MARK ||  type == Character.COMBINING_SPACING_MARK ||
+                type == Character.DECIMAL_DIGIT_NUMBER || type == Character.CONNECTOR_PUNCTUATION);
     }
 
 
@@ -245,10 +199,10 @@ public class JavaLexer implements Lexer, ColoringTo {
     private static Trie keywords() {
         Trie trie = new Trie();
         Stream.of("""
-        abstract,continue,for,new,switch,assert,default,goto,package,synchronized,boolean,do,if,private,
-        this,break,double,implements,protected,throw,byte,else,import,public,throws,case,enum,instanceof,
-        return,transient,catch,extends,int,short,try,char,final,interface,static,void,class,finally,long,
-        strictfp,volatile,const,float,native,super,while,var,record,sealed,with,yield,to,transitive,uses"""
+            as, break, const, continue, crate, else, enum, extern, false, fn, for, if, impl, in,
+            let, loop, match, mod, move, mut, pub, ref, return, self, Self, static, struct, super,
+            trait, true, type, unsafe, use, where, while, async, await, dyn, try
+            abstract, become, box, do, final, macro, override, priv, typeof, unsized, virtual,yield"""
             .split("[,\\s]")).forEach(trie::put);
         return trie;
     }
@@ -257,8 +211,9 @@ public class JavaLexer implements Lexer, ColoringTo {
     @Override
     public Coloring apply(int type) {
         return (type == Type.NUMBER) ? Coloring.DarkSkyBlue :
-               (type == Type.COMMENT) ? Coloring.DarkGreen :
+               (type == Type.COMMENT) ? Coloring.DarkGray :
                (type == Type.LINE_COMMENT) ? Coloring.DarkGray :
+               (type == Type.DOC_COMMENT) ? Coloring.DarkGreen :
                (type == Type.KEYWORD) ? Coloring.DarkOrange : null;
     }
 

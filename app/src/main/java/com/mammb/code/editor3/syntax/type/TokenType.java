@@ -15,6 +15,10 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
+import com.mammb.code.editor3.syntax.LexerSource;
+import com.mammb.code.editor3.syntax.ScopeType;
+import com.mammb.code.editor3.syntax.Token;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -22,10 +26,68 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Naotsugu Kobayashi
  */
 public interface TokenType {
+
+    /** The number of serial. */
     AtomicInteger serial = new AtomicInteger(0);
+
+    /** The type of any. */
     int ANY = serial.getAndIncrement();
+    /** The type of empty. */
     int EMPTY = serial.getAndIncrement();
+    /** The type of whitespace. */
     int SP = serial.getAndIncrement();
+    /** The type of eol. */
     int EOL = serial.getAndIncrement();
+
+
+    /**
+     * Read line end.
+     * @param source the lexer source
+     * @return the token
+     */
+    static Token lineEnd(LexerSource source) {
+        char ch = source.peekChar();
+        if (source.currentChar() == '\r' && ch == '\n' ||
+            source.currentChar() == '\n' && ch == '\r') {
+            source.commitPeek();
+            return new Token(TokenType.EOL, ScopeType.INLINE_END, source.position(), 2);
+        } else {
+            source.rollbackPeek();
+            return new Token(TokenType.EOL, ScopeType.INLINE_END, source.position(), 1);
+        }
+    }
+
+
+    /**
+     * Get the empty token.
+     * @param source the lexer source
+     * @return the empty token
+     */
+    static Token empty(LexerSource source) {
+        return Objects.isNull(source)
+            ? new Token(TokenType.EMPTY, ScopeType.NEUTRAL, 0, 0)
+            : new Token(TokenType.EMPTY, ScopeType.NEUTRAL, source.position(), 0);
+    }
+
+
+    /**
+     * Get the whitespace token.
+     * @param source the lexer source
+     * @return the whitespace token
+     */
+    static Token whitespace(LexerSource source) {
+        return new Token(TokenType.SP, ScopeType.NEUTRAL, source.position(), 1);
+    }
+
+
+    /**
+     * Get an any token.
+     * @param source the lexer source
+     * @return an any token
+     */
+    static Token any(LexerSource source) {
+        return new Token(TokenType.ANY, ScopeType.NEUTRAL, source.position(), 1);
+    }
+
 }
 

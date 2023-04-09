@@ -84,7 +84,7 @@ public class Caret extends Path {
     public void clear() {
         offset = 0;
         moveToOffset();
-        logicalX = physicalX;
+        syncLogicalToPhysical();
     }
 
 
@@ -106,6 +106,10 @@ public class Caret extends Path {
     }
 
 
+    /**
+     * Shift caret offset.
+     * @param delta the shifting delta
+     */
     public void shiftOffset(int delta) {
         if (delta == 0) return;
         offset += delta;
@@ -145,7 +149,7 @@ public class Caret extends Path {
      */
     public void end() {
         moveToPoint(Double.MAX_VALUE, physicalY);
-        logicalX = physicalX;
+        syncLogicalToPhysical();
     }
 
 
@@ -163,7 +167,7 @@ public class Caret extends Path {
             }
         } else {
             moveToPoint(0, physicalY);
-            logicalX = physicalX;
+            syncLogicalToPhysical();
         }
     }
 
@@ -187,10 +191,22 @@ public class Caret extends Path {
      */
     public void at(double x, double y) {
         moveToPoint(x, y);
+        syncLogicalToPhysical();
+    }
+
+
+    /**
+     * sync the logical position x to the physical position.
+     */
+    public void syncLogicalToPhysical() {
         logicalX = physicalX;
     }
 
 
+    /**
+     * Get the physical y position including TranslateY.
+     * @return the physical y position
+     */
     public double physicalYInParent() {
         return physicalY + getTranslateY();
     }
@@ -215,13 +231,6 @@ public class Caret extends Path {
      * @return the height of caret
      */
     public double height() { return height; }
-
-
-    /**
-     * Get the caret bottom position y.
-     * @return the caret bottom position y
-     */
-    public double bottom() { return physicalY + height; }
 
     // -- private -------------------------------------------------------------
 
@@ -268,6 +277,10 @@ public class Caret extends Path {
     }
 
 
+    /**
+     * Move caret to the position of offset and sync logical x.
+     * @return {@code true}, if caret is moved
+     */
     private boolean moveToOffsetSyncLogical() {
         boolean moved = moveToOffset();
         if (moved) {
@@ -277,6 +290,10 @@ public class Caret extends Path {
     }
 
 
+    /**
+     * Move caret to the position of offset.
+     * @return {@code true}, if caret is moved
+     */
     private boolean moveToOffset() {
         double oldX = physicalX;
         double oldY = physicalY;
@@ -292,7 +309,7 @@ public class Caret extends Path {
     }
 
 
-    public  int moveToPointRow(double y) {
+    public int moveToPointRow(double y) {
         int indexAt = text.insertionIndexAt(logicalX, y);
         PathElement[] pathElements = text.caretShape(indexAt, true);
         if (PathElements.getY(pathElements[0]) != physicalY) {

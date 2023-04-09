@@ -30,12 +30,12 @@ public class JsonLexer implements Lexer, ColoringTo {
 
     /** Token type. */
     protected interface Type extends TokenType {
-        int KEY = TokenType.serial.getAndIncrement();
-        int TEXT = TokenType.serial.getAndIncrement();
-        int NUMBER = TokenType.serial.getAndIncrement();
-        int LITERAL = TokenType.serial.getAndIncrement();
-        int LINE_COMMENT = TokenType.serial.getAndIncrement();
-        int COMMENT = TokenType.serial.getAndIncrement();
+        int KEY = serial.getAndIncrement();
+        int TEXT = serial.getAndIncrement();
+        int NUMBER = serial.getAndIncrement();
+        int LITERAL = serial.getAndIncrement();
+        int LINE_COMMENT = serial.getAndIncrement();
+        int COMMENT = serial.getAndIncrement();
     }
 
     /** The input string. */
@@ -79,12 +79,12 @@ public class JsonLexer implements Lexer, ColoringTo {
     @Override
     public Token nextToken() {
 
-        if (source == null) return new Token(Type.EMPTY, ScopeType.NEUTRAL, 0, 0);
+        if (source == null) return TokenType.empty(null);
 
         char ch = source.readChar();
         return switch (ch) {
-            case ' ', '\t' -> new Token(Type.SP, ScopeType.NEUTRAL, source.position(), 1);
-            case '\n', '\r' -> lineEnd(source);
+            case ' ', '\t' -> TokenType.whitespace(source);
+            case '\n', '\r' -> TokenType.lineEnd(source);
             case '/' -> readComment(source);
             case '"' -> readString(source);
             case 't' -> readTrue(source);
@@ -92,7 +92,7 @@ public class JsonLexer implements Lexer, ColoringTo {
             case 'n' -> readNull(source);
             case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' -> readNumber(source);
             case 0 -> new Token(Type.EMPTY, ScopeType.NEUTRAL, 0, 0);
-            default -> new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
+            default -> TokenType.any(source);
         };
     }
 
@@ -112,7 +112,8 @@ public class JsonLexer implements Lexer, ColoringTo {
             source.commitPeek();
             return new Token(JavaLexer.Type.COMMENT, ScopeType.BLOCK_START, pos, 2);
         } else {
-            return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
+            source.rollbackPeek();
+            return TokenType.any(source);
         }
     }
 
@@ -154,7 +155,7 @@ public class JsonLexer implements Lexer, ColoringTo {
             ch = source.peekChar();
             if (ch < '0' || ch > '9') {
                 source.rollbackPeek();
-                return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
+                return TokenType.any(source);
             }
         }
 
@@ -174,7 +175,7 @@ public class JsonLexer implements Lexer, ColoringTo {
             } while (ch >= '0' && ch <= '9');
             if (count == 1) {
                 source.rollbackPeek();
-                return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
+                return TokenType.any(source);
             }
         }
 
@@ -189,7 +190,7 @@ public class JsonLexer implements Lexer, ColoringTo {
             }
             if (count == 0) {
                 source.rollbackPeek();
-                return new Token(Type.ANY, ScopeType.NEUTRAL, pos, 1);
+                return TokenType.any(source);
             }
         }
         source.commitPeekBefore();
@@ -202,7 +203,7 @@ public class JsonLexer implements Lexer, ColoringTo {
      * @param source the lexer source
      * @return the token
      */
-    private static Token readTrue(LexerSource source) {
+    private Token readTrue(LexerSource source) {
         if (source.peekChar() == 'r' &&
             source.peekChar() == 'u' &&
             source.peekChar() == 'e') {
@@ -210,7 +211,7 @@ public class JsonLexer implements Lexer, ColoringTo {
             return new Token(Type.LITERAL, ScopeType.NEUTRAL, source.position() - 4, 4);
         }
         source.rollbackPeek();
-        return new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
+        return TokenType.any(source);
     }
 
 
@@ -219,7 +220,7 @@ public class JsonLexer implements Lexer, ColoringTo {
      * @param source the lexer source
      * @return the token
      */
-    private static Token readFalse(LexerSource source) {
+    private Token readFalse(LexerSource source) {
         if (source.peekChar() == 'a' &&
             source.peekChar() == 'l' &&
             source.peekChar() == 's' &&
@@ -228,7 +229,7 @@ public class JsonLexer implements Lexer, ColoringTo {
             return new Token(Type.LITERAL, ScopeType.NEUTRAL, source.position() - 5, 5);
         }
         source.rollbackPeek();
-        return new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
+        return TokenType.any(source);
     }
 
 
@@ -237,7 +238,7 @@ public class JsonLexer implements Lexer, ColoringTo {
      * @param source the lexer source
      * @return the token
      */
-    private static Token readNull(LexerSource source) {
+    private Token readNull(LexerSource source) {
         if (source.peekChar() == 'u' &&
             source.peekChar() == 'l' &&
             source.peekChar() == 'l') {
@@ -245,24 +246,7 @@ public class JsonLexer implements Lexer, ColoringTo {
             return new Token(Type.LITERAL, ScopeType.NEUTRAL, source.position() - 4, 4);
         }
         source.rollbackPeek();
-        return new Token(Type.ANY, ScopeType.NEUTRAL, source.position(), 1);
-    }
-
-
-    /**
-     * Read line end.
-     * @param source the lexer source
-     * @return the token
-     */
-    private static Token lineEnd(LexerSource source) {
-        char ch = source.peekChar();
-        if (source.currentChar() == '\r' && ch == '\n' ||
-            source.currentChar() == '\n' && ch == '\r') {
-            source.commitPeek();
-            return new Token(Type.EOL, ScopeType.INLINE_END, source.position(), 2);
-        } else {
-            return new Token(Type.EOL, ScopeType.INLINE_END, source.position(), 1);
-        }
+        return TokenType.any(source);
     }
 
 

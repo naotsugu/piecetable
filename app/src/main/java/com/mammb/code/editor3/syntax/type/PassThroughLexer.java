@@ -31,6 +31,10 @@ public class PassThroughLexer implements Lexer, ColoringTo {
     /** The input string. */
     private LexerSource source;
 
+    /** The flag of finished. */
+    private boolean finished = false;
+
+
     /**
      * Constructor.
      * @param source the {@link LexerSource}
@@ -61,18 +65,20 @@ public class PassThroughLexer implements Lexer, ColoringTo {
 
     @Override
     public void setSource(LexerSource source) {
+        this.finished = false;
         this.source = source;
     }
 
 
     @Override
     public Token nextToken() {
-
-        if (source == null) {
+        if (source == null || finished) {
             return new Token(0, ScopeType.NEUTRAL, 0, 0);
         }
+        finished = true;
         return new Token(0, ScopeType.NEUTRAL, 0, source.length());
     }
+
 
     @Override
     public Coloring apply(int type) {

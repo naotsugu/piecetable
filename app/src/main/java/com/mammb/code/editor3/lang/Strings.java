@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.lang;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -93,6 +93,9 @@ public class TextPane extends StackPane {
     }
 
 
+    /**
+     * Initialize handler.
+     */
     private void initHandler() {
 
         ScrollBehavior scrollBehavior = new ScrollBehavior(textFlow, pointing, model, screenBound);
@@ -119,6 +122,9 @@ public class TextPane extends StackPane {
     }
 
 
+    /**
+     * Initialize listener.
+     */
     private void initListener() {
         layoutBoundsProperty().addListener(this::layoutBoundsChanged);
         stage.focusedProperty().addListener((ob, ov, focused) -> {
@@ -138,17 +144,29 @@ public class TextPane extends StackPane {
     }
 
 
+    /**
+     * Save.
+     */
     public void save() {
         model.save();
     }
 
 
+    /**
+     * Save as.
+     */
     public void saveAs(Path path) {
         model.saveAs(path);
         setupStageTitle();
     }
 
 
+    /**
+     * Called when the value of the layout changes.
+     * @param observable the ObservableValue which value changed
+     * @param oldValue the old value
+     * @param newValue the new value
+     */
     private void layoutBoundsChanged(
             ObservableValue<? extends Bounds> observable,
             Bounds oldValue, Bounds newValue) {
@@ -184,6 +202,9 @@ public class TextPane extends StackPane {
     }
 
 
+    /**
+     * Setup stage title.
+     */
     private void setupStageTitle() {
         Path path = model.contentPath();
         String title = (path == null) ? "untitled" : path.toString();
@@ -217,6 +238,10 @@ public class TextPane extends StackPane {
     }
 
 
+    /**
+     * Get the rows panel.
+     * @return the rows panel
+     */
     RowsPanel rowsPanel() { return rowsPanel; }
 
 }

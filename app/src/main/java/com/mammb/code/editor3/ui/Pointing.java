@@ -254,6 +254,7 @@ public class Pointing extends Region {
                 selection.openOffset(),
                 selection.closeOffset());
             caret.shiftOffset(selectionHeadOffset - caret.offset());
+            caret.syncLogicalToPhysical();
         }
     }
 

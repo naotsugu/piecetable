@@ -85,6 +85,11 @@ public class Trie {
     }
 
 
+    /**
+     * Search the TrieNode.
+     * @param word the specified word
+     * @return the found TrieNode
+     */
     private TrieNode searchPrefix(String word) {
         TrieNode node = root;
         for (int i = 0; i < word.length();) {
@@ -100,6 +105,11 @@ public class Trie {
     }
 
 
+    /**
+     * Gets the list of suggestion by the specified word.
+     * @param word the specified word
+     * @return the specified word
+     */
     public List<String> suggestion(String word) {
         TrieNode node = root;
         for (int i = 0; i < word.length();) {

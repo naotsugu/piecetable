@@ -18,6 +18,7 @@ package com.mammb.code.editor3.syntax;
 import com.mammb.code.editor3.syntax.type.JavaLexer;
 import com.mammb.code.editor3.syntax.type.JsonLexer;
 import com.mammb.code.editor3.syntax.type.PassThroughLexer;
+import com.mammb.code.editor3.syntax.type.RustLexer;
 
 /**
  * Lexer.
@@ -38,11 +39,17 @@ public interface Lexer {
     void setSource(LexerSource source);
 
 
+    /**
+     * Get the lexer according to the extension.
+     * @param ext the extension
+     * @return the lexer
+     */
     static Lexer of(String ext) {
         return switch (ext) {
             case "java" -> JavaLexer.of();
             case "json" -> JsonLexer.of();
-            default -> PassThroughLexer.of();
+            case "rs"   -> RustLexer.of();
+            default     -> PassThroughLexer.of();
         };
     }
 

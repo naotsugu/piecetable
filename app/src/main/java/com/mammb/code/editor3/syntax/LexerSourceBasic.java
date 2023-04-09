@@ -15,6 +15,8 @@
  */
 package com.mammb.code.editor3.syntax;
 
+import java.util.Objects;
+
 /**
  * LexerSourceBasic.
  * @author Naotsugu Kobayashi
@@ -36,7 +38,7 @@ public class LexerSourceBasic implements LexerSource {
      * @param string the source string
      */
     private LexerSourceBasic(String string) {
-        this.string = string;
+        this.string = Objects.isNull(string) ? "" : string;
     }
 
 

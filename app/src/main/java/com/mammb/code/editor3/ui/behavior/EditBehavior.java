@@ -70,7 +70,6 @@ public class EditBehavior {
      * @param value the insertion text
      */
     public void input(String value) {
-
         if (pointing.selectionOn()) {
             selectionDelete();
         }
@@ -109,6 +108,7 @@ public class EditBehavior {
     public void backspace() {
         if (pointing.selectionOn()) {
             selectionDelete();
+            caretBehavior.at();
         } else {
             caretBehavior.at();
             caretBehavior.left();

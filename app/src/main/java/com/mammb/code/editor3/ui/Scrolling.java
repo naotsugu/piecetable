@@ -46,6 +46,9 @@ public class Scrolling extends Region {
     }
 
 
+    /**
+     * Initialize listener.
+     */
     private void initListener(ScreenBound screenBound) {
 
         // locate the scroll bars at the edge.
