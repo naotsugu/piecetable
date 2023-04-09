@@ -112,17 +112,28 @@ public class ScrollBehavior {
      */
     public void pageDown() {
 
-        double caretY = pointing.caretTop();
+        final int savedTranslatedLineOffset = textFlow.translatedLineOffset();
+        final int savedOriginRowIndex = model.originRowIndex();
+
+        final double caretY = pointing.caretTop();
         pointing.clearSelection();
 
-        int rows = textFlow.rowSize();
+        final int rows = textFlow.rowSize();
         if (rows == textFlow.lineSize()) {
             // if the text is not wrapped
             scrollNext(rows - 1);
         } else {
             for (int i = 1; i < rows; i++) scrollNext();
         }
-        pointing.caretRawAt(caretY);
+
+        if (savedTranslatedLineOffset == textFlow.translatedLineOffset() &&
+            savedOriginRowIndex == model.originRowIndex()) {
+            // If it is already located at the end of the page,
+            // only move the caret to the end
+            // TODO
+        } else {
+            pointing.caretRawAt(caretY);
+        }
     }
 
 
@@ -177,15 +188,13 @@ public class ScrollBehavior {
     public void scrollAt(int offset) {
 
         if (model.originRowIndex() < offset) {
-            for (;;) {
+            do {
                 scrollNext(1);
-                if (model.originRowIndex() >= offset) break;
-            }
+            } while (model.originRowIndex() < offset);
         } else if (model.originRowIndex() > offset) {
-            for (;;) {
+            do {
                 scrollPrev(1);
-                if (model.originRowIndex() <= offset) break;
-            }
+            } while (model.originRowIndex() > offset);
         }
     }
 
