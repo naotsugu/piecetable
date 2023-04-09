@@ -269,7 +269,7 @@ public class JsonLexer implements Lexer, ColoringTo {
 
     @Override
     public Coloring apply(int type) {
-        return (type == Type.KEY) ? Coloring.DarkYellow :
+        return (type == Type.KEY) ? Coloring.DarkOrange :
                (type == Type.TEXT) ? Coloring.DarkGreen :
                (type == Type.NUMBER) ? Coloring.DarkSkyBlue :
                (type == Type.LITERAL) ? Coloring.DarkOrange :

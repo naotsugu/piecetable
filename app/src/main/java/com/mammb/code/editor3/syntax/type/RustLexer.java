@@ -85,6 +85,7 @@ public class RustLexer implements Lexer, ColoringTo {
             case '\n', '\r' -> TokenType.lineEnd(source);
             case '/' -> readComment(source);
             case '*'  -> readCommentBlockClosed(source);
+            case '"'  -> readString(source);
             case 0 -> TokenType.empty(source);
             default -> isIdentifierStart(ch)
                 ? readIdentifier(source, ch)
@@ -132,6 +133,28 @@ public class RustLexer implements Lexer, ColoringTo {
             return new Token(Type.COMMENT, ScopeType.BLOCK_END, pos, 2);
         } else {
             return TokenType.any(source);
+        }
+    }
+
+
+    /**
+     * Read string.
+     * @param source the lexer source
+     * @return the token
+     */
+    private Token readString(LexerSource source) {
+        int pos = source.position();
+        char prev = 0;
+        for (;;) {
+            char ch = source.peekChar();
+            if (ch < ' ') {
+                source.rollbackPeek();
+                return TokenType.any(source);
+            } else if (prev != '\\' && ch == '"') {
+                source.commitPeek();
+                return new Token(Type.TEXT, ScopeType.NEUTRAL, pos, source.position() + 1 - pos);
+            }
+            prev = ch;
         }
     }
 
@@ -214,7 +237,8 @@ public class RustLexer implements Lexer, ColoringTo {
                (type == Type.COMMENT) ? Coloring.DarkGray :
                (type == Type.LINE_COMMENT) ? Coloring.DarkGray :
                (type == Type.DOC_COMMENT) ? Coloring.DarkGreen :
-               (type == Type.KEYWORD) ? Coloring.DarkOrange : null;
+               (type == Type.KEYWORD) ? Coloring.DarkOrange :
+               (type == Type.TEXT) ? Coloring.DarkGreen : null;
     }
 
 }

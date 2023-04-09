@@ -21,35 +21,66 @@ package com.mammb.code.editor3.syntax;
  */
 public enum ScopeType {
 
+    /** The type of neutral. */
     NEUTRAL,
+    /** The type of block start. */
     BLOCK_START,
+    /** The type of block any. */
     BLOCK_ANY,
+    /** The type of block end. */
     BLOCK_END,
+    /** The type of inline start. */
     INLINE_START,
+    /** The type of inline any. */
     INLINE_ANY,
+    /** The type of inline end. */
     INLINE_END,
     ;
 
+    /**
+     * Get whether this type is the type of neutral.
+     * @return {@code true}, if this type is the type of neutral
+     */
     public boolean isNeutral() {
         return this == NEUTRAL;
     }
 
+    /**
+     * Get whether this type is the type of block.
+     * @return {@code true}, if this type is the type of block
+     */
     public boolean isBlock() {
         return this == BLOCK_START || this == BLOCK_ANY || this == BLOCK_END;
     }
 
+    /**
+     * Get whether this type is the type of inline.
+     * @return {@code true}, if this type is the type of inline
+     */
     public boolean isInline() {
         return this == INLINE_START || this == INLINE_ANY || this == INLINE_END;
     }
 
+    /**
+     * Get whether this type is the type of start.
+     * @return {@code true}, if this type is the type of start
+     */
     public boolean isStart() {
         return this == BLOCK_START || this == INLINE_START;
     }
 
+    /**
+     * Get whether this type is the type of end.
+     * @return {@code true}, if this type is the type of end
+     */
     public boolean isEnd() {
         return this == BLOCK_END || this == INLINE_END;
     }
 
+    /**
+     * Get whether this type is the type of any.
+     * @return {@code true}, if this type is the type of any
+     */
     public boolean isAny() {
         return this == BLOCK_ANY || this == INLINE_ANY;
     }

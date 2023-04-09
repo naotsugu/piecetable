@@ -131,6 +131,13 @@ public class ScrollBehavior {
      */
     public void pageUp() {
 
+        if (textFlow.translatedLineOffset() == 0 && model.originRowIndex() == 0) {
+            // If it is already located at the top of the page,
+            // only move the caret to the origin
+            pointing.clear();
+            return;
+        }
+
         double caretY = pointing.caretTop();
         pointing.clearSelection();
 
