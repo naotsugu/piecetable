@@ -112,28 +112,22 @@ public class ScrollBehavior {
      */
     public void pageDown() {
 
-        final int savedTranslatedLineOffset = textFlow.translatedLineOffset();
-        final int savedOriginRowIndex = model.originRowIndex();
+        if (!model.hasNextSlice() &&
+            textFlow.wrappedLines() - textFlow.translatedLineOffset() <= 0) {
+            return;
+        }
 
         final double caretY = pointing.caretTop();
         pointing.clearSelection();
 
         final int rows = textFlow.rowSize();
-        if (rows == textFlow.lineSize()) {
+        if (textFlow.wrappedLines() == 0) {
             // if the text is not wrapped
-            scrollNext(rows - 1);
+            scrollNext(rows - 2);
         } else {
-            for (int i = 1; i < rows; i++) scrollNext();
+            for (int i = 2; i < rows; i++) scrollNext();
         }
-
-        if (savedTranslatedLineOffset == textFlow.translatedLineOffset() &&
-            savedOriginRowIndex == model.originRowIndex()) {
-            // If it is already located at the end of the page,
-            // only move the caret to the end
-            // TODO
-        } else {
-            pointing.caretRawAt(caretY);
-        }
+        pointing.caretRawAt(caretY);
     }
 
 
@@ -155,9 +149,9 @@ public class ScrollBehavior {
         int rows = textFlow.rowSize();
         if (rows == textFlow.lineSize()) {
             // if the text is not wrapping
-            scrollPrev(rows - 1);
+            scrollPrev(rows - 2);
         } else {
-            for (int i = 1; i < rows; i++) scrollPrev();
+            for (int i = 2; i < rows; i++) scrollPrev();
         }
         pointing.caretRawAt(caretY);
     }

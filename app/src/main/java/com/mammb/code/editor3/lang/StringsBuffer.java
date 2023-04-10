@@ -113,11 +113,11 @@ public class StringsBuffer {
      */
     public int shiftAppend(CharSequence tail) {
 
-        int lf = Strings.countLf(tail);
-        int len = IntStream.range(0, lf).map(this::rowLength).sum();
+        int rows = Strings.countRow(tail);
+        int len = IntStream.range(0, rows).map(this::rowLength).sum();
 
         if (len > 0) value.delete(0, len);
-        else if (rowSizeCache > -1) rowSizeCache += lf;
+        else if (rowSizeCache > -1) rowSizeCache += rows;
 
         value.append(tail);
         metrics.clear();

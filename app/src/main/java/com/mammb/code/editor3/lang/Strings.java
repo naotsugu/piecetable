@@ -17,6 +17,7 @@ package com.mammb.code.editor3.lang;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The string utilities.
@@ -76,6 +77,17 @@ public class Strings {
 
 
     /**
+     * Count the number of row in the specified char sequence.
+     * @param cs the specified char sequence
+     * @return the number of row
+     */
+    public static int countRow(CharSequence cs) {
+        return (cs == null || cs.isEmpty()) ? 0
+            : count(cs, LF) + ((cs.charAt(cs.length() - 1) != LF) ? 1 : 0);
+    }
+
+
+    /**
      * Count the number of line feed in the specified char sequence.
      * @param cs the specified char sequence
      * @return the number of line feed
@@ -92,7 +104,7 @@ public class Strings {
      * @return the number of the specified char
      */
     public static int count(CharSequence cs, char ch) {
-        return (int) cs.chars().filter(c -> c == ch).count();
+        return (cs == null) ? 0 : (int) cs.chars().filter(c -> c == ch).count();
     }
 
 

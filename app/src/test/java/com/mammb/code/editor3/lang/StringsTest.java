@@ -54,6 +54,17 @@ class StringsTest {
     }
 
     @Test
+    void countRow() {
+        assertEquals(0, Strings.countRow(""));
+        assertEquals(1, Strings.countRow("a"));
+        assertEquals(1, Strings.countRow("a\n"));
+        assertEquals(2, Strings.countRow("a\nb"));
+        assertEquals(2, Strings.countRow("a\nb\n"));
+        assertEquals(3, Strings.countRow("a\nb\nc"));
+        assertEquals(3, Strings.countRow("a\nb\nc\n"));
+    }
+
+    @Test
     void testCountLf() {
         assertEquals(0, Strings.countLf(""));
         assertEquals(0, Strings.countLf("a"));

@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.editor3.lang.StringsBuffer;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -167,7 +168,7 @@ public class TextSlice {
             if (!hasNext()) return;
             String tail = source.afterRow(buffer.length(), rowDelta);
             if (tail.isEmpty()) return;
-            int n = source.shiftRow(rowDelta);
+            int n = source.shiftRow(Strings.countRow(tail));
             origin = origin.plus(n, buffer.shiftAppend(tail));
         } else if (rowDelta < 0) {
             // scroll prev (i.e. arrow up)
