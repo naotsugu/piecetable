@@ -40,7 +40,7 @@ public class StringsBuffer {
      */
     public void set(CharSequence cs) {
         value.delete(0, value.length());
-        value.append(cs);
+        value.append((cs == null) ? "" : cs);
         metrics.clear();
         rowSizeCache = -1;
     }
@@ -51,10 +51,12 @@ public class StringsBuffer {
      * @param cs the character sequence to append
      */
     public void append(CharSequence cs) {
+        if (cs == null || cs.isEmpty()) return;
+        int tailGap = tailGap();
         value.append(cs);
         metrics.clear();
         if (rowSizeCache > -1) {
-            rowSizeCache += Strings.countLf(cs);
+            rowSizeCache += (Strings.countRow(cs) - tailGap);
         }
     }
 
@@ -78,6 +80,10 @@ public class StringsBuffer {
      * @param cs the sequence to be inserted
      */
     public void insert(int offset, CharSequence cs) {
+        if (offset >= length()) {
+            append(cs);
+            return;
+        }
         value.insert(offset, cs);
         metrics.clear();
         if (rowSizeCache > -1) {
@@ -113,7 +119,7 @@ public class StringsBuffer {
      */
     public int shiftAppend(CharSequence tail) {
 
-        int rows = Strings.countRow(tail);
+        int rows = Strings.countLf(tail);
         int len = IntStream.range(0, rows).map(this::rowLength).sum();
 
         if (len > 0) value.delete(0, len);
@@ -266,7 +272,8 @@ public class StringsBuffer {
      * @return
      */
     private int tailGap() {
-        return (value.charAt(value.length() - 1) == '\n') ? 1 : 0;
+        return value.isEmpty() ? 0
+            : ((value.charAt(value.length() - 1) == '\n') ? 1 : 0);
     }
 
 
