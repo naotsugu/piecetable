@@ -153,6 +153,7 @@ public class TextModel {
 
 
     public int scrollNext(int delta) {
+        if (delta <= 0) return 0;
         int old = textSlice.originOffset();
         textSlice.shiftRow(delta);
         return Math.abs(textSlice.originOffset() - old);
@@ -160,6 +161,7 @@ public class TextModel {
 
 
     public int scrollPrev(int delta) {
+        if (delta <= 0) return 0;
         if (textSlice.originRow() == 0) return 0;
         int old = textSlice.originOffset();
         textSlice.shiftRow(-delta);

@@ -39,13 +39,7 @@ class TextModelTest {
 
 
     @Test void addAndTrimMaxRows() {
-        var model = new TextModel();
-        model.setupMaxRows(5);
-        String text = IntStream.rangeClosed(1, 8)
-            .mapToObj(Integer::toString)
-            .collect(Collectors.joining("\n", "", "\n"));
-        model.add(0, text);
-
+        var model = textModel();
         assertEquals("""
             1
             2
@@ -57,14 +51,7 @@ class TextModelTest {
 
 
     @Test void delete() {
-
-        var model = new TextModel();
-        model.setupMaxRows(5);
-        String text = IntStream.rangeClosed(1, 8)
-            .mapToObj(Integer::toString)
-            .collect(Collectors.joining("\n", "", "\n"));
-        model.add(0, text);
-
+        var model = textModel();
         model.delete(0, 6);
         assertEquals("""
             4
@@ -73,6 +60,93 @@ class TextModelTest {
             7
             8
             """, model.string());
+    }
+
+
+    @Test void scrollNext() {
+        var model = textModel();
+        model.scrollNext(1);
+        assertEquals("""
+            2
+            3
+            4
+            5
+            6
+            """, model.string());
+        assertEquals(1, model.originRowIndex());
+
+        model.scrollNext(2);
+        assertEquals("""
+            4
+            5
+            6
+            7
+            8
+            """, model.string());
+        assertEquals(3, model.originRowIndex());
+
+        model.scrollNext(4);
+        assertEquals("""
+            4
+            5
+            6
+            7
+            8
+            """, model.string());
+        assertEquals(3, model.originRowIndex());
+    }
+
+    @Test void scrollPrev() {
+        var model = textModel();
+        model.scrollNext(4);
+        assertEquals("""
+            4
+            5
+            6
+            7
+            8
+            """, model.string());
+
+        model.scrollPrev(1);
+        assertEquals("""
+            3
+            4
+            5
+            6
+            7
+            """, model.string());
+        assertEquals(2, model.originRowIndex());
+
+        model.scrollPrev(1);
+        assertEquals("""
+            2
+            3
+            4
+            5
+            6
+            """, model.string());
+        assertEquals(1, model.originRowIndex());
+
+        model.scrollPrev(1);
+        assertEquals("""
+            1
+            2
+            3
+            4
+            5
+            """, model.string());
+        assertEquals(0, model.originRowIndex());
+    }
+
+
+    private TextModel textModel() {
+        var model = new TextModel();
+        model.setupMaxRows(5);
+        String text = IntStream.rangeClosed(1, 8)
+            .mapToObj(Integer::toString)
+            .collect(Collectors.joining("\n", "", "\n"));
+        model.add(0, text);
+        return model;
     }
 
 }

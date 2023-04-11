@@ -257,6 +257,9 @@ public class CursoredList {
         for (int i = from.index(); i >= 0; i--) {
             Piece piece = get(i);
             if (!first) {
+                if (piece.length() == 0) {
+                    continue;
+                }
                 start = piece.length();
             }
             for (;;) {
