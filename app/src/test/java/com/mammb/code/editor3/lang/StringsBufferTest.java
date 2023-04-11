@@ -27,9 +27,31 @@ class StringsBufferTest {
 
     @Test
     void set() {
+
         StringsBuffer sb = new StringsBuffer();
+
+        sb.set("");
+        assertEquals(0, sb.length());
+        assertEquals(1, sb.rowSize());
+
+        sb.set("a");
+        assertEquals(1, sb.length());
+        assertEquals(1, sb.rowSize());
+
+        sb.set("ab");
+        assertEquals(2, sb.length());
+        assertEquals(1, sb.rowSize());
+
+        sb.set("a\n");
+        assertEquals(2, sb.length());
+        assertEquals(2, sb.rowSize());
+
         sb.set("a\nb");
         assertEquals(3, sb.length());
+        assertEquals(2, sb.rowSize());
+
+        sb.set("\n");
+        assertEquals(1, sb.length());
         assertEquals(2, sb.rowSize());
     }
 
@@ -39,22 +61,56 @@ class StringsBufferTest {
 
         StringsBuffer sb = new StringsBuffer();
 
+        // [a] + [b] = [ab]
+        sb.set("");
         sb.append("a");
-        assertEquals(1, sb.length());
+        sb.append("b");
+        assertEquals(2, sb.length());
         assertEquals(1, sb.rowSize());
 
-        sb.append("\n");
-        assertEquals(2, sb.length());
+        // [ab] + [$c] = [ab$
+        //                c]
+        sb.set("");
+        sb.append("ab");
+        sb.append("\nc");
+        assertEquals(4, sb.length());
         assertEquals(2, sb.rowSize());
 
+        // [a$] + [b] = [a$
+        //               b]
+        sb.set("");
+        sb.append("a\n");
         sb.append("b");
         assertEquals(3, sb.length());
         assertEquals(2, sb.rowSize());
 
+        // [a$] + [b$] = [a$
+        //                b$
+        //               ]
+        sb.set("");
+        sb.append("a\n");
+        sb.append("b\n");
+        assertEquals(4, sb.length());
+        assertEquals(3, sb.rowSize());
+
+        // [a] + [$] = [a$ + [b] = [a$  + [$]  = [a$
+        //             ]            b]            b$
+        //                                       ]
+        sb.set("");
+        sb.append("a");
+        assertEquals(1, sb.length());
+        assertEquals(1, sb.rowSize());
+        sb.append("\n");
+        assertEquals(2, sb.length());
+        assertEquals(2, sb.rowSize());
+        sb.append("b");
+        assertEquals(3, sb.length());
+        assertEquals(2, sb.rowSize());
         sb.append("\n");
         assertEquals(4, sb.length());
         assertEquals(3, sb.rowSize());
     }
+
 
     @Test
     void truncateRows() {
@@ -66,10 +122,36 @@ class StringsBufferTest {
         sb.set("""
             a
             b
+            c
+            """);
+        assertEquals(4, sb.rowSize());
+        sb.truncateRows(2); // exec
+
+        assertEquals("""
+            a
+            b
+            """, sb.toString());
+        assertEquals(3, sb.rowSize());
+
+
+        sb.set("""
+            a
+            b
             c""");
         assertEquals(3, sb.rowSize());
         sb.truncateRows(2);
-        assertEquals(1, sb.rowSize());
+
+        assertEquals("""
+            a
+            """, sb.toString());
+        assertEquals(2, sb.rowSize());
+    }
+
+
+    @Test
+    void truncateHeadRows() {
+
+        StringsBuffer sb = new StringsBuffer();
 
         sb.set("""
             a
@@ -77,9 +159,24 @@ class StringsBufferTest {
             c
             """);
         assertEquals(4, sb.rowSize());
-        sb.truncateRows(2);
+        sb.truncateHeadRows(2);
+        assertEquals("""
+            c
+            """, sb.toString());
         assertEquals(2, sb.rowSize());
+
+        sb.set("""
+            a
+            b
+            c""");
+        assertEquals(3, sb.rowSize());
+        sb.truncateHeadRows(2);
+        assertEquals("""
+            c""", sb.toString());
+        assertEquals(1, sb.rowSize());
+
     }
+
 
     @Test
     void insert() {
@@ -102,6 +199,49 @@ class StringsBufferTest {
             b
             c""", sb.toString());
         assertEquals(5, sb.rowSize());
+
+        sb.insert(9, """
+            x
+            y""");
+        assertEquals("""
+            a
+            1
+            2
+            b
+            cx
+            y""", sb.toString());
+        assertEquals(6, sb.rowSize());
+
+    }
+
+
+    @Test
+    void delete() {
+        StringsBuffer sb = new StringsBuffer();
+        sb.append("""
+            a
+            b
+            c
+            """);
+        assertEquals(4, sb.rowSize());
+
+        sb.delete(4, 2); // [c$]
+        assertEquals("""
+            a
+            b
+            """, sb.toString());
+        assertEquals(3, sb.rowSize());
+
+        sb.delete(3, 1); // [$]
+        assertEquals("""
+            a
+            b""", sb.toString());
+        assertEquals(2, sb.rowSize());
+
+        sb.delete(0, 10); // all
+        assertEquals("", sb.toString());
+        assertEquals(1, sb.rowSize());
+
     }
 
 

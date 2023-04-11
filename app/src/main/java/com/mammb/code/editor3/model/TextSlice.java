@@ -85,11 +85,10 @@ public class TextSlice {
      * @param string the inserting string
      */
     public void insert(int offset, String string) {
-        int beforeRowSize = buffer.rowSize();
         buffer.insert(offset, string);
         source.handle(Edit.insert(origin.offset(), offset, string));
-        if (hasNext() && beforeRowSize < buffer.rowSize()) {
-            buffer.truncateRows(buffer.rowSize() - beforeRowSize);
+        if (buffer.rowSize() > maxRowSize) {
+            buffer.truncateRows(buffer.rowSize() - maxRowSize);
         }
     }
 
@@ -100,15 +99,14 @@ public class TextSlice {
      * @param length the length of deletion
      */
     public void delete(int offset, int length) {
-        int beforeRowSize = buffer.rowSize();
         String deleted = buffer.delete(offset, length);
         if (length > buffer.length()) {
             deleted = source.substring(offset, length);
         }
         source.handle(Edit.delete(origin.offset(), offset, deleted));
 
-        if (beforeRowSize > buffer.rowSize()) {
-            buffer.append(source.afterRow(buffer.length(), beforeRowSize - buffer.rowSize()));
+        if (buffer.rowSize() < maxRowSize) {
+            buffer.append(source.afterRow(buffer.length(), maxRowSize - buffer.rowSize() + 1));
         }
     }
 

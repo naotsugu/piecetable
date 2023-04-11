@@ -250,4 +250,13 @@ public class TextModel {
         return decorator.apply(textSlice.origin(), textSlice.string());
     }
 
+
+    /**
+     * Gst the string on slice.
+     * @return the string on slice
+     */
+    String string() {
+        return textSlice.string();
+    }
+
 }

@@ -52,11 +52,10 @@ public class StringsBuffer {
      */
     public void append(CharSequence cs) {
         if (cs == null || cs.isEmpty()) return;
-        int tailGap = tailGap();
         value.append(cs);
         metrics.clear();
         if (rowSizeCache > -1) {
-            rowSizeCache += (Strings.countRow(cs) - tailGap);
+            rowSizeCache += Strings.countLf(cs);
         }
     }
 
@@ -66,7 +65,22 @@ public class StringsBuffer {
      * @param n the number of row to truncate
      */
     public void truncateRows(int n) {
-        value.delete(rowIndex(rowSize() - (n + tailGap())), value.length());
+        if (n <= 0) return;
+        value.delete(rowIndex(rowSize() - n), value.length());
+        metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache -= (n - 1);
+        }
+    }
+
+
+    /**
+     * Truncate last rows.
+     * @param n the number of row to truncate
+     */
+    public void truncateHeadRows(int n) {
+        if (n <= 0) return;
+        value.delete(0, rowIndex(n));
         metrics.clear();
         if (rowSizeCache > -1) {
             rowSizeCache -= n;
@@ -99,6 +113,8 @@ public class StringsBuffer {
      * @return the deleted string
      */
     public String delete(int offset, int length) {
+
+        if (offset >= value.length()) return "";
 
         int end = Math.min(offset + length, value.length());
         String deleted = value.substring(offset, end);
