@@ -173,7 +173,7 @@ public class TextSlice {
             if (origin.row() == 0) return;
             int n = source.shiftRow(rowDelta);
             if (n == 0) return;
-            String head = source.rows(Math.abs(rowDelta));
+            String head = source.rows(n);
             buffer.shiftInsert(0, head);
             origin = origin.minus(n, head.length());
         }

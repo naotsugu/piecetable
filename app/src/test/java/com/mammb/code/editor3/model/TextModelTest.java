@@ -127,7 +127,7 @@ class TextModelTest {
             """, model.string());
         assertEquals(1, model.originRowIndex());
 
-        model.scrollPrev(1);
+        model.scrollPrev(3);
         assertEquals("""
             1
             2
@@ -136,6 +136,7 @@ class TextModelTest {
             5
             """, model.string());
         assertEquals(0, model.originRowIndex());
+
     }
 
 
