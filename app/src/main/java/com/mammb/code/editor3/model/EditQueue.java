@@ -53,8 +53,8 @@ public class EditQueue {
      * @param edit the edit
      */
     public void push(Edit edit) {
-        if (buffer.canMarge(edit)) {
-            buffer = buffer.marge(edit);
+        if (buffer.canMerge(edit)) {
+            buffer = buffer.merge(edit);
             if (Strings.countLf(buffer.string()) > 0) {
                 flush();
             }

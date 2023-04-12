@@ -121,7 +121,7 @@ public class Edit {
      * @param other the merging edit
      * @return {@code true} if other edit can be merged into this edit.
      */
-    public boolean canMarge(Edit other) {
+    public boolean canMerge(Edit other) {
         if (this.type.isNil()) {
             return true;
         }
@@ -139,7 +139,7 @@ public class Edit {
      * @param other the merging edit
      * @return the merged edit
      */
-    public Edit marge(Edit other) {
+    public Edit merge(Edit other) {
         return isEmpty() ? other
             : new Edit(other.type,
                 this.offset,
@@ -195,5 +195,7 @@ public class Edit {
         }
         return codePointCount;
     }
+
+
 
 }
