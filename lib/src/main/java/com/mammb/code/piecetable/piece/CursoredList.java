@@ -187,6 +187,7 @@ public class CursoredList {
         int start = startPos - from.position();
         for (int i = from.index(); i < length(); i++) {
             Piece piece = get(i);
+            if (piece.length() == 0) continue;
             for (;;) {
                 int end = Math.min(piece.length(), start + 256);
                 Buffer buf = piece.bytes(start, end);
@@ -220,6 +221,7 @@ public class CursoredList {
         int start = startPos - from.position();
         for (int i = from.index(); i < length(); i++) {
             Piece piece = get(i);
+            if (piece.length() == 0) continue;
             for (;;) {
                 int end = Math.min(piece.length(), start + 256);
                 Buffer buf = piece.bytes(start, end);
@@ -256,10 +258,8 @@ public class CursoredList {
         int start = startPosExclude - from.position();
         for (int i = from.index(); i >= 0; i--) {
             Piece piece = get(i);
+            if (piece.length() == 0) continue;
             if (!first) {
-                if (piece.length() == 0) {
-                    continue;
-                }
                 start = piece.length();
             }
             for (;;) {
@@ -296,6 +296,7 @@ public class CursoredList {
         PiecePoint to   = at(endPos - 1);
         for (int i = 0; i <= to.index() - from.index(); i++) {
             Piece piece = get(from.index() + i);
+            if (piece.length() == 0) continue;
             int start = (i == 0) ? startPos - from.position() : 0;
             int end = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
             for (;;) {
@@ -372,10 +373,10 @@ public class CursoredList {
 
 
     private void moveTo(int index) {
-        while (cursor.hasNext() && cursor.nextIndex() < index)  {
+        while (cursor.hasNext() && cursor.nextIndex() < index) {
             next();
         }
-        while (cursor.hasPrevious() && cursor.nextIndex() > index)  {
+        while (cursor.hasPrevious() && cursor.nextIndex() > index) {
             prev();
         }
         if (cursor.nextIndex() != index) {

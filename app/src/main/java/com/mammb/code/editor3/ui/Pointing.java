@@ -125,6 +125,24 @@ public class Pointing extends Region {
 
 
     /**
+     * Move the caret to the head of local origin.
+     */
+    public void head() {
+        caret.at(0, 0);
+        selection.moveCaretTo(caret.offset());
+    }
+
+
+    /**
+     * Move the caret to the tail of local.
+     */
+    public void tail() {
+        caret.tail();
+        selection.moveCaretTo(caret.offset());
+    }
+
+
+    /**
      * Move the caret to the specified point.
      * @param x point of x on scene
      * @param y point of y on scene

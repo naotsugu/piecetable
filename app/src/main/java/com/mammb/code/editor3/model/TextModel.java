@@ -225,6 +225,33 @@ public class TextModel {
 
 
     /**
+     * Get the number of tail row index.
+     * @return the number of tail row index
+     */
+    public int tailRowIndex() {
+        return textSlice.tailRow();
+    }
+
+
+    /**
+     * Get the origin offset(not code point counts).
+     * @return the origin offset(not code point counts)
+     */
+    public int originOffset() {
+        return textSlice.originOffset();
+    }
+
+
+    /**
+     * Get the tail offset(not code point counts).
+     * @return the tail offset(not code point counts)
+     */
+    public int tailOffset() {
+        return textSlice.tailOffset();
+    }
+
+
+    /**
      * Get the content path.
      * @return the content path. {@code null} if content path is empty
      */

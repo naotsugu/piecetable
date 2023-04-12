@@ -185,6 +185,16 @@ public class Caret extends Path {
 
 
     /**
+     * Move the caret to the tail of text.
+     */
+    public void tail() {
+        offset = text.textLength();
+        moveToOffset();
+        syncLogicalToPhysical();
+    }
+
+
+    /**
      * Move the caret to the specified point.
      * @param x point of x
      * @param y point of y

@@ -108,7 +108,6 @@ public class PieceTable {
      * @param cs a char sequence
      */
     public void insert(int pos, CharSequence cs) {
-
         if (pos < 0 || pos > length) {
             throw new IndexOutOfBoundsException(
                 "pos[%d], length[%d]".formatted(pos, length));
@@ -137,7 +136,6 @@ public class PieceTable {
             pushToUndo(applyEdit(edit), false);
         }
         length += buf.length();
-
     }
 
 

@@ -168,6 +168,7 @@ public class TextSlice {
             if (tail.isEmpty()) return;
             int n = source.shiftRow(Strings.countRow(tail));
             origin = origin.plus(n, buffer.shiftAppend(tail));
+
         } else if (rowDelta < 0) {
             // scroll prev (i.e. arrow up)
             if (origin.row() == 0) return;
@@ -243,6 +244,15 @@ public class TextSlice {
 
 
     /**
+     * Get the tail row number(zero based).
+     * @return the tail row number(zero based)
+     */
+    public int tailRow() {
+        return origin.row() + buffer.rowSize();
+    }
+
+
+    /**
      * Get the origin offset(not code point counts).
      * @return the origin offset(not code point counts)
      */
@@ -257,6 +267,16 @@ public class TextSlice {
      */
     public boolean hasNext() {
         return origin.row() + buffer.rowSize() < source.totalRowSize();
+    }
+
+
+    /**
+     * Get the tail offset.
+     * origin offset + slice buffer length
+     * @return the tail offset
+     */
+    public int tailOffset() {
+        return origin.offset() + buffer.length();
     }
 
 

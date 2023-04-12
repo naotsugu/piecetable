@@ -15,9 +15,7 @@
  */
 package com.mammb.code.editor3.model;
 
-import com.mammb.code.editor3.lang.StringMetrics;
 import org.junit.jupiter.api.Test;
-
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

@@ -114,6 +114,7 @@ public class ScrollBehavior {
 
         if (!model.hasNextSlice() &&
             textFlow.wrappedLines() - textFlow.translatedLineOffset() <= 0) {
+            pointing.tail();
             return;
         }
 
@@ -123,11 +124,17 @@ public class ScrollBehavior {
         final int rows = textFlow.rowSize();
         if (textFlow.wrappedLines() == 0) {
             // if the text is not wrapped
+            boolean shift = model.tailRowIndex() + rows - 2 > model.totalRowSize();
             scrollNext(rows - 2);
+            pointing.caretRawAt(caretY);
+            if (shift) {
+                scrollNext(); scrollNext();
+                pointing.down(); pointing.down();
+            }
         } else {
             for (int i = 2; i < rows; i++) scrollNext();
+            pointing.caretRawAt(caretY);
         }
-        pointing.caretRawAt(caretY);
     }
 
 

@@ -112,4 +112,14 @@ public record Piece(Buffer target, int bufIndex, int length) {
         return bufIndex + length;
     }
 
+
+    @Override
+    public String toString() {
+        return "Piece[" +
+            "target=" + target.getClass().getSimpleName() +
+            ", bufIndex=" + bufIndex +
+            ", length=" + length +
+            ']';
+    }
+
 }
