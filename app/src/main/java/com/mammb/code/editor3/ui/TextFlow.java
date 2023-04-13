@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.ui.util.TextMetrics;
+import com.mammb.code.editor3.ui.util.Texts;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
@@ -50,6 +51,7 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
         setPadding(new Insets(0, 0, 0, 4));
         setTabSize(4);
         setCursor(Cursor.TEXT);
+        addTextIfEmpty();
     }
 
 
@@ -59,6 +61,7 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
      */
     public void setAll(List<Text> texts) {
         getChildren().setAll(texts);
+        addTextIfEmpty();
         metrics = null;
         if (!textWrap) {
             setWidthBulk(TextMetrics.of(this).maxRowWidth() +
@@ -269,6 +272,14 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
             setWidth(width);
         }
     }
+
+
+    private void addTextIfEmpty() {
+        if (getChildren().isEmpty()) {
+            getChildren().add(Texts.asText(""));
+        }
+    }
+
 
     @Override
     public String toString() {

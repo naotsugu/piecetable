@@ -98,6 +98,7 @@ public class ImeBehavior {
         }
     }
 
+
     public boolean doing() {
         return pendingText != null;
     }
