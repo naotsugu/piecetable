@@ -190,6 +190,9 @@ public class TextSource implements EventListener<Edit> {
         if (event.isEmpty()) {
             return;
         }
+        if (!editQueue.canMerge(event)) {
+            editQueue.flush();
+        }
         Edit edit = event.withCodePointPosition(
             offset + asCodePointCount(event.offsetPoint().offset()));
         editQueue.push(edit);

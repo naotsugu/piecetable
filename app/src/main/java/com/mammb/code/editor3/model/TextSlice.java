@@ -235,7 +235,8 @@ public class TextSlice {
      * Get the origin.
      * @return the origin
      */
-    public RowPoint origin() { return origin;  }
+    public RowPoint origin() { return origin; }
+
 
     /**
      * Get the origin row number(zero based).

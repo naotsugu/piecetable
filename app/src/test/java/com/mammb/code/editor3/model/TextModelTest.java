@@ -138,6 +138,17 @@ class TextModelTest {
     }
 
 
+    @Test void edit() {
+        var model = new TextModel();
+        model.add(0, "a");
+        model.add(1, "b");
+        model.add(2, "c");
+        model.delete(2, 1);
+        assertEquals("ab", model.string());
+        assertEquals("ab", model.substring(0, 3));
+    }
+
+
     private TextModel textModel() {
         var model = new TextModel();
         model.setupMaxRows(5);

@@ -66,6 +66,16 @@ public class EditQueue {
 
 
     /**
+     * Get whether other edit can be merged into this edit.
+     * @param other the merging edit
+     * @return {@code true} if other edit can be merged into this edit.
+     */
+    public boolean canMerge(Edit other) {
+        return buffer.canMerge(other);
+    }
+
+
+    /**
      * Peek undo.
      * @return the undone edit.
      */
