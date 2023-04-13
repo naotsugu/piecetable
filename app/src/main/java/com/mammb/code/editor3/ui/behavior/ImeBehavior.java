@@ -80,7 +80,7 @@ public class ImeBehavior {
             on(pointing.caretOffset());
         }
         pendingText.setText(text);
-        pointing.slipCaret(originalTranslateX + Texts.width(pendingText.getText(), pendingText.getFont()));
+        pointing.slipCaretTranslateX(originalTranslateX + Texts.width(pendingText.getText(), pendingText.getFont()));
     }
 
 
@@ -89,11 +89,12 @@ public class ImeBehavior {
      */
     public void exit() {
         if (pendingText != null) {
-            flow.getChildren().remove(pendingText);
+            boolean rm = flow.getChildren().remove(pendingText);
+            if (!rm) throw new RuntimeException("ime exit error.");
             pendingText = null;
         }
         if (originalTranslateX != null) {
-            pointing.slipCaret(originalTranslateX);
+            pointing.slipCaretTranslateX(originalTranslateX);
             originalTranslateX = null;
         }
     }
@@ -143,7 +144,7 @@ public class ImeBehavior {
 
         }
         flow.setAll(texts);
-        originalTranslateX = pointing.getTranslateX();
+        originalTranslateX = pointing.caretTranslateX();
 
     }
 

@@ -284,7 +284,7 @@ public class TextModel {
      * Gst the string on slice.
      * @return the string on slice
      */
-    String string() {
+    public String string() {
         return textSlice.string();
     }
 

@@ -23,12 +23,17 @@ import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.util.Clipboards;
 import com.mammb.code.editor3.ui.util.Texts;
+import java.lang.System.Logger;
+import java.lang.System.Logger.*;
 
 /**
  * InputBehavior.
  * @author Naotsugu Kobayashi
  */
 public class EditBehavior {
+
+    /** The logger. */
+    private static final Logger log = System.getLogger(EditBehavior.class.getName());
 
     /** The text model. */
     private final TextModel model;
@@ -210,6 +215,15 @@ public class EditBehavior {
         int[] range = pointing.selectionOffsets();
         model.delete(range[0], range[1] - range[0]);
         pointing.clearSelection();
+    }
+
+
+    /**
+     * Dump.
+     */
+    public void dump() {
+        log.log(Level.INFO, "buf[" + model.string() + "]");
+        log.log(Level.INFO, "src[" + model.substring(0, Math.min(model.tailOffset(), 100)) + "]");
     }
 
 }

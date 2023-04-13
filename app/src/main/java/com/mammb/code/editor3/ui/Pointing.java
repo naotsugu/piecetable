@@ -299,11 +299,24 @@ public class Pointing extends Region {
 
 
     /**
-     * Slip caret.
+     * Slip caret's translateX.
+     * Update the position of the caret during IME input.
+     * @see Pointing#caretTranslateX()
      * @param translateX slip x
      */
-    public void slipCaret(double translateX) {
+    public void slipCaretTranslateX(double translateX) {
         caret.setTranslateX(translateX);
+    }
+
+
+    /**
+     * Get the caret's translateX.
+     * Get the base position of the caret before IME operation.
+     * @see Pointing#slipCaretTranslateX(double)
+     * @return the caret's translateX
+     */
+    public double caretTranslateX() {
+        return caret.getTranslateX();
     }
 
 }

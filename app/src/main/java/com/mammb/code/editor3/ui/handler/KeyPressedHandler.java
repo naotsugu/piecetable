@@ -119,7 +119,7 @@ public class KeyPressedHandler implements EventHandler<KeyEvent> {
             case PAGE_DOWN  -> scrollBehavior.pageDown();
             case DELETE     -> editBehavior.delete();
             case BACK_SPACE -> editBehavior.backspace();
-            case F1         -> System.out.println("f1");
+            case F1         -> editBehavior.dump();
             case ESCAPE     -> System.out.println("esc");
             default -> { }
         }
