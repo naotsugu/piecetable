@@ -99,9 +99,12 @@ public class TextSlice {
      * @param length the length of deletion
      */
     public void delete(int offset, int length) {
-        String deleted = buffer.delete(offset, length);
-        if (length > buffer.length()) {
+        String deleted;
+        if (offset + length > buffer.length()) {
             deleted = source.substring(offset, length);
+            buffer.delete(offset, length);
+        } else {
+            deleted = buffer.delete(offset, length);
         }
         source.handle(Edit.delete(origin.offset(), offset, deleted));
 

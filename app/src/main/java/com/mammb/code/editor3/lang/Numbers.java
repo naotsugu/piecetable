@@ -29,7 +29,7 @@ public class Numbers {
      * @return {@code true} if the char is a java number part
      */
     public static boolean isJavaNumberPart(char ch) {
-        return idNum(ch) || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F') ||
+        return isNum(ch) || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F') ||
                (ch == 'x') || (ch == 'X') ||
                (ch == '.') || (ch == '+') ||  (ch == '-') ||  (ch == '_') ||
                (ch == 'l') || (ch == 'L');
@@ -162,7 +162,7 @@ public class Numbers {
      * @param ch the char to check
      * @return {@code true} if the char is a numeric
      */
-    private static boolean idNum(char ch) {
+    private static boolean isNum(char ch) {
         return ch >= '0' && ch <= '9';
     }
 
@@ -175,6 +175,10 @@ public class Numbers {
      */
     static char[] toCharArrayStripedUnderscore(String source) {
 
+        if (source == null || source.isEmpty()) {
+            return new char[0];
+        }
+
         int n = 0;
         char[] temp = new char[source.length()];
         for (int i = 0; i < source.length(); i++) {
@@ -182,7 +186,7 @@ public class Numbers {
             if (i > 0 && i < source.length() - 1) {
                 char prev = source.charAt(i - 1);
                 char next = source.charAt(i + 1);
-                if (ch == '_' && (idNum(prev) || prev == '_') && (idNum(next) || next == '_')) {
+                if (ch == '_' && (isNum(prev) || prev == '_') && (isNum(next) || next == '_')) {
                     continue;
                 }
             }

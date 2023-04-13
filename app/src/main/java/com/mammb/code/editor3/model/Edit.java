@@ -17,6 +17,8 @@ package com.mammb.code.editor3.model;
 
 import com.mammb.code.editor3.lang.Strings;
 
+import java.util.StringJoiner;
+
 /**
  * Edit.
  * @author Naotsugu Kobayashi
@@ -34,6 +36,7 @@ public class Edit {
 
     /** The code point position. */
     private final int codePointPosition;
+    
     /** The edited string. */
     private final String string;
 
@@ -197,5 +200,16 @@ public class Edit {
     }
 
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Edit.class.getSimpleName() + "[", "]")
+            .add("type=" + type)
+            .add("offset=" + offset)
+            .add("codePointPosition=" + codePointPosition)
+            .add("string='" + string + "'")
+            .add("occurredOn=" + occurredOn)
+            .add("codePointCount=" + codePointCount)
+            .toString();
+    }
 
 }

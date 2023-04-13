@@ -146,12 +146,13 @@ public class PieceTable {
      */
     public void delete(int pos, int len) {
 
+        if (len <= 0) {
+            return;
+        }
+
         if (pos < 0 || pos >= length) {
             throw new IndexOutOfBoundsException(
                 "pos[%d], length[%d]".formatted(pos, length));
-        }
-        if (len <= 0) {
-            return;
         }
 
         // derive the pieces to be removed

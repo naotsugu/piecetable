@@ -27,8 +27,18 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class NumbersTest {
 
-    @Test
-    void toCharArrayStripedUnderscore() {
+    @Test void isJavaNumber() {
+        assertTrue(Numbers.isJavaNumber("1"));
+        assertTrue(Numbers.isJavaNumber("-2"));
+        assertTrue(Numbers.isJavaNumber("1_000"));
+        assertTrue(Numbers.isJavaNumber("0x5_2"));
+        assertTrue(Numbers.isJavaNumber("1234L"));
+        assertTrue(Numbers.isJavaNumber("3.14_15F"));
+        assertTrue(Numbers.isJavaNumber("2.712e-4"));
+    }
+
+
+    @Test void toCharArrayStripedUnderscore() {
         assertArrayEquals("_100".toCharArray(), Numbers.toCharArrayStripedUnderscore("_100"));
         assertArrayEquals("100_".toCharArray(), Numbers.toCharArrayStripedUnderscore("100_"));
         assertArrayEquals("100".toCharArray(), Numbers.toCharArrayStripedUnderscore("1_00"));
