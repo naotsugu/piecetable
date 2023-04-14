@@ -32,7 +32,7 @@ class TextModelTest {
         model.add(0, "a\nb");
         assertEquals("""
             a
-            b""", model.string());
+            b""", model.stringSlice());
     }
 
 
@@ -44,7 +44,7 @@ class TextModelTest {
             3
             4
             5
-            """, model.string());
+            """, model.stringSlice());
     }
 
 
@@ -57,7 +57,7 @@ class TextModelTest {
             6
             7
             8
-            """, model.string());
+            """, model.stringSlice());
     }
 
 
@@ -70,7 +70,7 @@ class TextModelTest {
             4
             5
             6
-            """, model.string());
+            """, model.stringSlice());
         assertEquals(1, model.originRowIndex());
 
         model.scrollNext(2);
@@ -80,7 +80,7 @@ class TextModelTest {
             6
             7
             8
-            """, model.string());
+            """, model.stringSlice());
         assertEquals(3, model.originRowIndex());
 
         model.scrollNext(4);
@@ -90,7 +90,7 @@ class TextModelTest {
             6
             7
             8
-            """, model.string());
+            """, model.stringSlice());
         assertEquals(3, model.originRowIndex());
     }
 
@@ -103,7 +103,7 @@ class TextModelTest {
             6
             7
             8
-            """, model.string());
+            """, model.stringSlice());
 
         model.scrollPrev(1);
         assertEquals("""
@@ -112,7 +112,7 @@ class TextModelTest {
             5
             6
             7
-            """, model.string());
+            """, model.stringSlice());
         assertEquals(2, model.originRowIndex());
 
         model.scrollPrev(1);
@@ -122,7 +122,7 @@ class TextModelTest {
             4
             5
             6
-            """, model.string());
+            """, model.stringSlice());
         assertEquals(1, model.originRowIndex());
 
         model.scrollPrev(3);
@@ -132,7 +132,7 @@ class TextModelTest {
             3
             4
             5
-            """, model.string());
+            """, model.stringSlice());
         assertEquals(0, model.originRowIndex());
 
     }
@@ -144,7 +144,19 @@ class TextModelTest {
         model.add(1, "b");
         model.add(2, "c");
         model.delete(2, 1);
-        assertEquals("ab", model.string());
+        assertEquals("ab", model.stringSlice());
+        assertEquals("ab", model.substring(0, 3));
+    }
+
+    @Test void edit2() {
+        var model = new TextModel();
+        model.setupMaxRows(5);
+        model.add(0, "1\n");
+        model.add(2, "2\n");
+        model.add(4, "3\n");
+        model.add(6, "4\n");
+        model.add(8, "5\n");
+        assertEquals("ab", model.stringSlice());
         assertEquals("ab", model.substring(0, 3));
     }
 

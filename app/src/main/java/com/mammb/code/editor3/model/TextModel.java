@@ -152,10 +152,10 @@ public class TextModel {
     }
 
 
-    public int scrollNext(int delta) {
-        if (delta <= 0) return 0;
+    public int scrollNext(int rawDelta) {
+        if (rawDelta <= 0) return 0;
         int old = textSlice.originOffset();
-        textSlice.shiftRow(delta);
+        textSlice.shiftRow(rawDelta);
         return Math.abs(textSlice.originOffset() - old);
     }
 
@@ -284,7 +284,7 @@ public class TextModel {
      * Gst the string on slice.
      * @return the string on slice
      */
-    public String string() {
+    public String stringSlice() {
         return textSlice.string();
     }
 

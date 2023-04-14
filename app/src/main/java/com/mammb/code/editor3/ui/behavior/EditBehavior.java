@@ -222,8 +222,13 @@ public class EditBehavior {
      * Dump.
      */
     public void dump() {
-        log.log(Level.INFO, "buf[" + model.string() + "]");
-        log.log(Level.INFO, "src[" + model.substring(0, Math.min(model.tailOffset(), 100)) + "]");
+        String buf = model.stringSlice();
+        String src = model.substring(0, Math.min(model.tailOffset(), 100));
+        if (!buf.equals(src)) {
+            log.log(Level.INFO, "buf[" + buf.replaceAll("\n", "$") + "]");
+            log.log(Level.INFO, "src[" + src.replaceAll("\n", "$") + "]");
+        }
+
     }
 
 }

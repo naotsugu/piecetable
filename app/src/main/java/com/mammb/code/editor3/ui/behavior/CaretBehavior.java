@@ -170,15 +170,13 @@ public class CaretBehavior {
     public void at(OffsetPoint point) {
         scrollBehavior.scrollAt(point.origin());
         if (pointing.caretOffset() > point.offset()) {
-            for (;;) {
+            do {
                 left();
-                if (pointing.caretOffset() <= point.offset()) break;
-            }
+            } while (pointing.caretOffset() > point.offset());
         } else if (pointing.caretOffset() < point.offset()) {
-            for (;;) {
+            do {
                 right();
-                if (pointing.caretOffset() >= point.offset()) break;
-            }
+            } while (pointing.caretOffset() < point.offset());
         }
     }
 

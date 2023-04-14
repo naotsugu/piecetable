@@ -68,7 +68,7 @@ public class EditorPane extends BorderPane {
      * Show stage.
      */
     public void show() {
-        Scene scene = new Scene(this, 800, 480);
+        Scene scene = new Scene(this, 800, 80);
         scene.setFill(Colors.background);
         stage.setScene(scene);
         stage.show();
