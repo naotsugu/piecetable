@@ -63,4 +63,26 @@ class TextSliceTest {
 
     }
 
+
+    @Test void insert() {
+
+        var slice = new TextSlice(new TextSource(new ContentImpl()));
+        slice.setMaxRowSize(4);
+
+        slice.insert(0, "1"); slice.insert(1, "\n");
+        slice.insert(2, "2"); slice.insert(3, "\n");
+        slice.insert(4, "3"); slice.insert(5, "\n");
+        slice.insert(6, "4"); slice.insert(7, "\n");
+        slice.insert(8, "5"); slice.insert(9, "\n");
+
+        assertEquals("""
+            1
+            2
+            3
+            4
+            """, slice.string());
+        assertEquals(5, slice.buffer().rowSize());
+        assertEquals(6, slice.totalViewRowSize());
+        assertEquals(true, slice.hasNext());
+    }
 }

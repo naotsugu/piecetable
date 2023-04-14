@@ -166,21 +166,21 @@ public class ScrollBehavior {
 
     /**
      * Scroll next.
-     * @param n the number of row
+     * @param countOfRow the number of row
      */
-    public void scrollNext(int n) {
-        int shiftedOffset = model.scrollNext(n);
+    public void scrollNext(int countOfRow) {
+        int shiftedOffset = model.scrollNext(countOfRow);
         scroll(-shiftedOffset);
     }
 
 
     /**
      * Scroll previous.
-     * @param n the number of row
+     * @param countOfRow the number of row
      * @return shifted offset
      */
-    public int scrollPrev(int n) {
-        int shiftedOffset = model.scrollPrev(n);
+    public int scrollPrev(int countOfRow) {
+        int shiftedOffset = model.scrollPrev(countOfRow);
         scroll(shiftedOffset);
         return shiftedOffset;
     }

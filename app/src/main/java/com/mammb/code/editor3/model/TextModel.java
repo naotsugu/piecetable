@@ -152,19 +152,19 @@ public class TextModel {
     }
 
 
-    public int scrollNext(int rawDelta) {
-        if (rawDelta <= 0) return 0;
+    public int scrollNext(int rows) {
+        if (rows <= 0) return 0;
         int old = textSlice.originOffset();
-        textSlice.shiftRow(rawDelta);
+        textSlice.shiftRow(rows);
         return Math.abs(textSlice.originOffset() - old);
     }
 
 
-    public int scrollPrev(int delta) {
-        if (delta <= 0) return 0;
+    public int scrollPrev(int rows) {
+        if (rows <= 0) return 0;
         if (textSlice.originRow() == 0) return 0;
         int old = textSlice.originOffset();
-        textSlice.shiftRow(-delta);
+        textSlice.shiftRow(-rows);
         return Math.abs(textSlice.originOffset() - old);
     }
 

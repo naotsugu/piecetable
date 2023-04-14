@@ -169,17 +169,18 @@ public class TextSlice {
             if (!hasNext()) return;
             String tail = source.afterRow(buffer.length(), rowDelta);
             if (tail.isEmpty()) return;
-            int n = source.shiftRow(Strings.countRow(tail));
-            origin = origin.plus(n, buffer.shiftAppend(tail));
+            int shiftedRows = source.shiftRow(Strings.countRow(tail));
+            int deletedCharCount = buffer.shiftAppend(tail);
+            origin = origin.plus(shiftedRows, deletedCharCount);
 
         } else if (rowDelta < 0) {
             // scroll prev (i.e. arrow up)
             if (origin.row() == 0) return;
-            int n = source.shiftRow(rowDelta);
-            if (n == 0) return;
-            String head = source.rows(n);
+            int shiftedRows = source.shiftRow(rowDelta);
+            if (shiftedRows == 0) return;
+            String head = source.rows(shiftedRows);
             buffer.shiftInsert(0, head);
-            origin = origin.minus(n, head.length());
+            origin = origin.minus(shiftedRows, head.length());
         }
 
     }
@@ -270,7 +271,7 @@ public class TextSlice {
      * @return {@code true} if exists next
      */
     public boolean hasNext() {
-        return origin.row() + buffer.rowSize() < source.totalRowSize();
+        return origin.row() + buffer.rowSize() < totalViewRowSize();
     }
 
 
@@ -294,11 +295,31 @@ public class TextSlice {
 
 
     /**
+     * Get the total view row size.
+     * <pre>
+     *     1$       1$       1$
+     *     2$       2$       2
+     *     3$      |
+     *     |
+     * ----------------------------
+     *     4        3        2
+     * </pre>
+     * @return the total row size
+     */
+    public int totalViewRowSize() {
+        return source.totalRowSize() + 1;
+    }
+
+
+    /**
      * Get the content path.
      * @return the content path. {@code null} if content path is empty
      */
     public Path contentPath() {
         return source.contentPath();
     }
+
+
+    StringsBuffer buffer() { return buffer; }
 
 }

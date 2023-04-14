@@ -150,14 +150,14 @@ class TextModelTest {
 
     @Test void edit2() {
         var model = new TextModel();
-        model.setupMaxRows(5);
+        model.setupMaxRows(3);
         model.add(0, "1\n");
         model.add(2, "2\n");
         model.add(4, "3\n");
         model.add(6, "4\n");
         model.add(8, "5\n");
-        assertEquals("ab", model.stringSlice());
-        assertEquals("ab", model.substring(0, 3));
+        assertEquals("1\n2\n3\n", model.stringSlice());
+        assertEquals("1\n2\n3\n4\n5\n", model.substring(0, 10));
     }
 
 

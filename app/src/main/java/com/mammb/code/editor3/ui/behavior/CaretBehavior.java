@@ -64,7 +64,7 @@ public class CaretBehavior {
     public void right() {
         scrollToCaretRow();
         pointing.right();
-        if (pointing.caretTop() >= viewHeight.get()) {
+        if (pointing.caretBottom() >= viewHeight.get()) {
             scrollBehavior.scrollNext();
         }
         scrollToCaretCol();
