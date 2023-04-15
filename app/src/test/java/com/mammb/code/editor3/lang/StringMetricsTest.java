@@ -31,7 +31,7 @@ class StringMetricsTest {
         sm.init();
         assertEquals(1, sm.rowSize());
         assertEquals(0, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
+        assertEquals(0, sm.rowOffset(0));
     }
 
 
@@ -41,19 +41,19 @@ class StringMetricsTest {
         sm.init();
         assertEquals(1, sm.rowSize());
         assertEquals(1, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
+        assertEquals(0, sm.rowOffset(0));
 
         sm = new StringMetrics("ab");
         sm.init();
         assertEquals(1, sm.rowSize());
         assertEquals(2, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
+        assertEquals(0, sm.rowOffset(0));
 
         sm = new StringMetrics("a😀b");
         sm.init();
         assertEquals(1, sm.rowSize());
         assertEquals(3, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
+        assertEquals(0, sm.rowOffset(0));
     }
 
     @Test
@@ -62,22 +62,22 @@ class StringMetricsTest {
         sm.init();
         assertEquals(2, sm.rowSize());
         assertEquals(1, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
-        assertEquals(1, sm.rowIndex(1));
+        assertEquals(0, sm.rowOffset(0));
+        assertEquals(1, sm.rowOffset(1));
 
         sm = new StringMetrics("a\n");
         sm.init();
         assertEquals(2, sm.rowSize());
         assertEquals(2, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
-        assertEquals(2, sm.rowIndex(1));
+        assertEquals(0, sm.rowOffset(0));
+        assertEquals(2, sm.rowOffset(1));
 
         sm = new StringMetrics("a😀b\n");
         sm.init();
         assertEquals(2, sm.rowSize());
         assertEquals(4, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
-        assertEquals(5, sm.rowIndex(1));
+        assertEquals(0, sm.rowOffset(0));
+        assertEquals(5, sm.rowOffset(1));
     }
 
     @Test
@@ -86,22 +86,22 @@ class StringMetricsTest {
         sm.init();
         assertEquals(2, sm.rowSize());
         assertEquals(2, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
-        assertEquals(1, sm.rowIndex(1));
+        assertEquals(0, sm.rowOffset(0));
+        assertEquals(1, sm.rowOffset(1));
 
         sm = new StringMetrics("a\nb");
         sm.init();
         assertEquals(2, sm.rowSize());
         assertEquals(3, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
-        assertEquals(2, sm.rowIndex(1));
+        assertEquals(0, sm.rowOffset(0));
+        assertEquals(2, sm.rowOffset(1));
 
         sm = new StringMetrics("a😀b\ncd");
         sm.init();
         assertEquals(2, sm.rowSize());
         assertEquals(6, sm.codePointCount());
-        assertEquals(0, sm.rowIndex(0));
-        assertEquals(5, sm.rowIndex(1));
+        assertEquals(0, sm.rowOffset(0));
+        assertEquals(5, sm.rowOffset(1));
     }
 
 }

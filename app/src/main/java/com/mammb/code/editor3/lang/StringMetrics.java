@@ -117,11 +117,11 @@ public class StringMetrics {
 
 
     /**
-     * Get the row index of this view text.
+     * Get the row offset of this view text.
      * @param row the number of row. zero origin
-     * @return the row index
+     * @return the row offset
      */
-    int rowIndex(int row) {
+    int rowOffset(int row) {
         if (isDisabled())
             throw new IllegalStateException("not initialized");
         if (row >= rowAnchor.size())

@@ -83,6 +83,6 @@ class TextSliceTest {
             """, slice.string());
         assertEquals(5, slice.buffer().rowSize());
         assertEquals(6, slice.totalViewRowSize());
-        assertEquals(true, slice.hasNext());
+        assertTrue(slice.hasNext());
     }
 }

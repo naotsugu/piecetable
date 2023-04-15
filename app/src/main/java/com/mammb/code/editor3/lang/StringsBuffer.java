@@ -66,7 +66,7 @@ public class StringsBuffer {
      */
     public void truncateRows(int n) {
         if (n <= 0) return;
-        value.delete(rowIndex(rowSize() - n), value.length());
+        value.delete(rowOffset(rowSize() - n), value.length());
         metrics.clear();
         if (rowSizeCache > -1) {
             rowSizeCache -= (n - 1);
@@ -80,7 +80,7 @@ public class StringsBuffer {
      */
     public void truncateHeadRows(int n) {
         if (n <= 0) return;
-        value.delete(0, rowIndex(n));
+        value.delete(0, rowOffset(n));
         metrics.clear();
         if (rowSizeCache > -1) {
             rowSizeCache -= n;
@@ -157,7 +157,7 @@ public class StringsBuffer {
 
         if (cs.isEmpty()) return 0;
 
-        int rowIndex = rowIndex(row);
+        int rowIndex = rowOffset(row);
         int lf = Strings.countLf(cs);
 
         int len = IntStream.range(rowSize() - (lf + tailGap()), rowSize())
@@ -210,8 +210,8 @@ public class StringsBuffer {
      * @param row the number of row. zero origin
      * @return the row index
      */
-    public int rowIndex(int row) {
-        return (row == 0) ? 0 : metrics().rowIndex(row);
+    public int rowOffset(int row) {
+        return (row == 0) ? 0 : metrics().rowOffset(row);
     }
 
 
@@ -222,9 +222,9 @@ public class StringsBuffer {
      */
     public int rowLength(int row) {
         if (row < rowSize() - 1) {
-            return rowIndex(row + 1) - rowIndex(row);
+            return rowOffset(row + 1) - rowOffset(row);
         } else if (row == rowSize() - 1) {
-            return value.length() - rowIndex(row);
+            return value.length() - rowOffset(row);
         } else {
             return 0;
         }
@@ -258,9 +258,9 @@ public class StringsBuffer {
      */
     private int rowCodePointCount(int row) {
         if (row < rowSize() - 1) {
-            return codePointCount(rowIndex(row), rowIndex(row + 1));
+            return codePointCount(rowOffset(row), rowOffset(row + 1));
         } else if (row == rowSize() - 1) {
-            return codePointCount(rowIndex(row), value.length());
+            return codePointCount(rowOffset(row), value.length());
         } else {
             return 0;
         }

@@ -228,7 +228,10 @@ public class EditBehavior {
             log.log(Level.INFO, "buf[" + buf.replaceAll("\n", "$") + "]");
             log.log(Level.INFO, "src[" + src.replaceAll("\n", "$") + "]");
         }
-
+        log.log(Level.INFO, "totalRowSize   [" + model.totalRowSize() + "]");
+        log.log(Level.INFO, "originRowIndex [" + model.originRowIndex() + "]");
+        log.log(Level.INFO, "originOffset   [" + model.originOffset() + "]");
+        log.log(Level.INFO, "tailOffset     [" + model.tailOffset() + "]");
     }
 
 }

@@ -125,8 +125,8 @@ class StringsBufferTest {
             c
             """);
         assertEquals(4, sb.rowSize());
-        sb.truncateRows(2); // exec
 
+        sb.truncateRows(2);
         assertEquals("""
             a
             b
