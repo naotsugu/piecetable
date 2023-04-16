@@ -87,8 +87,8 @@ public class TextSlice {
     public void insert(int offset, String string) {
         buffer.insert(offset, string);
         source.handle(Edit.insert(origin.offset(), offset, string));
-        if (buffer.rowSize() > maxRowSize) {
-            buffer.truncateRows(buffer.rowSize() - maxRowSize);
+        if (Strings.countLf(string) > 0) {
+            buffer.trim(maxRowSize);
         }
     }
 
@@ -108,8 +108,8 @@ public class TextSlice {
         }
         source.handle(Edit.delete(origin.offset(), offset, deleted));
 
-        if (buffer.rowSize() < maxRowSize) {
-            buffer.append(source.afterRow(buffer.length(), maxRowSize - buffer.rowSize() + 1));
+        if (buffer.rowViewSize() < maxRowSize) {
+            buffer.append(source.afterRow(buffer.length(), maxRowSize - buffer.rowViewSize() + 1));
         }
     }
 
@@ -253,7 +253,7 @@ public class TextSlice {
      * @return the tail row number(zero based)
      */
     public int tailRow() {
-        return origin.row() + buffer.rowSize();
+        return origin.row() + buffer.rowViewSize();
     }
 
 
@@ -271,7 +271,8 @@ public class TextSlice {
      * @return {@code true} if exists next
      */
     public boolean hasNext() {
-        return origin.row() + buffer.rowSize() < totalViewRowSize();
+        return origin.row() + buffer.rowViewSize() < totalRowSize();
+        //return !substring(origin.offset() + buffer.length(), 1).isEmpty();
     }
 
 
@@ -287,27 +288,17 @@ public class TextSlice {
 
     /**
      * Get the total row size.
+     * just count lf plus 1
+     * <pre>
+     *       1: |     1: a|     1: a$     1: a$
+     *       2:       2:        2:|       2: b|
+     *  -----------------------------------------
+     *  ret : 1        1         2         2
+     * </pre>
      * @return the total row size
      */
     public int totalRowSize() {
         return source.totalRowSize();
-    }
-
-
-    /**
-     * Get the total view row size.
-     * <pre>
-     *     1$       1$       1$
-     *     2$       2$       2
-     *     3$      |
-     *     |
-     * ----------------------------
-     *     4        3        2
-     * </pre>
-     * @return the total row size
-     */
-    public int totalViewRowSize() {
-        return source.totalRowSize() + 1;
     }
 
 

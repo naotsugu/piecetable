@@ -114,8 +114,8 @@ public class TextSource implements EventListener<Edit> {
      * @return the string
      */
     public String substring(int charOffset, int charLength) {
-        int offsetCodePoint = asCodePointCount(charOffset);
         editQueue.flush();
+        int offsetCodePoint = asCodePointCount(charOffset);
         return new String(
             source.bytes(offset + offsetCodePoint, Until.charLength(charLength)),
             charset);
@@ -160,8 +160,8 @@ public class TextSource implements EventListener<Edit> {
      * @return the row string
      */
     String afterRow(int charOffset, int n) {
-        int offsetCodePoint = asCodePointCount(charOffset);
         editQueue.flush();
+        int offsetCodePoint = asCodePointCount(charOffset);
         byte[] tailRow = source.bytes(offset + offsetCodePoint, Until.lfInclusive(n));
         return new String(tailRow, charset);
     }

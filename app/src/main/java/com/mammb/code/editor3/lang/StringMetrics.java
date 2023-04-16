@@ -95,10 +95,21 @@ public class StringMetrics {
 
 
     /**
-     * Get the row size of this view text.
-     * @return the row size
+     * Get the row view size of this view text.
+     * <pre>
+     *   1:  a$
+     *   2:  b$
+     *   3: |      -> rowViewSize : 3
+     *  -----------------------------------
+     *   1:  a$
+     *   2:  b$
+     *   3:  c|    -> rowViewSize : 3
+     *  -----------------------------------
+     *   1: |      -> rowViewSize : 1
+     * </pre>
+     * @return the row view size
      */
-    int rowSize() {
+    int rowViewSize() {
         if (isDisabled())
             throw new IllegalStateException("not initialized");
         return rowAnchor.size();

@@ -34,30 +34,30 @@ class TextSliceTest {
         slice.insert(0, IntStream.rangeClosed(1, 8)
             .mapToObj(Integer::toString)
             .collect(Collectors.joining("\n", "", "\n")));
-        // 1:  1
-        // 2: $2
-        // 3: $3
-        // 4: $4
-        // 5: $5
-        // 6: $
+        // 1:  1$
+        // 2:  2$
+        // 3:  3$
+        // 4:  4$
+        // 5:  5$
+        // 6: |
         assertEquals(6, slice.tailRow());
         assertEquals(10, slice.tailOffset());
 
         slice.shiftRow(1);
-        // 2:  2
-        // 3: $3
-        // 4: $4
-        // 5: $5
-        // 6: $6
-        // 7: $
+        // 2:  2$
+        // 3:  3$
+        // 4:  4$
+        // 5:  5$
+        // 6:  6$
+        // 7: |
         assertEquals(7, slice.tailRow());
         assertEquals(12, slice.tailOffset());
 
         slice.delete(0, 8);
-        // 2:  6
-        // 3: $7
-        // 4: $8
-        // 5: $
+        // 2:  6$
+        // 3:  7$
+        // 4:  8$
+        // 5: |
         assertEquals(5, slice.tailRow());
         assertEquals(8, slice.tailOffset());
 
@@ -81,8 +81,22 @@ class TextSliceTest {
             3
             4
             """, slice.string());
-        assertEquals(5, slice.buffer().rowSize());
-        assertEquals(6, slice.totalViewRowSize());
+        assertEquals(5, slice.buffer().rowViewSize());
+        assertEquals(6, slice.totalRowSize());
         assertTrue(slice.hasNext());
+    }
+
+    @Test void totalRowSize() {
+        var slice = new TextSlice(new TextSource(new ContentImpl()));
+        assertEquals(1, slice.totalRowSize());
+
+        slice.insert(1, "a");
+        assertEquals(1, slice.totalRowSize());
+
+        slice.insert(2, "\n");
+        assertEquals(2, slice.totalRowSize());
+
+        slice.insert(3, "b");
+        assertEquals(2, slice.totalRowSize());
     }
 }

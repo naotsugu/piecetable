@@ -51,7 +51,7 @@ public class ContentImpl implements Content {
      */
     public ContentImpl() {
         this.pt = PieceTable.of("");
-        this.rowSize = 0;
+        this.rowSize = 1;
     }
 
     /**

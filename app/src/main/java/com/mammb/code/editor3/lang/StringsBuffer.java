@@ -61,30 +61,79 @@ public class StringsBuffer {
 
 
     /**
-     * Truncate last rows.
-     * @param n the number of row to truncate
+     * Trim the rows.
+     * <pre>
+     *    1:  a$  -- max:2 -->  1:  a$
+     *    2:  b$                2:  b$
+     *    3:  c$                3: |
+     *    4: |
+     *  ---------------------------------
+     *   rowSize 4            rowSize 3
+     *
+     *
+     *    1:  a$  -- max:3 -->  1:  a$
+     *    2:  b$                2:  b$
+     *    3:  c$                3:  c$
+     *    4: |                  4: |
+     *  ---------------------------------
+     *   rowSize 4            rowSize 4
+     *
+     *
+     *    1:  a$  -- max:3 -->  1:  a$
+     *    2:  b$                2:  b$
+     *    3:  c$                3:  c$
+     *    4:  d                 4: |
+     *  ---------------------------------
+     *   rowSize 4            rowSize 4
+     *
+     * </pre>
+     * @param max the size of max
      */
-    public void truncateRows(int n) {
-        if (n <= 0) return;
-        value.delete(rowOffset(rowSize() - n), value.length());
+    public void trim(int max) {
+        if (max < 1 || max >= rowViewSize())  return;
+        int offset = rowOffset(max);
+        value.delete(offset, value.length());
         metrics.clear();
-        if (rowSizeCache > -1) {
-            rowSizeCache -= (n - 1);
-        }
+        rowSizeCache = max + 1;
     }
 
 
     /**
-     * Truncate last rows.
-     * @param n the number of row to truncate
+     * Trim the rows before.
+     * <pre>
+     *    1:  a$  -- max:2 -->  2:  b$
+     *    2:  b$                3:  c$
+     *    3:  c$                4: |
+     *    4: |
+     *  ---------------------------------
+     *   rowSize 4            rowSize 3
+     *
+     *
+     *    1:  a$  -- max:3 -->  1:  a$
+     *    2:  b$                2:  b$
+     *    3:  c$                3:  c$
+     *    4: |                  4: |
+     *  ---------------------------------
+     *   rowSize 4            rowSize 4
+     *
+     *
+     *    1:  a$  -- max:3 -->  2:  b$
+     *    2:  b$                3:  c$
+     *    3:  c$                4:  d|
+     *    4:  d|
+     *  ---------------------------------
+     *   rowSize 4            rowSize 3
+     *
+     * </pre>
+     * @param max the size of max
      */
-    public void truncateHeadRows(int n) {
-        if (n <= 0) return;
-        value.delete(0, rowOffset(n));
+    public void trimBefore(int max) {
+        if (max < 1 || max >= rowViewSize())  return;
+        int tailGap = tailIsEmpty() ? 1 : 0;
+        int offset = rowOffset(rowViewSize() - max - tailGap);
+        value.delete(0, offset);
         metrics.clear();
-        if (rowSizeCache > -1) {
-            rowSizeCache -= n;
-        }
+        rowSizeCache = max + tailGap;
     }
 
 
@@ -159,8 +208,9 @@ public class StringsBuffer {
 
         int rowIndex = rowOffset(row);
         int lf = Strings.countLf(cs);
+        int tailGap = tailIsEmpty() ? 1 : 0;
 
-        int len = IntStream.range(rowSize() - (lf + tailGap()), rowSize())
+        int len = IntStream.range(rowViewSize() - (lf + tailGap), rowViewSize())
             .map(this::rowLength).sum();
 
         if (len > 0) value.delete(value.length() - len, value.length());
@@ -194,13 +244,20 @@ public class StringsBuffer {
 
     /**
      * Get the row size of this view text.
+     * <pre>
+     *            1:  a$     1:  a$     1: |
+     *            2:  b$     2:  b$
+     *            3: |       3:  c|
+     *  -------------------------------------
+     *  rowViewSize : 3         3         1
+     * </pre>
      * @return the row size
      */
-    public int rowSize() {
+    public int rowViewSize() {
         if (rowSizeCache > -1) {
             return rowSizeCache;
         }
-        rowSizeCache = metrics().rowSize();
+        rowSizeCache = metrics().rowViewSize();
         return rowSizeCache;
     }
 
@@ -221,9 +278,9 @@ public class StringsBuffer {
      * @return the row length
      */
     public int rowLength(int row) {
-        if (row < rowSize() - 1) {
+        if (row < rowViewSize() - 1) {
             return rowOffset(row + 1) - rowOffset(row);
-        } else if (row == rowSize() - 1) {
+        } else if (row == rowViewSize() - 1) {
             return value.length() - rowOffset(row);
         } else {
             return 0;
@@ -232,38 +289,26 @@ public class StringsBuffer {
 
 
     /**
-     * Returns the number of Unicode code points in the specified range of this view text.
-     * @param beginIndex the index to the first char of the text range
-     * @param endIndex the index after the last char of the text range
-     * @return the number of Unicode code points in the specified text range
+     * Gets whether the tail is empty line or not.
+     * <pre>
+     *    1:|        1: a|        1: a$        1: a$
+     *    2:         2:           2: |         2: b
+     *  ------------------------------------------------
+     *    true       false        true         false
+     * </pre>
+     * @return {@code true}, if the tail is empty line
      */
-    private int codePointCount(int beginIndex, int endIndex) {
-        return value.codePointCount(beginIndex, endIndex);
+    public boolean tailIsEmpty() {
+        return value.isEmpty() || value.charAt(value.length() - 1) == '\n';
     }
 
 
     /**
-     * Get the code point count.
-     * @return the code point count
+     * Gets whether the tail is end of line or not.
+     * @return {@code true}, if the tail is end of line
      */
-    private int codePointCount() {
-        return metrics().codePointCount();
-    }
-
-
-    /**
-     * Get the row code point count.
-     * @param row the specified row
-     * @return the row code point count
-     */
-    private int rowCodePointCount(int row) {
-        if (row < rowSize() - 1) {
-            return codePointCount(rowOffset(row), rowOffset(row + 1));
-        } else if (row == rowSize() - 1) {
-            return codePointCount(rowOffset(row), value.length());
-        } else {
-            return 0;
-        }
+    public boolean tailIsEol() {
+        return value.charAt(value.length() - 1) == '\n';
     }
 
 
@@ -273,25 +318,6 @@ public class StringsBuffer {
     }
 
     // -- private -------------------------------------------------------------
-
-
-    /**
-     * Get the tail gap.
-     * <pre>
-     *     gap:1       gap:0       gap:1
-     *     --------    --------    --------
-     *     xxx$        xxx$        xxx$
-     *     xx$         xx|        |
-     *    |
-     *     --------    --------    --------
-     * </pre>
-     * @return
-     */
-    private int tailGap() {
-        return value.isEmpty() ? 0
-            : ((value.charAt(value.length() - 1) == '\n') ? 1 : 0);
-    }
-
 
     /**
      * Get the initialized metrics.
