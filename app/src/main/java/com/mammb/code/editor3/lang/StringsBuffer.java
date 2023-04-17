@@ -47,6 +47,46 @@ public class StringsBuffer {
 
 
     /**
+     * Inserts the specified CharSequence into this sequence.
+     * @param offset the offset
+     * @param cs the sequence to be inserted
+     */
+    public void insert(int offset, CharSequence cs) {
+        if (offset >= length()) {
+            append(cs);
+            return;
+        }
+        value.insert(offset, cs);
+        metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache += Strings.countLf(cs);
+        }
+    }
+
+
+    /**
+     * Removes the characters in a substring of this sequence.
+     * @param offset the beginning index
+     * @param length the length to delete, exclusive
+     * @return the deleted string
+     */
+    public String delete(int offset, int length) {
+
+        if (offset >= value.length()) return "";
+
+        int end = Math.min(offset + length, value.length());
+        String deleted = value.substring(offset, end);
+
+        value.delete(offset, end);
+        metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache -= Strings.countLf(deleted);
+        }
+        return deleted;
+    }
+
+
+    /**
      * Appends the specified character sequence to this Appendable.
      * @param cs the character sequence to append
      */
@@ -134,46 +174,6 @@ public class StringsBuffer {
         value.delete(0, offset);
         metrics.clear();
         rowSizeCache = max + tailGap;
-    }
-
-
-    /**
-     * Inserts the specified CharSequence into this sequence.
-     * @param offset the offset
-     * @param cs the sequence to be inserted
-     */
-    public void insert(int offset, CharSequence cs) {
-        if (offset >= length()) {
-            append(cs);
-            return;
-        }
-        value.insert(offset, cs);
-        metrics.clear();
-        if (rowSizeCache > -1) {
-            rowSizeCache += Strings.countLf(cs);
-        }
-    }
-
-
-    /**
-     * Removes the characters in a substring of this sequence.
-     * @param offset the beginning index
-     * @param length the length to delete, exclusive
-     * @return the deleted string
-     */
-    public String delete(int offset, int length) {
-
-        if (offset >= value.length()) return "";
-
-        int end = Math.min(offset + length, value.length());
-        String deleted = value.substring(offset, end);
-
-        value.delete(offset, end);
-        metrics.clear();
-        if (rowSizeCache > -1) {
-            rowSizeCache -= Strings.countLf(deleted);
-        }
-        return deleted;
     }
 
 

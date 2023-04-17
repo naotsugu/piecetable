@@ -50,6 +50,9 @@ public class EditBehavior {
     /** The caret behavior. */
     private final CaretBehavior caretBehavior;
 
+    /** The scroll behavior. */
+    private final ScrollBehavior scrollBehavior;
+
 
     /**
      * Constructor.
@@ -58,15 +61,18 @@ public class EditBehavior {
      * @param textFlow the text flow pane
      * @param rowsPanel the rows panel
      * @param caretBehavior the caret behavior
+     * @param scrollBehavior the scroll behavior
      */
     public EditBehavior(TextModel model, Pointing pointing,
             TextFlow textFlow, RowsPanel rowsPanel,
-            CaretBehavior caretBehavior) {
+            CaretBehavior caretBehavior,
+            ScrollBehavior scrollBehavior) {
         this.model = model;
         this.pointing = pointing;
         this.textFlow = textFlow;
         this.rowsPanel = rowsPanel;
         this.caretBehavior = caretBehavior;
+        this.scrollBehavior = scrollBehavior;
     }
 
 
@@ -84,6 +90,13 @@ public class EditBehavior {
             value = Strings.unifyLf(value);
         }
         caretBehavior.at();
+        if (pointing.caretOffset() >= (model.tailOffset() - model.originOffset())) {
+            // pre scroll if additions to the tail
+            int lfCount = Strings.countLf(value);
+            if (lfCount > 0) {
+                scrollBehavior.scrollNext(lfCount);
+            }
+        }
         model.add(pointing.caretOffset(), value);
         textFlow.setAll(Texts.asText(model.text()));
         for (int i = 0; i < Strings.codePointCount(value); i++)

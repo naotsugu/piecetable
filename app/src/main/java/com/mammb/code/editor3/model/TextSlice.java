@@ -272,7 +272,6 @@ public class TextSlice {
      */
     public boolean hasNext() {
         return origin.row() + buffer.rowViewSize() < totalRowSize();
-        //return !substring(origin.offset() + buffer.length(), 1).isEmpty();
     }
 
 

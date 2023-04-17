@@ -100,7 +100,7 @@ public class TextPane extends StackPane {
 
         ScrollBehavior scrollBehavior = new ScrollBehavior(textFlow, pointing, model, screenBound);
         CaretBehavior caretBehavior = new CaretBehavior(pointing, scrollBehavior, heightProperty(), widthProperty());
-        EditBehavior editBehavior = new EditBehavior(model, pointing, textFlow, rowsPanel, caretBehavior);
+        EditBehavior editBehavior = new EditBehavior(model, pointing, textFlow, rowsPanel, caretBehavior, scrollBehavior);
         FileBehavior fileBehavior = new FileBehavior(this);
         ConfBehavior confBehavior = new ConfBehavior(textFlow, pointing, rowsPanel);
         ImeBehavior imeBehavior = new ImeBehavior(textFlow, pointing, editBehavior);
