@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.behavior;
 
+import com.mammb.code.editor3.lang.EventListener;
 import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.editor3.model.OffsetPoint;
 import com.mammb.code.editor3.model.TextModel;
@@ -44,14 +45,14 @@ public class EditBehavior {
     /** The text flow pane. */
     private final TextFlow textFlow;
 
-    /** The rows panel. */
-    private final RowsPanel rowsPanel;
-
     /** The caret behavior. */
     private final CaretBehavior caretBehavior;
 
     /** The scroll behavior. */
     private final ScrollBehavior scrollBehavior;
+
+    /** The edit listener. */
+    private final EventListener<String> editListener;
 
 
     /**
@@ -59,20 +60,21 @@ public class EditBehavior {
      * @param model the text model
      * @param pointing the pointing
      * @param textFlow the text flow pane
-     * @param rowsPanel the rows panel
      * @param caretBehavior the caret behavior
      * @param scrollBehavior the scroll behavior
+     * @param editListener the scroll behavior
      */
     public EditBehavior(TextModel model, Pointing pointing,
-            TextFlow textFlow, RowsPanel rowsPanel,
+            TextFlow textFlow,
             CaretBehavior caretBehavior,
-            ScrollBehavior scrollBehavior) {
+            ScrollBehavior scrollBehavior,
+            EventListener<String> editListener) {
         this.model = model;
         this.pointing = pointing;
         this.textFlow = textFlow;
-        this.rowsPanel = rowsPanel;
         this.caretBehavior = caretBehavior;
         this.scrollBehavior = scrollBehavior;
+        this.editListener = editListener;
     }
 
 
@@ -101,7 +103,8 @@ public class EditBehavior {
         textFlow.setAll(Texts.asText(model.text()));
         for (int i = 0; i < Strings.codePointCount(value); i++)
             caretBehavior.right();
-        rowsPanel.redraw();
+
+        editListener.handle(null);
     }
 
 
@@ -116,7 +119,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
-        rowsPanel.redraw();
+        editListener.handle(null);
     }
 
 
@@ -133,7 +136,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
-        rowsPanel.redraw();
+        editListener.handle(null);
     }
 
 
@@ -148,7 +151,7 @@ public class EditBehavior {
         pointing.clearSelection();
         model.undo();
         textFlow.setAll(Texts.asText(model.text()));
-        rowsPanel.redraw();
+        editListener.handle(null);
     }
 
 
@@ -163,7 +166,7 @@ public class EditBehavior {
         pointing.clearSelection();
         model.redo();
         textFlow.setAll(Texts.asText(model.text()));
-        rowsPanel.redraw();
+        editListener.handle(null);
     }
 
 
@@ -210,7 +213,7 @@ public class EditBehavior {
                 if (cut) {
                     selectionDelete();
                     textFlow.setAll(Texts.asText(model.text()));
-                    rowsPanel.redraw();
+                    editListener.handle(null);
                 }
             }
         }
@@ -228,6 +231,7 @@ public class EditBehavior {
         int[] range = pointing.selectionOffsets();
         model.delete(range[0], range[1] - range[0]);
         pointing.clearSelection();
+        editListener.handle(null);
     }
 
 

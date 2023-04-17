@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
+import com.mammb.code.editor3.lang.EventListener;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
@@ -98,9 +99,11 @@ public class TextPane extends StackPane {
      */
     private void initHandler() {
 
+        EventListener<String> editListener = name -> { rowsPanel.redraw(); setupStageTitle(); };
+
         ScrollBehavior scrollBehavior = new ScrollBehavior(textFlow, pointing, model, screenBound);
         CaretBehavior caretBehavior = new CaretBehavior(pointing, scrollBehavior, heightProperty(), widthProperty());
-        EditBehavior editBehavior = new EditBehavior(model, pointing, textFlow, rowsPanel, caretBehavior, scrollBehavior);
+        EditBehavior editBehavior = new EditBehavior(model, pointing, textFlow, caretBehavior, scrollBehavior, editListener);
         FileBehavior fileBehavior = new FileBehavior(this);
         ConfBehavior confBehavior = new ConfBehavior(textFlow, pointing, rowsPanel);
         ImeBehavior imeBehavior = new ImeBehavior(textFlow, pointing, editBehavior);

@@ -73,6 +73,7 @@ public class TextModel {
         }
         textSlice.open(path);
         decorator = DecoratorImpl.of(Paths.getExtension(path));
+        dirty = false;
     }
 
 
@@ -104,6 +105,7 @@ public class TextModel {
     public void add(int offset, String string) {
         if (string == null || string.isEmpty()) return;
         textSlice.insert(offset, string);
+        dirty = true;
     }
 
 
@@ -115,6 +117,7 @@ public class TextModel {
     public void delete(int offset, int length) {
         if (length <= 0) return;
         textSlice.delete(offset, length);
+        dirty = true;
     }
 
 
@@ -140,7 +143,10 @@ public class TextModel {
      * Undo.
      */
     public void undo() {
-        textSlice.undo();
+        OffsetPoint point = textSlice.undo();
+        if (point.isEmpty() || textSlice.undoPeek().isEmpty()) {
+            dirty = false;
+        }
     }
 
 
@@ -148,7 +154,10 @@ public class TextModel {
      * Redo.
      */
     public void redo() {
-        textSlice.redo();
+        OffsetPoint point = textSlice.redo();
+        if (!point.isEmpty()) {
+            dirty = true;
+        }
     }
 
 

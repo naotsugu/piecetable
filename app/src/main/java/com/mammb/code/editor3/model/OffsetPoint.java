@@ -33,6 +33,10 @@ public record OffsetPoint(int origin, int offset) {
     }
 
 
+    /**
+     * Get whether this OffsetPoint is empty.
+     * @return {@code true}, if this OffsetPoint is empty
+     */
     public boolean isEmpty() {
         return this == empty;
     }

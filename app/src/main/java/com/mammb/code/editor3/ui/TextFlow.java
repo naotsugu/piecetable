@@ -230,6 +230,9 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
     }
 
 
+    /**
+     * Toggle text wrap.
+     */
     public void toggleTextWrap() {
         setTextWrap(!textWrap);
     }
