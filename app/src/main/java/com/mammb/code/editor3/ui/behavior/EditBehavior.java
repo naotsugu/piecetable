@@ -20,7 +20,6 @@ import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.editor3.model.OffsetPoint;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.Pointing;
-import com.mammb.code.editor3.ui.RowsPanel;
 import com.mammb.code.editor3.ui.TextFlow;
 import com.mammb.code.editor3.ui.util.Clipboards;
 import com.mammb.code.editor3.ui.util.Texts;
@@ -104,7 +103,7 @@ public class EditBehavior {
         for (int i = 0; i < Strings.codePointCount(value); i++)
             caretBehavior.right();
 
-        editListener.handle(null);
+        editListener.handle("input");
     }
 
 
@@ -119,7 +118,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
-        editListener.handle(null);
+        editListener.handle("delete");
     }
 
 
@@ -136,7 +135,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
-        editListener.handle(null);
+        editListener.handle("backspace");
     }
 
 
@@ -151,7 +150,7 @@ public class EditBehavior {
         pointing.clearSelection();
         model.undo();
         textFlow.setAll(Texts.asText(model.text()));
-        editListener.handle(null);
+        editListener.handle("undo");
     }
 
 
@@ -166,7 +165,7 @@ public class EditBehavior {
         pointing.clearSelection();
         model.redo();
         textFlow.setAll(Texts.asText(model.text()));
-        editListener.handle(null);
+        editListener.handle("redo");
     }
 
 
@@ -213,7 +212,6 @@ public class EditBehavior {
                 if (cut) {
                     selectionDelete();
                     textFlow.setAll(Texts.asText(model.text()));
-                    editListener.handle(null);
                 }
             }
         }
@@ -231,7 +229,7 @@ public class EditBehavior {
         int[] range = pointing.selectionOffsets();
         model.delete(range[0], range[1] - range[0]);
         pointing.clearSelection();
-        editListener.handle(null);
+        editListener.handle("selectionDelete");
     }
 
 

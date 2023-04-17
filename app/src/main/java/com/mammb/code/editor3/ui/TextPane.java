@@ -30,6 +30,7 @@ import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
 import com.mammb.code.editor3.ui.handler.MouseClickedHandler;
 import com.mammb.code.editor3.ui.handler.MouseDraggedHandler;
 import com.mammb.code.editor3.ui.handler.ScrollHandler;
+import com.mammb.code.editor3.ui.util.Dialogs;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
@@ -141,6 +142,13 @@ public class TextPane extends StackPane {
      * @param path the file content path
      */
     public void open(Path path) {
+        if (isDirty()) {
+            if (Dialogs.discardChanges()) {
+                model.clearDirty();
+            } else {
+                return;
+            }
+        }
         model.open(path);
         sync();
         pointing.clear();

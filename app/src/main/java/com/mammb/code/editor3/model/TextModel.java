@@ -207,6 +207,13 @@ public class TextModel {
 
 
     /**
+     * Clear dirty.
+     */
+    public void clearDirty() {
+        dirty = false;
+    }
+
+    /**
      * Gets whether a subsequent slice exists.
      * @return {@code true} if exists next
      */

@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.ui.TextPane;
+import com.mammb.code.editor3.ui.util.Dialogs;
 import com.mammb.code.editor3.ui.util.FileChoosers;
 import java.io.File;
 import java.util.Objects;
@@ -43,9 +44,6 @@ public class FileBehavior {
      * Open file.
      */
     public void open() {
-        if (textPane.isDirty()) {
-            // TODO
-        }
         File file = FileChoosers.fileChooseOpen(textPane.stage(), null);
         if (file != null) {
             textPane.open(file.toPath());
