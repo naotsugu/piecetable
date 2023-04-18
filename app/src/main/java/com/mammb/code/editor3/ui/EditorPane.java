@@ -20,6 +20,7 @@ import com.mammb.code.editor3.ui.util.Colors;
 import com.mammb.code.editor3.ui.util.Keys;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.lang.System.Logger;
 import java.lang.System.Logger.*;
@@ -28,7 +29,7 @@ import java.lang.System.Logger.*;
  * EditorPane.
  * @author Naotsugu Kobayashi
  */
-public class EditorPane extends BorderPane {
+public class EditorPane extends StackPane {
 
     /** The logger. */
     private static final Logger log = System.getLogger(EditorPane.class.getName());
@@ -39,6 +40,9 @@ public class EditorPane extends BorderPane {
     /** The text pane. */
     private final TextPane textPane;
 
+    /** The overlay pane. */
+    private final Overlay overlay;
+
 
     /**
      * Constructor.
@@ -46,19 +50,23 @@ public class EditorPane extends BorderPane {
     public EditorPane(Stage stage) {
         this.stage = stage;
         this.textPane = new TextPane(stage, new TextModel());
-        setCenter(textPane);
-        initGarter();
+        this.overlay = new Overlay();
+
+        BorderPane layout = new BorderPane();
+        layout.setCenter(textPane);
+        initGarter(layout);
         setOnKeyPressed(e -> { if (Keys.SC_N.match(e)) newPane(); });
+        getChildren().addAll(layout, overlay);
     }
 
 
     /**
      * Initialize garter.
      */
-    private void initGarter() {
+    private void initGarter(BorderPane layout) {
         Garter garter = new Garter();
         garter.addLeft(textPane.rowsPanel());
-        garter.apply(this);
+        garter.apply(layout);
         textPane.prefHeightProperty().bind(heightProperty().subtract(garter.top().heightProperty()));
         textPane.prefWidthProperty().bind(widthProperty().subtract(garter.left().widthProperty()));
     }
