@@ -16,7 +16,6 @@
 package com.mammb.code.editor3.ui.behavior;
 
 import com.mammb.code.editor3.ui.TextPane;
-import com.mammb.code.editor3.ui.util.Dialogs;
 import com.mammb.code.editor3.ui.util.FileChoosers;
 import java.io.File;
 import java.util.Objects;

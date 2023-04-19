@@ -30,7 +30,6 @@ import com.mammb.code.editor3.ui.handler.KeyTypedHandler;
 import com.mammb.code.editor3.ui.handler.MouseClickedHandler;
 import com.mammb.code.editor3.ui.handler.MouseDraggedHandler;
 import com.mammb.code.editor3.ui.handler.ScrollHandler;
-import com.mammb.code.editor3.ui.util.Dialogs;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
@@ -63,6 +62,9 @@ public class TextPane extends StackPane {
     /** The rows panel. */
     private final RowsPanel rowsPanel;
 
+    /** The overlay pane. */
+    private final Overlay overlay;
+
     /** The text model. */
     private TextModel model;
 
@@ -71,9 +73,10 @@ public class TextPane extends StackPane {
      * Constructor.
      * @param model the text view model
      */
-    public TextPane(Stage stage, TextModel model) {
+    public TextPane(Stage stage, Overlay overlay, TextModel model) {
 
         this.stage = Objects.requireNonNull(stage);
+        this.overlay = Objects.requireNonNull(overlay);
         this.model = Objects.requireNonNull(model);
 
         this.textFlow = new TextFlow();
@@ -132,26 +135,40 @@ public class TextPane extends StackPane {
     private void initListener() {
         layoutBoundsProperty().addListener(this::layoutBoundsChanged);
         stage.focusedProperty().addListener((ob, ov, focused) -> {
-            if (focused) pointing.showCaret(); else pointing.hideCaret();
+            if (focused && !overlay.isVisible()) {
+                pointing.showCaret();
+            } else {
+                pointing.hideCaret();
+            }
         });
     }
 
 
     /**
      * Open the file content path.
-     * @param path the file content path
+     * @param path the content file path
      */
     public void open(Path path) {
+        pointing.hideCaret();
         if (isDirty()) {
-            if (Dialogs.discardChanges()) {
-                model.clearDirty();
-            } else {
-                return;
-            }
+            overlay.confirm("Are you sure you want to discard your changes?",
+                () -> openForcibly(path), pointing::showCaret);
+            return;
         }
         model.open(path);
         sync();
         pointing.clear();
+        pointing.showCaret();
+    }
+
+
+    /**
+     * Open the file forcibly.
+     * @param path the content file path
+     */
+    private void openForcibly(Path path) {
+        model.clearDirty();
+        open(path);
     }
 
 

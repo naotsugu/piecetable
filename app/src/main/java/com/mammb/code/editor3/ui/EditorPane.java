@@ -49,8 +49,8 @@ public class EditorPane extends StackPane {
      */
     public EditorPane(Stage stage) {
         this.stage = stage;
-        this.textPane = new TextPane(stage, new TextModel());
         this.overlay = new Overlay();
+        this.textPane = new TextPane(stage, overlay, new TextModel());
 
         BorderPane layout = new BorderPane();
         layout.setCenter(textPane);

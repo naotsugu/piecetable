@@ -30,10 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Colors {
 
     /** The background color. */
-    public static final Color background = Color.web("#2B2B2B");
+    public static final Color background = Color.web("#212121");
 
     /** The foreground color. */
-    public static final Color foreground = Color.web("#A9B7C6");
+    public static final Color foreground = Color.web("#E3F2FD");
 
     /** The foreground modest color. */
     public static final Color foregroundModest = Color.web("#939ea9");
