@@ -43,10 +43,12 @@ public class FileBehavior {
      * Open file.
      */
     public void open() {
-        File file = FileChoosers.fileChooseOpen(textPane.stage(), null);
-        if (file != null) {
-            textPane.open(file.toPath());
-        }
+        textPane.open(() -> {
+            File file = FileChoosers.fileChooseOpen(textPane.stage(), null);
+            if (file != null) {
+                textPane.open(file.toPath());
+            }
+        });
     }
 
 

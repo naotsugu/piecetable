@@ -16,6 +16,7 @@
 package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.lang.EventListener;
+import com.mammb.code.editor3.lang.Functions;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.behavior.CaretBehavior;
 import com.mammb.code.editor3.ui.behavior.ConfBehavior;
@@ -149,26 +150,28 @@ public class TextPane extends StackPane {
      * @param path the content file path
      */
     public void open(Path path) {
-        pointing.hideCaret();
-        if (isDirty()) {
-            overlay.confirm("Are you sure you want to discard your changes?",
-                () -> openForcibly(path), pointing::showCaret);
-            return;
-        }
-        model.open(path);
-        sync();
-        pointing.clear();
-        pointing.showCaret();
+        open(() -> {
+            model.open(path);
+            sync();
+            pointing.clear();
+        });
     }
 
 
     /**
-     * Open the file forcibly.
-     * @param path the content file path
+     * Perform open action with dirty check.
+     * @param openAction the open action
      */
-    private void openForcibly(Path path) {
-        model.clearDirty();
-        open(path);
+    public void open(Runnable openAction) {
+        pointing.hideCaret();
+        if (isDirty()) {
+            overlay.confirm("Are you sure you want to discard your changes?",
+                Functions.and(model::clearDirty, openAction),
+                pointing::showCaret);
+        } else {
+            openAction.run();
+            pointing.showCaret();
+        }
     }
 
 

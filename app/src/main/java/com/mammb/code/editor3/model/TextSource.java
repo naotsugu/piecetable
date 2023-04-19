@@ -55,9 +55,6 @@ public class TextSource implements EventListener<Edit> {
 
 
     public void as(Path path) {
-        if (!editQueue.isBufferEmpty()) {
-            throw new IllegalStateException();
-        }
         this.source = new ContentImpl(path);
         this.offset = 0;
         this.editQueue = new EditQueue(source);
