@@ -65,8 +65,8 @@ public class Scrolling extends Region {
 
         // bind row scroll
         rowScroll.maxProperty().bind(screenBound.totalRowSizeProperty());
-        rowScroll.valueProperty().bind(screenBound.rowSlipOffsetProperty());
-        rowScroll.visibleAmountProperty().bind(screenBound.visibleRowSizeProperty());
+        rowScroll.valueProperty().bind(screenBound.lineSlipOffsetProperty());
+        rowScroll.visibleAmountProperty().bind(screenBound.visibleLineSizeProperty());
 
     }
 

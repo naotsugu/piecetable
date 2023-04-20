@@ -24,19 +24,41 @@ import javafx.scene.layout.Pane;
 
 /**
  * Screen bound property collection.
+ * <pre>
+ *                              0   1   2   3   4   5   6
+ *                   0:   1   | a | b | $ |   |   |   |   |
+ *                   1:   2   | a | b | c | $ |   |   |   |   __
+ *  rowOffset:2 ->   2:   3   | a | b | c | d | e | f | g |    |
+ *                        4   | h | i | j | k | l | m | n |   _|  <- lineSlipOffset:2
+ *                            ------------------------------  __
+ *                        5   | o | p | q | $ |   |   |   |    |
+ *                   3:   6   | a | $ |   |   |   |   |   |    |
+ *                   4:   7   | a | b | $ |   |   |   |   |    |
+ *                   5:   8   | a | b | c | $ |   |   |   |    |
+ *                   6:   9   | a | b | c | d | $ |   |   |   _|  <- visibleLineSize:5
+ *                            ------------------------------
+ *                   7:  10   | a | b | c | d | e | $ |   |
+ *                   8:  11   |   |   |   |   |   |   |   |
+ *                   |
+ *                   |        |___________________________|  <- visibleColSize(pixel)
+ *                   |         <- colOffset(pixel)
+ *                   |
+ *    totalRowSize = 9 + 2(wrapped lines in display area)
+ *    totalColSize = pixel of longest Row in display area
+ * </pre>
  * @author Naotsugu Kobayashi
  */
 public class ScreenBound {
 
     /** The row offset. */
     private final IntegerProperty rowOffset = new SimpleIntegerProperty(0);
-    /** The row slip offset. */
-    private final IntegerProperty rowSlipOffset = new SimpleIntegerProperty(0);
+    /** The line slip offset. */
+    private final IntegerProperty lineSlipOffset = new SimpleIntegerProperty(0);
     /** The col offset. */
     private final DoubleProperty colOffset = new SimpleDoubleProperty(0);
 
     /** The visible row size. */
-    private final IntegerProperty visibleRowSize = new SimpleIntegerProperty(0);
+    private final IntegerProperty visibleLineSize = new SimpleIntegerProperty(0);
     /** The visible col size. */
     private final DoubleProperty visibleColSize = new SimpleDoubleProperty(0);
 
@@ -55,7 +77,7 @@ public class ScreenBound {
 
         // changes the visible view size according to the bounds of the pane
         textPane.layoutBoundsProperty().addListener((os, ov, nv) ->
-            visibleRowSize.set((int) Math.ceil(nv.getHeight() / Texts.height)));
+            visibleLineSize.set((int) Math.ceil(nv.getHeight() / Texts.height)));
         visibleColSize.bind(textPane.widthProperty());
 
         // total col size = width of textFlow
@@ -83,14 +105,14 @@ public class ScreenBound {
      */
     public void setRowOffset(int value, int slipLine) {
         rowOffset.set(value);
-        rowSlipOffset.set(value + slipLine);
+        lineSlipOffset.set(value + slipLine);
     }
 
     // <editor-fold desc="properties">
 
     public IntegerProperty rowOffsetProperty() { return rowOffset; }
-    public IntegerProperty rowSlipOffsetProperty() { return rowSlipOffset; }
-    public IntegerProperty visibleRowSizeProperty() { return visibleRowSize; }
+    public IntegerProperty lineSlipOffsetProperty() { return lineSlipOffset; }
+    public IntegerProperty visibleLineSizeProperty() { return visibleLineSize; }
     public IntegerProperty totalRowSizeProperty() { return totalRowSize; }
 
     public DoubleProperty colOffsetProperty() { return colOffset; }

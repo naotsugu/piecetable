@@ -60,6 +60,7 @@ public class TextSlice {
         refresh();
     }
 
+
     /**
      * Save.
      */
@@ -109,7 +110,10 @@ public class TextSlice {
         source.handle(Edit.delete(origin.offset(), offset, deleted));
 
         if (buffer.rowViewSize() < maxRowSize) {
-            buffer.append(source.afterRow(buffer.length(), maxRowSize - buffer.rowViewSize() + 1));
+            String shiftUpText = source.afterRow(
+                buffer.length(),
+                maxRowSize - buffer.rowViewSize() + 1);
+            buffer.append(shiftUpText);
         }
     }
 
