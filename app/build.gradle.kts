@@ -26,12 +26,12 @@ tasks.compileJava.configure { options.encoding = Charsets.UTF_8.name() }
 tasks.compileTestJava.configure { options.encoding = Charsets.UTF_8.name() }
 
 javafx {
-    version = "19"
+    version = "20"
     modules("javafx.controls")
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(20))
     }
 }
