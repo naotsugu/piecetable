@@ -191,15 +191,6 @@ public class TextModel {
 
 
     /**
-     * The capacity of row on slice.
-     * @return the capacity of row on slice
-     */
-    public int capacityOfRows() {
-        return textSlice.maxRowSize();
-    }
-
-
-    /**
      * Gets whether this text is dirty.
      * @return {@code true} if text is dirty.
      */
@@ -212,6 +203,7 @@ public class TextModel {
     public void clearDirty() {
         dirty = false;
     }
+
 
     /**
      * Gets whether a subsequent slice exists.
