@@ -17,6 +17,7 @@ package com.mammb.code.editor3.syntax;
 
 import com.mammb.code.editor3.syntax.type.JavaLexer;
 import com.mammb.code.editor3.syntax.type.JsonLexer;
+import com.mammb.code.editor3.syntax.type.MarkdownLexer;
 import com.mammb.code.editor3.syntax.type.PassThroughLexer;
 import com.mammb.code.editor3.syntax.type.RustLexer;
 
@@ -49,6 +50,7 @@ public interface Lexer {
             case "java" -> JavaLexer.of();
             case "json" -> JsonLexer.of();
             case "rs"   -> RustLexer.of();
+            case "md"   -> MarkdownLexer.of();
             default     -> PassThroughLexer.of();
         };
     }
