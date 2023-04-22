@@ -145,6 +145,7 @@ public class TextModel {
     public void undo() {
         OffsetPoint point = textSlice.undo();
         if (point.isEmpty() || textSlice.undoPeek().isEmpty()) {
+            // clear dirty, if no more undo history is available
             dirty = false;
         }
     }
@@ -224,8 +225,8 @@ public class TextModel {
 
 
     /**
-     * Get the number of origin row index.
-     * @return the number of origin row index
+     * Get the number of origin row index(zero based).
+     * @return the number of origin row index(zero based)
      */
     public int originRowIndex() {
         return textSlice.originRow();

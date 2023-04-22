@@ -180,6 +180,7 @@ public class TextPane extends StackPane {
      */
     public void save() {
         model.save();
+        setupStageTitle();
     }
 
 

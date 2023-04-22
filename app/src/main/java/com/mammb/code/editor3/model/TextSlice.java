@@ -183,7 +183,7 @@ public class TextSlice {
             int shiftedRows = source.shiftRow(rowDelta);
             if (shiftedRows == 0) return;
             String head = source.rows(shiftedRows);
-            buffer.shiftInsert(0, head);
+            buffer.shiftInsert(0, head, maxRowSize);
             origin = origin.minus(shiftedRows, head.length());
         }
 

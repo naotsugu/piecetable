@@ -227,7 +227,7 @@ class StringsBufferTest {
         sb.shiftInsert(0, """
             1
             2
-            """);
+            """, 3);
 
         assertEquals("""
             1

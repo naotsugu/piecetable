@@ -200,26 +200,22 @@ public class StringsBuffer {
      * Shift row and insert text.
      * @param row at the number of row
      * @param cs insertion string
+     * @param maxRowSize the size of max
      * @return the number of deleted character
      */
-    public int shiftInsert(int row, CharSequence cs) {
+    public int shiftInsert(int row, CharSequence cs, int maxRowSize) {
 
         if (cs.isEmpty()) return 0;
 
-        int rowIndex = rowOffset(row);
-        int lf = Strings.countLf(cs);
-        int tailGap = tailIsEmpty() ? 1 : 0;
-
-        int len = IntStream.range(rowViewSize() - (lf + tailGap), rowViewSize())
-            .map(this::rowLength).sum();
-
-        if (len > 0) value.delete(value.length() - len, value.length());
-        else if (rowSizeCache > -1) rowSizeCache += lf;
-
-        value.insert(rowIndex, cs);
+        value.insert(rowOffset(row), cs);
         metrics.clear();
+        if (rowSizeCache > -1) {
+            rowSizeCache += Strings.countLf(cs);
+        }
 
-        return len;
+        int before = value.length();
+        trim(maxRowSize);
+        return before - value.length();
     }
 
 
