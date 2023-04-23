@@ -27,10 +27,27 @@ public interface Coloring {
     Coloring DarkYellow = new ColoringRec("#d7d02f", 1.0);
     Coloring DarkSkyBlue = new ColoringRec("#78aed7", 1.0);
 
+    /**
+     * Get the color string.
+     * @return the color string
+     */
     String colorString();
 
+
+    /**
+     * Get the opacity.
+     * @return the opacity
+     */
     double opacity();
 
-    record ColoringRec(String colorString, double opacity) implements Coloring { }
+
+    /**
+     * Coloring impl.
+     * @param colorString the color string
+     * @param opacity the opacity
+     */
+    record ColoringRec(
+        String colorString,
+        double opacity) implements Coloring { }
 
 }

@@ -19,51 +19,13 @@ package com.mammb.code.editor3.model;
  * DecoratedText.
  * @author Naotsugu Kobayashi
  */
-public interface DecoratedText {
+public interface DecoratedText extends Decorated {
 
     /**
      * Get the text.
      * @return the text
      */
     String text();
-
-    /**
-     * Get the size.
-     * @return the size
-     */
-    int size();
-
-    /**
-     * Get the color.
-     * @return the color
-     */
-    Coloring color();
-
-    /**
-     * Get the bold.
-     * @return the bold
-     */
-    boolean bold();
-
-    /**
-     * Get the underline.
-     * @return the underline
-     */
-    boolean underLine();
-
-    /**
-     * Get the italic.
-     * @return the italic
-     */
-    boolean italic();
-
-    /**
-     * Get whether this text is normal.
-     * @return {@code true}, if this text is normal
-     */
-    default boolean normal() {
-        return !bold() && !underLine() && !italic();
-    }
 
 
     /**
@@ -73,26 +35,42 @@ public interface DecoratedText {
      * @return a new DecoratedText
      */
     static DecoratedText of(String text, Coloring color) {
-        return new DecoratedText() {
-            @Override
-            public String text() { return text; }
-
-            @Override
-            public int size() { return 16; }
-
-            @Override
-            public Coloring color() { return color; }
-
-            @Override
-            public boolean bold() { return false; }
-
-            @Override
-            public boolean underLine() { return false; }
-
-            @Override
-            public boolean italic() { return false; }
-        };
+        return new DecoratedTextRec(text, 16, color, false, false, false);
     }
+
+
+    /**
+     * Create a new DecoratedText.
+     * @param text the text
+     * @param decorated the decorated
+     * @return a new DecoratedText
+     */
+    static DecoratedText of(String text, Decorated decorated) {
+        return new DecoratedTextRec(text,
+            decorated.size(),
+            decorated.color(),
+            decorated.bold(),
+            decorated.underLine(),
+            decorated.italic());
+    }
+
+
+    /**
+     * DecoratedText impl.
+     * @param text the text
+     * @param size the size
+     * @param color the color
+     * @param bold the bold
+     * @param underLine the underLine
+     * @param italic the italic
+     */
+    record DecoratedTextRec(
+        String text,
+        int size,
+        Coloring color,
+        boolean bold,
+        boolean underLine,
+        boolean italic) implements DecoratedText { }
 
 }
 
