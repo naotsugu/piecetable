@@ -18,7 +18,6 @@ package com.mammb.code.editor3.ui.util;
 import com.mammb.code.editor3.model.Coloring;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,10 +29,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Colors {
 
     /** The background color. */
-    public static final Color background = Color.web("#2B2B2B");
+    public static final Color background = MaterialColors.blueGrey900;
 
     /** The foreground color. */
-    public static final Color foreground = Color.web("#E3F2FD");
+    public static final Color foreground = MaterialColors.blueGrey100;
 
     /** The foreground modest color. */
     public static final Color foregroundModest = Color.web("#939ea9");

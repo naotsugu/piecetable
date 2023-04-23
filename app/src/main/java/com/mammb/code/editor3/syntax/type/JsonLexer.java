@@ -16,7 +16,8 @@
 package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.model.Coloring;
-import com.mammb.code.editor3.syntax.ColoringTo;
+import com.mammb.code.editor3.model.Decorated;
+import com.mammb.code.editor3.syntax.DecorateTo;
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
 import com.mammb.code.editor3.syntax.ScopeType;
@@ -26,7 +27,7 @@ import com.mammb.code.editor3.syntax.Token;
  * Lexer.
  * @author Naotsugu Kobayashi
  */
-public class JsonLexer implements Lexer, ColoringTo {
+public class JsonLexer implements Lexer, DecorateTo {
 
     /** Token type. */
     protected interface Type extends TokenType {
@@ -268,13 +269,13 @@ public class JsonLexer implements Lexer, ColoringTo {
 
 
     @Override
-    public Coloring apply(int type) {
-        return (type == Type.KEY) ? Coloring.DarkOrange :
-               (type == Type.TEXT) ? Coloring.DarkGreen :
-               (type == Type.NUMBER) ? Coloring.DarkSkyBlue :
-               (type == Type.LITERAL) ? Coloring.DarkOrange :
-               (type == Type.COMMENT) ? Coloring.DarkGray :
-               (type == Type.LINE_COMMENT) ? Coloring.DarkGray : null;
+    public Decorated apply(int type) {
+        return (type == Type.KEY) ? Decorated.of(Coloring.DarkOrange) :
+               (type == Type.TEXT) ? Decorated.of(Coloring.DarkGreen) :
+               (type == Type.NUMBER) ? Decorated.of(Coloring.DarkSkyBlue) :
+               (type == Type.LITERAL) ? Decorated.of(Coloring.DarkOrange) :
+               (type == Type.COMMENT) ? Decorated.of(Coloring.DarkGray) :
+               (type == Type.LINE_COMMENT) ? Decorated.of(Coloring.DarkGray) : Decorated.empty();
     }
 
 }

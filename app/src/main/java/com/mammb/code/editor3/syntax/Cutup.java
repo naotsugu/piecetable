@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class Cutup {
 
     /** The ColoringTo. */
-    private final ColoringTo coloringTo;
+    private final DecorateTo decorateTo;
 
     /** Cutup entry. */
     private final List<Entry> list = new ArrayList<>();
@@ -37,10 +37,10 @@ public class Cutup {
 
     /**
      * Constructor.
-     * @param coloringTo the ColoringTo
+     * @param decorateTo the ColoringTo
      */
-    public Cutup(ColoringTo coloringTo) {
-        this.coloringTo = Objects.isNull(coloringTo) ? ColoringTo.empty : coloringTo;
+    public Cutup(DecorateTo decorateTo) {
+        this.decorateTo = Objects.isNull(decorateTo) ? DecorateTo.empty : decorateTo;
     }
 
 
@@ -67,7 +67,7 @@ public class Cutup {
      */
     public List<DecoratedText> getList(String string) {
         List<DecoratedText> ret = list.stream()
-            .map(e -> DecoratedText.of(string.substring(e.beginIndex, e.endIndex), coloringTo.apply(e.type)))
+            .map(e -> DecoratedText.of(string.substring(e.beginIndex, e.endIndex), decorateTo.apply(e.type)))
             .collect(Collectors.toList());
         list.clear();
         return ret;

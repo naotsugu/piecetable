@@ -15,22 +15,23 @@
  */
 package com.mammb.code.editor3.syntax;
 
-import com.mammb.code.editor3.model.Coloring;
+import com.mammb.code.editor3.model.Decorated;
 
 /**
- * ColoringTo.
- * Type to Coloring mapper function.
+ * DecorateTo.
+ * Type to Decorated mapper function.
  * @author Naotsugu Kobayashi
  */
-public interface ColoringTo {
+public interface DecorateTo {
 
-    /** The empty ColoringTo. */
-    ColoringTo empty = type -> null;
+    /** The empty DecorateTo. */
+    DecorateTo empty = type -> null;
 
     /**
-     * Get the coloring from the type.
+     * Get the Decorating from the type.
      * @param type the type
-     * @return the coloring
+     * @return the decorated
      */
-    Coloring apply(int type);
+    Decorated apply(int type);
+
 }

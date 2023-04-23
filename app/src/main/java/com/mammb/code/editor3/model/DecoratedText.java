@@ -31,17 +31,6 @@ public interface DecoratedText extends Decorated {
     /**
      * Create a new DecoratedText.
      * @param text the text
-     * @param color the color
-     * @return a new DecoratedText
-     */
-    static DecoratedText of(String text, Coloring color) {
-        return new DecoratedTextRec(text, 16, color, false, false, false);
-    }
-
-
-    /**
-     * Create a new DecoratedText.
-     * @param text the text
      * @param decorated the decorated
      * @return a new DecoratedText
      */
@@ -66,7 +55,7 @@ public interface DecoratedText extends Decorated {
      */
     record DecoratedTextRec(
         String text,
-        int size,
+        double size,
         Coloring color,
         boolean bold,
         boolean underLine,

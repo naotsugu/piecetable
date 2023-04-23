@@ -21,11 +21,14 @@ package com.mammb.code.editor3.model;
  */
 public interface Decorated {
 
+    /** The empty decorated. */
+    Decorated empty = Decorated.of(null);
+
     /**
      * Get the size.
      * @return the size
      */
-    int size();
+    double size();
 
     /**
      * Get the color.
@@ -59,6 +62,13 @@ public interface Decorated {
         return !bold() && !underLine() && !italic();
     }
 
+    /**
+     * Create a empty decorated.
+     * @return a empty decorated
+     */
+    static Decorated empty() {
+        return empty;
+    }
 
     /**
      * Create a new decorated.
@@ -76,7 +86,7 @@ public interface Decorated {
      * @param color the color
      * @return a new decorated
      */
-    static Decorated of(int size, Coloring color) {
+    static Decorated of(double size, Coloring color) {
         return new DecoratedRec(size, color, false, false, false);
     }
 
@@ -90,7 +100,7 @@ public interface Decorated {
      * @param italic the italic
      */
     record DecoratedRec(
-        int size,
+        double size,
         Coloring color,
         boolean bold,
         boolean underLine,

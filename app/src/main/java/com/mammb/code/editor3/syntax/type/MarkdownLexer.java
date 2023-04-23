@@ -16,7 +16,8 @@
 package com.mammb.code.editor3.syntax.type;
 
 import com.mammb.code.editor3.model.Coloring;
-import com.mammb.code.editor3.syntax.ColoringTo;
+import com.mammb.code.editor3.model.Decorated;
+import com.mammb.code.editor3.syntax.DecorateTo;
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
 import com.mammb.code.editor3.syntax.ScopeType;
@@ -26,7 +27,7 @@ import com.mammb.code.editor3.syntax.Token;
  * MarkdownLexer.
  * @author Naotsugu Kobayashi
  */
-public class MarkdownLexer implements Lexer, ColoringTo {
+public class MarkdownLexer implements Lexer, DecorateTo {
 
     /** Token type. */
     protected interface Type extends TokenType {
@@ -121,12 +122,12 @@ public class MarkdownLexer implements Lexer, ColoringTo {
 
 
     @Override
-    public Coloring apply(int type) {
-        return (type == Type.H1) ? Coloring.DarkSkyBlue :
-               (type == Type.H2) ? Coloring.DarkSkyBlue :
-               (type == Type.H3) ? Coloring.DarkSkyBlue :
-               (type == Type.H4) ? Coloring.DarkSkyBlue :
-               (type == Type.H5) ? Coloring.DarkSkyBlue : null;
+    public Decorated apply(int type) {
+        return (type == Type.H1) ? Decorated.of(20, Coloring.DarkSkyBlue) :
+               (type == Type.H2) ? Decorated.of(19, Coloring.DarkSkyBlue) :
+               (type == Type.H3) ? Decorated.of(18, Coloring.DarkSkyBlue) :
+               (type == Type.H4) ? Decorated.of(17, Coloring.DarkSkyBlue) :
+               (type == Type.H5) ? Decorated.of(16, Coloring.DarkSkyBlue) : Decorated.empty();
     }
 
 }
