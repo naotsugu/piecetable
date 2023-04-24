@@ -283,9 +283,8 @@ public class Pointing extends Region {
     public void clearSelection() {
         if (selection.isDragging()) {
             selection.releaseDragging();
-        } else {
-            selection.clear();
         }
+        selection.clear();
     }
 
 
