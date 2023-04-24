@@ -21,6 +21,7 @@ import com.mammb.code.editor3.model.Decorated;
 import com.mammb.code.editor3.syntax.DecorateTo;
 import com.mammb.code.editor3.syntax.Lexer;
 import com.mammb.code.editor3.syntax.LexerSource;
+import com.mammb.code.editor3.syntax.LexicalScope;
 import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
 import com.mammb.code.editor3.syntax.Trie;
@@ -78,7 +79,7 @@ public class JavaLexer implements Lexer, DecorateTo {
 
 
     @Override
-    public void setSource(LexerSource source) {
+    public void setSource(LexerSource source, LexicalScope lexicalScope) {
         this.source = source;
     }
 

@@ -16,7 +16,6 @@
 package com.mammb.code.editor3.syntax;
 
 import com.mammb.code.editor3.syntax.type.TokenType;
-
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Comparator;

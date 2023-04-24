@@ -59,7 +59,7 @@ public class DecoratorImpl implements Decorator {
 
         tokens.subMap(origin.offset(), Integer.MAX_VALUE).clear();
         LexicalScope scope = LexicalScope.of(tokens.entrySet());
-        lexer.setSource(LexerSource.of(string));
+        lexer.setSource(LexerSource.of(string), scope);
         Cutup cutup = new Cutup((lexer instanceof DecorateTo c) ? c : null);
 
         int prevType = -1, beginIndex = 0;

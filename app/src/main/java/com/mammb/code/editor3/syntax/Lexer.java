@@ -33,11 +33,13 @@ public interface Lexer {
      */
     Token nextToken();
 
+
     /**
      * Set the source.
      * @param source the source.
+     * @param lexicalScope the lexicalScope.
      */
-    void setSource(LexerSource source);
+    void setSource(LexerSource source, LexicalScope lexicalScope);
 
 
     /**
@@ -49,9 +51,9 @@ public interface Lexer {
         return switch (ext) {
             case "java" -> JavaLexer.of();
             case "json" -> JsonLexer.of();
-            case "rs"   -> RustLexer.of();
-            case "md"   -> MarkdownLexer.of();
-            default     -> PassThroughLexer.of();
+            case "rs", "rust" -> RustLexer.of();
+            case "md" -> MarkdownLexer.of();
+            default -> PassThroughLexer.of();
         };
     }
 
