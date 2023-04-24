@@ -108,21 +108,21 @@ public class DecoratorImpl implements Decorator {
                     prevType = currentScope.get().type();
                     beginIndex = token.position();
                 } else if (prevType != currentScope.get().type()) {
-                    cutup.add(beginIndex, token.position(), prevType);
+                    cutup.add(beginIndex, token.position(), prevType, string);
                     prevType = currentScope.get().type();
                     beginIndex = token.position();
                 }
                 continue;
             } else if (prevType > 0) {
-                cutup.add(beginIndex, token.position(), prevType);
+                cutup.add(beginIndex, token.position(), prevType, string);
                 prevType = -1;
             }
 
-            cutup.add(token.position(), token.position() + token.length(), token.type());
+            cutup.add(token.position(), token.position() + token.length(), token.type(), string);
         }
 
         if (prevType > 0) {
-            cutup.add(beginIndex, string.length(), prevType);
+            cutup.add(beginIndex, string.length(), prevType, string);
         }
 
         return cutup.getList(string);

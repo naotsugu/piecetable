@@ -31,8 +31,11 @@ public class Cutup {
     /** The ColoringTo. */
     private final DecorateTo decorateTo;
 
-    /** Cutup entry. */
-    private final List<Entry> list = new ArrayList<>();
+    /** The decorated text list. */
+    private final List<DecoratedText> list = new ArrayList<>();
+
+    /** current entry. */
+    private Entry entry;
 
 
     /**
@@ -49,13 +52,18 @@ public class Cutup {
      * @param beginIndex the beginning index, inclusive
      * @param endIndex the ending index, exclusive
      * @param type the type of entry
+     * @param string the source string
      */
-    public void add(int beginIndex, int endIndex, int type) {
-        if (!list.isEmpty() &&
-            list.get(list.size() - 1).canMarge(beginIndex, endIndex, type)) {
-            list.get(list.size() - 1).marge(beginIndex, endIndex, type);
+    public void add(int beginIndex, int endIndex, int type, String string) {
+        if (entry == null) {
+            entry = new Entry(beginIndex, endIndex, type);
+        } else if (entry.canMarge(beginIndex, endIndex, type)) {
+            entry.marge(beginIndex, endIndex, type);
         } else {
-            list.add(new Entry(beginIndex, endIndex, type));
+            list.add(DecoratedText.of(
+                string.substring(entry.beginIndex, entry.endIndex),
+                decorateTo.apply(entry.type)));
+            entry = new Entry(beginIndex, endIndex, type);
         }
     }
 
@@ -66,11 +74,12 @@ public class Cutup {
      * @return the {@link DecoratedText} list
      */
     public List<DecoratedText> getList(String string) {
-        List<DecoratedText> ret = list.stream()
-            .map(e -> DecoratedText.of(string.substring(e.beginIndex, e.endIndex), decorateTo.apply(e.type)))
-            .collect(Collectors.toList());
-        list.clear();
-        return ret;
+        if (entry != null) {
+            list.add(DecoratedText.of(
+                string.substring(entry.beginIndex, entry.endIndex),
+                decorateTo.apply(entry.type)));
+        }
+        return list;
     }
 
 
