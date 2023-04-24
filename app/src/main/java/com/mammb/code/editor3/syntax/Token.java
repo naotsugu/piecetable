@@ -21,9 +21,22 @@ package com.mammb.code.editor3.syntax;
  * @param scope the scope
  * @param position the position
  * @param length the length
+ * @param note the note
  * @author Naotsugu Kobayashi
  */
-public record Token(int type, ScopeType scope, int position, int length) {
+public record Token(int type, ScopeType scope, int position, int length, String note) {
+
+    /**
+     * Constructor.
+     * @param type the type
+     * @param scope the scope
+     * @param position the position
+     * @param length the length
+     */
+    public Token(int type, ScopeType scope, int position, int length) {
+        this(type, scope, position, length, "");
+    }
+
 
     /**
      * Get whether this type is empty.

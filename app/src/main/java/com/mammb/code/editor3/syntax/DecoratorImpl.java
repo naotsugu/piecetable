@@ -60,13 +60,12 @@ public class DecoratorImpl implements Decorator {
         tokens.subMap(origin.offset(), Integer.MAX_VALUE).clear();
         LexicalScope scope = LexicalScope.of(tokens.entrySet());
         lexer.setSource(LexerSource.of(string));
-
-        int prevType = -1;
-        int beginIndex = 0;
-
         Cutup cutup = new Cutup((lexer instanceof DecorateTo c) ? c : null);
 
-        for (Token token = lexer.nextToken(); !token.isEmpty(); token = lexer.nextToken()) {
+        int prevType = -1, beginIndex = 0;
+        for (Token token = lexer.nextToken();
+             !token.isEmpty();
+             token = lexer.nextToken()) {
 
             if (token.scope().isBlock()) {
                 tokens.put(origin.offset() + token.position(), token);
@@ -74,8 +73,8 @@ public class DecoratorImpl implements Decorator {
             if (token.scope().isBlock() || token.scope().isInline()) {
                 scope.put(token);
             }
-            Optional<Token> currentScope = scope.current();
 
+            Optional<Token> currentScope = scope.current();
             if (currentScope.isPresent()) {
                 if (prevType < 0) {
                     prevType = currentScope.get().type();

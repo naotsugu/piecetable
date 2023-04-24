@@ -15,6 +15,8 @@
  */
 package com.mammb.code.editor3.syntax;
 
+import com.mammb.code.editor3.syntax.type.TokenType;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Comparator;
@@ -66,9 +68,12 @@ public class LexicalScope {
     public void put(Token token) {
         if (token.scope().isBlock()) {
             putScope(token, blockScopes);
-        } else if (token.scope().isInline() &&
-                (token.scope().isStart() || token.scope().isEnd())) {
-            putScope(token, inlineScopes);
+        } else if (token.scope().isInline()) {
+            if (token.type() == TokenType.EOL) {
+                inlineScopes.clear();
+            } else if (token.scope().isStart() || token.scope().isEnd()) {
+                putScope(token, inlineScopes);
+            }
         }
     }
 
