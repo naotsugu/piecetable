@@ -15,7 +15,6 @@
  */
 package com.mammb.code.editor3.syntax.type;
 
-import com.mammb.code.editor3.model.Coloring;
 import com.mammb.code.editor3.model.Decorated;
 import com.mammb.code.editor3.syntax.DecorateTo;
 import com.mammb.code.editor3.syntax.Lexer;

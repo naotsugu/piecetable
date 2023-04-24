@@ -37,10 +37,14 @@ public class MarkdownLexer implements Lexer, DecorateTo {
         int H3 = serial.getAndIncrement();
         int H4 = serial.getAndIncrement();
         int H5 = serial.getAndIncrement();
+        int FENCE = serial.getAndIncrement();
     }
 
     /** The input string. */
     private LexerSource source;
+
+    /** The decorateTo. */
+    private DecorateTo decorateTo;
 
 
     /**
@@ -49,6 +53,7 @@ public class MarkdownLexer implements Lexer, DecorateTo {
      */
     private MarkdownLexer(LexerSource source) {
         this.source = source;
+        this.decorateTo = self;
     }
 
 
@@ -113,7 +118,7 @@ public class MarkdownLexer implements Lexer, DecorateTo {
 
         if (type > 0) {
             for (;;) { if (source.peekChar() == '\n') break; }
-            source.commitPeek();
+            source.commitPeekBefore();
             return new Token(type, ScopeType.INLINE_ANY, pos, source.position() + 1 - pos);
         } else {
             source.rollbackPeek();
@@ -124,11 +129,16 @@ public class MarkdownLexer implements Lexer, DecorateTo {
 
     @Override
     public Decorated apply(int type) {
-        return (type == Type.H1) ? Decorated.of(20, Coloring.DarkSkyBlue) :
-               (type == Type.H2) ? Decorated.of(19, Coloring.DarkSkyBlue) :
-               (type == Type.H3) ? Decorated.of(18, Coloring.DarkSkyBlue) :
-               (type == Type.H4) ? Decorated.of(17, Coloring.DarkSkyBlue) :
-               (type == Type.H5) ? Decorated.of(16, Coloring.DarkSkyBlue) : Decorated.empty();
+        return decorateTo.apply(type);
     }
+
+
+    /** The markdown decorateTo. */
+    public static final DecorateTo self = type ->
+        (type == Type.H1) ? Decorated.of(20, Coloring.DarkSkyBlue) :
+        (type == Type.H2) ? Decorated.of(19, Coloring.DarkSkyBlue) :
+        (type == Type.H3) ? Decorated.of(18, Coloring.DarkSkyBlue) :
+        (type == Type.H4) ? Decorated.of(17, Coloring.DarkSkyBlue) :
+        (type == Type.H5) ? Decorated.of(16, Coloring.DarkSkyBlue) : Decorated.empty();
 
 }
