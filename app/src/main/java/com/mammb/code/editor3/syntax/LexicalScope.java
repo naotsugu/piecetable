@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,6 +37,8 @@ public class LexicalScope {
     /** The inline scopes(key:token type number). */
     private final Map<Integer, Deque<Token>> inlineScopes = new HashMap<>();
 
+    /** The context scopes(key:token type number). */
+    private final Map<Integer, Deque<Token>> contextScopes = new HashMap<>();
 
     /**
      * Create a new LexicalScope.
@@ -70,9 +73,11 @@ public class LexicalScope {
         } else if (token.scope().isInline()) {
             if (token.type() == TokenType.EOL) {
                 inlineScopes.clear();
-            } else if (token.scope().isStart() || token.scope().isEnd()) {
+            } else { //if (token.scope().isStart() || token.scope().isEnd()) {
                 putScope(token, inlineScopes);
             }
+        } else if (token.scope().isContext()) {
+            putScope(token, contextScopes);
         }
     }
 
@@ -97,6 +102,19 @@ public class LexicalScope {
 
 
     /**
+     * Get the current context scope token.
+     * @return the current context scope token
+     */
+    public List<Token> currentContext() {
+        return contextScopes.values().stream()
+            .flatMap(Collection::stream)
+            .filter(token -> token.scope().isStart() || token.scope().isAny())
+            .sorted(Comparator.comparing(Token::type))
+            .toList();
+    }
+
+
+    /**
      * Put the scope.
      * @param token the token
      * @param scopes the target scope
@@ -115,9 +133,11 @@ public class LexicalScope {
             // toggle scope if any
             Deque<Token> deque = scopes.get(token.type());
             if (deque == null || deque.isEmpty()) {
-                scopes.computeIfAbsent(token.type(), ArrayDeque::new).push(token);
+                scopes.computeIfAbsent(token.type(), ArrayDeque::new)
+                    .push(token);
             } else {
-                scopes.get(token.type()).poll();
+                scopes.get(token.type())
+                    .poll();
             }
         }
     }

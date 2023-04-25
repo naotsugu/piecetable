@@ -43,6 +43,9 @@ public class JavaLexer implements Lexer, DecorateTo {
         int CHAR_LITERAL = serial.getAndIncrement();
     }
 
+    /** The name. */
+    private final String name;
+
     /** The syntax keywords. */
     private static final Trie keywords = keywords();
 
@@ -52,9 +55,11 @@ public class JavaLexer implements Lexer, DecorateTo {
 
     /**
      * Constructor.
+     * @param name the name
      * @param source the {@link LexerSource}
      */
-    private JavaLexer(LexerSource source) {
+    private JavaLexer(String name, LexerSource source) {
+        this.name = name;
         this.source = source;
     }
 
@@ -65,16 +70,23 @@ public class JavaLexer implements Lexer, DecorateTo {
      * @return a lexer
      */
     public static Lexer of(LexerSource source) {
-        return new JavaLexer(source);
+        return new JavaLexer("", source);
     }
 
 
     /**
      * Create a new lexer.
+     * @param name the name
      * @return a lexer
      */
-    public static Lexer of() {
-        return new JavaLexer(null);
+    public static Lexer of(String name) {
+        return new JavaLexer(name, null);
+    }
+
+
+    @Override
+    public String name() {
+        return name;
     }
 
 

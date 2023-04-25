@@ -40,15 +40,20 @@ public class JsonLexer implements Lexer, DecorateTo {
         int COMMENT = serial.getAndIncrement();
     }
 
+    /** The name. */
+    private final String name;
+
     /** The input string. */
     private LexerSource source;
 
 
     /**
      * Constructor.
+     * @param name the name
      * @param source the {@link LexerSource}
      */
-    private JsonLexer(LexerSource source) {
+    private JsonLexer(String name, LexerSource source) {
+        this.name = name;
         this.source = source;
     }
 
@@ -59,16 +64,23 @@ public class JsonLexer implements Lexer, DecorateTo {
      * @return a lexer
      */
     public static Lexer of(LexerSource source) {
-        return new JsonLexer(source);
+        return new JsonLexer("", source);
     }
 
 
     /**
      * Create a new lexer.
+     * @param name the name
      * @return a lexer
      */
-    public static Lexer of() {
-        return new JsonLexer(null);
+    public static Lexer of(String name) {
+        return new JsonLexer(name, null);
+    }
+
+
+    @Override
+    public String name() {
+        return name;
     }
 
 

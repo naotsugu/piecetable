@@ -50,7 +50,7 @@ public class DecoratorImpl implements Decorator {
      * @return a new Decorator
      */
     public static Decorator of(String ext) {
-        return new DecoratorImpl(Lexer.of(ext));
+        return new DecoratorImpl(Lexer.of(Lexer.name(ext)));
     }
 
 
@@ -67,10 +67,10 @@ public class DecoratorImpl implements Decorator {
              !token.isEmpty();
              token = lexer.nextToken()) {
 
-            if (token.scope().isBlock()) {
+            if (token.scope().isBlock() || token.scope().isContext()) {
                 tokens.put(origin.offset() + token.position(), token);
             }
-            if (token.scope().isBlock() || token.scope().isInline()) {
+            if (!token.scope().isNeutral()) {
                 scope.put(token);
             }
 

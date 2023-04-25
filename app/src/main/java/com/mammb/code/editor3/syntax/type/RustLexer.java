@@ -42,6 +42,9 @@ public class RustLexer implements Lexer, DecorateTo {
         int DOC_COMMENT = serial.getAndIncrement();
     }
 
+    /** The name. */
+    private final String name;
+
     /** The syntax keywords. */
     private static final Trie keywords = keywords();
 
@@ -51,19 +54,28 @@ public class RustLexer implements Lexer, DecorateTo {
 
     /**
      * Constructor.
+     * @param name the name
      * @param source the {@link LexerSource}
      */
-    private RustLexer(LexerSource source) {
+    private RustLexer(String name, LexerSource source) {
+        this.name = name;
         this.source = source;
     }
 
 
     /**
      * Create a new lexer.
+     * @param name the name
      * @return a lexer
      */
-    public static Lexer of() {
-        return new RustLexer(null);
+    public static Lexer of(String name) {
+        return new RustLexer(name, null);
+    }
+
+
+    @Override
+    public String name() {
+        return name;
     }
 
 

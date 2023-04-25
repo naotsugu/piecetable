@@ -15,6 +15,8 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.ui.util.MaterialColors;
+
 /**
  * Coloring.
  * @author Naotsugu Kobayashi
@@ -26,6 +28,7 @@ public interface Coloring {
     Coloring DarkGray = new ColoringRec("#808080", 1.0);
     Coloring DarkYellow = new ColoringRec("#d7d02f", 1.0);
     Coloring DarkSkyBlue = new ColoringRec("#78aed7", 1.0);
+    Coloring DarkBrown = new ColoringRec("#A1887F", 1.0);
 
     /**
      * Get the color string.

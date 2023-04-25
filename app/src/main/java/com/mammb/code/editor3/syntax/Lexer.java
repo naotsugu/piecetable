@@ -28,6 +28,12 @@ import com.mammb.code.editor3.syntax.type.RustLexer;
 public interface Lexer {
 
     /**
+     * Get the name.
+     * @return the name
+     */
+    String name();
+
+    /**
      * Gets the next token.
      * @return the next token
      */
@@ -43,17 +49,33 @@ public interface Lexer {
 
 
     /**
-     * Get the lexer according to the extension.
-     * @param ext the extension
+     * Get the lexer according to the name.
+     * @param name the name
      * @return the lexer
      */
-    static Lexer of(String ext) {
+    static Lexer of(String name) {
+        return switch (name) {
+            case "java" -> JavaLexer.of(name);
+            case "json" -> JsonLexer.of(name);
+            case "rust" -> RustLexer.of(name);
+            case "markdown" -> MarkdownLexer.of(name);
+            default -> PassThroughLexer.of(name);
+        };
+    }
+
+
+    /**
+     * Get the lexer name according to the extension.
+     * @param ext the extension
+     * @return the lexer name
+     */
+    static String name(String ext) {
         return switch (ext) {
-            case "java" -> JavaLexer.of();
-            case "json" -> JsonLexer.of();
-            case "rs", "rust" -> RustLexer.of();
-            case "md" -> MarkdownLexer.of();
-            default -> PassThroughLexer.of();
+            case "java" -> "java";
+            case "json" -> "json";
+            case "rs", "rust" -> "rust";
+            case "md" -> "markdown";
+            default -> "pt";
         };
     }
 

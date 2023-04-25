@@ -29,18 +29,20 @@ import com.mammb.code.editor3.syntax.Token;
  */
 public class PassThroughLexer implements Lexer, DecorateTo {
 
+    /** The name. */
+    private final String name;
+
     /** The input string. */
     private LexerSource source;
-
-    /** The flag of finished. */
-    private boolean finished = false;
 
 
     /**
      * Constructor.
+     * @param name the name
      * @param source the {@link LexerSource}
      */
-    private PassThroughLexer(LexerSource source) {
+    private PassThroughLexer(String name, LexerSource source) {
+        this.name = name;
         this.source = source;
     }
 
@@ -51,33 +53,46 @@ public class PassThroughLexer implements Lexer, DecorateTo {
      * @return a lexer
      */
     public static Lexer of(LexerSource source) {
-        return new PassThroughLexer(source);
+        return new PassThroughLexer("", source);
     }
 
 
     /**
      * Create a new lexer.
+     * @param name the name
      * @return a lexer
      */
-    public static Lexer of() {
-        return new PassThroughLexer(null);
+    public static Lexer of(String name) {
+        return new PassThroughLexer(name, null);
+    }
+
+
+    @Override
+    public String name() {
+        return name;
     }
 
 
     @Override
     public void setSource(LexerSource source, LexicalScope lexicalScope) {
-        this.finished = false;
         this.source = source;
     }
 
 
     @Override
     public Token nextToken() {
-        if (source == null || finished) {
-            return new Token(0, ScopeType.NEUTRAL, 0, 0);
+
+        if (source == null) {
+            return TokenType.empty(null);
         }
-        finished = true;
-        return new Token(0, ScopeType.NEUTRAL, 0, source.length());
+
+        char ch = source.readChar();
+        return switch (ch) {
+            case ' ', '\t' -> TokenType.whitespace(source);
+            case '\n', '\r' -> TokenType.lineEnd(source);
+            case 0 -> new Token(TokenType.EMPTY, ScopeType.NEUTRAL, 0, 0);
+            default -> TokenType.any(source);
+        };
     }
 
 
