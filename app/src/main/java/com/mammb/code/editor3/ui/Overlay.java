@@ -17,6 +17,7 @@ package com.mammb.code.editor3.ui;
 
 import com.mammb.code.editor3.lang.Functions;
 import com.mammb.code.editor3.ui.control.FlatDialog;
+import com.mammb.code.editor3.ui.util.Colors;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,8 +38,9 @@ public class Overlay extends StackPane {
      */
     public Overlay() {
         setAlignment(Pos.CENTER);
+        Color c = Colors.background;
         setBackground(new Background(
-            new BackgroundFill(Color.web("#000000", 0.5),
+            new BackgroundFill(Color.color(c.getRed(), c.getGreen(), c.getBlue(), 0.7),
                 CornerRadii.EMPTY, Insets.EMPTY)));
         setFocused(false);
         setVisible(false);

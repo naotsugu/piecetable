@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Colors {
 
     /** The background color. */
-    public static final Color background = MaterialColors.blueGrey900;
+    public static final Color background = MaterialColors.grey900;
 
     /** The foreground color. */
     public static final Color foreground = MaterialColors.blueGrey100;
