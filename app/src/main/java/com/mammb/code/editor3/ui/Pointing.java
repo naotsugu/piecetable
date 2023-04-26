@@ -61,6 +61,14 @@ public class Pointing extends Region {
 
 
     /**
+     * Refresh pointing.
+     */
+    public void refresh() {
+        caret.moveToOffset();
+    }
+
+
+    /**
      * Shift this pointing.
      * @param delta the shift of delta
      */

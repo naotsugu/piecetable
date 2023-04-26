@@ -221,5 +221,6 @@ public class MarkdownLexer implements Lexer, DecorateTo {
         (type == Type.H3) ? Decorated.of(18, Coloring.DarkSkyBlue) :
         (type == Type.H4) ? Decorated.of(17, Coloring.DarkSkyBlue) :
         (type == Type.H5) ? Decorated.of(16, Coloring.DarkSkyBlue) :
+        (type == Type.FENCE) ? Decorated.of(Coloring.DarkBrown) :
         (type == Type.INLINE_CODE) ? Decorated.of(Coloring.DarkBrown) : Decorated.empty();
 }

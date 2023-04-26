@@ -191,6 +191,14 @@ public class CaretBehavior {
 
 
     /**
+     * Refresh pointing.
+     */
+    public void refresh() {
+        pointing.refresh();
+    }
+
+
+    /**
      * Start select.
      */
     public void select() {

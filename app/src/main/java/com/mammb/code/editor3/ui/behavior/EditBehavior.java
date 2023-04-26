@@ -118,6 +118,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
+        caretBehavior.refresh();
         editListener.handle("delete");
     }
 
@@ -135,6 +136,7 @@ public class EditBehavior {
             model.delete(pointing.caretOffset(), 1);
         }
         textFlow.setAll(Texts.asText(model.text()));
+        caretBehavior.refresh();
         editListener.handle("backspace");
     }
 
@@ -150,6 +152,7 @@ public class EditBehavior {
         pointing.clearSelection();
         model.undo();
         textFlow.setAll(Texts.asText(model.text()));
+        caretBehavior.refresh();
         editListener.handle("undo");
     }
 
@@ -165,6 +168,7 @@ public class EditBehavior {
         pointing.clearSelection();
         model.redo();
         textFlow.setAll(Texts.asText(model.text()));
+        caretBehavior.refresh();
         editListener.handle("redo");
     }
 

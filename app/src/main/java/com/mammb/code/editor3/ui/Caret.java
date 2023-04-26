@@ -304,7 +304,7 @@ public class Caret extends Path {
      * Move caret to the position of offset.
      * @return {@code true}, if caret is moved
      */
-    private boolean moveToOffset() {
+    public boolean moveToOffset() {
         double oldX = physicalX;
         double oldY = physicalY;
         setShape(text.caretShape(offset, true));
