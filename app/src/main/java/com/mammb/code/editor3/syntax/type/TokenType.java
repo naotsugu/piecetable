@@ -46,14 +46,13 @@ public interface TokenType {
      * @return the token
      */
     static Token lineEnd(LexerSource source) {
-        char ch = source.peekChar();
-        if (source.currentChar() == '\r' && ch == '\n' ||
-            source.currentChar() == '\n' && ch == '\r') {
+        int pos = source.position();
+        if (source.currentChar() == '\r' && source.peekChar() == '\n') {
             source.commitPeek();
-            return new Token(TokenType.EOL, ScopeType.INLINE_END, source.position(), 2);
+            return new Token(TokenType.EOL, ScopeType.INLINE_END, pos, 2);
         } else {
             source.rollbackPeek();
-            return new Token(TokenType.EOL, ScopeType.INLINE_END, source.position(), 1);
+            return new Token(TokenType.EOL, ScopeType.INLINE_END, pos, 1);
         }
     }
 
