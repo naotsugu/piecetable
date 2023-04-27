@@ -193,7 +193,7 @@ public class MarkdownLexer implements Lexer, DecorateTo {
                 char ch = source.peekChar();
                 if (Character.isLetterOrDigit(ch)) {
                     sb.append(ch);
-                } else if (ch == '\n' || ch == 0) {
+                } else if (ch == '\r' || ch == '\n' || ch == 0) {
                     source.commitPeekBefore();
                     return new Token(Type.FENCE, ScopeType.CONTEXT_START, pos, source.position() + 1 - pos, sb.toString());
                 } else {
