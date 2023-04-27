@@ -157,6 +157,7 @@ public class Strings {
      * @return the unified string
      */
     public static String unifyLf(String string) {
+        if (string == null || string.isEmpty()) return string;
         int len = 0;
         char[] chars = new char[string.length()];
         for (int i = 0; i < string.length(); i++) {
@@ -170,6 +171,32 @@ public class Strings {
             } else {
                 chars[len++] = ch;
             }
+        }
+        return new String(chars, 0, len);
+    }
+
+
+    /**
+     * Unify line breaks in the given string to CR LF line breaks.
+     * @param string the given string
+     * @return the unified string
+     */
+    public static String unifyCrLf(String string) {
+        if (string == null || string.isEmpty()) return string;
+        int lfCount = count(string, LF);
+        if (lfCount == 0) {
+            return string;
+        }
+        int len = 0;
+        char prev = 0;
+        char[] chars = new char[string.length() + lfCount];
+        for (int i = 0; i < string.length(); i++) {
+            char ch = string.charAt(i);
+            if (ch == LF && prev != CR) {
+                chars[len++] = CR;
+            }
+            chars[len++] = ch;
+            prev = ch;
         }
         return new String(chars, 0, len);
     }

@@ -26,8 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class StringsTest {
 
-    @Test
-    void testLengthOfLastRow() {
+    @Test void lengthOfLastRow() {
         assertEquals(0, Strings.lengthOfLastRow(""));
         assertEquals(1, Strings.lengthOfLastRow("a"));
         assertEquals(2, Strings.lengthOfLastRow("ab"));
@@ -44,8 +43,7 @@ class StringsTest {
         assertEquals(3, Strings.lengthOfLastRow("a😀b\nefg"));
     }
 
-    @Test
-    void testLastIndexOf() {
+    @Test void lastIndexOf() {
         assertEquals(-1, Strings.lastIndexOf("", 'a'));
         assertEquals(0, Strings.lastIndexOf("abc", 'a'));
         assertEquals(1, Strings.lastIndexOf("abc", 'b'));
@@ -53,8 +51,7 @@ class StringsTest {
         assertEquals(-1, Strings.lastIndexOf("abc", 'x'));
     }
 
-    @Test
-    void countRow() {
+    @Test void countRow() {
         assertEquals(0, Strings.countRow(""));
         assertEquals(1, Strings.countRow("a"));
         assertEquals(1, Strings.countRow("a\n"));
@@ -64,8 +61,7 @@ class StringsTest {
         assertEquals(3, Strings.countRow("a\nb\nc\n"));
     }
 
-    @Test
-    void testCountLf() {
+    @Test void testCountLf() {
         assertEquals(0, Strings.countLf(""));
         assertEquals(0, Strings.countLf("a"));
         assertEquals(0, Strings.countLf("ab"));
@@ -81,8 +77,27 @@ class StringsTest {
         assertEquals(2, Strings.countLf("a\nb\nc"));
     }
 
-    @Test
-    void testLengthByteAsUtf16() {
+    @Test void unifyLf() {
+        assertEquals("", Strings.unifyLf(""));
+        assertEquals("a", Strings.unifyLf("a"));
+        assertEquals("ab", Strings.unifyLf("ab"));
+        assertEquals("\n", Strings.unifyLf("\n"));
+        assertEquals("\n", Strings.unifyLf("\r\n"));
+        assertEquals("\n\n", Strings.unifyLf("\r\n\r\n"));
+        assertEquals("a\nb\nc", Strings.unifyLf("a\nb\r\nc"));
+    }
+
+    @Test void unifyCrLf() {
+        assertEquals("", Strings.unifyCrLf(""));
+        assertEquals("a", Strings.unifyCrLf("a"));
+        assertEquals("ab", Strings.unifyCrLf("ab"));
+        assertEquals("\r\n", Strings.unifyCrLf("\r\n"));
+        assertEquals("\r\n", Strings.unifyCrLf("\n"));
+        assertEquals("\r\n\r\n", Strings.unifyCrLf("\n\n"));
+        assertEquals("a\r\nb\r\nc", Strings.unifyCrLf("a\nb\r\nc"));
+    }
+
+    @Test void lengthByteAsUtf16() {
         assertEquals(0, Strings.lengthByteAsUtf16((byte) -1));
         assertEquals(1, Strings.lengthByteAsUtf16("a".getBytes(StandardCharsets.UTF_8)[0]));
         assertEquals(1, Strings.lengthByteAsUtf16("あ".getBytes(StandardCharsets.UTF_8)[0]));
