@@ -166,7 +166,7 @@ public class Pointing extends Region {
      * @param y point of y on local
      */
     public void caretRawAt(double y) {
-        caret.moveToPointRow(y);
+        caret.moveToPointRow(y - getTranslateY());
     }
 
 
