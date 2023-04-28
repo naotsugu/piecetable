@@ -67,8 +67,10 @@ public class EditorPane extends StackPane {
         Garter garter = new Garter();
         garter.addLeft(textPane.rowsPanel());
         garter.apply(layout);
-        textPane.prefHeightProperty().bind(heightProperty().subtract(garter.top().heightProperty()));
-        textPane.prefWidthProperty().bind(widthProperty().subtract(garter.left().widthProperty()));
+        textPane.prefHeightProperty().bind(heightProperty()
+            .subtract(garter.top().heightProperty()));
+        textPane.prefWidthProperty().bind(widthProperty()
+            .subtract(garter.left().widthProperty()));
     }
 
 

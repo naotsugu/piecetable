@@ -15,11 +15,13 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.lang.LineEnding;
 import com.mammb.code.editor3.lang.Until;
 import com.mammb.code.editor3.lang.EventListener;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import static com.mammb.code.editor3.lang.LineEnding.*;
 
 /**
  * TextSource.
@@ -95,9 +97,9 @@ public class TextSource implements EventListener<Edit> {
         int count = 0;
         for (byte b : row) {
             if ((b & 0xC0) != 0x80) count++;
-            if (b == '\n') rows++;
+            if (LF.match(b)) rows++;
         }
-        if (row[row.length - 1] == '\n') rows--;
+        if (LF.match(row[row.length - 1])) rows--;
 
         offset += Math.signum(rowDelta) * count;
         return rows;
@@ -132,25 +134,6 @@ public class TextSource implements EventListener<Edit> {
 
 
     /**
-     * Get the before row.
-     * @return the before row
-     */
-    String beforeRow() {
-        editQueue.flush();
-        byte[] headRow = source.bytesBefore(offset, Until.lf(2));
-        return new String(headRow, charset);
-    }
-
-
-    /**
-     * Get the after row.
-     * @param charOffset the char offset
-     * @return the row string
-     */
-    String afterRow(int charOffset) { return afterRow(charOffset, 1); }
-
-
-    /**
      * Get the after row.
      * @param charOffset the char offset
      * @param n the number of row to get
@@ -179,6 +162,15 @@ public class TextSource implements EventListener<Edit> {
      */
     public int totalSize() {
         return source.length() + editQueue.pendingCodePointCountDelta();
+    }
+
+
+    /**
+     * Get the line ending.
+     * @return the line ending
+     */
+    public LineEnding lineEnding() {
+        return source.lineEnding();
     }
 
 

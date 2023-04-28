@@ -17,7 +17,6 @@ package com.mammb.code.editor3.lang;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The string utilities.
@@ -25,19 +24,13 @@ import java.util.Objects;
  */
 public class Strings {
 
-    /** carriage return. */
-    public static char CR = '\r';
-    /** line feed. */
-    public static char LF = '\n';
-
-
     /**
      * Get the length of specified character sequences last row.
      * @param cs the specified char sequence
      * @return the length of last row(not code point)
      */
     public static int lengthOfLastRow(CharSequence cs) {
-        int index = Math.max(0, Math.min(lastIndexOf(cs, LF) + 1, cs.length()));
+        int index = Math.max(0, Math.min(lastIndexOf(cs, LineEnding.LF.c()) + 1, cs.length()));
         return cs.subSequence(index, cs.length()).length();
     }
 
@@ -83,7 +76,7 @@ public class Strings {
      */
     public static int countRow(CharSequence cs) {
         return (cs == null || cs.isEmpty()) ? 0
-            : count(cs, LF) + ((cs.charAt(cs.length() - 1) != LF) ? 1 : 0);
+            : count(cs, LineEnding.LF.c()) + (!LineEnding.LF.match(cs.charAt(cs.length() - 1)) ? 1 : 0);
     }
 
 
@@ -93,7 +86,7 @@ public class Strings {
      * @return the number of line feed
      */
     public static int countLf(CharSequence cs) {
-        return count(cs, LF);
+        return count(cs, LineEnding.LF.c());
     }
 
 
@@ -136,7 +129,7 @@ public class Strings {
      * @return {@code true}, if given byte is a carriage return
      */
     public static boolean isLf(char ch) {
-        return ch == LF;
+        return LineEnding.LF.match(ch);
     }
 
 
@@ -147,7 +140,7 @@ public class Strings {
      * @return {@code true}, if given bytes is a CRLF
      */
     public static boolean isCrLf(char ch1, char ch2) {
-        return ch1 == CR && ch2 == LF;
+        return LineEnding.CRLF.match(ch1, ch2);
     }
 
 
@@ -162,11 +155,11 @@ public class Strings {
         char[] chars = new char[string.length()];
         for (int i = 0; i < string.length(); i++) {
             char ch = string.charAt(i);
-            if (ch == CR) {
-                if (i + 1 < string.length() && string.charAt(i + 1) == LF) {
+            if (LineEnding.CR.match(ch)) {
+                if (i + 1 < string.length() && LineEnding.LF.match(string.charAt(i + 1))) {
                     // just skip
                 } else {
-                    chars[len++] = LF;
+                    chars[len++] = LineEnding.LF.c();
                 }
             } else {
                 chars[len++] = ch;
@@ -183,7 +176,7 @@ public class Strings {
      */
     public static String unifyCrLf(String string) {
         if (string == null || string.isEmpty()) return string;
-        int lfCount = count(string, LF);
+        int lfCount = count(string, LineEnding.LF.c());
         if (lfCount == 0) {
             return string;
         }
@@ -192,8 +185,8 @@ public class Strings {
         char[] chars = new char[string.length() + lfCount];
         for (int i = 0; i < string.length(); i++) {
             char ch = string.charAt(i);
-            if (ch == LF && prev != CR) {
-                chars[len++] = CR;
+            if (LineEnding.LF.match(ch) && !LineEnding.CRLF.match(prev, ch)) {
+                chars[len++] = LineEnding.CR.c();
             }
             chars[len++] = ch;
             prev = ch;

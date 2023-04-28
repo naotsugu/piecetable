@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.lang.LineEnding;
 import com.mammb.code.editor3.lang.Strings;
 import com.mammb.code.piecetable.PieceTable;
 import java.nio.file.Path;
@@ -45,6 +46,7 @@ public class ContentImpl implements Content {
     /** The number of row. */
     private int rowSize;
 
+    private LineEnding lineEnding;
 
     /**
      * Constructor.
@@ -52,6 +54,7 @@ public class ContentImpl implements Content {
     public ContentImpl() {
         this.pt = PieceTable.of("");
         this.rowSize = 1;
+        lineEnding = LineEnding.platform();
     }
 
     /**
@@ -61,7 +64,11 @@ public class ContentImpl implements Content {
     public ContentImpl(Path path) {
         this.pt = PieceTable.of(path);
         this.path = path;
-        this.rowSize = pt.count(bytes -> bytes[0] == '\n') + 1;
+        this.lineEnding = LineEnding.LF;
+        this.rowSize = pt.count(bytes -> {
+            if (LineEnding.CR.match(bytes[0])) lineEnding = LineEnding.CRLF;
+            return LineEnding.LF.match(bytes[0]);
+        }) + 1;
     }
 
 
@@ -80,6 +87,8 @@ public class ContentImpl implements Content {
     @Override
     public int rowSize() { return rowSize; }
 
+    @Override
+    public LineEnding lineEnding() { return lineEnding; }
 
     @Override
     public byte[] bytes(int startPos, Predicate<byte[]> until) {

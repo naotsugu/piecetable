@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui.util;
 
+import com.mammb.code.editor3.lang.LineEnding;
 import com.mammb.code.editor3.model.DecoratedText;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -59,7 +60,7 @@ public class Texts {
         Text text = asText(string);
         text.setWrappingWidth(wrappingWidth);
         int line = (int) (text.getLayoutBounds().getHeight() / height);
-        if (string.charAt(string.length() - 1) == '\n') line--;
+        if (LineEnding.LF.match(string.charAt(string.length() - 1))) line--;
 
         String[] ret = new String[line];
         int offset = 0;

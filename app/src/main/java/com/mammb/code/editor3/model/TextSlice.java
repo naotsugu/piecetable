@@ -86,6 +86,7 @@ public class TextSlice {
      * @param string the inserting string
      */
     public void insert(int offset, String string) {
+        string = source.lineEnding().unify(string);
         buffer.insert(offset, string);
         source.handle(Edit.insert(origin.offset(), offset, string));
         if (Strings.countLf(string) > 0) {

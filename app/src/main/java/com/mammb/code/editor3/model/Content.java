@@ -15,6 +15,8 @@
  */
 package com.mammb.code.editor3.model;
 
+import com.mammb.code.editor3.lang.LineEnding;
+
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
@@ -42,6 +44,12 @@ public interface Content extends EditListener {
      * @return the total row size
      */
     int rowSize();
+
+    /**
+     * Get the line ending.
+     * @return the line ending
+     */
+    LineEnding lineEnding();
 
     /**
      * Get the bytes.
