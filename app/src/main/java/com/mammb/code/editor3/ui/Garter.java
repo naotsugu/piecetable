@@ -115,7 +115,7 @@ public class Garter {
      */
     static class TopGarter extends StackPane {
 
-        private static final double HEIGHT = 4.0;
+        private static final double HEIGHT = 6.0;
 
         private final Rectangle left;
 
@@ -123,7 +123,7 @@ public class Garter {
             setPrefHeight(HEIGHT);
             setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_PREF_SIZE);
             setAlignment(Pos.TOP_LEFT);
-            setBackground(new Background(new BackgroundFill(Colors.background, null, null)));
+            //setBackground(new Background(new BackgroundFill(Colors.background, null, null)));
 
             left = new Rectangle(LeftGarter.MIN_WIDTH, HEIGHT, Colors.panel);
             left.heightProperty().bind(heightProperty());
