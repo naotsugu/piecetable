@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor3.ui;
 
+import com.mammb.code.editor3.lang.Functions;
 import com.mammb.code.editor3.model.TextModel;
 import com.mammb.code.editor3.ui.util.Colors;
 import com.mammb.code.editor3.ui.util.Keys;
@@ -22,6 +23,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
+
 import java.lang.System.Logger;
 import java.lang.System.Logger.*;
 
@@ -82,6 +86,7 @@ public class EditorPane extends StackPane {
         scene.setFill(Colors.background);
         stage.setScene(scene);
         stage.show();
+        scene.getWindow().setOnCloseRequest(textPane.closeWithDirtyCheck());
     }
 
 

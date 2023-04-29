@@ -65,6 +65,15 @@ public class Overlay extends StackPane {
 
 
     /**
+     * Confirmation will be performed.
+     * @param contentText the content text
+     * @param ok the action if OK is selected
+     */
+    public void confirm(String contentText, Runnable ok) {
+        confirm(contentText, ok, Functions.empty());
+    }
+
+    /**
      * Clear overlay.
      */
     public void clear() {

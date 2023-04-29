@@ -91,7 +91,7 @@ public class ImeBehavior {
      * Exit ime.
      */
     public void exit() {
-        if (pendingText != null) {
+        if (doing()) {
             boolean rm = flow.getChildren().remove(pendingText);
             if (!rm) throw new RuntimeException("ime exit error.");
             pendingText = null;
@@ -103,6 +103,10 @@ public class ImeBehavior {
     }
 
 
+    /**
+     * Gets whether ime processing is in progress or not.
+     * @return {@code true}, if ime processing is in progress
+     */
     public boolean doing() {
         return pendingText != null;
     }
@@ -148,7 +152,6 @@ public class ImeBehavior {
         }
         flow.setAll(texts);
         originalTranslateX = pointing.caretTranslateX();
-
     }
 
 

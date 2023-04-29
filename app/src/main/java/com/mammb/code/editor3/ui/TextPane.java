@@ -33,12 +33,17 @@ import com.mammb.code.editor3.ui.handler.MouseDraggedHandler;
 import com.mammb.code.editor3.ui.handler.ScrollHandler;
 import com.mammb.code.editor3.ui.util.Texts;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.AccessibleRole;
+import javafx.scene.input.DragEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
+
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -47,6 +52,9 @@ import java.util.Objects;
  * @author Naotsugu Kobayashi
  */
 public class TextPane extends StackPane {
+
+    /** The logger. */
+    private static final System.Logger log = System.getLogger(TextPane.class.getName());
 
     /** The stage. */
     private final Stage stage;
@@ -127,6 +135,7 @@ public class TextPane extends StackPane {
 
         setInputMethodRequests(imeBehavior.inputMethodRequests());
         setOnInputMethodTextChanged(ImeTextHandler.of(imeBehavior));
+
     }
 
 
@@ -165,13 +174,34 @@ public class TextPane extends StackPane {
     public void open(Runnable openAction) {
         pointing.hideCaret();
         if (isDirty()) {
-            overlay.confirm("Are you sure you want to discard your changes?",
+            overlay.confirm(
+                "Are you sure you want to discard your changes?",
                 Functions.and(model::clearDirty, openAction),
                 pointing::showCaret);
         } else {
             openAction.run();
             pointing.showCaret();
         }
+    }
+
+
+    /**
+     * Get the close window event handler.
+     * @return the WindowEvent handler
+     */
+    public EventHandler<WindowEvent> closeWithDirtyCheck() {
+        return event -> {
+            final Window window = (Window) event.getSource();
+            if (isDirty()) {
+                event.consume();
+                overlay.confirm(
+                    "Are you sure you want to discard your changes?",
+                    Functions.and(
+                        model::clearDirty,
+                        () -> window.fireEvent(
+                            new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST))));
+            }
+        };
     }
 
 

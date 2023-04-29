@@ -22,7 +22,7 @@ package com.mammb.code.editor3.lang;
 public class Functions {
 
     /**
-     * Get a runnable that performs, in sequence
+     * Get a runnable that performs, in sequence.
      * @param before the operation to perform before this operation
      * @param after the operation to perform after this operation
      * @return a composed Runnable that performs in sequence
@@ -32,6 +32,15 @@ public class Functions {
             if (before != null) before.run();
             if (after  != null) after.run();
         };
+    }
+
+
+    /**
+     * Get a empty runnable.
+     * @return a empty runnable
+     */
+    public static Runnable empty() {
+        return () -> { };
     }
 
 }
