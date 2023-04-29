@@ -225,7 +225,7 @@ public class EditBehavior {
     /**
      * Delete the selecting text.
      */
-    private void selectionDelete() {
+    public void selectionDelete() {
         if (!pointing.selectionOn()) return;
 
         pointing.normalizeSelectionCaret();

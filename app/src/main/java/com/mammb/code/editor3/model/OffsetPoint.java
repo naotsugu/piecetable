@@ -24,6 +24,7 @@ public record OffsetPoint(int origin, int offset) {
     /** The empty offset point. */
     public static final OffsetPoint empty = new OffsetPoint(-1, -1);
 
+
     /**
      * Get the position.
      * @return the position

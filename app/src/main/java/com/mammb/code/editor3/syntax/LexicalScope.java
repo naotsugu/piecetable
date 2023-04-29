@@ -40,6 +40,7 @@ public class LexicalScope {
     /** The context scopes(key:token type number). */
     private final Map<Integer, Deque<Token>> contextScopes = new HashMap<>();
 
+
     /**
      * Create a new LexicalScope.
      * @param entries the token entries

@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class Texts {
 
-    private static final Font DEFAULT = new Font("Consolas", 16);
+    private static final Font DEFAULT = new Font("Consolas", 15);
 
     public static final Text bit = new Text("X");
     static {
@@ -110,11 +110,6 @@ public class Texts {
         text.setFont(font);
         text.setFill(color);
         return text;
-    }
-
-
-    public static List<Text> asTextPlain(List<String> strings) {
-        return strings.stream().map(Texts::asText).toList();
     }
 
 

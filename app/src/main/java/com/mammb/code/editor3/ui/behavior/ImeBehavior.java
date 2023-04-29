@@ -80,7 +80,10 @@ public class ImeBehavior {
             on(pointing.caretOffset());
         }
         pendingText.setText(text);
-        pointing.slipCaretTranslateX(originalTranslateX + Texts.width(pendingText.getText(), pendingText.getFont()));
+        pointing.slipCaretTranslateX(
+            originalTranslateX + Texts.width(
+                pendingText.getText(),
+                pendingText.getFont()));
     }
 
 

@@ -29,17 +29,29 @@ public enum LineEnding {
     CRLF;
 
 
+    /**
+     * Get the char array.
+     * @return the char array
+     */
     public char[] cs() {
         return str().toCharArray();
     }
 
 
+    /**
+     * Get the first char.
+     * @return the first char
+     */
     public char c() {
         if (this == CRLF) throw new IllegalStateException(this.toString());
         return str().toCharArray()[0];
     }
 
 
+    /**
+     * Get the line ending string.
+     * @return the line ending string
+     */
     public String str() {
         return switch (this) {
             case LF -> "\n";
@@ -49,6 +61,11 @@ public enum LineEnding {
     }
 
 
+    /**
+     * Gets whether the specified char array matches a newline character.
+     * @param x the specified char array
+     * @return {@code true}, if the specified char array matches a newline character
+     */
     public boolean match(char... x) {
         if (x == null || x.length == 0) return false;
         return switch (this) {
@@ -59,12 +76,12 @@ public enum LineEnding {
 
 
     /**
-     *
-     * @param x
-     * @return
+     * Gets whether the specified byte matches a newline character.
+     * @param b the specified byte
+     * @return {@code true}, if the specified byte matches a newline character
      */
-    public boolean match(byte x) {
-        return match((char) x);
+    public boolean match(byte b) {
+        return match((char) b);
     }
 
 
@@ -82,6 +99,10 @@ public enum LineEnding {
     }
 
 
+    /**
+     * Get the platform line separator.
+     * @return the platform line separator
+     */
     public static LineEnding platform() {
         var s = System.getProperty("line.separator");
         return LF.str().equals(s) ? LF

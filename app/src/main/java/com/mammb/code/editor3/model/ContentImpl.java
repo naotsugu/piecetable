@@ -46,7 +46,9 @@ public class ContentImpl implements Content {
     /** The number of row. */
     private int rowSize;
 
+    /** The line ending. */
     private LineEnding lineEnding;
+
 
     /**
      * Constructor.
@@ -87,8 +89,10 @@ public class ContentImpl implements Content {
     @Override
     public int rowSize() { return rowSize; }
 
+
     @Override
     public LineEnding lineEnding() { return lineEnding; }
+
 
     @Override
     public byte[] bytes(int startPos, Predicate<byte[]> until) {

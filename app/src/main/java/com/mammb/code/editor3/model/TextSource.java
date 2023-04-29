@@ -69,7 +69,8 @@ public class TextSource implements EventListener<Edit> {
      */
     public void shiftIndex(int charOffset) {
         if (charOffset == 0) return;
-        if (charOffset < 0) throw new IndexOutOfBoundsException("charOffset[" + charOffset + "]");
+        if (charOffset < 0)
+            throw new IndexOutOfBoundsException("charOffset[" + charOffset + "]");
 
         int newValue = offset + asCodePointCount(charOffset);
         if (newValue < 0 || newValue > totalSize()) {
@@ -90,8 +91,10 @@ public class TextSource implements EventListener<Edit> {
         editQueue.flush();
 
         byte[] row = (rowDelta > 0)
-            ? source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)))   // scroll next (i.e. arrow down)
-            : source.bytesBefore(offset, Until.lf(Math.abs(rowDelta) + 1)); // scroll prev (i.e. arrow up)
+            // scroll next (i.e. arrow down)
+            ? source.bytes(offset, Until.lfInclusive(Math.abs(rowDelta)))
+            // scroll prev (i.e. arrow up)
+            : source.bytesBefore(offset, Until.lf(Math.abs(rowDelta) + 1));
 
         int rows = 1;
         int count = 0;
