@@ -52,11 +52,29 @@ public class ScrollHandler implements EventHandler<ScrollEvent> {
     public void handle(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL) {
             if (e.getDeltaY() > 0) {
-                behavior.scrollPrev();
+                scrollPrev(Math.min((int) e.getDeltaY(), 3));
             } else if (e.getDeltaY() < 0) {
-                behavior.scrollNext();
+                scrollNext(Math.min(Math.abs((int) e.getDeltaY()), 3));
             }
         }
+    }
+
+
+    /**
+     * Scroll previous.
+     * @param n the number of scroll
+     */
+    private void scrollPrev(int n) {
+        for (int i = 0; i < n; i++) behavior.scrollPrev();
+    }
+
+
+    /**
+     * Scroll next.
+     * @param n the number of scroll
+     */
+    private void scrollNext(int n) {
+        for (int i = 0; i < n; i++) behavior.scrollNext();
     }
 
 }

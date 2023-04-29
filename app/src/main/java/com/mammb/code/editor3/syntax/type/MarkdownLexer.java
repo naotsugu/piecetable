@@ -23,6 +23,7 @@ import com.mammb.code.editor3.syntax.LexerSource;
 import com.mammb.code.editor3.syntax.LexicalScope;
 import com.mammb.code.editor3.syntax.ScopeType;
 import com.mammb.code.editor3.syntax.Token;
+import com.mammb.code.editor3.ui.util.Texts;
 
 import java.util.Optional;
 
@@ -216,11 +217,11 @@ public class MarkdownLexer implements Lexer, DecorateTo {
 
     /** The markdown decorateTo. */
     public static final DecorateTo self = type ->
-        (type == Type.H1) ? Decorated.of(20, Coloring.DarkSkyBlue) :
-        (type == Type.H2) ? Decorated.of(19, Coloring.DarkSkyBlue) :
-        (type == Type.H3) ? Decorated.of(18, Coloring.DarkSkyBlue) :
-        (type == Type.H4) ? Decorated.of(17, Coloring.DarkSkyBlue) :
-        (type == Type.H5) ? Decorated.of(16, Coloring.DarkSkyBlue) :
+        (type == Type.H1) ? Decorated.of(Texts.font.getSize() * 1.5, Coloring.DarkSkyBlue) :
+        (type == Type.H2) ? Decorated.of(Texts.font.getSize() * 1.4, Coloring.DarkSkyBlue) :
+        (type == Type.H3) ? Decorated.of(Texts.font.getSize() * 1.3, Coloring.DarkSkyBlue) :
+        (type == Type.H4) ? Decorated.of(Texts.font.getSize() * 1.2, Coloring.DarkSkyBlue) :
+        (type == Type.H5) ? Decorated.of(Texts.font.getSize(), Coloring.DarkSkyBlue) :
         (type == Type.FENCE) ? Decorated.of(Coloring.DarkBrown) :
         (type == Type.INLINE_CODE) ? Decorated.of(Coloring.DarkBrown) : Decorated.empty();
 }
