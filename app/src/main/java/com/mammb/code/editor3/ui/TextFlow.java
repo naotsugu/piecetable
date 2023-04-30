@@ -238,6 +238,10 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
     }
 
 
+    /**
+     * Set text wrap.
+     * @param wrap the text wrap
+     */
     void setTextWrap(boolean wrap) {
         if (textWrap == wrap) return;
         textWrap = wrap;
@@ -265,6 +269,10 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
     }
 
 
+    /**
+     * Set width.
+     * @param width size of width
+     */
     private void setWidthBulk(double width) {
         setMinWidth(width);
         setMaxWidth(width);
@@ -277,6 +285,9 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
     }
 
 
+    /**
+     * Add empty text.
+     */
     private void addTextIfEmpty() {
         if (getChildren().isEmpty()) {
             getChildren().add(Texts.asText(""));

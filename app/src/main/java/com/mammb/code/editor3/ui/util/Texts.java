@@ -32,7 +32,7 @@ import java.util.List;
 public class Texts {
 
     /** The default font. */
-    private static final Font DEFAULT = new Font("Consolas", 15);
+    private static final Font DEFAULT = new Font("Consolas", 13);
 
     /** The default text bit. */
     public static final Text bit = new Text("X");
