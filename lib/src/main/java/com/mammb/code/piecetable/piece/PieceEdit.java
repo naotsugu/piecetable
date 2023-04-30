@@ -32,7 +32,14 @@ import java.util.Objects;
 public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
 
     /** The edit place. */
-    public enum Place { HEAD, MID, TAIL }
+    public enum Place {
+        /** head. */
+        HEAD,
+        /** mid. */
+        MID,
+        /** tail. */
+        TAIL
+    }
 
 
     /**
@@ -114,8 +121,8 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
      *  |---|
      *  |+++|   |+++|
      * </pre>
-     * @param from
-     * @return
+     * @param from the position of edit
+     * @return the edited
      */
     public Edited asEdited(int from) {
 

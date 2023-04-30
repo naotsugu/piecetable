@@ -34,6 +34,11 @@ public class Charsets {
     private static final int bufSize = 8000;
 
 
+    /**
+     * Detect charset.
+     * @param source the source input stream
+     * @return the charset
+     */
     public static Charset charsetOf(InputStream source) {
 
         final InputStream is = (source.markSupported()) ? source

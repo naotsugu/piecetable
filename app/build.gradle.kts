@@ -10,11 +10,11 @@ repositories {
 dependencies {
     //implementation(project(mapOf("path" to ":lib")))
     implementation(project(":lib"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
 }
 
 application {
-    mainClass.set("com.mammb.code.editor3.App")
+    mainClass.set("com.mammb.code.editor.App")
     mainModule.set("com.mammb.code.editor")
 }
 
