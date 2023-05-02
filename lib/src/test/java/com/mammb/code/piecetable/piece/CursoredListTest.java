@@ -18,10 +18,8 @@ package com.mammb.code.piecetable.piece;
 import com.mammb.code.piecetable.buffer.Buffer;
 import com.mammb.code.piecetable.buffer.ReadBuffer;
 import org.junit.jupiter.api.Test;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
