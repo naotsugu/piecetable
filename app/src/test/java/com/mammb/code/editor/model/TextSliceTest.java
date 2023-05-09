@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor.model;
 
+import com.mammb.code.editor.lang.LineEnding;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TextSliceTest {
 
     @Test void tailRowAndTailOffset() {
-        var slice = new TextSlice(new TextSource(new ContentImpl()));
+        var slice = new TextSlice(new TextSource(new ContentImpl(LineEnding.LF)));
         slice.setMaxRowSize(5);
         slice.insert(0, IntStream.rangeClosed(1, 8)
             .mapToObj(Integer::toString)
@@ -66,7 +67,7 @@ class TextSliceTest {
 
     @Test void insert() {
 
-        var slice = new TextSlice(new TextSource(new ContentImpl()));
+        var slice = new TextSlice(new TextSource(new ContentImpl(LineEnding.LF)));
         slice.setMaxRowSize(4);
 
         slice.insert(0, "1"); slice.insert(1, "\n");
@@ -87,7 +88,7 @@ class TextSliceTest {
     }
 
     @Test void totalRowSize() {
-        var slice = new TextSlice(new TextSource(new ContentImpl()));
+        var slice = new TextSlice(new TextSource(new ContentImpl(LineEnding.LF)));
         assertEquals(1, slice.totalRowSize());
 
         slice.insert(1, "a");

@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor.model;
 
+import com.mammb.code.editor.lang.LineEnding;
 import org.junit.jupiter.api.Test;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TextModelTest {
 
     @Test void add() {
-        var model = new TextModel();
+        var model = new TextModel(LineEnding.LF);
         model.add(0, "a\nb");
         assertEquals("""
             a
@@ -139,7 +140,7 @@ class TextModelTest {
 
 
     @Test void edit() {
-        var model = new TextModel();
+        var model = new TextModel(LineEnding.LF);
         model.add(0, "a");
         model.add(1, "b");
         model.add(2, "c");
@@ -149,7 +150,7 @@ class TextModelTest {
     }
 
     @Test void edit2() {
-        var model = new TextModel();
+        var model = new TextModel(LineEnding.LF);
         model.setupMaxRows(3);
         model.add(0, "1\n");
         model.add(2, "2\n");
@@ -162,7 +163,7 @@ class TextModelTest {
 
 
     private TextModel textModel() {
-        var model = new TextModel();
+        var model = new TextModel(LineEnding.LF);
         model.setupMaxRows(5);
         String text = IntStream.rangeClosed(1, 8)
             .mapToObj(Integer::toString)

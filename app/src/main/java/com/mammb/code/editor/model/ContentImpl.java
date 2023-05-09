@@ -54,10 +54,20 @@ public class ContentImpl implements Content {
      * Constructor.
      */
     public ContentImpl() {
+        this(LineEnding.platform());
+    }
+
+
+    /**
+     * Constructor.
+     * @param lineEnding the line ending
+     */
+    public ContentImpl(LineEnding lineEnding) {
         this.pt = PieceTable.of("");
         this.rowSize = 1;
-        lineEnding = LineEnding.platform();
+        this.lineEnding = lineEnding;
     }
+
 
     /**
      * Create content for specified path.
