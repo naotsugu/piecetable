@@ -16,7 +16,7 @@
 package com.mammb.code.editor.syntax.type;
 
 import com.mammb.code.editor.model.Coloring;
-import com.mammb.code.editor.model.Decorated;
+import com.mammb.code.editor.model.Decorating;
 import com.mammb.code.editor.syntax.DecorateTo;
 import com.mammb.code.editor.syntax.Lexer;
 import com.mammb.code.editor.syntax.LexerSource;
@@ -210,18 +210,18 @@ public class MarkdownLexer implements Lexer, DecorateTo {
 
 
     @Override
-    public Decorated apply(int type) {
+    public Decorating apply(int type) {
         return decorateTo.apply(type);
     }
 
 
     /** The markdown decorateTo. */
     public static final DecorateTo self = type ->
-        (type == Type.H1) ? Decorated.of(Texts.font.getSize() * 1.5, Coloring.DarkSkyBlue) :
-        (type == Type.H2) ? Decorated.of(Texts.font.getSize() * 1.4, Coloring.DarkSkyBlue) :
-        (type == Type.H3) ? Decorated.of(Texts.font.getSize() * 1.3, Coloring.DarkSkyBlue) :
-        (type == Type.H4) ? Decorated.of(Texts.font.getSize() * 1.2, Coloring.DarkSkyBlue) :
-        (type == Type.H5) ? Decorated.of(Texts.font.getSize(), Coloring.DarkSkyBlue) :
-        (type == Type.FENCE) ? Decorated.of(Coloring.DarkBrown) :
-        (type == Type.INLINE_CODE) ? Decorated.of(Coloring.DarkBrown) : Decorated.empty();
+        (type == Type.H1) ? Decorating.of(Texts.font.getSize() * 1.5, Coloring.DarkSkyBlue) :
+        (type == Type.H2) ? Decorating.of(Texts.font.getSize() * 1.4, Coloring.DarkSkyBlue) :
+        (type == Type.H3) ? Decorating.of(Texts.font.getSize() * 1.3, Coloring.DarkSkyBlue) :
+        (type == Type.H4) ? Decorating.of(Texts.font.getSize() * 1.2, Coloring.DarkSkyBlue) :
+        (type == Type.H5) ? Decorating.of(Texts.font.getSize(), Coloring.DarkSkyBlue) :
+        (type == Type.FENCE) ? Decorating.of(Coloring.DarkBrown) :
+        (type == Type.INLINE_CODE) ? Decorating.of(Coloring.DarkBrown) : Decorating.empty();
 }

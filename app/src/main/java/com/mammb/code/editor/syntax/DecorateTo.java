@@ -15,7 +15,7 @@
  */
 package com.mammb.code.editor.syntax;
 
-import com.mammb.code.editor.model.Decorated;
+import com.mammb.code.editor.model.Decorating;
 
 /**
  * DecorateTo.
@@ -32,6 +32,6 @@ public interface DecorateTo {
      * @param type the type
      * @return the decorated
      */
-    Decorated apply(int type);
+    Decorating apply(int type);
 
 }

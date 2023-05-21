@@ -19,10 +19,10 @@ package com.mammb.code.editor.model;
  * Decorated.
  * @author Naotsugu Kobayashi
  */
-public interface Decorated {
+public interface Decorating {
 
     /** The empty decorated. */
-    Decorated empty = Decorated.of(null);
+    Decorating empty = Decorating.of(null);
 
     /**
      * Get the size.
@@ -63,10 +63,10 @@ public interface Decorated {
     }
 
     /**
-     * Create a empty decorated.
-     * @return a empty decorated
+     * Create an empty decorated.
+     * @return an empty decorated
      */
-    static Decorated empty() {
+    static Decorating empty() {
         return empty;
     }
 
@@ -75,8 +75,8 @@ public interface Decorated {
      * @param color the color
      * @return a new decorated
      */
-    static Decorated of(Coloring color) {
-        return new DecoratedRec(16, color, false, false, false);
+    static Decorating of(Coloring color) {
+        return new DecoratingRec(16, color, false, false, false);
     }
 
 
@@ -86,8 +86,8 @@ public interface Decorated {
      * @param color the color
      * @return a new decorated
      */
-    static Decorated of(double size, Coloring color) {
-        return new DecoratedRec(size, color, false, false, false);
+    static Decorating of(double size, Coloring color) {
+        return new DecoratingRec(size, color, false, false, false);
     }
 
 
@@ -99,11 +99,11 @@ public interface Decorated {
      * @param underLine the underLine
      * @param italic the italic
      */
-    record DecoratedRec(
+    record DecoratingRec(
         double size,
         Coloring color,
         boolean bold,
         boolean underLine,
-        boolean italic) implements Decorated { }
+        boolean italic) implements Decorating { }
 
 }

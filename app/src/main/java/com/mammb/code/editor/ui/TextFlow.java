@@ -169,15 +169,6 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
 
 
     /**
-     * Get the total height of text.
-     * @return the total height of text
-     */
-    public double totalHeight() {
-        return metrics().totalHeight();
-    }
-
-
-    /**
      * Get the number of lines containing wrapped text.
      * @return the number of lines containing wrapped text
      */
@@ -227,6 +218,15 @@ public class TextFlow extends javafx.scene.text.TextFlow implements ScreenText {
      */
     public int translatedShiftRow() {
         return metrics().lines().get(translatedLineOffset).rowIndex();
+    }
+
+
+    /**
+     * Scroll horizontally to display.
+     * @param delta the scroll delta
+     */
+    public void translateCol(double delta) {
+        setTranslateX(getTranslateX() + delta);
     }
 
 

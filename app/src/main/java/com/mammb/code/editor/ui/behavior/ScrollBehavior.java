@@ -109,49 +109,51 @@ public class ScrollBehavior {
 
     /**
      * Scroll down to the next page.
+     * @param followCaret whether to follow the caret
      */
-    public void pageDown() {
+    public void pageDown(boolean followCaret) {
 
         if (!model.hasNextSlice() &&
             textFlow.wrappedLines() - textFlow.translatedLineOffset() <= 0) {
-            pointing.tail();
+            if (followCaret) pointing.tail();
             return;
         }
 
         final double caretY = pointing.caretTop();
-        pointing.clearSelection();
+        if (followCaret) pointing.clearSelection();
 
         final int rows = textFlow.rowSize();
         if (textFlow.wrappedLines() == 0) {
             // if the text is not wrapped
             boolean shift = model.tailRowIndex() + rows - 2 > model.totalRowSize();
             scrollNext(rows - 2);
-            pointing.caretRawAt(caretY);
+            if (followCaret) pointing.caretRawAt(caretY);
             if (shift) {
                 scrollNext(); scrollNext();
                 pointing.down(); pointing.down();
             }
         } else {
             for (int i = 2; i < rows; i++) scrollNext();
-            pointing.caretRawAt(caretY);
+            if (followCaret) pointing.caretRawAt(caretY);
         }
     }
 
 
     /**
      * Scroll up to the previous page.
+     * @param followCaret whether to follow the caret
      */
-    public void pageUp() {
+    public void pageUp(boolean followCaret) {
 
         if (textFlow.translatedLineOffset() == 0 && model.originRowIndex() == 0) {
             // If it is already located at the top of the page,
             // only move the caret to the origin
-            pointing.clear();
+            if (followCaret) pointing.clear();
             return;
         }
 
         double caretY = pointing.caretTop();
-        pointing.clearSelection();
+        if (followCaret) pointing.clearSelection();
 
         int rows = textFlow.rowSize();
         if (rows == textFlow.lineSize()) {
@@ -160,7 +162,7 @@ public class ScrollBehavior {
         } else {
             for (int i = 2; i < rows; i++) scrollPrev();
         }
-        pointing.caretRawAt(caretY);
+        if (followCaret) pointing.caretRawAt(caretY);
     }
 
 
@@ -169,6 +171,34 @@ public class ScrollBehavior {
      * @param countOfRow the number of row
      */
     public void scrollNext(int countOfRow) {
+        for (int i = 0; i < countOfRow / model.maxRowSize(); i++) {
+            scrollNextUnit(model.maxRowSize());
+        }
+        scrollNextUnit(countOfRow % model.maxRowSize());
+    }
+
+
+    /**
+     * Scroll previous.
+     * @param countOfRow the number of row
+     * @return shifted offset
+     */
+    public int scrollPrev(int countOfRow) {
+        int ret = 0;
+        for (int i = 0; i < countOfRow / model.maxRowSize(); i++) {
+            ret += scrollPrevUnit(model.maxRowSize());
+        }
+        ret += scrollPrevUnit(countOfRow % model.maxRowSize());
+        return ret;
+    }
+
+
+    /**
+     * Scroll next.
+     * @param countOfRow the number of row
+     */
+    private void scrollNextUnit(int countOfRow) {
+        if (countOfRow <= 0) return;
         int shiftedOffset = model.scrollNext(countOfRow);
         scroll(-shiftedOffset);
     }
@@ -179,7 +209,8 @@ public class ScrollBehavior {
      * @param countOfRow the number of row
      * @return shifted offset
      */
-    public int scrollPrev(int countOfRow) {
+    private int scrollPrevUnit(int countOfRow) {
+        if (countOfRow <= 0) return 0;
         int shiftedOffset = model.scrollPrev(countOfRow);
         scroll(shiftedOffset);
         return shiftedOffset;
@@ -208,6 +239,15 @@ public class ScrollBehavior {
             screenBound.setTotalRowSize(model.totalRowSize() + textFlow.wrappedLines());
             screenBound.setRowOffset(model.originRowIndex(), textFlow.translatedLineOffset());
         }
+    }
+
+
+    /**
+     * Scroll horizontally to display.
+     * @param delta the scroll delta
+     */
+    public void scrollCol(double delta) {
+        textFlow.translateCol(delta);
     }
 
 }

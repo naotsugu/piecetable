@@ -64,6 +64,10 @@ public class TextModel {
     }
 
 
+    /**
+     * Create text view.
+     * @param lineEnding the line ending
+     */
     TextModel(LineEnding lineEnding) {
         this(new TextSlice(new TextSource(new ContentImpl(lineEnding))));
     }
@@ -194,6 +198,15 @@ public class TextModel {
             textSlice.setMaxRowSize(maxRows);
             textSlice.refresh();
         }
+    }
+
+
+    /**
+     * Get the max row number.
+     * @return the max row number
+     */
+    public int maxRowSize() {
+        return textSlice.maxRowSize();
     }
 
 

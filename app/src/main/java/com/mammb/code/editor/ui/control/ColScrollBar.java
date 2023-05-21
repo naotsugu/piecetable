@@ -15,11 +15,13 @@
  */
 package com.mammb.code.editor.ui.control;
 
+import com.mammb.code.editor.lang.EventListener;
 import com.mammb.code.editor.ui.util.Colors;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.AccessibleRole;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
@@ -48,6 +50,9 @@ public class ColScrollBar extends StackPane {
     /** The visible amount. */
     private final DoubleProperty visibleAmount = new SimpleDoubleProperty(100);
 
+    /** The handler. */
+    private EventListener<ScrollBarChange> handler;
+
 
     /**
      * Constructor.
@@ -68,9 +73,55 @@ public class ColScrollBar extends StackPane {
      * Initialize listener.
      */
     private void initListener() {
+
         max.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbWidth()));
         visibleAmount.addListener((os, ov, nv) -> thumb.lengthProperty().set(computeThumbWidth()));
         value.addListener(this::handleValueChanged);
+
+        setOnMouseEntered(e -> thumb.activeProperty().set(true));
+        setOnMouseExited(e  -> thumb.activeProperty().set(thumb.dragProperty().get()));
+
+        thumb.dragPointProperty().addListener(this::handleThumbDragged);
+        setOnMouseClicked(this::handleTruckClicked);
+
+    }
+
+
+    /**
+     * The thumb dragged handler.
+     * @param observable the ObservableValue which value changed
+     * @param oldValue the old value
+     * @param newValue the new value
+     */
+    private void handleThumbDragged(
+        ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+
+        if (!thumb.dragProperty().get() || handler == null) {
+            return;
+        }
+        double delta =  oldValue.doubleValue() - newValue.doubleValue();
+        handler.handle(ScrollBarChange.colThumbMovedOf(delta));
+    }
+
+
+    /**
+     * The truck clicked handler.
+     * @param event the MouseEvent
+     */
+    private void handleTruckClicked(MouseEvent event) {
+        if (event.isSynthesized()) {
+            event.consume();
+            return;
+        }
+        if (event.getX() >= thumb.getX() &&
+            event.getX() <= thumb.getX() + thumb.getWidth()) {
+            event.consume();
+            return;
+        }
+
+        handler.handle(ScrollBarChange.colTruckClickedOf(
+            -Math.signum(event.getX() - thumb.getX()) * visibleAmount.get()));
+        event.consume();
     }
 
 
@@ -95,16 +146,7 @@ public class ColScrollBar extends StackPane {
     private void handleValueChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         double val = clamp(-newValue.doubleValue());
         double x = visibleAmount.get() * (val - min.get()) / max.get() - min.get();
-        thumb.setX(x);
-    }
-
-
-    /**
-     * Set the layout width.
-     * @param width the layout width
-     */
-    public void setLayoutWidth(double width) {
-        setWidth(width);
+        thumb.setX(Math.min(Math.max(min.get(), x), max.get() - visibleAmount.get()));
     }
 
 
@@ -116,6 +158,25 @@ public class ColScrollBar extends StackPane {
     private double clamp(double value) {
         return Math.min(Math.max(min.get(), value), max.get());
     }
+
+
+    /**
+     * Set the handler.
+     * @param handler the handler
+     */
+    public void setHandler(EventListener<ScrollBarChange> handler) {
+        this.handler = handler;
+    }
+
+
+    /**
+     * Set the layout width.
+     * @param width the layout width
+     */
+    public void setLayoutWidth(double width) {
+        setWidth(width);
+    }
+
 
     public DoubleProperty maxProperty() { return max; }
     public DoubleProperty visibleAmountProperty() { return visibleAmount; }

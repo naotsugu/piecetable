@@ -15,7 +15,7 @@
  */
 package com.mammb.code.editor.syntax.type;
 
-import com.mammb.code.editor.model.Decorated;
+import com.mammb.code.editor.model.Decorating;
 import com.mammb.code.editor.syntax.DecorateTo;
 import com.mammb.code.editor.syntax.Lexer;
 import com.mammb.code.editor.syntax.LexerSource;
@@ -97,8 +97,8 @@ public class PassThroughLexer implements Lexer, DecorateTo {
 
 
     @Override
-    public Decorated apply(int type) {
-        return Decorated.empty();
+    public Decorating apply(int type) {
+        return Decorating.empty();
     }
 
 }

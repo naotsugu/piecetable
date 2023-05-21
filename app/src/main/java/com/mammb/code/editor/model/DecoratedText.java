@@ -19,7 +19,7 @@ package com.mammb.code.editor.model;
  * DecoratedText.
  * @author Naotsugu Kobayashi
  */
-public interface DecoratedText extends Decorated {
+public interface DecoratedText extends Decorating {
 
     /**
      * Get the text.
@@ -31,16 +31,16 @@ public interface DecoratedText extends Decorated {
     /**
      * Create a new DecoratedText.
      * @param text the text
-     * @param decorated the decorated
+     * @param decorating the decorated
      * @return a new DecoratedText
      */
-    static DecoratedText of(String text, Decorated decorated) {
+    static DecoratedText of(String text, Decorating decorating) {
         return new DecoratedTextRec(text,
-            decorated.size(),
-            decorated.color(),
-            decorated.bold(),
-            decorated.underLine(),
-            decorated.italic());
+            decorating.size(),
+            decorating.color(),
+            decorating.bold(),
+            decorating.underLine(),
+            decorating.italic());
     }
 
 

@@ -235,9 +235,9 @@ public class CaretBehavior {
     private void scrollToCaretCol() {
         if (pointing.caretX() > (viewWidth.get() - Texts.width * 2)) {
             double delta = pointing.caretX() - (viewWidth.get() - Texts.width * 2);
-            pointing.setTranslateX(pointing.getTranslateX() - delta);
+            scrollBehavior.scrollCol(-delta);
         } else if (pointing.caretX() < 0) {
-            pointing.setTranslateX(pointing.getTranslateX() - pointing.caretX());
+            scrollBehavior.scrollCol(-pointing.caretX());
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor.ui;
 
+import com.mammb.code.editor.lang.LineEnding;
 import com.mammb.code.editor.ui.util.PathElements;
 import com.mammb.code.editor.ui.util.Texts;
 import javafx.animation.KeyFrame;
@@ -124,9 +125,11 @@ public class Caret extends Path {
         if (text.textLength() > offset) {
             ++offset;
         }
-        if (text.textLength() > offset &&
-            Character.isHighSurrogate(text.charAt(offset))) {
-            offset++;
+        if (text.textLength() > offset) {
+            char ch = text.charAt(offset);
+            if (LineEnding.CR.match(ch) || Character.isHighSurrogate(ch)) {
+                offset++;
+            }
         }
         moveToOffsetSyncLogical();
     }
@@ -137,7 +140,8 @@ public class Caret extends Path {
      */
     public void left() {
         if (offset == 0) return;
-        if (Character.isLowSurrogate(text.charAt(--offset))) {
+        char ch = text.charAt(--offset);
+        if (LineEnding.CR.match(ch) || Character.isLowSurrogate(ch)) {
             offset--;
         }
         moveToOffsetSyncLogical();
@@ -164,6 +168,7 @@ public class Caret extends Path {
                     offset++;
                 }
                 moveToOffset();
+                syncLogicalToPhysical();
             }
         } else {
             moveToPoint(0, physicalY);

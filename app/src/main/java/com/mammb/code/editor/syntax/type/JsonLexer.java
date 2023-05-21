@@ -16,7 +16,7 @@
 package com.mammb.code.editor.syntax.type;
 
 import com.mammb.code.editor.model.Coloring;
-import com.mammb.code.editor.model.Decorated;
+import com.mammb.code.editor.model.Decorating;
 import com.mammb.code.editor.syntax.DecorateTo;
 import com.mammb.code.editor.syntax.Lexer;
 import com.mammb.code.editor.syntax.LexerSource;
@@ -282,13 +282,13 @@ public class JsonLexer implements Lexer, DecorateTo {
 
 
     @Override
-    public Decorated apply(int type) {
-        return (type == Type.KEY) ? Decorated.of(Coloring.DarkOrange) :
-               (type == Type.TEXT) ? Decorated.of(Coloring.DarkGreen) :
-               (type == Type.NUMBER) ? Decorated.of(Coloring.DarkSkyBlue) :
-               (type == Type.LITERAL) ? Decorated.of(Coloring.DarkOrange) :
-               (type == Type.COMMENT) ? Decorated.of(Coloring.DarkGray) :
-               (type == Type.LINE_COMMENT) ? Decorated.of(Coloring.DarkGray) : Decorated.empty();
+    public Decorating apply(int type) {
+        return (type == Type.KEY) ? Decorating.of(Coloring.DarkOrange) :
+               (type == Type.TEXT) ? Decorating.of(Coloring.DarkGreen) :
+               (type == Type.NUMBER) ? Decorating.of(Coloring.DarkSkyBlue) :
+               (type == Type.LITERAL) ? Decorating.of(Coloring.DarkOrange) :
+               (type == Type.COMMENT) ? Decorating.of(Coloring.DarkGray) :
+               (type == Type.LINE_COMMENT) ? Decorating.of(Coloring.DarkGray) : Decorating.empty();
     }
 
 }

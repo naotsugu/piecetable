@@ -216,8 +216,7 @@ public class TextSource implements EventListener<Edit> {
      * @return the undone edit.
      */
     public Edit undo() {
-        Edit edit = editQueue.undo();
-        return edit;
+        return editQueue.undo();
     }
 
 
@@ -226,8 +225,7 @@ public class TextSource implements EventListener<Edit> {
      * @return the redone edit.
      */
     public Edit redo() {
-        Edit edit = editQueue.redo();
-        return edit;
+        return editQueue.redo();
     }
 
 

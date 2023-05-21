@@ -110,8 +110,7 @@ public class StringMetrics {
      * @return the row view size
      */
     int rowViewSize() {
-        if (isDisabled())
-            throw new IllegalStateException("not initialized");
+        mustBeEnabled();
         return rowAnchor.size();
     }
 
@@ -121,8 +120,7 @@ public class StringMetrics {
      * @return the code point count
      */
     int codePointCount() {
-        if (isDisabled())
-            throw new IllegalStateException("not initialized");
+        mustBeEnabled();
         return codePointCount;
     }
 
@@ -133,12 +131,16 @@ public class StringMetrics {
      * @return the row offset
      */
     int rowOffset(int row) {
-        if (isDisabled())
-            throw new IllegalStateException("not initialized");
+        mustBeEnabled();
         if (row >= rowAnchor.size())
             throw new IllegalArgumentException(
                 "out of index.[row:%d][rowAnchor.size:%d]".formatted(row, rowAnchor.size()));
         return rowAnchor.get(row);
+    }
+
+
+    private void mustBeEnabled() {
+        if (isDisabled()) throw new IllegalStateException("not initialized");
     }
 
 }

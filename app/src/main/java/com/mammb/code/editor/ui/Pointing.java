@@ -45,7 +45,7 @@ public class Pointing extends Region {
         layoutYProperty().bind(textFlow.layoutYProperty().add(textFlow.getPadding().getTop()).subtract(1));
 
         translateYProperty().bind(textFlow.translateYProperty());
-        translateXProperty().bindBidirectional(textFlow.translateXProperty());
+        translateXProperty().bind(textFlow.translateXProperty());
 
         getChildren().setAll(selection, caret);
     }

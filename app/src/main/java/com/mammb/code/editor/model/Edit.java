@@ -16,7 +16,6 @@
 package com.mammb.code.editor.model;
 
 import com.mammb.code.editor.lang.Strings;
-
 import java.util.StringJoiner;
 
 /**
