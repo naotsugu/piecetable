@@ -270,7 +270,9 @@ public class CursoredList {
                     if (until.test(bytes)) {
                         return byteArray.reverse();
                     }
-                    byteArray.add(bytes);
+                    for (int k = bytes.length - 1; k >= 0; k--) {
+                        byteArray.add(bytes[k]);
+                    }
                 }
                 if (end == 0) {
                     break;
