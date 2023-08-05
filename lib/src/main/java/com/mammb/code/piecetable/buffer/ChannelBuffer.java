@@ -87,7 +87,7 @@ public class ChannelBuffer implements Buffer, Closeable {
     /**
      * Create a new Buffer.
      * @param channel the byte channel
-     * @param traverse the bytes traverse
+     * @param traverse the bytes traverse at initial loading
      * @return a created buffer
      */
     public static Buffer of(SeekableByteChannel channel, Consumer<byte[]> traverse) {
@@ -99,7 +99,7 @@ public class ChannelBuffer implements Buffer, Closeable {
      * Create a new Buffer.
      * @param channel the byte channel
      * @param pitch the pitch
-     * @param consumer the bytes consumer
+     * @param consumer the bytes consumer at initial loading
      * @return a created buffer
      */
     static Buffer of(SeekableByteChannel channel, short pitch, Consumer<byte[]> consumer) {

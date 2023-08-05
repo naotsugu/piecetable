@@ -106,7 +106,7 @@ public class PieceTable {
     /**
      * Create a new {@code PieceTable}.
      * @param path the path
-     * @param traverse the bytes traverse
+     * @param traverse the bytes traverse at initial loading
      * @return a new {@code PieceTable}
      */
     public static PieceTable of(Path path, Consumer<byte[]> traverse) {

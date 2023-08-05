@@ -78,7 +78,7 @@ public abstract class Buffers {
     /**
      * Create a new buffer form given path.
      * @param path the source path
-     * @param traverse the bytes traverse
+     * @param traverse the bytes traverse at initial loading
      * @return a new buffer
      */
     public static Buffer of(Path path, Consumer<byte[]> traverse) {
