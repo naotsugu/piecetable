@@ -89,7 +89,9 @@ public abstract class Buffers {
                     traverse);
             } else {
                 byte[] bytes = Files.readAllBytes(path);
-                traverse.accept(bytes);
+                if (traverse != null) {
+                    traverse.accept(bytes);
+                }
                 return ReadBuffer.of(bytes);
             }
         } catch (IOException e) {
