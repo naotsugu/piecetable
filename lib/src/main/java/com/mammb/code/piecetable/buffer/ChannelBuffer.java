@@ -20,6 +20,7 @@ import com.mammb.code.piecetable.array.IntArray;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
+import java.util.function.Consumer;
 
 /**
  * ByteChannel buffer.
@@ -68,7 +69,7 @@ public class ChannelBuffer implements Buffer, Closeable {
      * @return a created buffer
      */
     public static Buffer of(SeekableByteChannel channel) {
-        return of(channel, DEFAULT_PITCH);
+        return of(channel, DEFAULT_PITCH, null);
     }
 
 
@@ -78,7 +79,30 @@ public class ChannelBuffer implements Buffer, Closeable {
      * @param pitch the pitch
      * @return a created buffer
      */
-    static Buffer of(SeekableByteChannel channel, short pitch) {
+    public static Buffer of(SeekableByteChannel channel, short pitch) {
+        return of(channel, pitch, null);
+    }
+
+
+    /**
+     * Create a new Buffer.
+     * @param channel the byte channel
+     * @param traverse the bytes traverse
+     * @return a created buffer
+     */
+    public static Buffer of(SeekableByteChannel channel, Consumer<byte[]> traverse) {
+        return of(channel, DEFAULT_PITCH, traverse);
+    }
+
+
+    /**
+     * Create a new Buffer.
+     * @param channel the byte channel
+     * @param pitch the pitch
+     * @param consumer the bytes consumer
+     * @return a created buffer
+     */
+    static Buffer of(SeekableByteChannel channel, short pitch, Consumer<byte[]> consumer) {
         var ch = ChannelArray.of(channel);
         var charCount = 0;
         var piles = IntArray.of();
@@ -86,7 +110,11 @@ public class ChannelBuffer implements Buffer, Closeable {
             if (charCount++ % pitch == 0) {
                 piles.add(i);
             }
-            i += (Utf8.followsCount(ch.get(i)) - 1);
+            final short followsCount = Utf8.followsCount(ch.get(i));
+            if (consumer != null) {
+                consumer.accept(ch.get(i, i + followsCount));
+            }
+            i += (followsCount - 1);
         }
         return new ChannelBuffer(ch, charCount, pitch, piles.get());
     }

@@ -21,6 +21,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.function.Consumer;
 
 /**
  * Utility of buffers.
@@ -70,10 +71,27 @@ public abstract class Buffers {
      * @return a new buffer
      */
     public static Buffer of(Path path) {
+        return of(path, null);
+    }
+
+
+    /**
+     * Create a new buffer form given path.
+     * @param path the source path
+     * @param traverse the bytes traverse
+     * @return a new buffer
+     */
+    public static Buffer of(Path path, Consumer<byte[]> traverse) {
         try {
-            return (Files.size(path) >= Runtime.getRuntime().freeMemory() * 0.8)
-                ? ChannelBuffer.of(FileChannel.open(path, StandardOpenOption.READ))
-                : ReadBuffer.of(Files.readAllBytes(path));
+            if (Files.size(path) >= Runtime.getRuntime().freeMemory() * 0.8) {
+                return ChannelBuffer.of(
+                    FileChannel.open(path, StandardOpenOption.READ),
+                    traverse);
+            } else {
+                byte[] bytes = Files.readAllBytes(path);
+                traverse.accept(bytes);
+                return ReadBuffer.of(bytes);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

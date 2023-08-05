@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -101,6 +102,16 @@ public class PieceTable {
         return new PieceTable(Buffers.of(path), Buffers.appendOf());
     }
 
+
+    /**
+     * Create a new {@code PieceTable}.
+     * @param path the path
+     * @param traverse the bytes traverse
+     * @return a new {@code PieceTable}
+     */
+    public static PieceTable of(Path path, Consumer<byte[]> traverse) {
+        return new PieceTable(Buffers.of(path, traverse), Buffers.appendOf());
+    }
 
     /**
      * Inserts the char sequence into this {@code PieceTable}.

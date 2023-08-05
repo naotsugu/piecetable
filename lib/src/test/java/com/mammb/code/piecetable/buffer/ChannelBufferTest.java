@@ -24,6 +24,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -62,4 +66,22 @@ class ChannelBufferTest {
         assertEquals("1②34", b.subBuffer(1, 5).toString());
 
     }
+
+    @Test
+    void testChannelBufferWithConsumer() throws IOException {
+
+        var str = "01②3456789あいうえお🌞ABCDEＦ";
+        var texts = str.getBytes(StandardCharsets.UTF_8);
+        Files.write(path, texts);
+        var ch = FileChannel.open(path, StandardOpenOption.READ);
+
+        List<byte[]> ret = new ArrayList<>();
+        var b = ChannelBuffer.of(ch, ret::add);
+        assertEquals(Character.codePointCount(str, 0, str.length()), b.length());
+
+        assertEquals(str, ret.stream()
+            .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
+            .collect(Collectors.joining()));
+    }
+
 }
