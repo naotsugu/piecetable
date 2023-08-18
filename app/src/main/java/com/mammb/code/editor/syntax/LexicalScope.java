@@ -123,7 +123,7 @@ public class LexicalScope {
     private void putScope(Token token, Map<Integer, Deque<Token>> scopes) {
 
         if (token.scope().isStart()) {
-            scopes.computeIfAbsent(token.type(), ArrayDeque::new)
+            scopes.computeIfAbsent(token.type(), k -> new ArrayDeque<>())
                 .push(token);
 
         } else if (token.scope().isEnd() && scopes.containsKey(token.type())) {
@@ -134,7 +134,7 @@ public class LexicalScope {
             // toggle scope if any
             Deque<Token> deque = scopes.get(token.type());
             if (deque == null || deque.isEmpty()) {
-                scopes.computeIfAbsent(token.type(), ArrayDeque::new)
+                scopes.computeIfAbsent(token.type(), k -> new ArrayDeque<>())
                     .push(token);
             } else {
                 scopes.get(token.type())
