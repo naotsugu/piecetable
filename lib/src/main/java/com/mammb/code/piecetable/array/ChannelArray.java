@@ -148,7 +148,7 @@ public class ChannelArray implements Closeable {
     private void fillBuffer(int from, int to) {
         try {
             var bb = ByteBuffer.allocate(
-                Math.max(to, Math.addExact(from, PREF_BUF_SIZE) - from));
+                Math.max(to, Math.addExact(from, PREF_BUF_SIZE)) - from);
             ch.position(from);
             ch.read(bb);
             bb.flip();

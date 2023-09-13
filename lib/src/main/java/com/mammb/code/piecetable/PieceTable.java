@@ -340,8 +340,11 @@ public class PieceTable {
     }
 
 
-    @Override
-    public String toString() {
+    /**
+     * Get the content string.
+     * @return the content string
+     */
+    public String getAsString() {
         return pieces.stream()
             .map(p -> p.target().subBuffer(p.bufIndex(), p.end()).toString())
             .collect(Collectors.joining());

@@ -36,27 +36,27 @@ class PieceTableTest {
         table.insert(3, "def");
         // |a|b|c| |d|e|f|
         // |0|1|2| |3|4|5|
-        assertEquals("abc" + "def", table.toString());
+        assertEquals("abc" + "def", table.getAsString());
 
         table.insert(6, "ghi");
         // |a|b|c| |d|e|f| |g|h|i|
         // |0|1|2| |3|4|5| |6|7|8|
-        assertEquals("abc" + "def" + "ghi", table.toString());
+        assertEquals("abc" + "def" + "ghi", table.getAsString());
 
         table.delete(2, 2);
         // |a|b| |e|f| |g|h|i|
         // |0|1| |2|3| |4|5|6|
-        assertEquals("ab" + "ef" + "ghi", table.toString());
+        assertEquals("ab" + "ef" + "ghi", table.getAsString());
 
         table.insert(0, "**");
         // |*|*| |a|b| |e|f| |g|h|i|
         // |0|1| |2|3| |4|5| |6|7|8|
-        assertEquals("**" + "ab" + "ef" + "ghi", table.toString());
+        assertEquals("**" + "ab" + "ef" + "ghi", table.getAsString());
 
         table.insert(9, "**");
         // |*|*| |a|b| |e|f| |g|h|i| |*|*|
         // |0|1| |2|3| |4|5| |6|7|8| |9|A|
-        assertEquals("**" + "ab" + "ef" + "ghi" + "**", table.toString());
+        assertEquals("**" + "ab" + "ef" + "ghi" + "**", table.getAsString());
         assertEquals("b", table.substring(3, 4));
         assertEquals("be", table.substring(3, 5));
         assertEquals("bef", table.substring(3, 6));
@@ -69,22 +69,22 @@ class PieceTableTest {
         table.delete(4, 5);
         // |*|*| |a|b| |*|*|
         // |0|1| |2|3| |4|5|
-        assertEquals("**" + "ab" + "**", table.toString());
+        assertEquals("**" + "ab" + "**", table.getAsString());
 
         table.delete(0, 6);
         // |
         // |
-        assertEquals("", table.toString());
+        assertEquals("", table.getAsString());
 
         table.insert(0, "①②③456");
         // |①|②|③|4|5|6|
         // |０|１|２|3|4|5|
-        assertEquals("①②③456", table.toString());
+        assertEquals("①②③456", table.getAsString());
 
         table.delete(2, 2);
         // |①|②|5|6|
         // |０|１|4|5|
-        assertEquals("①②56", table.toString());
+        assertEquals("①②56", table.getAsString());
     }
 
     @Test
@@ -94,45 +94,45 @@ class PieceTableTest {
         table.enableUndo();
         // |a|b|c|
         // |0|1|2|
-        assertEquals("abc", table.toString());
+        assertEquals("abc", table.getAsString());
 
         table.insert(3, "def");
         // |a|b|c| |d|e|f|
         // |0|1|2| |3|4|5|
-        assertEquals("abc" + "def", table.toString());
+        assertEquals("abc" + "def", table.getAsString());
 
         table.delete(2, 2);
         // |a|b| |e|f|
         // |0|1| |2|3|
-        assertEquals("ab" + "ef", table.toString());
+        assertEquals("ab" + "ef", table.getAsString());
 
         table.undo();
         // |a|b|c| |d|e|f|
         // |0|1|2| |3|4|5|
-        assertEquals("abc" + "def", table.toString());
+        assertEquals("abc" + "def", table.getAsString());
 
         table.undo();
         // |a|b|c|
         // |0|1|2|
-        assertEquals("abc", table.toString());
+        assertEquals("abc", table.getAsString());
 
         table.redo();
         // |a|b|c| |d|e|f|
         // |0|1|2| |3|4|5|
-        assertEquals("abc" + "def", table.toString());
+        assertEquals("abc" + "def", table.getAsString());
 
         table.insert(2, "***");
         // |a|b| |*|*|*| |c| |d|e|f|
         // |0|1| |2|3|4| |5| |6|7|8|
-        assertEquals("ab" + "***" + "c" + "def", table.toString());
+        assertEquals("ab" + "***" + "c" + "def", table.getAsString());
 
         table.redo();
-        assertEquals("ab" + "***" + "c" + "def", table.toString());
+        assertEquals("ab" + "***" + "c" + "def", table.getAsString());
 
         table.undo();
         // |a|b|c| |d|e|f|
         // |0|1|2| |3|4|5|
-        assertEquals("abc" + "def", table.toString());
+        assertEquals("abc" + "def", table.getAsString());
 
     }
 

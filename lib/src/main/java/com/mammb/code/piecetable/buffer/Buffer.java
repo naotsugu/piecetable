@@ -94,8 +94,10 @@ public interface Buffer {
             int m = Math.min(i + buf.remaining(), to);
             buf.put(bytes(i, m));
             buf.flip();
-            i += channel.write(buf);
+            int n = channel.write(buf);
+            i += n;
             buf.compact();
+            if (n <= 0) break;
         }
 
         return to - from;
