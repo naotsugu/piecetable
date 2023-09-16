@@ -50,13 +50,13 @@ Single character deletion can be one of two possible conditions:
 
 ## Project detail
 
-|directory|description|
-|--------------|-- |
-|`lib`|Piece table implementation|
-|`app`|Example app of editor(sloppy)|
+|directory| description                 |
+|--------------|-----------------------------|
+|`lib`| Piece table implementation  |
+|`app`| Example editor app (sloppy) |
 
 
-### How to run the application
+### How to run example
 
 Clone repository.
 
@@ -73,5 +73,10 @@ $ .gradlew run
 
 ![editor](docs/images/editor.png)
 
+
+
+## Sample applications using this library
+
+* [min-editor](https://github.com/naotsugu/min-editor)
 
 

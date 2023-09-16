@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 public class ChannelBuffer implements Buffer, Closeable {
 
     /** The default size of pitch. */
-    private static final short DEFAULT_PITCH = 256;
+    private static final short DEFAULT_PITCH = 512;
 
     /** The channel array. */
     private final ChannelArray ch;
