@@ -105,14 +105,19 @@ public class ChannelBuffer implements Buffer, Closeable {
     static Buffer of(SeekableByteChannel channel, short pitch, Consumer<byte[]> consumer) {
         var ch = ChannelArray.of(channel);
         var charCount = 0;
-        var piles = IntArray.of();
+        var piles = IntArray.of(ch.length() / pitch);
         for (int i = 0; i < ch.length(); i++) {
             if (charCount++ % pitch == 0) {
                 piles.add(i);
             }
-            final short followsCount = Utf8.followsCount(ch.get(i));
+            final byte b = ch.get(i);
+            final short followsCount = Utf8.followsCount(b);
             if (consumer != null) {
-                consumer.accept(ch.get(i, i + followsCount));
+                if (followsCount == 1) {
+                    consumer.accept(new byte[] { b });
+                } else {
+                    consumer.accept(ch.get(i, i + followsCount));
+                }
             }
             i += (followsCount - 1);
         }
