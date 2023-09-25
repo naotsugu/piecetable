@@ -55,12 +55,12 @@ public class IntArray implements Serializable {
 
 
     /**
-     * Create a new {@code IntArray} from the given int value.
-     * @param value the given int value
+     * Create a new {@code IntArray} with the initial capacity.
+     * @param initialCapacity the initial capacity
      * @return a new {@code IntArray}
      */
-    public static IntArray of(int value) {
-        return new IntArray(new int[]{ value }, 1);
+    public static IntArray of(int initialCapacity) {
+        return new IntArray(new int[initialCapacity], 0);
     }
 
 
@@ -157,7 +157,7 @@ public class IntArray implements Serializable {
         } else {
             return ints = Arrays.copyOf(ints, ArraySupport.newCapacity(oldCapacity,
                     minCapacity - oldCapacity,
-                    Math.min(64, oldCapacity >> 1)));
+                    Math.min(512, oldCapacity >> 1)));
         }
     }
 

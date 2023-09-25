@@ -110,9 +110,14 @@ public class ChannelBuffer implements Buffer, Closeable {
             if (charCount++ % pitch == 0) {
                 piles.add(i);
             }
-            final short followsCount = Utf8.followsCount(ch.get(i));
+            final byte b = ch.get(i);
+            final short followsCount = Utf8.followsCount(b);
             if (consumer != null) {
-                consumer.accept(ch.get(i, i + followsCount));
+                if (followsCount == 1) {
+                    consumer.accept(new byte[] { b });
+                } else {
+                    consumer.accept(ch.get(i, i + followsCount));
+                }
             }
             i += (followsCount - 1);
         }
