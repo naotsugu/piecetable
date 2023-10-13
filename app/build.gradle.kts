@@ -1,6 +1,6 @@
 plugins {
     application
-    id("org.openjfx.javafxplugin") version "0.0.14"
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 repositories {
@@ -10,7 +10,9 @@ repositories {
 dependencies {
     //implementation(project(mapOf("path" to ":lib")))
     implementation(project(":lib"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 application {
@@ -26,12 +28,12 @@ tasks.compileJava.configure { options.encoding = Charsets.UTF_8.name() }
 tasks.compileTestJava.configure { options.encoding = Charsets.UTF_8.name() }
 
 javafx {
-    version = "20"
+    version = "21"
     modules("javafx.controls")
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
