@@ -113,6 +113,7 @@ public class PieceTable {
         return new PieceTable(Buffers.of(path, traverse), Buffers.appendOf());
     }
 
+
     /**
      * Inserts the char sequence into this {@code PieceTable}.
      * @param pos the offset
@@ -243,6 +244,54 @@ public class PieceTable {
 
 
     /**
+     * Get the bytes.
+     * <pre>
+     *     | a | b | c | d | a |
+     *                       L startPos
+     *      L  until [a] appears [a, b, c]
+     * </pre>
+     * @param startPosExclude start position(code point index), exclusive
+     * @param until the until predicate, exclusive
+     * @return the bytes
+     */
+    public byte[] bytesBefore(int startPosExclude, Predicate<byte[]> until) {
+        return pieces.bytesBefore(startPosExclude, until).get();
+    }
+
+
+    /**
+     * Get the code point index.
+     * <pre>
+     *     | a | b | c | d |
+     *       L startPos
+     *                   L  until [d] appears 3
+     * </pre>
+     * @param startPos the start position(code point index), inclusive
+     * @param until the until predicate, exclusive
+     * @return the code point index
+     */
+    public int position(int startPos, Predicate<byte[]> until) {
+        return pieces.position(startPos, until);
+    }
+
+
+    /**
+     * Get the code point index.
+     * <pre>
+     *     | a | b | c | d | a |
+     *                       L startPos
+     *      L  until [a] appears 3
+     * </pre>
+     * @param startPosExclude start position(code point index), exclusive
+     * @param until the until predicate, exclusive
+     * @return the code point index
+     */
+    public int positionBefore(int startPosExclude, Predicate<byte[]> until) {
+        return pieces.positionBefore(startPosExclude, until);
+    }
+
+
+    /**
      * Get the count.
      * @param startPos the start position(code point index), inclusive
      * @param until the until predicate, exclusive
@@ -250,22 +299,6 @@ public class PieceTable {
      */
     public int count(int startPos, Predicate<byte[]> until) {
         return pieces.count(startPos, until);
-    }
-
-
-    /**
-     * Get the bytes.
-     * <pre>
-     *     | a | b | c | d | a |
-     *                       L startPos
-     *      L  until [a] appears [a, b, c]
-     * </pre>
-     * @param startPos start position(code point index), exclusive
-     * @param until the until predicate, exclusive
-     * @return the bytes
-     */
-    public byte[] bytesBefore(int startPos, Predicate<byte[]> until) {
-        return pieces.bytesBefore(startPos, until).get();
     }
 
 

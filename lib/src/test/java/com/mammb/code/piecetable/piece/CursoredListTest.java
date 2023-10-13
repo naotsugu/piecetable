@@ -132,6 +132,40 @@ class CursoredListTest {
 
 
     @Test
+    void testPosition() {
+
+        var list = new CursoredList();
+
+        Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
+        list.add(0, new Piece(buf, 0, 3));
+        list.add(1, new Piece(buf, 4, 3));
+        list.add(2, new Piece(buf, 8, 3));
+
+        assertEquals(9, list.position(0, b -> b[0] == 'z'));
+        assertEquals(8, list.position(1, b -> b[0] == 'i'));
+        assertEquals(6, list.position(3, b -> b[0] == 'g'));
+    }
+
+
+    @Test
+    void testPositionBefore() {
+
+        var list = new CursoredList();
+
+        Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
+        list.add(0, new Piece(buf, 0, 3));
+        list.add(1, new Piece(buf, 4, 3));
+        list.add(2, new Piece(buf, 8, 3));
+
+        assertEquals(0, list.positionBefore(9, b -> b[0] == '1'));
+        assertEquals(3, list.positionBefore(9, b -> b[0] == 'c'));
+        assertEquals(1, list.positionBefore(8, b -> b[0] == 'a'));
+        assertEquals(3, list.positionBefore(6, b -> b[0] == 'c'));
+
+    }
+
+
+    @Test
     void testCount() {
 
         var list = new CursoredList();

@@ -189,7 +189,7 @@ public class CursoredList {
             Piece piece = get(i);
             if (piece.length() == 0) continue;
             for (;;) {
-                int end = Math.min(piece.length(), start + 256);
+                int end = Math.min(piece.length(), start + 1024);
                 Buffer buf = piece.bytes(start, end);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
@@ -223,7 +223,7 @@ public class CursoredList {
             Piece piece = get(i);
             if (piece.length() == 0) continue;
             for (;;) {
-                int end = Math.min(piece.length(), start + 256);
+                int end = Math.min(piece.length(), start + 1024);
                 Buffer buf = piece.bytes(start, end);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
@@ -263,7 +263,7 @@ public class CursoredList {
                 start = piece.length();
             }
             for (;;) {
-                int end = Math.max(0, start - 256);
+                int end = Math.max(0, start - 1024);
                 Buffer buf = piece.bytes(end, start);
                 for (int j = buf.length() - 1; j >= 0; j--) {
                     byte[] bytes = buf.charAt(j);
@@ -286,6 +286,81 @@ public class CursoredList {
 
 
     /**
+     * Get the code point index.
+     * @param startPos the start position
+     * @param until the Conditions for Termination
+     * @return the code point index at the specified position
+     */
+    public int position(int startPos, Predicate<byte[]> until) {
+        int count = 0;
+        PiecePoint from = at(startPos);
+        int start = startPos - from.position();
+        for (int i = from.index(); i < length(); i++) {
+            Piece piece = get(i);
+            if (piece.length() == 0) continue;
+            for (;;) {
+                int end = Math.min(piece.length(), start + 1024);
+                Buffer buf = piece.bytes(start, end);
+                for (int j = 0; j < buf.length(); j++) {
+                    byte[] bytes = buf.charAt(j);
+                    if (until.test(bytes)) {
+                        return startPos + count;
+                    }
+                    count++;
+                }
+                if (end == piece.length()) {
+                    break;
+                }
+                start = end;
+            }
+            start = 0;
+        }
+        return startPos + count;
+
+    }
+
+    /**
+     * Get the code point index.
+     * Inspects the forward direction from the designated position
+     * @param startPosExclude the start position
+     * @param until the conditions for termination
+     * @return the code point index at the specified position
+     */
+    public int positionBefore(int startPosExclude, Predicate<byte[]> until) {
+        if (startPosExclude <= 0) throw new IndexOutOfBoundsException();
+        int count = 0;
+        PiecePoint from = at(startPosExclude - 1);
+        boolean first = true;
+        int start = startPosExclude - from.position();
+        for (int i = from.index(); i >= 0; i--) {
+            Piece piece = get(i);
+            if (piece.length() == 0) continue;
+            if (!first) {
+                start = piece.length();
+            }
+            for (;;) {
+                int end = Math.max(0, start - 1024);
+                Buffer buf = piece.bytes(end, start);
+                for (int j = buf.length() - 1; j >= 0; j--) {
+                    byte[] bytes = buf.charAt(j);
+                    if (until.test(bytes)) {
+                        return startPosExclude - count;
+                    }
+                    count++;
+                }
+                if (end == 0) {
+                    break;
+                }
+                start = end;
+            }
+            first = false;
+        }
+        return startPosExclude - count;
+
+    }
+
+
+    /**
      * Get the count up to the specified range.
      * @param startPos the start position
      * @param endPos the end position
@@ -302,7 +377,7 @@ public class CursoredList {
             int start = (i == 0) ? startPos - from.position() : 0;
             int end = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
             for (;;) {
-                int eu = Math.min(end, start + 256);
+                int eu = Math.min(end, start + 1024);
                 Buffer buf = piece.bytes(start, eu);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
