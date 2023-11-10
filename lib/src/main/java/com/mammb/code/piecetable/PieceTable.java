@@ -156,7 +156,7 @@ public class PieceTable {
      * @param pos the beginning index, inclusive
      * @param len the length to be deleted
      */
-    public void delete(int pos, int len) {
+    public void delete(long pos, int len) {
 
         if (len <= 0) {
             return;
