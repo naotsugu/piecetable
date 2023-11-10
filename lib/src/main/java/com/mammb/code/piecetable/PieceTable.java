@@ -211,7 +211,7 @@ public class PieceTable {
      * @param endPos the ending index, exclusive
      * @return the new string
      */
-    public String substring(int startPos, int endPos) {
+    public String substring(long startPos, long endPos) {
         return new String(pieces.bytes(startPos, endPos).get(), StandardCharsets.UTF_8);
     }
 
@@ -222,7 +222,7 @@ public class PieceTable {
      * @param endPos the ending index, exclusive
      * @return the bytes
      */
-    public byte[] bytes(int startPos, int endPos) {
+    public byte[] bytes(long startPos, long endPos) {
         return pieces.bytes(startPos, endPos).get();
     }
 
@@ -238,7 +238,7 @@ public class PieceTable {
      * @param until the until predicate, exclusive
      * @return the bytes
      */
-    public byte[] bytes(int startPos, Predicate<byte[]> until) {
+    public byte[] bytes(long startPos, Predicate<byte[]> until) {
         return pieces.bytes(startPos, until).get();
     }
 
@@ -254,7 +254,7 @@ public class PieceTable {
      * @param until the until predicate, exclusive
      * @return the bytes
      */
-    public byte[] bytesBefore(int startPosExclude, Predicate<byte[]> until) {
+    public byte[] bytesBefore(long startPosExclude, Predicate<byte[]> until) {
         return pieces.bytesBefore(startPosExclude, until).get();
     }
 
@@ -270,7 +270,7 @@ public class PieceTable {
      * @param until the until predicate, exclusive
      * @return the code point index
      */
-    public long position(int startPos, Predicate<byte[]> until) {
+    public long position(long startPos, Predicate<byte[]> until) {
         return pieces.position(startPos, until);
     }
 
@@ -286,7 +286,7 @@ public class PieceTable {
      * @param until the until predicate, exclusive
      * @return the code point index
      */
-    public long positionBefore(int startPosExclude, Predicate<byte[]> until) {
+    public long positionBefore(long startPosExclude, Predicate<byte[]> until) {
         return pieces.positionBefore(startPosExclude, until);
     }
 
@@ -297,7 +297,7 @@ public class PieceTable {
      * @param until the until predicate, exclusive
      * @return the count
      */
-    public int count(int startPos, Predicate<byte[]> until) {
+    public int count(long startPos, Predicate<byte[]> until) {
         return pieces.count(startPos, until);
     }
 
@@ -309,7 +309,7 @@ public class PieceTable {
      * @param predicate the count predicate
      * @return the count
      */
-    public int count(int startPos, int endPos, Predicate<byte[]> predicate) {
+    public int count(long startPos, long endPos, Predicate<byte[]> predicate) {
         return pieces.count(startPos, endPos, predicate);
     }
 
