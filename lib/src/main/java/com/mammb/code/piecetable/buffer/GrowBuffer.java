@@ -33,7 +33,7 @@ public class GrowBuffer implements AppendBuffer {
     private final ByteArray elements;
 
     /** The length of code point counts. */
-    private int length;
+    private long length;
 
     /** The size of pitch. */
     private final short pilePitch;
@@ -126,14 +126,14 @@ public class GrowBuffer implements AppendBuffer {
 
 
     @Override
-    public Buffer subBuffer(int start, int end) {
-        return ReadBuffer.of(Arrays.copyOfRange(elements.get(), asIndex(start), asIndex(end)));
+    public Buffer subBuffer(long start, long end) {
+        return ReadBuffer.of(Arrays.copyOfRange(elements.get(), Math.toIntExact(asIndex(start)), Math.toIntExact(asIndex(end))));
     }
 
 
     @Override
-    public byte[] bytes(int rawStart, int rawEnd) {
-        return elements.get(rawStart, rawEnd);
+    public byte[] bytes(long rawStart, long rawEnd) {
+        return elements.get(Math.toIntExact(rawStart), Math.toIntExact(rawEnd));
     }
 
 
@@ -144,13 +144,13 @@ public class GrowBuffer implements AppendBuffer {
 
 
     @Override
-    public byte[] charAt(int index) {
-        return Utf8.asCharBytes(elements.get(), asIndex(index));
+    public byte[] charAt(long index) {
+        return Utf8.asCharBytes(elements.get(), Math.toIntExact(asIndex(index)));
     }
 
 
     @Override
-    public int asIndex(int index) {
+    public long asIndex(long index) {
         if (index == length) {
             return elements.length();
         }
@@ -158,8 +158,8 @@ public class GrowBuffer implements AppendBuffer {
         if (cached.isPresent()) {
             return cached.get();
         }
-        int i = piles.get(index / pilePitch);
-        int remaining = index % pilePitch;
+        int i = piles.get(Math.toIntExact(index / pilePitch));
+        int remaining = Math.toIntExact(index % pilePitch);
         for (; remaining > 0 && i < elements.length(); remaining--, i++) {
             i += (Utf8.followsCount(elements.get(i)) - 1);
         }
@@ -169,7 +169,7 @@ public class GrowBuffer implements AppendBuffer {
 
 
     @Override
-    public int length() {
+    public long length() {
         return length;
     }
 

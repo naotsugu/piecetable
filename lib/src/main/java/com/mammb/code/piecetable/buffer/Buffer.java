@@ -29,14 +29,14 @@ public interface Buffer {
      * Get the length of buffer.
      * @return the count of code point
      */
-    int length();
+    long length();
 
     /**
      * Gets the char value at the specified index.
      * @param index the index(code point) of the char value
      * @return the char value at the specified index of this string
      */
-    byte[] charAt(int index);
+    byte[] charAt(long index);
 
     /**
      * Get the byte array at the specified index.
@@ -44,7 +44,7 @@ public interface Buffer {
      * @param rawEnd the end raw index of the byte value
      * @return the byte array at the specified index
      */
-    byte[] bytes(int rawStart, int rawEnd);
+    byte[] bytes(long rawStart, long rawEnd);
 
     /**
      * Get the byte array.
@@ -58,14 +58,14 @@ public interface Buffer {
      * @param end the ending index, exclusive
      * @return the subBuffer of this buffer
      */
-    Buffer subBuffer(int start, int end);
+    Buffer subBuffer(long start, long end);
 
     /**
      * Get the raw index from the specified code point based index.
      * @param index the specified code point based index
      * @return the raw index
      */
-    int asIndex(int index);
+    long asIndex(long index);
 
     /**
      * Get whether this buffer is empty.
@@ -84,14 +84,14 @@ public interface Buffer {
      * @return the written Length
      * @throws IOException if some other I/O error occurs
      */
-    default int write(WritableByteChannel channel, ByteBuffer buf,
-            int offset, int length) throws IOException {
+    default long write(WritableByteChannel channel, ByteBuffer buf,
+            long offset, long length) throws IOException {
 
-        int from = asIndex(offset);
-        int to   = asIndex(offset + length);
+        long from = asIndex(offset);
+        long to   = asIndex(offset + length);
 
-        for (int i = from; i < to;) {
-            int m = Math.min(i + buf.remaining(), to);
+        for (long i = from; i < to;) {
+            long m = Math.min(i + buf.remaining(), to);
             buf.put(bytes(i, m));
             buf.flip();
             int n = channel.write(buf);

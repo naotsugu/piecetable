@@ -163,7 +163,7 @@ public class TextSource implements EventListener<Edit> {
      * Get the total code point counts.
      * @return the total code point counts
      */
-    public int totalSize() {
+    public long totalSize() {
         return source.length() + editQueue.pendingCodePointCountDelta();
     }
 

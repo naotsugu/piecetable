@@ -37,7 +37,7 @@ public interface Content extends EditListener {
      * length is a code point count.
      * @return the content length
      */
-    int length();
+    long length();
 
     /**
      * Get the total row size.

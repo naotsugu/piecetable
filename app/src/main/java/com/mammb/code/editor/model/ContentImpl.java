@@ -91,7 +91,7 @@ public class ContentImpl implements Content {
 
 
     @Override
-    public int length() {
+    public long length() {
         return pt.length();
     }
 

@@ -29,7 +29,7 @@ import java.util.Optional;
  *
  * @author Naotsugu Kobayashi
  */
-public record Piece(Buffer target, int bufIndex, int length) {
+public record Piece(Buffer target, long bufIndex, long length) {
 
     /** Piece pair. */
     public record Pair(Piece left, Piece right) { }
@@ -40,7 +40,7 @@ public record Piece(Buffer target, int bufIndex, int length) {
      * @param offset the split position
      * @return the split pieces
      */
-    public Pair split(int offset) {
+    public Pair split(long offset) {
         if (offset >= length) {
             throw new RuntimeException("Illegal offset value. offset[%s], length[%s]"
                     .formatted(offset, length));
@@ -75,7 +75,7 @@ public record Piece(Buffer target, int bufIndex, int length) {
      * @param end the end index of the range to be copied, exclusive
      * @return the sub buffer of the specified range of this piece
      */
-    public Buffer bytes(int start, int end) {
+    public Buffer bytes(long start, long end) {
         if (start < 0 || end > end() || start >= end) {
             throw new RuntimeException("Illegal index. start[%s], end[%s]".formatted(start, end));
         }
@@ -99,7 +99,7 @@ public record Piece(Buffer target, int bufIndex, int length) {
      * @return the number of bytes written, possibly zero
      * @throws IOException If some other I/O error occurs
      */
-    int writeTo(WritableByteChannel channel, ByteBuffer buf) throws IOException {
+    long writeTo(WritableByteChannel channel, ByteBuffer buf) throws IOException {
         return target.write(channel, buf, bufIndex, length);
     }
 
@@ -108,7 +108,7 @@ public record Piece(Buffer target, int bufIndex, int length) {
      * Get the end position.
      * @return the end position
      */
-    public int end() {
+    public long end() {
         return bufIndex + length;
     }
 

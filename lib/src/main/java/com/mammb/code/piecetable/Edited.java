@@ -25,7 +25,7 @@ import java.util.Objects;
  * @param bytes edited bytes
  * @author Naotsugu Kobayashi
  */
-public record Edited(EditType type, int pos, int len, byte[] bytes) {
+public record Edited(EditType type, long pos, int len, byte[] bytes) {
 
     /** The empty edited. */
     public static final Edited empty = new Edited(EditType.NIL, 0, 0, new byte[0]);

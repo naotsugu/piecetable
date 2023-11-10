@@ -38,13 +38,13 @@ public class ChannelArray implements Closeable {
     private final SeekableByteChannel ch;
 
     /** The current size of entity to which this channel is connected. */
-    private final int chSize;
+    private final long chSize;
 
     /** The byte buffer. */
     private byte[] buffer;
 
     /** The offset of buffer. */
-    private int offset;
+    private long offset;
 
 
     /**
@@ -54,7 +54,7 @@ public class ChannelArray implements Closeable {
     private ChannelArray(SeekableByteChannel ch) {
         Objects.requireNonNull(ch);
         try {
-            this.chSize = Math.toIntExact(ch.size());
+            this.chSize = ch.size();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -79,7 +79,7 @@ public class ChannelArray implements Closeable {
      * @param index the specified index position
      * @return byte value
      */
-    public byte get(int index) {
+    public byte get(long index) {
         if (index < 0 || index >= chSize) {
             throw new IndexOutOfBoundsException(
                 "index[%d], length[%d]".formatted(index, chSize));
@@ -87,7 +87,7 @@ public class ChannelArray implements Closeable {
         if (buffer == EMPTY || index < offset || index >= offset + buffer.length) {
             fillBuffer(index, Math.addExact(index, PREF_BUF_SIZE));
         }
-        return buffer[index - offset];
+        return buffer[Math.toIntExact(index - offset)];
     }
 
 
@@ -97,7 +97,7 @@ public class ChannelArray implements Closeable {
      * @param to the final index of the range to be copied, exclusive
      * @return a new array containing the specified range from the original array
      */
-    public byte[] get(int from, int to) {
+    public byte[] get(long from, long to) {
         if (from < 0 || to > chSize || from > to) {
             throw new IndexOutOfBoundsException(
                 "from[%d], to[%d], length[%d]".formatted(from, to, chSize));
@@ -112,7 +112,7 @@ public class ChannelArray implements Closeable {
                 return ret;
             }
         }
-        return Arrays.copyOfRange(buffer, from - offset, to - offset);
+        return Arrays.copyOfRange(buffer, Math.toIntExact(from - offset), Math.toIntExact(to - offset));
     }
 
 
@@ -129,7 +129,7 @@ public class ChannelArray implements Closeable {
      * Get the length of byte array.
      * @return the length of byte array
      */
-    public int length() {
+    public long length() {
         return chSize;
     }
 
@@ -145,10 +145,10 @@ public class ChannelArray implements Closeable {
      * @param from start position of channel
      * @param to end position of channel
      */
-    private void fillBuffer(int from, int to) {
+    private void fillBuffer(long from, long to) {
         try {
-            var bb = ByteBuffer.allocate(
-                Math.max(to, Math.addExact(from, PREF_BUF_SIZE)) - from);
+            var bb = ByteBuffer.allocate(Math.toIntExact(
+                Math.max(to, Math.addExact(from, PREF_BUF_SIZE)) - from));
             ch.position(from);
             ch.read(bb);
             bb.flip();

@@ -67,7 +67,7 @@ public class IntArray implements Serializable {
     /**
      * Create a new {@code IntArray} from the given int array.
      * @param values the given int array
-     * @return a new {@code ByteArray}
+     * @return a new {@code IntArray}
      */
     public static IntArray of(int[] values) {
         return new IntArray(Arrays.copyOf(values, values.length), values.length);

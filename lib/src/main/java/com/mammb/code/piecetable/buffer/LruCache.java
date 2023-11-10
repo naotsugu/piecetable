@@ -66,7 +66,7 @@ class LruCache {
      * @param key the key of entry
      * @param value the value of entry
      */
-    void put(int key, int value) {
+    void put(long key, long value) {
         var e = new Entry(key, value);
         cache.remove(e);
         if (cache.size() == cacheSize) {
@@ -81,7 +81,7 @@ class LruCache {
      * @param key the key of entry
      * @return the entry
      */
-    Optional<Integer> get(int key) {
+    Optional<Long> get(long key) {
         // this cache is very small, so we do iterate.
         for (Entry entry : cache) {
             if (entry.key == key) {
@@ -105,6 +105,6 @@ class LruCache {
      * @param key the key
      * @param value the value
      */
-    record Entry(int key, int value) { }
+    record Entry(long key, long value) { }
 
 }

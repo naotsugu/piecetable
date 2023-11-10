@@ -46,7 +46,7 @@ public class PieceTable {
     private final AppendBuffer buffer;
 
     /** The length of characters(code point). */
-    private int length;
+    private long length;
 
     /** The undo queue. */
     private final Deque<PieceEdit> undo;
@@ -119,7 +119,7 @@ public class PieceTable {
      * @param pos the offset
      * @param cs a char sequence
      */
-    public void insert(int pos, CharSequence cs) {
+    public void insert(long pos, CharSequence cs) {
         if (pos < 0 || pos > length) {
             throw new IndexOutOfBoundsException(
                 "pos[%d], length[%d]".formatted(pos, length));
@@ -199,7 +199,7 @@ public class PieceTable {
      * Get the length of characters(code points) this piece table holds.
      * @return the length of characters(code points)
      */
-    public int length() {
+    public long length() {
         return length;
     }
 
@@ -270,7 +270,7 @@ public class PieceTable {
      * @param until the until predicate, exclusive
      * @return the code point index
      */
-    public int position(int startPos, Predicate<byte[]> until) {
+    public long position(int startPos, Predicate<byte[]> until) {
         return pieces.position(startPos, until);
     }
 
@@ -286,7 +286,7 @@ public class PieceTable {
      * @param until the until predicate, exclusive
      * @return the code point index
      */
-    public int positionBefore(int startPosExclude, Predicate<byte[]> until) {
+    public long positionBefore(int startPosExclude, Predicate<byte[]> until) {
         return pieces.positionBefore(startPosExclude, until);
     }
 
@@ -357,7 +357,7 @@ public class PieceTable {
     public void write(Path path) {
         try (FileChannel channel = FileChannel.open(path,
             StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-            int size = pieces.writeTo(channel);
+            long size = pieces.writeTo(channel);
             channel.truncate(size);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -404,7 +404,7 @@ public class PieceTable {
 
     private Edited asEdited(PieceEdit edit) {
 
-        int from = 0;
+        long from = 0;
         for (int i = 0; i < edit.index(); i++) {
             Piece p = pieces.get(i);
             from += p.length();

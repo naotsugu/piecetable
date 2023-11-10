@@ -89,13 +89,13 @@ public class ReadBuffer implements Buffer {
 
 
     @Override
-    public int length() {
+    public long length() {
         return length;
     }
 
     @Override
-    public byte[] bytes(int rawStart, int rawEnd) {
-        return Arrays.copyOfRange(elements, rawStart, rawEnd);
+    public byte[] bytes(long rawStart, long rawEnd) {
+        return Arrays.copyOfRange(elements, Math.toIntExact(rawStart), Math.toIntExact(rawEnd));
     }
 
     @Override
@@ -104,17 +104,17 @@ public class ReadBuffer implements Buffer {
     }
 
     @Override
-    public Buffer subBuffer(int start, int end) {
-        return of(Arrays.copyOfRange(elements, asIndex(start), asIndex(end)));
+    public Buffer subBuffer(long start, long end) {
+        return of(Arrays.copyOfRange(elements, Math.toIntExact(asIndex(start)), Math.toIntExact(asIndex(end))));
     }
 
     @Override
-    public byte[] charAt(int index) {
-        return Utf8.asCharBytes(elements, asIndex(index));
+    public byte[] charAt(long index) {
+        return Utf8.asCharBytes(elements, Math.toIntExact(asIndex(index)));
     }
 
     @Override
-    public int asIndex(int index) {
+    public long asIndex(long index) {
         if (index == length) {
             return elements.length;
         }
@@ -122,8 +122,8 @@ public class ReadBuffer implements Buffer {
         if (cached.isPresent()) {
             return cached.get();
         }
-        int i = piles[index / pilePitch];
-        int remaining = index % pilePitch;
+        int i = piles[Math.toIntExact(index / pilePitch)];
+        int remaining = Math.toIntExact(index % pilePitch);
         for (; remaining > 0 && i < elements.length; remaining--, i++) {
             i += (Utf8.followsCount(elements[i]) - 1);
         }

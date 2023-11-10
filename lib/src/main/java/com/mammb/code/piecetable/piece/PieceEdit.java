@@ -69,8 +69,8 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
      * Get the total length of the original pieces
      * @return the total length of the original pieces
      */
-    public int totalOrgLength() {
-        return Arrays.stream(org()).mapToInt(Piece::length).sum();
+    public long totalOrgLength() {
+        return Arrays.stream(org()).mapToLong(Piece::length).sum();
     }
 
 
@@ -78,8 +78,8 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
      * Get the total length of the modified pieces
      * @return the total length of the modified pieces
      */
-    public int totalModLength() {
-        return Arrays.stream(mod()).mapToInt(Piece::length).sum();
+    public long totalModLength() {
+        return Arrays.stream(mod()).mapToLong(Piece::length).sum();
     }
 
 
@@ -124,13 +124,13 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
      * @param from the position of edit
      * @return the edited
      */
-    public Edited asEdited(int from) {
+    public Edited asEdited(long from) {
 
-        int totalOrgLength = totalOrgLength();
-        int totalModLength = totalModLength();
+        long totalOrgLength = totalOrgLength();
+        long totalModLength = totalModLength();
 
         if (totalOrgLength < totalModLength) {
-            int len = totalModLength - totalOrgLength;
+            int len = Math.toIntExact(totalModLength - totalOrgLength);
             if (org.length == 0) {
                 // just insert or revert just delete
                 //  org[-]     mod[1]
@@ -143,7 +143,7 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
                 //  |....|     |....|
                 //             |++++|
                 //             |....|
-                int offset = mod[0].length();
+                long offset = mod[0].length();
                 from += offset;
                 return new Edited(EditType.INS, from, len,
                     bytes(mod, offset, offset + len).get());
@@ -161,7 +161,7 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
                 //  org[1]     mod[1..]
                 //  |....|     |....|
                 //             |++++|
-                int offset = org[0].length();
+                long offset = org[0].length();
                 from += offset;
                 return new Edited(EditType.INS, from, len,
                     bytes(mod, offset, offset + len).get());
@@ -172,14 +172,14 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
                 //  |....|     |....|
                 //             |++++|
                 //  |....|     |....|
-                int offset = org[0].length();
+                long offset = org[0].length();
                 from += offset;
                 return new Edited(EditType.INS, from, len,
                     bytes(mod, offset, offset + len).get());
             }
         }
         if (totalOrgLength > totalModLength) {
-            int len = totalOrgLength - totalModLength;
+            int len = Math.toIntExact(totalOrgLength - totalModLength);
             if (mod.length == 0) {
                 // revert just insert or just delete
                 //  org[1]     mod[1]
@@ -192,7 +192,7 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
                 //  |....|     |....|
                 //  |----|
                 //  |....|
-                int offset = org()[0].length();
+                long offset = org()[0].length();
                 from += offset;
                 return new Edited(EditType.DEL, from, len,
                     bytes(org, offset, offset + len).get());
@@ -210,7 +210,7 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
                 //  org[1..]   mod[1]
                 //  |....|     |....|
                 //  |----|
-                int offset = mod[0].length();
+                long offset = mod[0].length();
                 from += offset;
                 return new Edited(EditType.DEL, from, len,
                     bytes(org, offset, offset + len).get());
@@ -221,7 +221,7 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
                 //  |....|     |....|
                 //  |----|
                 //  |....|     |....|
-                int offset = mod[0].length();
+                long offset = mod[0].length();
                 from += offset;
                 return new Edited(EditType.DEL, from, len,
                     bytes(org, offset, offset + len).get());
@@ -245,9 +245,9 @@ public record PieceEdit(int index, Piece[] org, Piece[] mod, Place place) {
      * @param endPos the end position
      * @return the byte array
      */
-    private static ByteArray bytes(Piece[] pieces, int startPos, int endPos) {
+    private static ByteArray bytes(Piece[] pieces, long startPos, long endPos) {
         ByteArray byteArray = ByteArray.of();
-        int count = 0;
+        long count = 0;
         for (int i = 0; i < pieces.length; i++) {
             Buffer buf = pieces[i].bytes();
             if (count + buf.length() > startPos) {

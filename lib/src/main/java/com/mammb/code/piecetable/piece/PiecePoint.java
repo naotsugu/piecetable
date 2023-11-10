@@ -25,7 +25,7 @@ public class PiecePoint {
     private int index;
 
     /** The position on the target buffer. */
-    private int position;
+    private long position;
 
 
     /**
@@ -33,7 +33,7 @@ public class PiecePoint {
      * @param index the index to the buffer
      * @param position the position on the target buffer
      */
-    private PiecePoint(int index, int position) {
+    private PiecePoint(int index, long position) {
         this.index = index;
         this.position = position;
     }
@@ -60,7 +60,7 @@ public class PiecePoint {
      * Increment this point.
      * @param length the length
      */
-    public void inc(int length) {
+    public void inc(long length) {
         index++;
         position += length;
     }
@@ -70,7 +70,7 @@ public class PiecePoint {
      * Decrement this point
      * @param length the length
      */
-    public void dec(int length) {
+    public void dec(long length) {
         index--;
         position -= length;
     }
@@ -89,7 +89,7 @@ public class PiecePoint {
      * Get the position on the target buffer.
      * @return the position on the target buffer
      */
-    public int position() {
+    public long position() {
         return position;
     }
 

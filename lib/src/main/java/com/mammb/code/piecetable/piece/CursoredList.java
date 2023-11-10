@@ -94,7 +94,7 @@ public class CursoredList {
      * @param pos the specified position
      * @return the moved point
      */
-    public PiecePoint at(int pos) {
+    public PiecePoint at(long pos) {
         if (point.position() < pos) {
             while (cursor.hasNext() && point.position() < pos) {
                 next();
@@ -161,14 +161,14 @@ public class CursoredList {
      * @param endPos the end position
      * @return the bytes at the specified position
      */
-    public ByteArray bytes(int startPos, int endPos) {
+    public ByteArray bytes(long startPos, long endPos) {
         ByteArray byteArray = ByteArray.of();
         PiecePoint from = at(startPos);
         PiecePoint to   = at(endPos - 1);
         for (int i = 0; i <= to.index() - from.index(); i++) {
             Piece piece = get(from.index() + i);
-            int s = (i == 0) ? startPos - from.position() : 0;
-            int e = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
+            long s = (i == 0) ? startPos - from.position() : 0;
+            long e = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
             byteArray.add(piece.bytes(s, e).bytes());
         }
         return byteArray;
@@ -181,15 +181,15 @@ public class CursoredList {
      * @param until the Conditions for Termination
      * @return the bytes at the specified position
      */
-    public ByteArray bytes(int startPos, Predicate<byte[]> until) {
+    public ByteArray bytes(long startPos, Predicate<byte[]> until) {
         ByteArray byteArray = ByteArray.of();
         PiecePoint from = at(startPos);
-        int start = startPos - from.position();
+        long start = startPos - from.position();
         for (int i = from.index(); i < length(); i++) {
             Piece piece = get(i);
             if (piece.length() == 0) continue;
             for (;;) {
-                int end = Math.min(piece.length(), start + 1024);
+                long end = Math.min(piece.length(), start + 1024);
                 Buffer buf = piece.bytes(start, end);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
@@ -215,15 +215,15 @@ public class CursoredList {
      * @param until the conditions for termination
      * @return the number of count
      */
-    public int count(int startPos, Predicate<byte[]> until) {
+    public int count(long startPos, Predicate<byte[]> until) {
         int count = 0;
         PiecePoint from = at(startPos);
-        int start = startPos - from.position();
+        long start = startPos - from.position();
         for (int i = from.index(); i < length(); i++) {
             Piece piece = get(i);
             if (piece.length() == 0) continue;
             for (;;) {
-                int end = Math.min(piece.length(), start + 1024);
+                long end = Math.min(piece.length(), start + 1024);
                 Buffer buf = piece.bytes(start, end);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
@@ -250,12 +250,12 @@ public class CursoredList {
      * @param until the conditions for termination
      * @return the bytes at the specified position
      */
-    public ByteArray bytesBefore(int startPosExclude, Predicate<byte[]> until) {
+    public ByteArray bytesBefore(long startPosExclude, Predicate<byte[]> until) {
         if (startPosExclude <= 0) throw new IndexOutOfBoundsException();
         ByteArray byteArray = ByteArray.of();
         PiecePoint from = at(startPosExclude - 1);
         boolean first = true;
-        int start = startPosExclude - from.position();
+        long start = startPosExclude - from.position();
         for (int i = from.index(); i >= 0; i--) {
             Piece piece = get(i);
             if (piece.length() == 0) continue;
@@ -263,9 +263,9 @@ public class CursoredList {
                 start = piece.length();
             }
             for (;;) {
-                int end = Math.max(0, start - 1024);
+                long end = Math.max(0, start - 1024);
                 Buffer buf = piece.bytes(end, start);
-                for (int j = buf.length() - 1; j >= 0; j--) {
+                for (long j = buf.length() - 1; j >= 0; j--) {
                     byte[] bytes = buf.charAt(j);
                     if (until.test(bytes)) {
                         return byteArray.reverse();
@@ -291,15 +291,15 @@ public class CursoredList {
      * @param until the Conditions for Termination
      * @return the code point index at the specified position
      */
-    public int position(int startPos, Predicate<byte[]> until) {
+    public long position(long startPos, Predicate<byte[]> until) {
         int count = 0;
         PiecePoint from = at(startPos);
-        int start = startPos - from.position();
+        long start = startPos - from.position();
         for (int i = from.index(); i < length(); i++) {
             Piece piece = get(i);
             if (piece.length() == 0) continue;
             for (;;) {
-                int end = Math.min(piece.length(), start + 1024);
+                long end = Math.min(piece.length(), start + 1024);
                 Buffer buf = piece.bytes(start, end);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
@@ -326,12 +326,12 @@ public class CursoredList {
      * @param until the conditions for termination
      * @return the code point index at the specified position
      */
-    public int positionBefore(int startPosExclude, Predicate<byte[]> until) {
+    public long positionBefore(long startPosExclude, Predicate<byte[]> until) {
         if (startPosExclude <= 0) throw new IndexOutOfBoundsException();
         int count = 0;
         PiecePoint from = at(startPosExclude - 1);
         boolean first = true;
-        int start = startPosExclude - from.position();
+        long start = startPosExclude - from.position();
         for (int i = from.index(); i >= 0; i--) {
             Piece piece = get(i);
             if (piece.length() == 0) continue;
@@ -339,9 +339,9 @@ public class CursoredList {
                 start = piece.length();
             }
             for (;;) {
-                int end = Math.max(0, start - 1024);
+                long end = Math.max(0, start - 1024);
                 Buffer buf = piece.bytes(end, start);
-                for (int j = buf.length() - 1; j >= 0; j--) {
+                for (long j = buf.length() - 1; j >= 0; j--) {
                     byte[] bytes = buf.charAt(j);
                     if (until.test(bytes)) {
                         return startPosExclude - count;
@@ -367,17 +367,17 @@ public class CursoredList {
      * @param predicate the count-up conditions
      * @return the number of count
      */
-    public int count(int startPos, int endPos, Predicate<byte[]> predicate) {
+    public int count(long startPos, long endPos, Predicate<byte[]> predicate) {
         int count = 0;
         PiecePoint from = at(startPos);
         PiecePoint to   = at(endPos - 1);
         for (int i = 0; i <= to.index() - from.index(); i++) {
             Piece piece = get(from.index() + i);
             if (piece.length() == 0) continue;
-            int start = (i == 0) ? startPos - from.position() : 0;
-            int end = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
+            long start = (i == 0) ? startPos - from.position() : 0;
+            long end = (i == (to.index() - from.index())) ? endPos - to.position() : piece.length();
             for (;;) {
-                int eu = Math.min(end, start + 1024);
+                long eu = Math.min(end, start + 1024);
                 Buffer buf = piece.bytes(start, eu);
                 for (int j = 0; j < buf.length(); j++) {
                     byte[] bytes = buf.charAt(j);
@@ -401,8 +401,8 @@ public class CursoredList {
      * @return the number of bytes written, possibly zero
      * @throws IOException If some other I/O error occurs
      */
-    public int writeTo(WritableByteChannel channel) throws IOException {
-        int size = 0;
+    public long writeTo(WritableByteChannel channel) throws IOException {
+        long size = 0;
         ByteBuffer buf = ByteBuffer.allocate(1024);
         for (Piece piece : raw) {
             size += piece.writeTo(channel, buf);
