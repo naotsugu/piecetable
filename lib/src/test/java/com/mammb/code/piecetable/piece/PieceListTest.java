@@ -23,17 +23,17 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test of {@link CursoredList}.
+ * Test of {@link PieceList}.
  * @author Naotsugu Kobayashi
  */
-class CursoredListTest {
+class PieceListTest {
 
     Charset cs = StandardCharsets.UTF_8;
 
     @Test
     void testCursorList() {
 
-        var list = new CursoredList();
+        var list = new PieceList();
 
         list.add(0, new Piece(null, 0, 3));
         // |0|1|2|
@@ -94,7 +94,7 @@ class CursoredListTest {
     @Test
     void testBytes() {
 
-        var list = new CursoredList();
+        var list = new PieceList();
 
         Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
         list.add(0, new Piece(buf, 0, 3));
@@ -116,7 +116,7 @@ class CursoredListTest {
     @Test
     void testBytesBefore() {
 
-        var list = new CursoredList();
+        var list = new PieceList();
 
         Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
         list.add(0, new Piece(buf, 0, 3));
@@ -134,7 +134,7 @@ class CursoredListTest {
     @Test
     void testPosition() {
 
-        var list = new CursoredList();
+        var list = new PieceList();
 
         Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
         list.add(0, new Piece(buf, 0, 3));
@@ -150,7 +150,7 @@ class CursoredListTest {
     @Test
     void testPositionBefore() {
 
-        var list = new CursoredList();
+        var list = new PieceList();
 
         Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
         list.add(0, new Piece(buf, 0, 3));
@@ -168,7 +168,7 @@ class CursoredListTest {
     @Test
     void testCount() {
 
-        var list = new CursoredList();
+        var list = new PieceList();
 
         Buffer buf = ReadBuffer.of("abc_121_abc".getBytes(cs));
         list.add(0, new Piece(buf, 0, 3));

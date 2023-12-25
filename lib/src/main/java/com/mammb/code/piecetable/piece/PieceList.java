@@ -28,13 +28,14 @@ import java.util.stream.Stream;
 
 /**
  * Provides cursor-based list access.
- *
+ * <p>
  * Traversing LinkedList is very inefficient,
  * so we provide list access by cursor.
+ * </p>
  *
  * @author Naotsugu Kobayashi
  */
-public class CursoredList {
+public class PieceList {
 
     /** The raw list of piece. */
     private final List<Piece> raw;
@@ -50,7 +51,7 @@ public class CursoredList {
      * Constructor.
      * @param raw the raw list of piece
      */
-    public CursoredList(List<Piece> raw) {
+    public PieceList(List<Piece> raw) {
         this.raw = raw;
         this.cursor = raw.listIterator();
         this.point = new PiecePoint();
@@ -60,7 +61,7 @@ public class CursoredList {
     /**
      * Constructor.
      */
-    public CursoredList() {
+    public PieceList() {
         this(new LinkedList<>());
     }
 
@@ -69,8 +70,8 @@ public class CursoredList {
      * Create a new CursoredList.
      * @return a new CursoredList
      */
-    public static CursoredList of() {
-        return new CursoredList(new LinkedList<>());
+    public static PieceList of() {
+        return new PieceList(new LinkedList<>());
     }
 
 

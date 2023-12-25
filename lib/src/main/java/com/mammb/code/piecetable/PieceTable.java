@@ -18,7 +18,7 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.buffer.AppendBuffer;
 import com.mammb.code.piecetable.buffer.Buffer;
 import com.mammb.code.piecetable.buffer.Buffers;
-import com.mammb.code.piecetable.piece.CursoredList;
+import com.mammb.code.piecetable.piece.PieceList;
 import com.mammb.code.piecetable.piece.Piece;
 import com.mammb.code.piecetable.piece.PieceEdit;
 import com.mammb.code.piecetable.piece.PiecePoint;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class PieceTable {
 
     /** The pieces. */
-    private final CursoredList pieces;
+    private final PieceList pieces;
 
     /** The Append buffer. */
     private final AppendBuffer buffer;
@@ -64,7 +64,7 @@ public class PieceTable {
      * @param appendBuffer the Append buffer
      */
     public PieceTable(Buffer readBuffer, AppendBuffer appendBuffer) {
-        this.pieces = CursoredList.of();
+        this.pieces = PieceList.of();
         this.pieces.add(0, new Piece(readBuffer, 0, readBuffer.length()));
         this.buffer = appendBuffer;
         this.length = readBuffer.length();

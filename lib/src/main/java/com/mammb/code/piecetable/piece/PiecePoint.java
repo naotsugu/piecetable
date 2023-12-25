@@ -17,21 +17,27 @@ package com.mammb.code.piecetable.piece;
 
 /**
  * Pieces index with piece start position.
+ * <pre>
+ *  index  target          bufIndex   length
+ *     0 | read buffer   |  0        | 3     |   PiecePoint(0, 0)
+ *     1 | append buffer |  0        | 2     |   PiecePoint(1, 3)
+ *     2 | append buffer |  5        | 6     |   PiecePoint(2, 5)
+ * </pre>
  * @author Naotsugu Kobayashi
  */
 public class PiecePoint {
 
-    /** The index to the buffer. */
+    /** The index of the piece. */
     private int index;
 
-    /** The position on the target buffer. */
+    /** The position on the head of piece. */
     private long position;
 
 
     /**
      * Constructor.
-     * @param index the index to the buffer
-     * @param position the position on the target buffer
+     * @param index the index of the piece
+     * @param position the position on the head of piece
      */
     private PiecePoint(int index, long position) {
         this.index = index;
@@ -77,8 +83,8 @@ public class PiecePoint {
 
 
     /**
-     * Get the index to the buffer.
-     * @return the index to the buffer
+     * Get the index of the piece.
+     * @return the index of the piece
      */
     public int index() {
         return index;
@@ -86,8 +92,8 @@ public class PiecePoint {
 
 
     /**
-     * Get the position on the target buffer.
-     * @return the position on the target buffer
+     * Get the position on the head of piece.
+     * @return the position on the head of piece
      */
     public long position() {
         return position;
