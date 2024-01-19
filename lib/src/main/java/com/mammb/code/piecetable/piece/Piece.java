@@ -26,7 +26,6 @@ import java.util.Optional;
  * @param target which buffer
  * @param bufIndex start index in the buffer
  * @param length length in the buffer
- *
  * @author Naotsugu Kobayashi
  */
 public record Piece(Buffer target, long bufIndex, long length) {
@@ -37,11 +36,11 @@ public record Piece(Buffer target, long bufIndex, long length) {
 
     /**
      * Split this piece at the specified offset.
-     * @param offset the split position
+     * @param offset the split position in ths piece
      * @return the split pieces
      */
     public Pair split(long offset) {
-        if (offset >= length) {
+        if (offset <=  0 || offset >= length) {
             throw new RuntimeException("Illegal offset value. offset[%s], length[%s]"
                     .formatted(offset, length));
         }

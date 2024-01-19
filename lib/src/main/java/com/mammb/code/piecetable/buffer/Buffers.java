@@ -82,8 +82,20 @@ public abstract class Buffers {
      * @return a new buffer
      */
     public static Buffer of(Path path, Consumer<byte[]> traverse) {
+        return of(path, 32_000_000, traverse);
+    }
+
+
+    /**
+     * Create a new buffer form given path.
+     * @param path the source path
+     * @param inMemoryThreshold the bytes size of inMemory threshold
+     * @param traverse the bytes traverse at initial loading
+     * @return a new buffer
+     */
+    public static Buffer of(Path path, long inMemoryThreshold, Consumer<byte[]> traverse) {
         try {
-            if (Files.size(path) >= Runtime.getRuntime().freeMemory() * 0.8) {
+            if (Files.size(path) >= inMemoryThreshold) {
                 return ChannelBuffer.of(
                     FileChannel.open(path, StandardOpenOption.READ),
                     traverse);

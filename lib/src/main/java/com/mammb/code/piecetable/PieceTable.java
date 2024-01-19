@@ -35,6 +35,34 @@ import java.util.stream.Collectors;
 
 /**
  * Piece Table implementation.
+ *
+ * <pre>
+ *            PieceList pieces
+ *            -------------------------------------
+ *            | Buffer target | bufIndex | length |
+ *            -------------------------------------
+ *  (1) Piece |  readBuffer  |       0  |      6  |
+ *            -------------------------------------
+ *  (2) Piece | appendBuffer |       0  |      3  |
+ *            -------------------------------------
+ *  (3) Piece |  readBuffer  |       7  |      2  |
+ *            -------------------------------------
+ *            ...
+ *
+ *
+ *  readBuffer(read only)                  appendBuffer
+ *  ---------------------------------      -------------
+ *  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |      | 0 | 1 | 2 | ...
+ *  | L | o | r | e | m |   | u | m |      | i | p | s | ...
+ *  ---------------------------------      -------------
+ *  \__________(1)_________/
+ *                                         \____(2)___/
+ *                          \_(3)__/
+ *
+ *  (1)                     (2)          (3)
+ *  | L | o | r | e | m |   | i | p | s | u | m |
+ * </pre>
+ *
  * @author Naotsugu Kobayashi
  */
 public class PieceTable {
@@ -120,17 +148,20 @@ public class PieceTable {
      * @param cs a char sequence
      */
     public void insert(long pos, CharSequence cs) {
+
         if (pos < 0 || pos > length) {
             throw new IndexOutOfBoundsException(
                 "pos[%d], length[%d]".formatted(pos, length));
         }
 
+        // append the inserted text to the end of the append buffer
         Buffer buf = Buffers.of(cs);
         Piece newPiece = new Piece(buffer, buffer.length(), buf.length());
         buffer.append(buf);
 
         PiecePoint point = pieces.at(pos);
         if (point.position() == pos) {
+            // add to the boundary position
             PieceEdit edit = new PieceEdit(
                     point.index(),
                     new Piece[0],
@@ -138,6 +169,7 @@ public class PieceTable {
                     PieceEdit.Place.HEAD);
             pushToUndo(applyEdit(edit), false);
         } else {
+            // split the piece and add
             Piece piece = pieces.get(point.index());
             Piece.Pair pair = piece.split(pos - point.position());
             PieceEdit edit = new PieceEdit(
