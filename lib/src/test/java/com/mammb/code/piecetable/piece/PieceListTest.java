@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable.piece;
 
 import com.mammb.code.piecetable.buffer.Buffer;
+import com.mammb.code.piecetable.buffer.Buffers;
 import com.mammb.code.piecetable.buffer.ReadBuffer;
 import org.junit.jupiter.api.Test;
 import java.nio.charset.Charset;
@@ -189,6 +190,99 @@ class PieceListTest {
 
         assertEquals(1, list.count(1, 2, b -> b[0] == 'b'));
         assertEquals(1, list.count(6, 8, b -> b[0] == 'b'));
+
+    }
+
+
+    @Test
+    void testRemove() {
+
+        var list = new PieceList();
+        Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
+        list.add(0, new Piece(buf, 0, 3)); // 0  abc
+        list.add(1, new Piece(buf, 3, 1)); // 1  _
+        list.add(2, new Piece(buf, 4, 3)); // 2  def
+        list.add(3, new Piece(buf, 7, 1)); // 3  _
+        list.add(4, new Piece(buf, 8, 3)); // 4  ghi
+
+        list.remove(1);
+        // 0  abc
+        // 1  def
+        // 2  _
+        // 3  ghi
+        assertEquals(new PiecePoint(1, 3), list.getPoint());
+        assertEquals("def", new String(list.get(1).bytes().bytes()));
+        assertEquals(4, list.length());
+
+        list.remove(2);
+        // 0  abc
+        // 1  def
+        // 2  ghi
+        assertEquals(new PiecePoint(2, 6), list.getPoint());
+        assertEquals("ghi", new String(list.get(2).bytes().bytes()));
+        assertEquals(3, list.length());
+
+        assertEquals("abcdefghi", new String(list.bytes(0, 9).get()));
+
+    }
+
+
+    @Test
+    void testAddWithMerge() {
+        Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
+        var list = new PieceList();
+
+        list.add(0, true, new Piece(buf, 0, 3)); // add abc
+        assertEquals(new PiecePoint(1, 3), list.getPoint());
+        assertEquals(1, list.length());
+
+        // 0 | abc |   ->    0 | abc |   ->    0 | abc_ |
+        //                   1 | _   |           (merged)
+        list.add(1, true, new Piece(buf, 3, 1));
+        assertEquals(new PiecePoint(1, 4), list.getPoint());
+        assertEquals(1, list.length());
+        assertEquals("abc_", new String(list.get(0).bytes().bytes()));
+
+        list.add(1, true, new Piece(buf, 8, 3));  // add ghi
+        assertEquals(2, list.length());
+
+        // 0 | abc_ |  ->    0 | abc_ |  ->    0 | abc_def |
+        // 1 | ghi  |  ->    1 | def  |           (merged)
+        //                   2 | _    |        1 | _ghi    |
+        //                   3 | ghi  |           (merged)
+        list.add(1, true, new Piece(buf, 4, 3), new Piece(buf, 7, 1)); // add def _
+        assertEquals(new PiecePoint(2, 11), list.getPoint());
+        assertEquals(2, list.length());
+        assertEquals("abc_def", new String(list.get(0).bytes().bytes()));
+        assertEquals("_ghi", new String(list.get(1).bytes().bytes()));
+
+    }
+
+    @Test
+    void testRemoveWithMerge() {
+
+        var list = new PieceList();
+        Buffer buf = ReadBuffer.of("abc_def_ghi".getBytes(cs));
+        Buffer app = Buffers.appendOf();
+        list.add(0, new Piece(buf, 0, 3)); // 0  abc
+        list.add(1, new Piece(app, 0, 1)); // 1  append buffer 1
+        list.add(2, new Piece(buf, 3, 1)); // 2  _
+        list.add(3, new Piece(buf, 4, 3)); // 3  def
+        list.add(4, new Piece(buf, 7, 1)); // 4  _
+        list.add(5, new Piece(app, 1, 1)); // 5  append buffer 2
+        list.add(6, new Piece(buf, 8, 3)); // 6  ghi
+
+        list.remove(1, true);
+        // 0  abc_
+        // 1  def
+        // 2  _
+        // 3  append buffer 2
+        // 4  ghi
+        assertEquals(new PiecePoint(1, 4), list.getPoint());
+        assertEquals("abc_", new String(list.get(0).bytes().bytes()));
+        assertEquals("def", new String(list.get(1).bytes().bytes()));
+        assertEquals(new PiecePoint(2, 7), list.getPoint());
+        assertEquals(5, list.length());
 
     }
 

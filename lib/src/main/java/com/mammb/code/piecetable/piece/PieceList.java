@@ -120,15 +120,55 @@ public class PieceList {
      * @param pieces to be inserted
      */
     public void add(int index, Piece... pieces) {
-        if (index < 0 || index > length()) {
-            throw new IndexOutOfBoundsException();
+        add(index, false, pieces);
+    }
+
+
+    /**
+     * Add the specified element at the specified position in this list
+     * and if we can, we will merge.
+     * @param index at which the specified element is to be inserted element
+     * @param withMerge whether to attempt a merge
+     * @param pieces to be inserted
+     */
+    public void add(int index, boolean withMerge, Piece... pieces) {
+
+        if (pieces == null || pieces.length == 0) {
+            return;
         }
+
+        if (index < 0 || index > length()) {
+            throw new IndexOutOfBoundsException(
+                "index[%d], length[%d]".formatted(index, length()));
+        }
+
         moveTo(index);
         for (int i = 0; i < pieces.length; i++) {
-            var piece = pieces[i];
+            Piece piece = pieces[i];
             cursor.add(piece);
             point.inc(piece.length());
         }
+
+        if (withMerge) {
+            // | a | b |
+            //     ^    index : 1  added : | 1 | 2 | 3 |
+            //
+            // | a | 1 | 2 | 3 | b |
+            //                 ^
+            int lastPieceIndex = index + pieces.length - 1;
+            if (index > 0) {
+                boolean merged = mergeWithNext(index - 1);
+                if (merged) {
+                    //   0    1   2   3
+                    // | a1 | 2 | 3 | b |
+                    lastPieceIndex--;
+                }
+            }
+            if (pieces.length > 1 && lastPieceIndex < (length() - 1)) {
+                mergeWithNext(lastPieceIndex);
+            }
+        }
+
     }
 
 
@@ -137,6 +177,17 @@ public class PieceList {
      * @param index the index of the element to be removed
      */
     public void remove(int index) {
+        remove(index, false);
+    }
+
+
+    /**
+     * Removes the element at the specified position in this list
+     * and if we can, we will merge.
+     * @param index the index of the element to be removed
+     * @param withMerge whether to attempt a merge
+     */
+    public void remove(int index, boolean withMerge) {
         if (index < 0 || index >= length()) {
             throw new IndexOutOfBoundsException(
                 "index[%d], length[%d]".formatted(index, length()));
@@ -144,6 +195,40 @@ public class PieceList {
         get(index);
         moveTo(index);
         cursor.remove();
+
+        if (index > 0 && index < length() - 1 && withMerge) {
+            mergeWithNext(index - 1);
+        }
+
+    }
+
+
+    /**
+     * Merge the piece at the specified index with the next piece, if possible.
+     * <pre>
+     *   index:0  | buffer a | 0 | 2 |
+     *   index:1  | buffer a | 2 | 3 |
+     *
+     *   marge(0)
+     *   index:0  | buffer a | 0 | 5 |
+     *
+     * </pre>
+     * @param index the specified index
+     * @return {@code true} if merged
+     */
+    private boolean mergeWithNext(int index) {
+        Piece curr = get(index);
+        Piece next = get(index + 1);
+        var merged = curr.merge(next);
+        if (merged.isPresent()) {
+            moveTo(index);
+            cursor.set(merged.get()); cursor.next();
+            next();
+            cursor.remove();
+            point.fixupPosition(curr.length());
+            return true;
+        }
+        return false;
     }
 
 
@@ -460,6 +545,22 @@ public class PieceList {
         if (cursor.nextIndex() != index) {
             throw new IndexOutOfBoundsException();
         }
+    }
+
+
+    PiecePoint getPoint() {
+        return point;
+    }
+
+    String dump() {
+        var sb = new StringBuilder();
+        moveTo(0);
+        for (int i = 0; ; i++) {
+            var p = next();
+            if (p == null) break;
+            sb.append(i + ": " + p + "\n");
+        }
+        return sb.toString();
     }
 
 }

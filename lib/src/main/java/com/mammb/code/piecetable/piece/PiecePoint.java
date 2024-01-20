@@ -15,6 +15,8 @@
  */
 package com.mammb.code.piecetable.piece;
 
+import java.util.Objects;
+
 /**
  * Pieces index with piece start position.
  * <pre>
@@ -39,7 +41,7 @@ public class PiecePoint {
      * @param index the index of the piece
      * @param position the position on the head of piece
      */
-    private PiecePoint(int index, long position) {
+    PiecePoint(int index, long position) {
         this.index = index;
         this.position = position;
     }
@@ -99,10 +101,30 @@ public class PiecePoint {
         return position;
     }
 
+    /**
+     * Fixup the position.
+     * @param delta the delta
+     */
+    void fixupPosition(long delta) {
+        position += delta;
+    }
 
     @Override
     public String toString() {
         return "PiecePoint{bufIndex=%d, position=%d}".formatted(index, position);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PiecePoint that = (PiecePoint) o;
+        return index == that.index && position == that.position;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, position);
     }
 
 }

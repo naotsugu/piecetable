@@ -61,7 +61,7 @@ class PieceTest {
 
 
     @Test
-    void marge() {
+    void merge() {
         var buffer = Buffers.appendOf();
 
         // | 0 | 1 |
@@ -69,16 +69,16 @@ class PieceTest {
         var p1 = new Piece(buffer, 0, 2);
         var p2 = new Piece(buffer, 2, 2);
 
-        assertEquals(new Piece(buffer, 0, 4), p1.marge(p2).get());
-        assertEquals(new Piece(buffer, 0, 4), p2.marge(p1).get());
+        assertEquals(new Piece(buffer, 0, 4), p1.merge(p2).get());
+        assertEquals(new Piece(buffer, 0, 4), p2.merge(p1).get());
 
         // | 0 | 1 |
         //               | 3 | 4 |
         p1 = new Piece(buffer, 0, 2);
         p2 = new Piece(buffer, 3, 2);
 
-        assertEquals(Optional.empty(), p1.marge(p2));
-        assertEquals(Optional.empty(), p2.marge(p1));
+        assertEquals(Optional.empty(), p1.merge(p2));
+        assertEquals(Optional.empty(), p2.merge(p1));
 
     }
 

@@ -51,11 +51,11 @@ public record Piece(Buffer target, long bufIndex, long length) {
 
 
     /**
-     * Marge the piece.
+     * Merge the piece.
      * @param other the piece to be merged
      * @return the merged piece
      */
-    public Optional<Piece> marge(Piece other) {
+    public Optional<Piece> merge(Piece other) {
         if (target == other.target) {
             if (end() == other.bufIndex) {
                 return Optional.of(new Piece(target, bufIndex, length + other.length));
