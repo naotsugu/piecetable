@@ -82,7 +82,7 @@ public abstract class Buffers {
      * @return a new buffer
      */
     public static Buffer of(Path path, Consumer<byte[]> traverse) {
-        return of(path, 32_000_000, traverse);
+        return of(path, Math.min(Runtime.getRuntime().freeMemory(), 32_000_000), traverse);
     }
 
 

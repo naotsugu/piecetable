@@ -425,10 +425,10 @@ public class PieceTable {
 
     private PieceEdit applyEdit(PieceEdit edit) {
         for (int i = 0; i < edit.org().length; i++) {
-            pieces.remove(edit.index());
+            pieces.remove(edit.index(), !undoEnable);
         }
         if (edit.mod().length > 0) {
-            pieces.add(edit.index(), edit.mod());
+            pieces.add(edit.index(), !undoEnable, edit.mod());
         }
         return edit.flip();
     }

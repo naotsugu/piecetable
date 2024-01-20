@@ -64,6 +64,7 @@ public class ContentImpl implements Content {
      */
     public ContentImpl(LineEnding lineEnding) {
         this.pt = PieceTable.of("");
+        this.pt.enableUndo();
         this.rowSize = 1;
         this.lineEnding = lineEnding;
     }
@@ -75,6 +76,7 @@ public class ContentImpl implements Content {
      */
     public ContentImpl(Path path) {
         this.pt = PieceTable.of(path);
+        this.pt.enableUndo();
         this.path = path;
         this.lineEnding = LineEnding.LF;
         this.rowSize = pt.count(bytes -> {
