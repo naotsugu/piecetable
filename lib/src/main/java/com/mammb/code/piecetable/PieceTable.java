@@ -425,7 +425,7 @@ public class PieceTable {
 
     private PieceEdit applyEdit(PieceEdit edit) {
         for (int i = 0; i < edit.org().length; i++) {
-            pieces.remove(edit.index(), !undoEnable);
+            pieces.remove(edit.index());
         }
         if (edit.mod().length > 0) {
             pieces.add(edit.index(), !undoEnable, edit.mod());
