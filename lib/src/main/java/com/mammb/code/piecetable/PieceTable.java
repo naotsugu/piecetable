@@ -428,7 +428,9 @@ public class PieceTable {
             pieces.remove(edit.index());
         }
         if (edit.mod().length > 0) {
-            pieces.add(edit.index(), !undoEnable, edit.mod());
+            // TODO withMerge op
+            //pieces.add(edit.index(), !undoEnable, edit.mod());
+            pieces.add(edit.index(), false, edit.mod());
         }
         return edit.flip();
     }

@@ -88,6 +88,16 @@ class PieceTableTest {
     }
 
     @Test
+    void testEdit2() {
+        var pt = PieceTable.of("");
+        pt.insert(0, "あいうえお"); // あいうえお
+        pt.insert(5, "\n");       // あいうえお$
+        pt.insert(2, "かきく");    // あいかきくうえお$
+        pt.delete(5, 3);          // あいかきく$
+        assertEquals("あいかきく\n", pt.getAsString());
+    }
+
+    @Test
     void testUndoRedo() {
 
         var table = PieceTable.of("abc");
