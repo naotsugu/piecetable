@@ -548,9 +548,23 @@ public class PieceList {
     }
 
 
+    /**
+     * Get the piece point.
+     * @return the piece point
+     */
     PiecePoint getPoint() {
         return point;
     }
+
+
+    /**
+     * Get the cursor next index.
+     * @return the cursor next index
+     */
+    int nextIndex() {
+        return cursor.nextIndex();
+    }
+
 
     String dump() {
         var sb = new StringBuilder();
