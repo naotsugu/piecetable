@@ -15,8 +15,10 @@
  */
 package com.mammb.code.piecetable.piece;
 
+import com.mammb.code.piecetable.buffer.AppendBuffer;
 import com.mammb.code.piecetable.buffer.Buffer;
 import com.mammb.code.piecetable.buffer.Buffers;
+import com.mammb.code.piecetable.buffer.GrowBuffer;
 import com.mammb.code.piecetable.buffer.ReadBuffer;
 import org.junit.jupiter.api.Test;
 import java.nio.charset.Charset;
@@ -256,6 +258,33 @@ class PieceListTest {
         assertEquals("abc_def", new String(list.get(0).bytes().bytes()));
         assertEquals("_ghi", new String(list.get(1).bytes().bytes()));
 
+    }
+
+    @Test
+    void testAddWithMerge2() {
+        var list = new PieceList();
+        list.add(0, true, new Piece(ReadBuffer.of(new byte[0]), 0, 0));
+
+        AppendBuffer buf = GrowBuffer.of();
+        buf.append("abc".getBytes(cs));
+        list.add(1, true, new Piece(buf, 0, 3));
+        assertEquals(2, list.length());
+        assertEquals(new PiecePoint(2, 3), list.getPoint());
+        assertEquals("abc", new String(list.get(1).bytes().bytes()));
+
+        buf.append("\n".getBytes(cs));
+        list.add(2, true, new Piece(buf, 3, 1));
+        assertEquals(2, list.length());
+        assertEquals(new PiecePoint(2, 4), list.getPoint());
+        assertEquals("abc\n", new String(list.get(1).bytes().bytes()));
+
+        buf.append("def".getBytes(cs));
+        list.remove(1);
+        list.add(1, true, new Piece(buf, 0, 3), new Piece(buf, 4, 3), new Piece(buf, 3, 1));
+        assertEquals(4, list.length());
+        assertEquals("abc", new String(list.get(1).bytes().bytes()));
+        assertEquals("def", new String(list.get(2).bytes().bytes()));
+        assertEquals("\n", new String(list.get(3).bytes().bytes()));
     }
 
     @Test
