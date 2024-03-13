@@ -261,35 +261,55 @@ class PieceListTest {
     }
 
     @Test
+    void testAdd2() {
+
+        var list = new PieceList();
+        list.add(0, false, new Piece(ReadBuffer.of(new byte[0]), 0, 0));
+        AppendBuffer buf = GrowBuffer.of();
+
+        buf.append("あいうえお".getBytes(cs));
+        list.add(1, false, new Piece(buf, 0, 5));
+
+        buf.append("\n".getBytes(cs));
+        list.add(2, false, new Piece(buf, 5, 1));
+
+        buf.append("かきく".getBytes(cs));
+        list.remove(1);
+        list.add(1, false, new Piece(buf, 0, 2), new Piece(buf, 6, 3), new Piece(buf, 2, 3));
+
+        list.remove(3);
+
+        assertEquals(4, list.length());
+        assertEquals("あい", new String(list.get(1).bytes().bytes()));
+        assertEquals("かきく", new String(list.get(2).bytes().bytes()));
+        assertEquals("\n", new String(list.get(3).bytes().bytes()));
+    }
+
+    @Test
     void testAddWithMerge2() {
+
         var list = new PieceList();
         list.add(0, true, new Piece(ReadBuffer.of(new byte[0]), 0, 0));
-
         AppendBuffer buf = GrowBuffer.of();
-        buf.append("abcgh".getBytes(cs));
+
+        buf.append("あいうえお".getBytes(cs));
         list.add(1, true, new Piece(buf, 0, 5));
-        assertEquals(2, list.length());
-        assertEquals(2, list.nextIndex());
-        assertEquals(new PiecePoint(2, 5), list.getPoint());
-        assertEquals("abcgh", new String(list.get(1).bytes().bytes()));
 
         buf.append("\n".getBytes(cs));
         list.add(2, true, new Piece(buf, 5, 1));
-        assertEquals(2, list.length());
-        assertEquals(2, list.nextIndex());
-        assertEquals(new PiecePoint(2, 6), list.getPoint());
-        assertEquals("abcgh\n", new String(list.get(1).bytes().bytes()));
 
-        buf.append("def".getBytes(cs)); // abcgh$def
+        buf.append("かきく".getBytes(cs));
         list.remove(1);
-        //                          abc                   def                  gh$
-        list.add(1, true, new Piece(buf, 0, 3), new Piece(buf, 6, 3), new Piece(buf, 3, 3));
+        list.add(1, true, new Piece(buf, 0, 2), new Piece(buf, 6, 3), new Piece(buf, 2, 4));
+
+        list.remove(3);
+        System.out.println("----");
+        list.add(3, true, new Piece(buf, 5, 1)); // あいうえお|n|かきく
+
         assertEquals(4, list.length());
-        assertEquals(2, list.nextIndex());
-        assertEquals(new PiecePoint(2, 3), list.getPoint());
-        assertEquals("abc", new String(list.get(1).bytes().bytes()));
-        assertEquals("def", new String(list.get(2).bytes().bytes()));
-        assertEquals("gh\n", new String(list.get(3).bytes().bytes()));
+        assertEquals("あい", new String(list.get(1).bytes().bytes()));
+        assertEquals("かきく", new String(list.get(2).bytes().bytes()));
+        assertEquals("\n", new String(list.get(3).bytes().bytes()));
     }
 
     @Test

@@ -56,13 +56,8 @@ public record Piece(Buffer target, long bufIndex, long length) {
      * @return the merged piece
      */
     public Optional<Piece> merge(Piece other) {
-        if (target == other.target) {
-            if (end() == other.bufIndex) {
-                return Optional.of(new Piece(target, bufIndex, length + other.length));
-            }
-            if (other.end() == bufIndex) {
-                return Optional.of(new Piece(target, other.bufIndex, length + other.length));
-            }
+        if (target == other.target && end() == other.bufIndex) {
+            return Optional.of(new Piece(target, bufIndex, length + other.length));
         }
         return Optional.empty();
     }

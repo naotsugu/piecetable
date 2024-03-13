@@ -70,7 +70,6 @@ class PieceTest {
         var p2 = new Piece(buffer, 2, 2);
 
         assertEquals(new Piece(buffer, 0, 4), p1.merge(p2).get());
-        assertEquals(new Piece(buffer, 0, 4), p2.merge(p1).get());
 
         // | 0 | 1 |
         //               | 3 | 4 |
