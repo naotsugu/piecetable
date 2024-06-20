@@ -75,7 +75,7 @@ public class ChannelArray implements Closeable {
 
 
     /**
-     * Get byte at the specified index position.
+     * Get the byte at the specified index position.
      * @param index the specified index position
      * @return byte value
      */
@@ -92,7 +92,7 @@ public class ChannelArray implements Closeable {
 
 
     /**
-     * Get copies the specified range of this array.
+     * Get the copies the specified range of this array.
      * @param from the initial index of the range to be copied, inclusive
      * @param to the final index of the range to be copied, exclusive
      * @return a new array containing the specified range from the original array
