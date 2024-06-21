@@ -120,6 +120,15 @@ public abstract class Utf8 {
 
 
     /**
+     * Get the bom as byte array.
+     * @return the bom
+     */
+    public static byte[] bom() {
+        return new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+    }
+
+
+    /**
      * Get the utf-8 charset.
      * @return the utf-8 charset
      */
