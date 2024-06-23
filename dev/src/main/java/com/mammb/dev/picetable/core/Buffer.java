@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.dev.picetable;
+package com.mammb.dev.picetable.core;
 
-/**
- * PieceTable.
- * @author Naotsugu Kobayashi
- */
-public interface PieceTable {
-    void insert(long pos, byte[] bytes);
-    void delete(long pos, int len);
+public interface Buffer {
+    /**
+     * Get the length of buffer.
+     * @return the count of code point
+     */
     long length();
 }
