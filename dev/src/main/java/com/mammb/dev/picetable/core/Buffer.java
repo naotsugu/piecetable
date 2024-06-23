@@ -16,9 +16,12 @@
 package com.mammb.dev.picetable.core;
 
 public interface Buffer {
-    /**
-     * Get the length of buffer.
-     * @return the count of code point
-     */
+    byte get(long index);
+    byte[] bytes(long rawStart, long rawEnd);
     long length();
+
+    default boolean isEmpty() {
+        return this.length() == 0;
+    }
+
 }

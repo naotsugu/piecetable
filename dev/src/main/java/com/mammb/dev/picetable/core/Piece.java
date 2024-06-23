@@ -25,4 +25,7 @@ public record Piece(Buffer target, long bufIndex, long length) {
         return bufIndex + length;
     }
 
+    public byte[] bytes() {
+        return target.bytes(bufIndex, bufIndex + length);
+    }
 }

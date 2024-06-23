@@ -22,14 +22,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class PieceTableImpl implements PieceTable {
-    /** The Append buffer. */
     private final AppendBuffer appendBuffer;
     private final List<Piece> pieces;
     private final TreeMap<Long, PiecePoint> indices;
     private long length;
 
     public PieceTableImpl() {
-        this.appendBuffer = null;
+        this.appendBuffer = AppendBuffer.of();
         this.pieces = new ArrayList<>();
         this.indices = new TreeMap<>();
         this.length = 0;
@@ -59,7 +58,7 @@ public class PieceTableImpl implements PieceTable {
             // split the piece and add
             long offset = pos - point.position();
             var head = new Piece(point.piece.target(), point.piece.bufIndex(), offset);
-            var tail = new Piece(point.piece.target(), point.piece.bufIndex(), point.piece.length() - offset);
+            var tail = new Piece(point.piece.target(), point.piece.bufIndex() + offset, point.piece.length() - offset);
             pieces.remove(point.tableIndex);
             pieces.addAll(point.tableIndex, List.of(head, newPiece, tail));
             indices.tailMap(point.position).clear();
@@ -69,9 +68,17 @@ public class PieceTableImpl implements PieceTable {
 
     @Override
     public void delete(long pos, int len) {
-        if (len == 0) {
+        if (len <= 0) {
             return;
         }
+
+        if (pos < 0 || pos >= length) {
+            throw new IndexOutOfBoundsException(
+                "pos[%d], length[%d]".formatted(pos, length));
+        }
+
+        PiecePoint point = at(pos);
+
 
         length -= len;
     }
@@ -79,6 +86,14 @@ public class PieceTableImpl implements PieceTable {
     @Override
     public long length() {
         return length;
+    }
+
+    public byte[] bytes() {
+        ByteArray bytes = ByteArray.of();
+        for (Piece piece : pieces) {
+            bytes.add(piece.bytes());
+        }
+        return bytes.get();
     }
 
 
