@@ -15,6 +15,10 @@
  */
 package com.mammb.dev.picetable.core;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
+
 public record Piece(Buffer target, long bufIndex, long length) {
 
     /**
@@ -48,4 +52,16 @@ public record Piece(Buffer target, long bufIndex, long length) {
     public byte[] bytes() {
         return target.bytes(bufIndex, bufIndex + length);
     }
+
+    /**
+     * Writes a sequence of bytes to the channel from this piece.
+     * @param channel the channel to write to
+     * @param buf the buffer used for writing
+     * @return the number of bytes written, possibly zero
+     * @throws IOException If some other I/O error occurs
+     */
+    long writeTo(WritableByteChannel channel, ByteBuffer buf) throws IOException {
+        return target.write(channel, buf, bufIndex, length);
+    }
+
 }

@@ -16,22 +16,59 @@
 package com.mammb.dev.picetable.core;
 
 import com.mammb.dev.picetable.PieceTable;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
+/**
+ * The PieceTable implementation.
+ * @author Naotsugu Kobayashi
+ */
 public class PieceTableImpl implements PieceTable {
+
     private final AppendBuffer appendBuffer;
     private final List<Piece> pieces;
     private final TreeMap<Long, PiecePoint> indices;
     private long length;
 
-    public PieceTableImpl() {
-        this.appendBuffer = AppendBuffer.of();
-        this.pieces = new ArrayList<>();
-        this.indices = new TreeMap<>();
-        this.length = 0;
+    /**
+     * Constructor.
+     * @param initial the initial piece
+     */
+    private PieceTableImpl(Piece initial) {
+        appendBuffer = AppendBuffer.of();
+        pieces = new ArrayList<>();
+        indices = new TreeMap<>();
+        length = 0;
+        if (initial != null) {
+            pieces.add(initial);
+            length = initial.length();
+        }
+    }
+
+    /**
+     * Create a new {@code PieceTable}.
+     * @return a new {@code PieceTable}
+     */
+    public static PieceTableImpl of() {
+        return new PieceTableImpl(null);
+    }
+
+    /**
+     * Create a new {@code PieceTable}.
+     * @param path the path
+     * @return a new {@code PieceTable}
+     */
+    public static PieceTableImpl of(Path path) {
+        var cb = ChannelBuffer.of(path);
+        return new PieceTableImpl(new Piece(cb, 0, cb.length()));
     }
 
     @Override
@@ -56,11 +93,9 @@ public class PieceTableImpl implements PieceTable {
             indices.tailMap(point.position).clear();
         } else {
             // split the piece and add
-            long offset = pos - point.position();
-            var head = new Piece(point.piece.target(), point.piece.bufIndex(), offset);
-            var tail = new Piece(point.piece.target(), point.piece.bufIndex() + offset, point.piece.length() - offset);
+            Piece[] splits = point.piece.split(pos - point.position());
             pieces.remove(point.tableIndex);
-            pieces.addAll(point.tableIndex, List.of(head, newPiece, tail));
+            pieces.addAll(point.tableIndex, List.of(splits[0], newPiece, splits[1]));
             indices.tailMap(point.position).clear();
         }
         length += bytes.length;
@@ -77,8 +112,24 @@ public class PieceTableImpl implements PieceTable {
                 "pos[%d], length[%d]".formatted(pos, length));
         }
 
-        PiecePoint point = at(pos);
+        PiecePoint[] range = range(pos, pos + len - 1);
+        for (PiecePoint del : range) {
+            // remove all pieces of range
+            pieces.remove(del.tableIndex);
+        }
 
+        // disable indices
+        PiecePoint from = range[0];
+        indices.tailMap(from.position).clear();
+
+        // derive the split pieces
+        PiecePoint to = range.length > 1 ? range[range.length - 1] : null;
+        if (to != null && to.endPosition() < pos + len) {
+            pieces.add(from.tableIndex, to.piece.split(pos + len - to.position)[1]);
+        }
+        if (from.position < pos) {
+            pieces.add(from.tableIndex, from.piece.split(pos - from.position)[0]);
+        }
 
         length -= len;
     }
@@ -96,24 +147,83 @@ public class PieceTableImpl implements PieceTable {
         return bytes.get();
     }
 
+    /**
+     * Writes the contents of the PieceTable to the specified path.
+     * @param path the specified path
+     */
+    public void write(Path path) {
+        try (FileChannel channel = FileChannel.open(path,
+            StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+            ByteBuffer buf = ByteBuffer.allocate(1024 * 8);
+            long size = 0;
+            for (Piece piece : pieces) {
+                size += piece.writeTo(channel, buf);
+            }
+            channel.truncate(size);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private PiecePoint at(long pos) {
         // 0  |x|x|x|  length:3
         // 3  |x|x|    length:2
         // 5  |x|x|    length:2
-        Map.Entry<Long, PiecePoint> entry = indices.floorEntry(pos);
-        if (entry == null) {
+
+        PiecePoint piecePoint = Optional.ofNullable(indices.floorEntry(pos))
+                    .map(Map.Entry::getValue).orElse(null);
+        if (piecePoint == null) {
             return fillToIndices(pos, 0L, 0);
         } else {
-            if (pos < entry.getValue().endPosition()) {
-                return entry.getValue();
+            if (piecePoint.contains(pos)) {
+                return piecePoint;
             } else {
                 return fillToIndices(pos,
-                    entry.getValue().endPosition(),
-                    entry.getValue().tableIndex + 1);
+                    piecePoint.endPosition(),
+                    piecePoint.tableIndex() + 1);
             }
         }
     }
+
+    private PiecePoint[] range(long startPos, long endPos) {
+        PiecePoint pp = at(startPos);
+        PiecePoint to = at(endPos);
+        PiecePoint[] org = new PiecePoint[to.tableIndex - pp.tableIndex + 1];
+        for (int i = 0; i < org.length; i++) {
+            org[i++] = pp;
+            pp = at(pp.endPosition());
+        }
+        return org;
+    }
+
+    public void gc() {
+        List<Piece> dest = new ArrayList<>(pieces.size());
+        Piece prev = null;
+        for (Piece piece : pieces) {
+            if (prev == null) {
+                prev = piece;
+                continue;
+            }
+            if (prev.target() == piece.target() &&
+                prev.end() == piece.bufIndex()) {
+                prev = new Piece(
+                    prev.target(),
+                    prev.bufIndex(),
+                    prev.length() + piece.length());
+            } else {
+                dest.add(prev);
+                prev = piece;
+            }
+        }
+        if (prev != null) {
+            dest.add(prev);
+        }
+        pieces.clear();
+        pieces.addAll(dest);
+        indices.clear();
+    }
+
 
     private PiecePoint fillToIndices(long pos, long piecePosition, int tableIndex) {
         for (int i = tableIndex; i < pieces.size(); i++) {
@@ -130,6 +240,7 @@ public class PieceTableImpl implements PieceTable {
 
 
     record PiecePoint(Long position, int tableIndex, Piece piece) {
+        // excludes
         public long endPosition() {
             return position + piece.length();
         }

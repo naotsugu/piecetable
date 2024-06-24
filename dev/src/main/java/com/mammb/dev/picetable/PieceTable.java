@@ -20,7 +20,25 @@ package com.mammb.dev.picetable;
  * @author Naotsugu Kobayashi
  */
 public interface PieceTable {
+
+    /**
+     * Inserts the bytes into this {@code PieceTable}.
+     * @param pos the offset
+     * @param bytes the bytes to be inserted
+     */
     void insert(long pos, byte[] bytes);
+
+    /**
+     * Removes the bytes in a substring of this {@code PieceTable}.
+     * @param pos the beginning index, inclusive
+     * @param len the length to be deleted
+     */
     void delete(long pos, int len);
+
+    /**
+     * Get the length of bytes this piece table holds.
+     * @return the length of bytes
+     */
     long length();
+
 }
