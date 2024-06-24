@@ -101,7 +101,7 @@ public class PieceTableImpl implements PieceTable {
         // 0  |x|x|x|  length:3
         // 3  |x|x|    length:2
         // 5  |x|x|    length:2
-        Map.Entry<Long, PiecePoint> entry = indices.ceilingEntry(pos);
+        Map.Entry<Long, PiecePoint> entry = indices.floorEntry(pos);
         if (entry == null) {
             return fillToIndices(pos, 0L, 0);
         } else {

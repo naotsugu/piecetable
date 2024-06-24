@@ -25,6 +25,26 @@ public record Piece(Buffer target, long bufIndex, long length) {
         return bufIndex + length;
     }
 
+    /**
+     * Split this piece at the specified offset.
+     * @param offset the split position in ths piece
+     * @return the split pieces
+     */
+    public Piece[] split(long offset) {
+        if (offset <  0 || offset >= length) {
+            throw new RuntimeException("Illegal offset value. offset[%s], length[%s]"
+                .formatted(offset, length));
+        }
+        if (offset == 0 && offset == length - 1) {
+            return new Piece[] { this };
+        } else {
+            return new Piece[]{
+                new Piece(target, bufIndex, offset),
+                new Piece(target, bufIndex + offset, length - offset)
+            };
+        }
+    }
+
     public byte[] bytes() {
         return target.bytes(bufIndex, bufIndex + length);
     }
