@@ -15,19 +15,27 @@
  */
 package com.mammb.dev.picetable.index;
 
-import java.util.List;
+public class Block {
+    static final int CAPACITY = 100;
+    private int length = 0;
+    private long offset = 0;
+    private int[] lines = new int[CAPACITY];
 
-public class Index {
+    Block(long offset) {
+        this.offset = offset;
+    }
 
-    private List<Chunk> chunks;
+    void put(int index, long pos) {
+        lines[index] = Math.toIntExact(pos - offset);
+        length++;
+    }
 
-    long lineAt(long line) {
-        for (Chunk chunk : chunks) {
-            if (chunk.containsLine(line)) {
-                return chunk.lineAt(line).line;
-            }
-        }
-        return -1;
+    long get(int index) {
+        return offset + lines[index];
+    }
+
+    void shift(int delta) {
+        offset += delta;
     }
 
 }

@@ -15,34 +15,30 @@
  */
 package com.mammb.dev.picetable.index;
 
-public class Entry {
-    int pos = 0, ch = 0, line = 0;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Entry() {
+public class LineIndex {
+    private final List<Block> blocks = new ArrayList<>();
+
+    public LineIndex() {
+        blocks.add(new Block(0));
     }
 
-    public Entry(int pos, int ch, int line) {
-        this.pos = pos;
-        this.ch = ch;
-        this.line = line;
+    void put(int line, long pos) {
+        int blockIndex = line / Block.CAPACITY;
+        if (blockIndex > blocks.size() - 1) {
+            var block = new Block(pos);
+            block.put(0, pos);
+            blocks.add(block);
+        }
+        blocks.get(blockIndex)
+            .put(line % Block.CAPACITY, pos);
     }
 
-    void plus(Entry entry) {
-        pos += entry.pos;
-        ch += entry.ch;
-        line += entry.line;
-    }
-
-    void clear() {
-        pos = ch = line = 0;
-    }
-
-    boolean isEmpty() {
-        return pos == 0 && ch == 0 && line == 0;
-    }
-
-    Entry plusOf(Entry entry) {
-        return new Entry(pos + entry.pos, ch + entry.ch, line + entry.line);
+    long get(int line) {
+        int blockIndex = line / Block.CAPACITY;
+        return blocks.get(blockIndex).get(line % Block.CAPACITY);
     }
 
 }
