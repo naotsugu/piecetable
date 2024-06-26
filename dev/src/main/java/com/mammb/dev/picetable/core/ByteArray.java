@@ -18,6 +18,10 @@ package com.mammb.dev.picetable.core;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * Growable byte array.
+ * @author Naotsugu Kobayashi
+ */
 public class ByteArray implements Serializable {
 
     /** The empty byte array. */
