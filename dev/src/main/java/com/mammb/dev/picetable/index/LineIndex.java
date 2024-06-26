@@ -41,4 +41,15 @@ public class LineIndex {
         return blocks.get(blockIndex).get(line % Block.CAPACITY);
     }
 
+    void insert(int line, int posAtLine, byte[] bytes) {
+        int blockIndex = line / Block.CAPACITY;
+        long pos = blocks.get(blockIndex).get(line % Block.CAPACITY);
+
+        int delta = 0;
+        for (int i = blockIndex + 1; i < blocks.size(); i++) {
+            blocks.get(i).shift(delta);
+        }
+
+    }
+
 }

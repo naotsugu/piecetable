@@ -19,6 +19,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
+/**
+ * A piece consists of three param.
+ * @param target which buffer
+ * @param bufIndex start index in the buffer
+ * @param length length in the buffer
+ * @author Naotsugu Kobayashi
+ */
 public record Piece(Buffer target, long bufIndex, long length) {
 
     /**
@@ -49,6 +56,10 @@ public record Piece(Buffer target, long bufIndex, long length) {
         }
     }
 
+    /**
+     * Get the bytes.
+     * @return the bytes
+     */
     public byte[] bytes() {
         return target.bytes(bufIndex, bufIndex + length);
     }

@@ -49,6 +49,10 @@ public class ChannelBuffer implements Buffer, Closeable {
     private long offset;
 
 
+    /**
+     * Create a new {@link ChannelBuffer}.
+     * @param ch the source channel
+     */
     private ChannelBuffer(SeekableByteChannel ch) {
         try {
             this.length = ch.size();
@@ -61,6 +65,11 @@ public class ChannelBuffer implements Buffer, Closeable {
     }
 
 
+    /**
+     * Create a new {@code ChannelBuffer} from the given {@code Path}.
+     * @param path the given {@code Path}
+     * @return a new {@code ChannelBuffer}
+     */
     public static ChannelBuffer of(Path path) {
         try {
             return new ChannelBuffer(FileChannel.open(path, StandardOpenOption.READ));
