@@ -38,7 +38,7 @@ public class ArraySupport {
             return prefLength;
         } else {
             int minLength = oldLength + minGrowth;
-            if (minLength < 0) {
+            if (minLength < 0) { // overflow
                 throw new OutOfMemoryError(
                     "Required array length %d %d is too large".formatted(oldLength, minGrowth));
             }

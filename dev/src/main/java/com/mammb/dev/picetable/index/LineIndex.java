@@ -1,55 +1,128 @@
-/*
- * Copyright 2022-2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.mammb.dev.picetable.index;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class LineIndex {
-    private final List<Block> blocks = new ArrayList<>();
 
-    public LineIndex() {
-        blocks.add(new Block(0));
+    private int[] lineLengths;
+    private int length;
+
+    /** sub-total cache. */
+    private long[] stCache;
+    private int cacheLength;
+    private final int cacheInterval;
+
+    public LineIndex(int cacheInterval) {
+        lineLengths = new int[0];
+        length = 0;
+
+        stCache = new long[0];
+        cacheLength = 0;
+        this.cacheInterval = cacheInterval;
     }
 
-    void put(int line, long pos) {
-        int blockIndex = line / Block.CAPACITY;
-        if (blockIndex > blocks.size() - 1) {
-            var block = new Block(pos);
-            block.put(0, pos);
-            blocks.add(block);
-        }
-        blocks.get(blockIndex)
-            .put(line % Block.CAPACITY, pos);
+    public static LineIndex of() {
+        return new LineIndex(100);
     }
 
-    long get(int line) {
-        int blockIndex = line / Block.CAPACITY;
-        return blocks.get(blockIndex).get(line % Block.CAPACITY);
-    }
+    void add(byte[] bytes) {
 
-    void insert(int line, int posAtLine, byte[] bytes) {
-        int blockIndex = line / Block.CAPACITY;
-        long pos = blocks.get(blockIndex).get(line % Block.CAPACITY);
-
-        int delta = 0;
-        for (int i = blockIndex + 1; i < blocks.size(); i++) {
-            blocks.get(i).shift(delta);
+        int[] lines = lines(bytes);
+        if (lines.length == 0) {
+            return;
         }
 
+        if (length + lines.length > lineLengths.length) {
+            lineLengths = grow(length + lines.length);
+        }
+
+        if (length == 0) {
+            length++;
+        }
+        for (int i = 0; i < lines.length; i++) {
+            lineLengths[length - 1] += lines[i];
+            if (lines.length > 1 && i < lines.length - 1) {
+                // lines |0|
+                // lines |0|length++|1|
+                // lines |0|length++|1|length++|2|
+                // lines |0|length++|1|length++|2|length++|3|
+                length++;
+            }
+        }
+
     }
 
+    long get(int lineNum) {
+
+        int startLine = 0;
+        long startPos = 0;
+
+        int index = lineNum / cacheInterval;
+        if (index > 0 && index <= cacheLength) {
+            startLine = index * cacheInterval;
+            startPos = stCache[index];
+        }
+
+        for (int i = startLine; i < length && i < lineNum; i++) {
+            startPos += lineLengths[i];
+            if (i % cacheInterval == 0) {
+                if (cacheLength + 1 > stCache.length) {
+                    stCache = growCache(cacheLength + 1);
+                }
+                stCache[i / cacheInterval] = startPos;
+            }
+        }
+        return startPos;
+    }
+
+
+    int[] lineLengths() {
+        return Arrays.copyOf(lineLengths, length);
+    }
+
+
+    static int[] lines(byte[] bytes) {
+
+        if (bytes == null || bytes.length == 0) {
+            return new int[0];
+        }
+
+        IntArray intArray = IntArray.of();
+
+        int n = 0;
+        for (byte aByte : bytes) {
+            n++;
+            if (aByte == '\n') {
+                intArray.add(n);
+                n = 0;
+            }
+        }
+        intArray.add(n);
+
+        return intArray.get();
+    }
+
+    private int[] grow(int minCapacity) {
+        int oldCapacity = lineLengths.length;
+        if (oldCapacity > 0) {
+            int newCapacity = Math.min(
+                Math.max(minCapacity, oldCapacity >> 1),
+                Integer.MAX_VALUE - 8);
+            return lineLengths = Arrays.copyOf(lineLengths, newCapacity);
+        } else {
+            return lineLengths = new int[Math.max(100, minCapacity)];
+        }
+    }
+
+    private long[] growCache(int minCapacity) {
+        int oldCapacity = stCache.length;
+        if (oldCapacity > 0) {
+            int newCapacity = Math.min(
+                Math.max(minCapacity, oldCapacity >> 2),
+                Integer.MAX_VALUE - 8);
+            return stCache = Arrays.copyOf(stCache, newCapacity);
+        } else {
+            return stCache = new long[Math.max(10, minCapacity)];
+        }
+    }
 }
