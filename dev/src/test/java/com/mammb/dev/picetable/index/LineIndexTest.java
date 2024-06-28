@@ -45,16 +45,21 @@ class LineIndexTest {
 
     @Test
     void get() {
-        var index = LineIndex.of();
-        index.add("ab\n\ncde\nf\ng".getBytes());
-        assertEquals(0, index.get(0));  // |a|b|$|
-        assertEquals(3, index.get(1));  // |$|
-        assertEquals(4, index.get(2));  // |c|d|e|$|
-        assertEquals(8, index.get(3));  // |f|$|
-        assertEquals(10, index.get(4)); // |g|
+        var index = LineIndex.of(5);
+        index.add("ab\n\ncde\nf\ng\nhi\njkl\nmn".getBytes());
+        assertEquals( 0, index.get(0));  // |a|b|$|    3    3
+        assertEquals( 3, index.get(1));  // |$|        1    4
+        assertEquals( 4, index.get(2));  // |c|d|e|$|  4    8
+        assertEquals( 8, index.get(3));  // |f|$|      2   10
+        assertEquals(10, index.get(4));  // |g|$|      2   12
+        assertEquals(12, index.get(5));  // |h|i|$|    3   15
+        assertEquals(15, index.get(6));  // |j|k|l|$|  4   19
+        assertEquals(19, index.get(7));  // |m|n|      2   21
 
+        assertEquals(2, index.stCache().length);
+        assertEquals(0, index.stCache()[0]);
+        assertEquals(12, index.stCache()[1]);
     }
-
 
     @Test
     void lines() {

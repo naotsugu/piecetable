@@ -25,6 +25,11 @@ public class LineIndex {
         return new LineIndex(100);
     }
 
+    static LineIndex of(int cacheInterval) {
+        return new LineIndex(cacheInterval);
+    }
+
+
     void add(byte[] bytes) {
 
         int[] lines = lines(bytes);
@@ -52,32 +57,53 @@ public class LineIndex {
 
     }
 
+
     long get(int lineNum) {
 
         int startLine = 0;
         long startPos = 0;
 
-        int index = lineNum / cacheInterval;
-        if (index > 0 && index <= cacheLength) {
-            startLine = index * cacheInterval;
-            startPos = stCache[index];
+        int cacheIndex = lineNum / cacheInterval;
+        if (cacheIndex > 0 && cacheIndex < cacheLength) {
+            startLine = cacheIndex * cacheInterval;
+            startPos = stCache[cacheIndex];
         }
 
         for (int i = startLine; i < length && i < lineNum; i++) {
-            startPos += lineLengths[i];
             if (i % cacheInterval == 0) {
                 if (cacheLength + 1 > stCache.length) {
                     stCache = growCache(cacheLength + 1);
                 }
-                stCache[i / cacheInterval] = startPos;
+                int chIndex = i / cacheInterval;
+                stCache[chIndex] = startPos;
+                cacheLength = chIndex + 1;
             }
+            startPos += lineLengths[i];
         }
         return startPos;
     }
 
+    void insert(int lineNum, int posAtLine, byte[] bytes) {
+        int[] lines = lines(bytes);
+        if (lines.length == 0) {
+            return;
+        }
 
-    int[] lineLengths() {
-        return Arrays.copyOf(lineLengths, length);
+        if (lines.length == 1) {
+            lineLengths[lineNum] += lines[0];
+        } else {
+            System.arraycopy(lineLengths, lineNum + 1,
+                lineLengths, lineNum + lines.length,
+                lines.length - 1);
+            int tail = lineLengths[lineNum] - posAtLine;
+            lineLengths[lineNum++] = posAtLine + lines[0];
+            for (int i = 1; i < lines.length - 1; i++) {
+                lineLengths[lineNum++] = lines[i];
+            }
+            lineLengths[lineNum] = tail + lines[lines.length - 1];
+        }
+        length += lines.length - 1;
+        cacheLength = lineNum / cacheInterval;
     }
 
 
@@ -125,4 +151,13 @@ public class LineIndex {
             return stCache = new long[Math.max(10, minCapacity)];
         }
     }
+
+    int[] lineLengths() {
+        return Arrays.copyOf(lineLengths, length);
+    }
+
+    long[] stCache() {
+        return Arrays.copyOf(stCache, cacheLength);
+    }
+
 }
