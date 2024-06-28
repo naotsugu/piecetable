@@ -89,12 +89,16 @@ public class LineIndex {
             return;
         }
 
+        if (length + lines.length > lineLengths.length) {
+            lineLengths = grow(length + lines.length);
+        }
+
         if (lines.length == 1) {
             lineLengths[lineNum] += lines[0];
         } else {
             System.arraycopy(lineLengths, lineNum + 1,
                 lineLengths, lineNum + lines.length,
-                lines.length - 1);
+                length - (lineNum + 1));
             int tail = lineLengths[lineNum] - posAtLine;
             lineLengths[lineNum++] = posAtLine + lines[0];
             for (int i = 1; i < lines.length - 1; i++) {

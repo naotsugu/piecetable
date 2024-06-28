@@ -62,6 +62,35 @@ class LineIndexTest {
     }
 
     @Test
+    void insert() {
+        var index = LineIndex.of(5);
+        index.add("ab\ncde\nfg\nhij\nk".getBytes());
+        assertEquals(5, index.lineLengths().length);
+        assertEquals(3, index.lineLengths()[0]);
+        assertEquals(4, index.lineLengths()[1]);
+        assertEquals(3, index.lineLengths()[2]);
+        assertEquals(4, index.lineLengths()[3]);
+        assertEquals(1, index.lineLengths()[4]);
+        // |a|b|$|                    |a|b|$|
+        // |c|d|e|$|   |1|2|$|        |c|d|1|2|$|
+        //     ^------ |3|4|$|        |3|4|$|
+        //             |5|6|          |5|6|e|$|
+        // |f|g|$|                    |f|g|$|
+        // |h|i|j|$|                  |h|i|j|$|
+        // |k|                        |k|
+        index.insert(1, 2, "12\n24\n56".getBytes());
+
+        assertEquals(7, index.lineLengths().length);
+        assertEquals(3, index.lineLengths()[0]);
+        assertEquals(5, index.lineLengths()[1]);
+        assertEquals(3, index.lineLengths()[2]);
+        assertEquals(4, index.lineLengths()[3]);
+        assertEquals(3, index.lineLengths()[4]);
+        assertEquals(4, index.lineLengths()[5]);
+        assertEquals(1, index.lineLengths()[6]);
+    }
+
+    @Test
     void lines() {
 
         int[] ret = LineIndex.lines("".getBytes());
