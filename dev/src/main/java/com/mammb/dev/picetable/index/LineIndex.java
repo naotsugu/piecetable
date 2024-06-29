@@ -92,6 +92,7 @@ public class LineIndex {
         if (length + lines.length > lineLengths.length) {
             lineLengths = grow(length + lines.length);
         }
+        cacheLength = lineNum / cacheInterval;
 
         if (lines.length == 1) {
             lineLengths[lineNum] += lines[0];
@@ -107,7 +108,45 @@ public class LineIndex {
             lineLengths[lineNum] = tail + lines[lines.length - 1];
         }
         length += lines.length - 1;
-        cacheLength = lineNum / cacheInterval;
+    }
+
+    void delete(int lineNum, int posAtLine, int len) {
+        if (len <= 0) {
+            return;
+        }
+
+        int rest = len;
+        int offset = posAtLine;
+        int ln = 0;
+
+        while (rest > 0) {
+            rest -= (lineLengths[lineNum + ln++] - offset);
+            offset = 0;
+        }
+
+        int delStart = lineNum;
+        int delLines = ln;
+        if (posAtLine > 0) {
+            delLines--;
+            delStart++;
+        }
+        if (delLines > 0 && rest < 0) {
+            delLines--;
+        }
+
+        if (delLines > 0) {
+            System.arraycopy(
+                lineLengths, delStart + delLines,
+                lineLengths, delStart,
+                length - (delStart + delLines));
+        }
+
+        if (posAtLine > 0) {
+            lineLengths[lineNum] -= posAtLine;
+        }
+        if (rest < 0) {
+            lineLengths[lineNum + 1] -= -rest;
+        }
     }
 
 
