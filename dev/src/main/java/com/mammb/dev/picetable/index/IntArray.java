@@ -154,7 +154,7 @@ public class IntArray implements Serializable {
         int oldCapacity = ints.length;
         if (oldCapacity > 0 || ints != EMPTY) {
             int newCapacity = Math.min(
-                Math.max(minCapacity, oldCapacity >> 1),
+                Math.max(minCapacity, oldCapacity + (oldCapacity >> 1)),
                 Integer.MAX_VALUE - 8);
             return ints = Arrays.copyOf(ints, newCapacity);
         } else {

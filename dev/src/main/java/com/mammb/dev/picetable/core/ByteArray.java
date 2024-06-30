@@ -185,9 +185,6 @@ public class ByteArray implements Serializable {
         }
     }
 
-    /** The max length of array. */
-    private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
-
 
     /**
      * Create new capacity size.
@@ -197,8 +194,9 @@ public class ByteArray implements Serializable {
      * @return the new capacity size
      */
     public static int newCapacity(int oldLength, int minGrowth, int prefGrowth) {
+        int softMaxArrayLength = Integer.MAX_VALUE - 8;
         int prefLength = oldLength + Math.max(minGrowth, prefGrowth);
-        if (0 < prefLength && prefLength <= SOFT_MAX_ARRAY_LENGTH) {
+        if (0 < prefLength && prefLength <= softMaxArrayLength) {
             return prefLength;
         } else {
             int minLength = oldLength + minGrowth;
@@ -206,7 +204,7 @@ public class ByteArray implements Serializable {
                 throw new OutOfMemoryError(
                     "Required array length %d %d is too large".formatted(oldLength, minGrowth));
             }
-            return Math.max(minLength, SOFT_MAX_ARRAY_LENGTH);
+            return Math.max(minLength, softMaxArrayLength);
         }
     }
 }
