@@ -115,40 +115,33 @@ public class LineIndex {
             return;
         }
 
-        int rest = len;
-        int offset = posAtLine;
-        int ln = 0;
+        cacheLength = lineNum / cacheInterval;
 
-        while (rest > 0) {
-            rest -= (lineLengths[lineNum + ln++] - offset);
-            offset = 0;
-        }
-
-        int delStart = lineNum;
-        int delLines = ln;
-        if (posAtLine > 0) {
-            delLines--;
-            delStart++;
-        }
-        if (delLines > 0 && rest < 0) {
-            delLines--;
-        }
-
-        if (delLines > 0) {
+        if ((lineLengths[lineNum] - posAtLine) > len) {
+            // Delete operation within a single line
+            // |a|b|c|d|$|       ->        |a|d|$|
+            //   ^---  posAtLine:1, len:2
+            lineLengths[lineNum] -= len;
+        } else {
+            // Delete operation across multiple lines
+            // 0 |a|b|$|    delete(             |a|f|$|
+            // 1 |c|d|$|      lineNum = 0,      |g|h|$|
+            // 2 |e|f|$|      posAtLine = 1,
+            // 3 |g|h|$|      len = 6)
+            len -= lineLengths[lineNum] - posAtLine;
+            lineLengths[lineNum] = posAtLine;
+            int lines = 0;
+            do {
+                len -= lineLengths[lineNum + ++lines];
+            } while (len > 0);
+            lineLengths[lineNum] += (-len); // Merge the rest to the first line
             System.arraycopy(
-                lineLengths, delStart + delLines,
-                lineLengths, delStart,
-                length - (delStart + delLines));
-        }
-
-        if (posAtLine > 0) {
-            lineLengths[lineNum] -= posAtLine;
-        }
-        if (rest < 0) {
-            lineLengths[lineNum + 1] -= -rest;
+                lineLengths, lineNum + 1 + lines,
+                lineLengths, lineNum + 1,
+                length - (lineNum + 1 + lines));
+            length -= lines;
         }
     }
-
 
     static int[] lines(byte[] bytes) {
 

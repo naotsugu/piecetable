@@ -91,6 +91,27 @@ class LineIndexTest {
     }
 
     @Test
+    void deleteWithinSingleLine() {
+        var index = LineIndex.of(5);
+        index.add("abcd\n".getBytes());
+        index.delete(0, 1, 2);
+        assertEquals(2, index.lineLengths().length);
+        assertEquals(3, index.lineLengths()[0]);
+        assertEquals(0, index.lineLengths()[1]);
+    }
+
+    @Test
+    void deleteAcrossMultipleLines() {
+        var index = LineIndex.of(5);
+        index.add("ab\ncd\nef\ngh\n".getBytes());
+        index.delete(0, 1, 6);
+        assertEquals(3, index.lineLengths().length);
+        assertEquals(3, index.lineLengths()[0]);
+        assertEquals(3, index.lineLengths()[1]);
+        assertEquals(0, index.lineLengths()[2]);
+    }
+
+    @Test
     void lines() {
 
         int[] ret = LineIndex.lines("".getBytes());
