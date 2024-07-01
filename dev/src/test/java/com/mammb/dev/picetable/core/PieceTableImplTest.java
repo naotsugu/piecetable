@@ -19,11 +19,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * The test of {@link PieceTableImplTest}.
+ * @author Naotsugu Kobayashi
+ */
 class PieceTableImplTest {
 
     @Test
     void edit() {
+
         var pieceTable = PieceTableImpl.of();
+
         pieceTable.insert(0, "ac".getBytes());
         pieceTable.insert(1, "b".getBytes());
         assertEquals("abc", new String(pieceTable.bytes()));
@@ -36,6 +42,22 @@ class PieceTableImplTest {
 
         pieceTable.delete(0, 1);
         assertEquals("", new String(pieceTable.bytes()));
+    }
+
+
+    @Test
+    void get() {
+
+        var pieceTable = PieceTableImpl.of();
+        pieceTable.insert(0, "ab".getBytes());
+        pieceTable.insert(2, "cd".getBytes());
+        pieceTable.insert(4, "ef".getBytes());
+
+        assertEquals("abcdef", new String(pieceTable.get(0, 6)));
+        assertEquals("bcdef", new String(pieceTable.get(1, 5)));
+        assertEquals("abcde", new String(pieceTable.get(0, 5)));
+
+
     }
 
 }

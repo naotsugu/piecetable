@@ -36,17 +36,18 @@ public record Piece(Buffer target, long bufIndex, long length) {
         return bufIndex + length;
     }
 
+
     /**
      * Split this piece at the specified offset.
      * @param offset the split position in ths piece
      * @return the split pieces
      */
     public Piece[] split(long offset) {
-        if (offset <  0 || offset >= length) {
+        if (offset <  0 || offset > length) {
             throw new RuntimeException("Illegal offset value. offset[%s], length[%s]"
                 .formatted(offset, length));
         }
-        if (offset == 0 && offset == length - 1) {
+        if (offset == 0 || offset == length) {
             return new Piece[] { this };
         } else {
             return new Piece[]{
@@ -56,6 +57,21 @@ public record Piece(Buffer target, long bufIndex, long length) {
         }
     }
 
+
+    /**
+     * Get the byte array of the specified range of this piece.
+     * @param offset the start index of the range to be copied, inclusive
+     * @param len the length of the range to be copied
+     * @return the byte array of the specified range of this piece
+     */
+    public byte[] bytes(long offset, int len) {
+        if (offset < 0 || offset + len > length) {
+            throw new RuntimeException("Illegal index. offset[%s], len[%s]".formatted(offset, len));
+        }
+        return target.bytes(bufIndex + offset, bufIndex + offset + len);
+    }
+
+
     /**
      * Get the bytes.
      * @return the bytes
@@ -63,6 +79,7 @@ public record Piece(Buffer target, long bufIndex, long length) {
     public byte[] bytes() {
         return target.bytes(bufIndex, bufIndex + length);
     }
+
 
     /**
      * Writes a sequence of bytes to the channel from this piece.

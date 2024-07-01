@@ -86,6 +86,7 @@ public interface Buffer {
 
     /**
      * Create a new in-memory buffer.
+     * @param bytes the source byte array
      * @return a new in-memory buffer
      */
     static Buffer of(byte[] bytes) {

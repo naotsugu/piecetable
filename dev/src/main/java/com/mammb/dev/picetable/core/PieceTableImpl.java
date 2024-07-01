@@ -33,10 +33,15 @@ import java.util.TreeMap;
  */
 public class PieceTableImpl implements PieceTable {
 
+    /** The Append buffer. */
     private final AppendBuffer appendBuffer;
+    /** The pieces. */
     private final List<Piece> pieces;
+    /** The index of pieces. */
     private final TreeMap<Long, PiecePoint> indices;
+    /** The total byte length of the piece table. */
     private long length;
+
 
     /**
      * Constructor.
@@ -53,6 +58,7 @@ public class PieceTableImpl implements PieceTable {
         }
     }
 
+
     /**
      * Create a new {@code PieceTable}.
      * @return a new {@code PieceTable}
@@ -60,6 +66,7 @@ public class PieceTableImpl implements PieceTable {
     public static PieceTableImpl of() {
         return new PieceTableImpl(null);
     }
+
 
     /**
      * Create a new {@code PieceTable}.
@@ -71,11 +78,14 @@ public class PieceTableImpl implements PieceTable {
         return new PieceTableImpl(new Piece(cb, 0, cb.length()));
     }
 
+
     @Override
     public void insert(long pos, byte[] bytes) {
+
         if (bytes == null || bytes.length == 0) {
             return;
         }
+
         if (pos < 0 || pos > length) {
             throw new IndexOutOfBoundsException(
                 "pos[%d], length[%d]".formatted(pos, length));
@@ -86,20 +96,27 @@ public class PieceTableImpl implements PieceTable {
 
         PiecePoint point = at(pos);
         if (point == null) {
+
             pieces.add(newPiece);
+
         } else if (point.position == pos) {
+
             // add to the boundary position
             pieces.add(point.tableIndex, newPiece);
             indices.tailMap(point.position).clear();
+
         } else {
+
             // split the piece and add
             Piece[] splits = point.piece.split(pos - point.position());
             pieces.remove(point.tableIndex);
             pieces.addAll(point.tableIndex, List.of(splits[0], newPiece, splits[1]));
             indices.tailMap(point.position).clear();
+
         }
         length += bytes.length;
     }
+
 
     @Override
     public void delete(long pos, int len) {
@@ -134,11 +151,40 @@ public class PieceTableImpl implements PieceTable {
         length -= len;
     }
 
+
+    @Override
+    public byte[] get(long offset, int len) {
+
+        PiecePoint[] range = range(offset, offset + len - 1);
+        if (range.length == 0) return new byte[0];
+
+        byte[] ret = new byte[len];
+        int start = Math.toIntExact(offset - range[0].position);
+        int destPos = 0;
+
+        for (PiecePoint pp : range) {
+            Piece piece = pp.piece();
+            int length = (piece.length() > len) ? len : Math.toIntExact(piece.length());
+            byte[] bytes = piece.bytes(start, length - start);
+            System.arraycopy(bytes, 0, ret, destPos, bytes.length);
+            start = 0;
+            destPos += bytes.length;
+            len -= bytes.length;
+        }
+        return ret;
+    }
+
+
     @Override
     public long length() {
         return length;
     }
 
+
+    /**
+     * Get the all bytes.
+     * @return the all bytes
+     */
     public byte[] bytes() {
         ByteArray bytes = ByteArray.of();
         for (Piece piece : pieces) {
@@ -146,6 +192,7 @@ public class PieceTableImpl implements PieceTable {
         }
         return bytes.get();
     }
+
 
     /**
      * Writes the contents of the PieceTable to the specified path.
@@ -191,12 +238,15 @@ public class PieceTableImpl implements PieceTable {
         PiecePoint to = at(endPos);
         PiecePoint[] org = new PiecePoint[to.tableIndex - pp.tableIndex + 1];
         for (int i = 0; i < org.length; i++) {
-            org[i++] = pp;
+            org[i] = pp;
             pp = at(pp.endPosition());
         }
         return org;
     }
 
+    /**
+     * Perform gc.
+     */
     public void gc() {
         List<Piece> dest = new ArrayList<>(pieces.size());
         Piece prev = null;
