@@ -118,10 +118,12 @@ public class ChannelBuffer implements Buffer, Closeable {
         return length;
     }
 
+
     @Override
     public void close() throws IOException {
         ch.close();
     }
+
 
     /**
      * Fill buffer.

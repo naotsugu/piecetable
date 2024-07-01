@@ -132,6 +132,7 @@ public class LineIndex {
         return startPos;
     }
 
+
     /**
      * Insert the specified byte array to the index.
      * @param lineNum the specified line
@@ -150,9 +151,12 @@ public class LineIndex {
         cacheLength = lineNum / cacheInterval;
 
         if (lines.length == 1) {
+
             // insert operation within a single line
             lineLengths[lineNum] += lines[0];
+
         } else {
+
             // insert operation across multiple lines
             System.arraycopy(lineLengths, lineNum + 1,
                 lineLengths, lineNum + lines.length,
@@ -163,6 +167,7 @@ public class LineIndex {
                 lineLengths[lineNum++] = lines[i];
             }
             lineLengths[lineNum] = tail + lines[lines.length - 1];
+
         }
         length += lines.length - 1;
     }
@@ -275,6 +280,7 @@ public class LineIndex {
         }
     }
 
+
     /**
      * Gets the line lengths array.
      * @return the line lengths array
@@ -282,6 +288,7 @@ public class LineIndex {
     int[] lineLengths() {
         return Arrays.copyOf(lineLengths, length);
     }
+
 
     /**
      * Gets the sub-total cache array.
