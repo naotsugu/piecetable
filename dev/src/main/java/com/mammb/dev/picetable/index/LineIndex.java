@@ -161,11 +161,14 @@ public class LineIndex {
             System.arraycopy(lineLengths, lineNum + 1,
                 lineLengths, lineNum + lines.length,
                 length - (lineNum + 1));
+
             int tail = lineLengths[lineNum] - posAtLine;
             lineLengths[lineNum++] = posAtLine + lines[0];
+
             for (int i = 1; i < lines.length - 1; i++) {
                 lineLengths[lineNum++] = lines[i];
             }
+
             lineLengths[lineNum] = tail + lines[lines.length - 1];
 
         }
@@ -208,7 +211,9 @@ public class LineIndex {
             do {
                 len -= lineLengths[lineNum + ++lines];
             } while (len > 0);
+
             lineLengths[lineNum] += (-len); // merge the rest to the first line
+
             System.arraycopy(
                 lineLengths, lineNum + 1 + lines,
                 lineLengths, lineNum + 1,

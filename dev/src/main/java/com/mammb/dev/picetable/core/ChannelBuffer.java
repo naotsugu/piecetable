@@ -94,6 +94,7 @@ public class ChannelBuffer implements Buffer, Closeable {
 
     @Override
     public byte[] bytes(long from, long to) {
+
         if (from < 0 || to > length || from > to) {
             throw new IndexOutOfBoundsException(
                 "from[%d], to[%d], length[%d]".formatted(from, to, length));
@@ -132,8 +133,8 @@ public class ChannelBuffer implements Buffer, Closeable {
      */
     private void fillBuffer(long from, long to) {
         try {
-            var bb = ByteBuffer.allocate(Math.toIntExact(
-                Math.max(to, Math.addExact(from, PREF_BUF_SIZE)) - from));
+            var bb = ByteBuffer.allocate(
+                Math.toIntExact(Math.max(to - from, PREF_BUF_SIZE)));
             ch.position(from);
             ch.read(bb);
             bb.flip();

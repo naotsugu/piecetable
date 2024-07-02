@@ -65,6 +65,7 @@ public interface AppendBuffer extends Buffer {
             public long length() {
                 return elements.length();
             }
+
         };
     }
 

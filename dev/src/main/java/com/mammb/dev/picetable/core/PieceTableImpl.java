@@ -120,6 +120,7 @@ public class PieceTableImpl implements PieceTable {
 
     @Override
     public void delete(long pos, int len) {
+
         if (len <= 0) {
             return;
         }
@@ -199,14 +200,19 @@ public class PieceTableImpl implements PieceTable {
      * @param path the specified path
      */
     public void write(Path path) {
+
         try (FileChannel channel = FileChannel.open(path,
             StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-            ByteBuffer buf = ByteBuffer.allocate(1024 * 8);
+
+            ByteBuffer buf = ByteBuffer.allocateDirect(
+                Math.toIntExact(Math.min(length, 1024 * 8)));
+
             long size = 0;
             for (Piece piece : pieces) {
                 size += piece.writeTo(channel, buf);
             }
             channel.truncate(size);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
