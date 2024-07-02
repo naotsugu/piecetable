@@ -18,6 +18,7 @@ package com.mammb.dev.picetable;
 import com.mammb.dev.picetable.index.LineIndex;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -32,19 +33,22 @@ public class Document {
     private LineIndex index;
 
 
-    public Document(PieceTable pt) {
+    public Document(PieceTable pt, Path path) {
         this.pt = pt;
+        this.path = path;
         this.charset = StandardCharsets.UTF_8;
+        this.index = LineIndex.of();
+        index.add(Files.readAllBytes(path));
     }
 
 
     public static Document of() {
-        return new Document(PieceTable.of());
+        return new Document(PieceTable.of(), null);
     }
 
 
     public static Document of(Path path) {
-        return new Document(PieceTable.of(path));
+        return new Document(PieceTable.of(path), path);
     }
 
 
