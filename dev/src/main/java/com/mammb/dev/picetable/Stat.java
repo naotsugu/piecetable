@@ -15,6 +15,7 @@
  */
 package com.mammb.dev.picetable;
 
+import com.mammb.dev.picetable.index.LineIndex;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -25,9 +26,22 @@ import java.util.function.Consumer;
 
 public class Stat {
 
-    public Stat() {
+    private LineIndex index;
+
+    private Stat(Path path) {
+        this.index = LineIndex.of();
+        if (path != null) {
+            readAll(path, index::add);
+        }
     }
 
+    public static Stat of(Path path) {
+        return new Stat(path);
+    }
+
+    public LineIndex index() {
+        return index;
+    }
 
     private void readAll(Path path, Consumer<byte[]> consumer) {
 
@@ -38,7 +52,7 @@ public class Stat {
                 throw new OutOfMemoryError("Required array size too large");
             }
 
-            int cap = 1024 * 16;
+            int cap = 1024 * 64;
             ByteBuffer buf = (size < cap)
                 ? ByteBuffer.allocate((int) size)
                 : ByteBuffer.allocateDirect(cap);

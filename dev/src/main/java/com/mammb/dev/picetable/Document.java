@@ -30,15 +30,14 @@ public class Document {
     private PieceTable pt;
     private Path path;
     private Charset charset;
-    private LineIndex index;
+    private Stat stat;
 
 
     public Document(PieceTable pt, Path path) {
         this.pt = pt;
         this.path = path;
         this.charset = StandardCharsets.UTF_8;
-        this.index = LineIndex.of();
-        index.add(Files.readAllBytes(path));
+        this.stat = Stat.of(path);
     }
 
 
@@ -54,19 +53,19 @@ public class Document {
 
     public void insert(int line, int col, CharSequence cs) {
         byte[] bytes = cs.toString().getBytes(charset);
-        pt.insert(index.get(line) + col, bytes);
-        index.insert(line, col, bytes);
+        pt.insert(stat.index().get(line) + col, bytes);
+        stat.index().insert(line, col, bytes);
     }
 
 
     public void delete(int line, int col, int len) {
-        pt.delete(index.get(line) + col, len);
-        index.delete(line, col, len);
+        pt.delete(stat.index().get(line) + col, len);
+        stat.index().delete(line, col, len);
     }
 
 
     public byte[] get(int line, int col, int len) {
-        return pt.get(index.get(line) + col, len);
+        return pt.get(stat.index().get(line) + col, len);
     }
 
 

@@ -205,7 +205,7 @@ public class PieceTableImpl implements PieceTable {
             StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
 
             ByteBuffer buf = ByteBuffer.allocateDirect(
-                Math.toIntExact(Math.min(length, 1024 * 8)));
+                Math.toIntExact(Math.min(length, 1024 * 64)));
 
             long size = 0;
             for (Piece piece : pieces) {
