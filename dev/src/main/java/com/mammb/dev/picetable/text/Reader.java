@@ -33,7 +33,7 @@ public class Reader {
     private final Path path;
     private final RowIndex index;
     private int bom = 0;
-    private Charset charset = StandardCharsets.UTF_8;
+    private Charset charset;
     private long length;
 
     private Reader(Path path) {
@@ -53,7 +53,7 @@ public class Reader {
     }
 
     public Charset charset() {
-        return charset;
+        return (charset == null) ? StandardCharsets.UTF_8 : charset;
     }
 
     public int bom() {
@@ -110,7 +110,42 @@ public class Reader {
     }
 
     private int checkBom(byte[] bytes) {
+        if (bytes == null) {
+            return 0;
+        } else if (bytes.length >= 3 &&
+            (bytes[0] & 0xFF) == 0xef &&
+            (bytes[1] & 0xFF) == 0xbb &&
+            (bytes[2] & 0xFF) == 0xbf) {
+            charset = StandardCharsets.UTF_8;
+            return 3;
+        } else if (bytes.length >= 2 &&
+            (bytes[0] & 0xFF) == 0xfe &&
+            (bytes[1] & 0xFF) == 0xff) {
+            charset = StandardCharsets.UTF_16BE;
+            return 2;
+        } else if (bytes.length >= 2 &&
+            (bytes[0] & 0xFF) == 0xff &&
+            (bytes[1] & 0xFF) == 0xfe) {
+            charset = StandardCharsets.UTF_16LE;
+            return 2;
+        } else if (bytes.length >= 4 &&
+            (bytes[0] & 0xFF) == 0x00 &&
+            (bytes[1] & 0xFF) == 0x00 &&
+            (bytes[1] & 0xFF) == 0xfe &&
+            (bytes[1] & 0xFF) == 0xff) {
+            charset = Charset.forName("UTF_32BE");
+            return 4;
+        } else if (bytes.length >= 4 &&
+            (bytes[0] & 0xFF) == 0xff &&
+            (bytes[1] & 0xFF) == 0xfe &&
+            (bytes[1] & 0xFF) == 0x00 &&
+            (bytes[1] & 0xFF) == 0x00) {
+            charset = Charset.forName("UTF_32LE");
+            return 4;
+        }
         return 0;
     }
+
+
 
 }
