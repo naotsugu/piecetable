@@ -13,44 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.dev.picetable;
+package com.mammb.dev.picetable.text;
 
-import com.mammb.dev.picetable.index.RowIndex;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
-public class Stat {
+/**
+ * Reader.
+ * @author Naotsugu Kobayashi
+ */
+public class Reader {
 
-    private RowIndex index;
+    private final Path path;
+    private final RowIndex index;
+    private int bom = 0;
+    private Charset charset = StandardCharsets.UTF_8;
+    private long length;
 
-    private Stat(Path path) {
+    private Reader(Path path) {
+        this.path = path;
         this.index = RowIndex.of();
         if (path != null) {
-            readAll(path, index::add);
+            readAll(path);
         }
     }
 
-    public static Stat of(Path path) {
-        return new Stat(path);
+    public static Reader of(Path path) {
+        return new Reader(path);
     }
 
     public RowIndex index() {
         return index;
     }
 
-    private void readAll(Path path, Consumer<byte[]> consumer) {
+    public Charset charset() {
+        return charset;
+    }
+
+    public int bom() {
+        return bom;
+    }
+
+    private void readAll(Path path) {
 
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             long size = channel.size();
-            if (size > (long) Integer.MAX_VALUE) {
-                throw new OutOfMemoryError("Required array size too large");
-            }
 
             int cap = 1024 * 64;
             ByteBuffer buf = (size < cap)
@@ -67,24 +81,36 @@ public class Stat {
                 }
 
                 buf.flip();
-
-                if (buf.isDirect()) {
-                    if (n != bytes.length) {
-                        byte[] rest = new byte[n];
-                        buf.get(rest);
-                        consumer.accept(rest);
-                    } else {
-                        buf.get(bytes);
-                        consumer.accept(bytes);
-                    }
-                } else {
-                    consumer.accept(Arrays.copyOf(buf.array(), buf.limit()));
+                byte[] read = asBytes(buf, n, bytes);
+                if (length == 0) {
+                    bom = checkBom(read);
                 }
+                length += read.length;
+                index.add(read);
             }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
+
+    private byte[] asBytes(ByteBuffer buf, int nRead, byte[] bytes) {
+        if (buf.isDirect()) {
+            if (nRead != bytes.length) {
+                byte[] rest = new byte[nRead];
+                buf.get(rest);
+                return rest;
+            } else {
+                buf.get(bytes);
+                return bytes;
+            }
+        } else {
+            return Arrays.copyOf(buf.array(), buf.limit());
+        }
+    }
+
+    private int checkBom(byte[] bytes) {
+        return 0;
+    }
+
 }

@@ -17,9 +17,7 @@ package com.mammb.dev.picetable.text;
 
 import com.mammb.dev.picetable.Document;
 import com.mammb.dev.picetable.PieceTable;
-import com.mammb.dev.picetable.index.RowIndex;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /**
@@ -33,14 +31,13 @@ public class DocumentImpl implements Document {
     private Charset charset;
     private RowIndex index;
 
-
     public DocumentImpl(PieceTable pt, Path path) {
         this.pt = pt;
         this.path = path;
-        this.index = RowIndex.of();
-        this.charset = StandardCharsets.UTF_8;
+        var reader = Reader.of(path);
+        this.index = reader.index();
+        this.charset = reader.charset();
     }
-
 
     public static DocumentImpl of() {
         return new DocumentImpl(PieceTable.of(), null);
@@ -53,9 +50,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public void insert(int row, int col, CharSequence cs) {
-        byte[] bytes = cs.toString().getBytes(charset);
-        pt.insert(index.get(row) + col, bytes);
-        index.insert(row, col, bytes);
+        insert(row, col, cs.toString().getBytes(charset));
     }
 
     @Override
@@ -83,13 +78,18 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public long length() {
-        return pt.length();
+    public CharSequence getText(int row, int col, int len) {
+        return new String(get(row, col, len), charset);
     }
 
     @Override
-    public Charset charset() {
-        return charset;
+    public CharSequence getText(int row) {
+        return new String(get(row), charset);
+    }
+
+    @Override
+    public long length() {
+        return pt.length();
     }
 
 }

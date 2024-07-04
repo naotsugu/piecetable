@@ -15,8 +15,6 @@
  */
 package com.mammb.dev.picetable;
 
-import java.nio.charset.Charset;
-
 /**
  * The document.
  * @author Naotsugu Kobayashi
@@ -33,12 +31,14 @@ public interface Document {
 
     byte[] get(int row);
 
+    CharSequence getText(int row, int col, int len);
+
+    CharSequence getText(int row);
+
     /**
      * Get the bytes length of this document holds.
      * @return the bytes length of this document holds
      */
     long length();
-
-    Charset charset();
 
 }
