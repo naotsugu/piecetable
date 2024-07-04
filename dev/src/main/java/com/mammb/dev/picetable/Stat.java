@@ -15,7 +15,7 @@
  */
 package com.mammb.dev.picetable;
 
-import com.mammb.dev.picetable.index.LineIndex;
+import com.mammb.dev.picetable.index.RowIndex;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -26,10 +26,10 @@ import java.util.function.Consumer;
 
 public class Stat {
 
-    private LineIndex index;
+    private RowIndex index;
 
     private Stat(Path path) {
-        this.index = LineIndex.of();
+        this.index = RowIndex.of();
         if (path != null) {
             readAll(path, index::add);
         }
@@ -39,7 +39,7 @@ public class Stat {
         return new Stat(path);
     }
 
-    public LineIndex index() {
+    public RowIndex index() {
         return index;
     }
 

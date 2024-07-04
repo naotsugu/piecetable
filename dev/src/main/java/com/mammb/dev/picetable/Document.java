@@ -15,62 +15,30 @@
  */
 package com.mammb.dev.picetable;
 
-import com.mammb.dev.picetable.index.LineIndex;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
- * Document.
+ * The document.
  * @author Naotsugu Kobayashi
  */
-public class Document {
+public interface Document {
 
-    private PieceTable pt;
-    private Path path;
-    private Charset charset;
-    private Stat stat;
+    void insert(int row, int col, CharSequence cs);
 
+    void insert(int row, int col, byte[] bytes);
 
-    public Document(PieceTable pt, Path path) {
-        this.pt = pt;
-        this.path = path;
-        this.charset = StandardCharsets.UTF_8;
-        this.stat = Stat.of(path);
-    }
+    void delete(int row, int col, int len);
 
+    byte[] get(int row, int col, int len);
 
-    public static Document of() {
-        return new Document(PieceTable.of(), null);
-    }
+    byte[] get(int row);
 
+    /**
+     * Get the bytes length of this document holds.
+     * @return the bytes length of this document holds
+     */
+    long length();
 
-    public static Document of(Path path) {
-        return new Document(PieceTable.of(path), path);
-    }
-
-
-    public void insert(int line, int col, CharSequence cs) {
-        byte[] bytes = cs.toString().getBytes(charset);
-        pt.insert(stat.index().get(line) + col, bytes);
-        stat.index().insert(line, col, bytes);
-    }
-
-
-    public void delete(int line, int col, int len) {
-        pt.delete(stat.index().get(line) + col, len);
-        stat.index().delete(line, col, len);
-    }
-
-
-    public byte[] get(int line, int col, int len) {
-        return pt.get(stat.index().get(line) + col, len);
-    }
-
-
-    public long length() {
-        return pt.length();
-    }
+    Charset charset();
 
 }

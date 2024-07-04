@@ -18,14 +18,14 @@ package com.mammb.dev.picetable.index;
 import java.util.Arrays;
 
 /**
- * The LineIndex.
- * Holds the byte length of each line as an index.
+ * The RowIndex.
+ * Holds the byte length of each row as an index.
  * @author Naotsugu Kobayashi
  */
-public class LineIndex {
+public class RowIndex {
 
-    /** The line lengths. */
-    private int[] lineLengths;
+    /** The row lengths. */
+    private int[] rowLengths;
     /** The length of line lengths array. */
     private int length;
 
@@ -38,11 +38,11 @@ public class LineIndex {
 
 
     /**
-     * Create a new {@code LineIndex}.
+     * Create a new {@code RowIndex}.
      * @param cacheInterval the sub-total cache interval
      */
-    private LineIndex(int cacheInterval) {
-        lineLengths = new int[0];
+    private RowIndex(int cacheInterval) {
+        rowLengths = new int[0];
         length = 0;
 
         stCache = new long[0];
@@ -52,21 +52,21 @@ public class LineIndex {
 
 
     /**
-     * Create a new {@code LineIndex}.
-     * @return a new {@code LineIndex}
+     * Create a new {@link RowIndex}.
+     * @return a new {@link RowIndex}
      */
-    public static LineIndex of() {
-        return new LineIndex(100);
+    public static RowIndex of() {
+        return new RowIndex(100);
     }
 
 
     /**
-     * Create a new {@code LineIndex}.
+     * Create a new {@link RowIndex}.
      * @param cacheInterval the sub-total cache interval
-     * @return a new {@code LineIndex}
+     * @return a new {@link RowIndex}
      */
-    static LineIndex of(int cacheInterval) {
-        return new LineIndex(cacheInterval);
+    static RowIndex of(int cacheInterval) {
+        return new RowIndex(cacheInterval);
     }
 
 
@@ -76,25 +76,25 @@ public class LineIndex {
      */
     public void add(byte[] bytes) {
 
-        int[] lines = lines(bytes);
-        if (lines.length == 0) {
+        int[] rows = rows(bytes);
+        if (rows.length == 0) {
             return;
         }
 
-        if (length + lines.length > lineLengths.length) {
-            lineLengths = grow(length + lines.length);
+        if (length + rows.length > rowLengths.length) {
+            rowLengths = grow(length + rows.length);
         }
 
         if (length == 0) {
             length++;
         }
-        for (int i = 0; i < lines.length; i++) {
-            lineLengths[length - 1] += lines[i];
-            if (lines.length > 1 && i < lines.length - 1) {
-                // lines |0|
-                // lines |0|length++|1|
-                // lines |0|length++|1|length++|2|
-                // lines |0|length++|1|length++|2|length++|3|
+        for (int i = 0; i < rows.length; i++) {
+            rowLengths[length - 1] += rows[i];
+            if (rows.length > 1 && i < rows.length - 1) {
+                // rows |0|
+                // rows |0|length++|1|
+                // rows |0|length++|1|length++|2|
+                // rows |0|length++|1|length++|2|length++|3|
                 length++;
             }
         }
@@ -103,22 +103,22 @@ public class LineIndex {
 
 
     /**
-     * Gets the byte length of the specified line.
-     * @param lineNum the specified line
-     * @return the byte length of the specified line
+     * Gets the byte length of the specified row.
+     * @param row the specified row
+     * @return the byte length of the specified row
      */
-    public long get(int lineNum) {
+    public long get(int row) {
 
-        int startLine = 0;
+        int startRow = 0;
         long startPos = 0;
 
-        int cacheIndex = lineNum / cacheInterval;
+        int cacheIndex = row / cacheInterval;
         if (cacheIndex > 0 && cacheIndex < cacheLength) {
-            startLine = cacheIndex * cacheInterval;
+            startRow = cacheIndex * cacheInterval;
             startPos = stCache[cacheIndex];
         }
 
-        for (int i = startLine; i < length && i < lineNum; i++) {
+        for (int i = startRow; i < length && i < row; i++) {
             if (i % cacheInterval == 0) {
                 if (cacheLength + 1 > stCache.length) {
                     stCache = growCache(cacheLength + 1);
@@ -127,7 +127,7 @@ public class LineIndex {
                 stCache[chIndex] = startPos;
                 cacheLength = chIndex + 1;
             }
-            startPos += lineLengths[i];
+            startPos += rowLengths[i];
         }
         return startPos;
     }
@@ -135,89 +135,89 @@ public class LineIndex {
 
     /**
      * Insert the specified byte array to the index.
-     * @param lineNum the specified line
-     * @param posAtLine the specified position in a line
+     * @param row the specified row
+     * @param col the specified position in a row
      * @param bytes the specified byte array to be inserted
      */
-    public void insert(int lineNum, int posAtLine, byte[] bytes) {
-        int[] lines = lines(bytes);
-        if (lines.length == 0) {
+    public void insert(int row, int col, byte[] bytes) {
+        int[] rows = rows(bytes);
+        if (rows.length == 0) {
             return;
         }
 
-        if (length + lines.length > lineLengths.length) {
-            lineLengths = grow(length + lines.length);
+        if (length + rows.length > rowLengths.length) {
+            rowLengths = grow(length + rows.length);
         }
-        cacheLength = lineNum / cacheInterval;
+        cacheLength = row / cacheInterval;
 
-        if (lines.length == 1) {
+        if (rows.length == 1) {
 
-            // insert operation within a single line
-            lineLengths[lineNum] += lines[0];
+            // insert operation within a single row
+            rowLengths[row] += rows[0];
 
         } else {
 
-            // insert operation across multiple lines
-            System.arraycopy(lineLengths, lineNum + 1,
-                lineLengths, lineNum + lines.length,
-                length - (lineNum + 1));
+            // insert operation across multiple rowss
+            System.arraycopy(rowLengths, row + 1,
+                rowLengths, row + rows.length,
+                length - (row + 1));
 
-            int tail = lineLengths[lineNum] - posAtLine;
-            lineLengths[lineNum++] = posAtLine + lines[0];
+            int tail = rowLengths[row] - col;
+            rowLengths[row++] = col + rows[0];
 
-            for (int i = 1; i < lines.length - 1; i++) {
-                lineLengths[lineNum++] = lines[i];
+            for (int i = 1; i < rows.length - 1; i++) {
+                rowLengths[row++] = rows[i];
             }
 
-            lineLengths[lineNum] = tail + lines[lines.length - 1];
+            rowLengths[row] = tail + rows[rows.length - 1];
 
         }
-        length += lines.length - 1;
+        length += rows.length - 1;
     }
 
 
     /**
      * Delete the specified byte length of the index.
-     * @param lineNum the specified line
-     * @param posAtLine the specified position in a line
+     * @param row the specified row
+     * @param col the specified position in a row
      * @param len the specified byte length to be deleted
      */
-    public void delete(int lineNum, int posAtLine, int len) {
+    public void delete(int row, int col, int len) {
 
         if (len <= 0) {
             return;
         }
 
-        cacheLength = lineNum / cacheInterval;
+        cacheLength = row / cacheInterval;
 
-        if ((lineLengths[lineNum] - posAtLine) > len) {
+        if ((rowLengths[row] - col) > len) {
 
-            // delete operation within a single line
+            // delete operation within a single row
             // |a|b|c|d|$|       ->        |a|d|$|
-            //   ^---  posAtLine:1, len:2
-            lineLengths[lineNum] -= len;
+            //   ^---  col:1, len:2
+            rowLengths[row] -= len;
 
         } else {
 
-            // delete operation across multiple lines
-            // 0 |a|b|$|    delete(          ->   |a|f|$|
-            // 1 |c|d|$|      lineNum = 0,        |g|h|$|
-            // 2 |e|f|$|      posAtLine = 1,
+            // delete operation across multiple rows
+            // 0 |a|b|$|    delete(        ->   |a|f|$|
+            // 1 |c|d|$|      row = 0,          |g|h|$|
+            // 2 |e|f|$|      col = 1,
             // 3 |g|h|$|      len = 6)
 
-            len -= lineLengths[lineNum] - posAtLine;
-            lineLengths[lineNum] = posAtLine;
+            len -= rowLengths[row] - col;
+            rowLengths[row] = col;
             int lines = 0;
             do {
-                len -= lineLengths[lineNum + ++lines];
+                len -= rowLengths[row + ++lines];
             } while (len > 0);
 
-            lineLengths[lineNum] += (-len); // merge the rest to the first line
+            rowLengths[row] += (-len); // merge the rest to the first row
 
             System.arraycopy(
-                lineLengths, lineNum + 1 + lines,
-                lineLengths, lineNum + 1,
-                length - (lineNum + 1 + lines));
+                rowLengths, row + 1 + lines,
+                rowLengths, row + 1,
+                length - (row + 1 + lines));
             length -= lines;
         }
     }
@@ -228,7 +228,7 @@ public class LineIndex {
      * @param bytes the specified byte array
      * @return line-by-line byte length
      */
-    static int[] lines(byte[] bytes) {
+    static int[] rows(byte[] bytes) {
 
         if (bytes == null || bytes.length == 0) {
             return new int[0];
@@ -256,14 +256,14 @@ public class LineIndex {
      * @return the grown int array
      */
     private int[] grow(int minCapacity) {
-        int oldCapacity = lineLengths.length;
+        int oldCapacity = rowLengths.length;
         if (oldCapacity > 0) {
             int newCapacity = Math.min(
                 Math.max(minCapacity, oldCapacity >> 1),
                 Integer.MAX_VALUE - 8);
-            return lineLengths = Arrays.copyOf(lineLengths, newCapacity);
+            return rowLengths = Arrays.copyOf(rowLengths, newCapacity);
         } else {
-            return lineLengths = new int[Math.max(100, minCapacity)];
+            return rowLengths = new int[Math.max(100, minCapacity)];
         }
     }
 
@@ -287,11 +287,11 @@ public class LineIndex {
 
 
     /**
-     * Gets the line lengths array.
-     * @return the line lengths array
+     * Gets the row lengths array.
+     * @return the row lengths array
      */
-    int[] lineLengths() {
-        return Arrays.copyOf(lineLengths, length);
+    int[] rowLengths() {
+        return Arrays.copyOf(rowLengths, length);
     }
 
 
