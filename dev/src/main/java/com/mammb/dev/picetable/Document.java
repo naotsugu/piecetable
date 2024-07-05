@@ -41,4 +41,9 @@ public interface Document {
      */
     long length();
 
+    static Document of() {
+        return Document.of();
+    }
+
+
 }

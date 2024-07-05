@@ -22,7 +22,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Reader.
@@ -30,22 +33,30 @@ import java.util.Arrays;
  */
 public class Reader {
 
-    private final Path path;
     private final RowIndex index;
     private int bom = 0;
     private Charset charset;
     private long length;
+    private final List<CharsetMatch> matches = new ArrayList<>();
 
-    private Reader(Path path) {
-        this.path = path;
+    private Reader(Path path, CharsetMatch... matches) {
         this.index = RowIndex.of();
+        this.matches.addAll(Arrays.asList(matches));
         if (path != null) {
             readAll(path);
         }
     }
 
     public static Reader of(Path path) {
-        return new Reader(path);
+        return new Reader(path, CharsetMatch.utf8());
+    }
+
+    public static Reader of(Path path, Charset charset) {
+        return new Reader(path, CharsetMatch.of(charset));
+    }
+
+    public static Reader of(Path path, CharsetMatch... matches) {
+        return new Reader(path, matches);
     }
 
     public RowIndex index() {
@@ -81,9 +92,13 @@ public class Reader {
                 }
 
                 buf.flip();
+
                 byte[] read = asBytes(buf, n, bytes);
                 if (length == 0) {
                     bom = checkBom(read);
+                }
+                if (charset == null) {
+                    charset = checkCharset(read);
                 }
                 length += read.length;
                 index.add(read);
@@ -123,6 +138,13 @@ public class Reader {
             (bytes[1] & 0xFF) == 0xff) {
             charset = StandardCharsets.UTF_16BE;
             return 2;
+        } else if (bytes.length >= 4 &&
+            (bytes[0] & 0xFF) == 0xff &&
+            (bytes[1] & 0xFF) == 0xfe &&
+            (bytes[1] & 0xFF) == 0x00 &&
+            (bytes[1] & 0xFF) == 0x00) {
+            charset = Charset.forName("UTF_32LE");
+            return 4;
         } else if (bytes.length >= 2 &&
             (bytes[0] & 0xFF) == 0xff &&
             (bytes[1] & 0xFF) == 0xfe) {
@@ -135,17 +157,16 @@ public class Reader {
             (bytes[1] & 0xFF) == 0xff) {
             charset = Charset.forName("UTF_32BE");
             return 4;
-        } else if (bytes.length >= 4 &&
-            (bytes[0] & 0xFF) == 0xff &&
-            (bytes[1] & 0xFF) == 0xfe &&
-            (bytes[1] & 0xFF) == 0x00 &&
-            (bytes[1] & 0xFF) == 0x00) {
-            charset = Charset.forName("UTF_32LE");
-            return 4;
         }
         return 0;
     }
 
-
+    private Charset checkCharset(byte[] bytes) {
+        return matches.stream().map(m -> m.put(bytes))
+            .max(Comparator.naturalOrder())
+            .filter(r -> r.confidence() > 100)
+            .map(r -> r.charset())
+            .orElse(null);
+    }
 
 }
