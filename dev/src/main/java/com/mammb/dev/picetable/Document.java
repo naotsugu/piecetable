@@ -15,7 +15,6 @@
  */
 package com.mammb.dev.picetable;
 
-import com.mammb.dev.picetable.text.CharsetMatch;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 

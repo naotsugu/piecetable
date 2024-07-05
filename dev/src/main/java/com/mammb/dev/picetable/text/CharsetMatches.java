@@ -15,36 +15,25 @@
  */
 package com.mammb.dev.picetable.text;
 
+import com.mammb.dev.picetable.CharsetMatch;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * The CharsetMatch.
+ * The CharsetMatch simple implementation collections.
  * @author Naotsugu Kobayashi
  */
-public interface CharsetMatch {
-
-    Result put(byte[] bytes);
-
-
-    static CharsetMatch of(Charset charset) {
-        return bytes -> new Result(charset, 100);
-    }
-
+public class CharsetMatches {
 
     static CharsetMatch utf8() {
         return new Utf8Match();
     }
 
-
-    record Result(Charset charset, int confidence) implements Comparable<Result> {
-        @Override
-        public int compareTo(Result o) {
-            return Integer.compare(confidence, o.confidence);
-        }
+    static CharsetMatch sjis() {
+        return new SjisMatch();
     }
 
-    class Utf8Match implements CharsetMatch {
+    static class Utf8Match implements CharsetMatch {
 
         private int confidence = 50;
         private int trail = 0;
@@ -98,7 +87,7 @@ public interface CharsetMatch {
         }
     }
 
-    class SjisMatch implements CharsetMatch {
+    static class SjisMatch implements CharsetMatch {
         private int confidence = 50;
         @Override
         public Result put(byte[] bytes) {

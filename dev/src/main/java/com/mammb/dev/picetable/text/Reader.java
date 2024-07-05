@@ -15,6 +15,7 @@
  */
 package com.mammb.dev.picetable.text;
 
+import com.mammb.dev.picetable.CharsetMatch;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
