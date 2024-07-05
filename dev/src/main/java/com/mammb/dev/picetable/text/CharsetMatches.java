@@ -29,8 +29,8 @@ public class CharsetMatches {
         return new Utf8Match();
     }
 
-    static CharsetMatch sjis() {
-        return new SjisMatch();
+    static CharsetMatch ms932() {
+        return new Ms932Match();
     }
 
     static class Utf8Match implements CharsetMatch {
@@ -48,7 +48,7 @@ public class CharsetMatches {
                 if (trail == 0) {
                     byte b = bytes[i];
                     int trail = trail(b);
-                    if (trail == -1) confidence = clamp(confidence--);
+                    if (trail == -1) confidence = clamp(--confidence);
                     if (trail <= 0) continue;
                 }
 
@@ -58,13 +58,13 @@ public class CharsetMatches {
                         break;
                     }
                     byte b = bytes[i];
-                    if ((b & 0xc0) != 0x080) {
-                        confidence = clamp(confidence--);
+                    if ((b & 0xc0) != 0x80) {
+                        confidence = clamp(--confidence);
                         trail = 0;
                         break;
                     }
                     if (--trail == 0) {
-                        confidence = clamp(confidence++);
+                        confidence = clamp(++confidence);
                         break;
                     }
                 }
@@ -87,10 +87,27 @@ public class CharsetMatches {
         }
     }
 
-    static class SjisMatch implements CharsetMatch {
+    static class Ms932Match implements CharsetMatch {
         private int confidence = 50;
         @Override
         public Result put(byte[] bytes) {
+            for (int i = 0; i < bytes.length; i++) {
+                int b = Byte.toUnsignedInt(bytes[i]);
+                if (b == 0x80 || b == 0xa0 || b >= 0xfd) {
+                    // unused
+                    confidence = clamp(--confidence);
+                    continue;
+                }
+                if ((0x81 <= b && b <= 0x9f) || b >= 0xe0) {
+                    // double width
+                    int s = Byte.toUnsignedInt(bytes[++i]);
+                    if ((0x40 <= s && s <= 0x7e) || (0x80 <= s && s <= 0xfc)) {
+                        confidence = clamp(++confidence);
+                    } else {
+                        confidence = clamp(--confidence);
+                    }
+                }
+            }
             return new Result(Charset.forName("windows-31j"), confidence);
         }
     }

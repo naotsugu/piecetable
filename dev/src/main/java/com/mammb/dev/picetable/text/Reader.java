@@ -49,7 +49,7 @@ public class Reader {
     }
 
     public static Reader of(Path path) {
-        return new Reader(path, CharsetMatch.utf8());
+        return new Reader(path, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
 
     public static Reader of(Path path, Charset charset) {
@@ -165,7 +165,7 @@ public class Reader {
     private Charset checkCharset(byte[] bytes) {
         return matches.stream().map(m -> m.put(bytes))
             .max(Comparator.naturalOrder())
-            .filter(r -> r.confidence() > 100)
+            .filter(r -> r.confidence() >= 100)
             .map(r -> r.charset())
             .orElse(null);
     }
