@@ -34,6 +34,9 @@ public class DocumentImpl implements Document {
     private Charset charset;
     /** The {@link RowIndex}. */
     private RowIndex index;
+    /** The byte order mark. */
+    private byte[] bom;
+
 
     /**
      * Constructor.
@@ -46,6 +49,7 @@ public class DocumentImpl implements Document {
         var reader = Reader.of(path);
         this.index = reader.index();
         this.charset = reader.charset();
+        this.bom = reader.bom();
     }
 
     /**
@@ -67,31 +71,36 @@ public class DocumentImpl implements Document {
 
     @Override
     public void insert(int row, int col, CharSequence cs) {
+        col += (row == 0) ? bom.length : 0;
         insert(row, col, cs.toString().getBytes(charset));
     }
 
     @Override
     public void insert(int row, int col, byte[] bytes) {
+        col += (row == 0) ? bom.length : 0;
         pt.insert(index.get(row) + col, bytes);
         index.insert(row, col, bytes);
     }
 
     @Override
     public void delete(int row, int col, int len) {
+        col += (row == 0) ? bom.length : 0;
         pt.delete(index.get(row) + col, len);
         index.delete(row, col, len);
     }
 
     @Override
     public byte[] get(int row, int col, int len) {
+        col += (row == 0) ? bom.length : 0;
         return pt.get(index.get(row) + col, len);
     }
 
     @Override
     public byte[] get(int row) {
-        long pos = index.get(row);
-        int len = Math.toIntExact(index.get(row + 1) - pos);
-        return pt.get(index.get(row), len);
+        long col = index.get(row);
+        col += (row == 0) ? bom.length : 0;
+        int len = Math.toIntExact(index.get(row + 1) - col);
+        return pt.get(col, len);
     }
 
     @Override
@@ -106,7 +115,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public long length() {
-        return pt.length();
+        return pt.length() - bom.length;
     }
 
 }
