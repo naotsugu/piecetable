@@ -52,6 +52,7 @@ public class DocumentImpl implements Document {
         this.bom = reader.bom();
     }
 
+
     /**
      * Create a new {@link Document}.
      * @return a new {@link Document}
@@ -59,6 +60,7 @@ public class DocumentImpl implements Document {
     public static DocumentImpl of() {
         return new DocumentImpl(PieceTable.of(), null);
     }
+
 
     /**
      * Create a new {@link Document}.
@@ -69,11 +71,13 @@ public class DocumentImpl implements Document {
         return new DocumentImpl(PieceTable.of(path), path);
     }
 
+
     @Override
     public void insert(int row, int col, CharSequence cs) {
         col += (row == 0) ? bom.length : 0;
         insert(row, col, cs.toString().getBytes(charset));
     }
+
 
     @Override
     public void insert(int row, int col, byte[] bytes) {
@@ -82,6 +86,7 @@ public class DocumentImpl implements Document {
         index.insert(row, col, bytes);
     }
 
+
     @Override
     public void delete(int row, int col, int len) {
         col += (row == 0) ? bom.length : 0;
@@ -89,11 +94,13 @@ public class DocumentImpl implements Document {
         index.delete(row, col, len);
     }
 
+
     @Override
     public byte[] get(int row, int col, int len) {
         col += (row == 0) ? bom.length : 0;
         return pt.get(index.get(row) + col, len);
     }
+
 
     @Override
     public byte[] get(int row) {
@@ -103,15 +110,18 @@ public class DocumentImpl implements Document {
         return pt.get(col, len);
     }
 
+
     @Override
     public CharSequence getText(int row, int col, int len) {
         return new String(get(row, col, len), charset);
     }
 
+
     @Override
     public CharSequence getText(int row) {
         return new String(get(row), charset);
     }
+
 
     @Override
     public long length() {

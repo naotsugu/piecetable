@@ -45,6 +45,7 @@ public class Reader {
     /** The CharsetMatches. */
     private final List<CharsetMatch> matches = new ArrayList<>();
 
+
     /**
      * Constructor.
      * @param path the path to be read
@@ -58,6 +59,7 @@ public class Reader {
         }
     }
 
+
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
@@ -66,6 +68,7 @@ public class Reader {
     public static Reader of(Path path) {
         return new Reader(path, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
+
 
     /**
      * Create a new {@link Reader}.
@@ -77,6 +80,7 @@ public class Reader {
         return new Reader(path, CharsetMatch.of(charset));
     }
 
+
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
@@ -87,6 +91,7 @@ public class Reader {
         return new Reader(path, matches);
     }
 
+
     /**
      * Get the {@link RowIndex}.
      * @return the {@link RowIndex}
@@ -94,6 +99,7 @@ public class Reader {
     public RowIndex index() {
         return index;
     }
+
 
     /**
      * Get the {@link Charset}.
@@ -103,6 +109,7 @@ public class Reader {
         return (charset == null) ? StandardCharsets.UTF_8 : charset;
     }
 
+
     /**
      * Get the byte order mark.
      * @return byte order mark
@@ -110,6 +117,7 @@ public class Reader {
     public byte[] bom() {
         return bom;
     }
+
 
     private void readAll(Path path) {
 
@@ -149,6 +157,7 @@ public class Reader {
         }
     }
 
+
     private byte[] asBytes(ByteBuffer buf, int nRead, byte[] bytes) {
         if (buf.isDirect()) {
             if (nRead != bytes.length) {
@@ -163,6 +172,7 @@ public class Reader {
             return Arrays.copyOf(buf.array(), buf.limit());
         }
     }
+
 
     private byte[] checkBom(byte[] bytes) {
         if (bytes == null) {
@@ -200,6 +210,7 @@ public class Reader {
         }
         return new byte[0];
     }
+
 
     private Charset checkCharset(byte[] bytes) {
         return matches.stream().map(m -> m.put(bytes))

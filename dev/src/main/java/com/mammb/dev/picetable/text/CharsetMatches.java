@@ -44,7 +44,7 @@ public class CharsetMatches {
     /**
      * The utf-8 {@link CharsetMatch}.
      */
-    static class Utf8Match implements CharsetMatch {
+    private static class Utf8Match implements CharsetMatch {
 
         private int confidence = 50;
         private int trail = 0;
@@ -58,7 +58,7 @@ public class CharsetMatches {
 
                 if (trail == 0) {
                     byte b = bytes[i];
-                    int trail = trail(b);
+                    trail = trail(b);
                     if (trail == -1) confidence = clamp(--confidence);
                     if (trail <= 0) continue;
                 }
@@ -93,6 +93,7 @@ public class CharsetMatches {
             } else if ((b & 0xF8) == 0xF0) {
                 return 3; // 1111 0...
             } else {
+                System.out.println(Byte.toString(b));
                 return -1;
             }
         }
@@ -101,7 +102,7 @@ public class CharsetMatches {
     /**
      * The ms932 {@link CharsetMatch}.
      */
-    static class Ms932Match implements CharsetMatch {
+    private static class Ms932Match implements CharsetMatch {
         private int confidence = 50;
         @Override
         public Result put(byte[] bytes) {
