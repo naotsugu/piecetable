@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReaderTest {
 
     @Test
-    void index(@TempDir Path tempDir) throws IOException {
+    void reader(@TempDir Path tempDir) throws IOException {
 
         var file = tempDir.resolve("file.txt");
         Files.write(file, "a\nbc\ndef\n".getBytes());
@@ -46,4 +46,24 @@ class ReaderTest {
         assertEquals(StandardCharsets.UTF_8, reader.charset());
 
     }
+
+    @Test
+    void readerUtf16(@TempDir Path tempDir) throws IOException {
+
+        var file = tempDir.resolve("file.txt");
+        Files.write(file, "a\nbc\ndef\n".getBytes(StandardCharsets.UTF_16));
+
+        var reader = Reader.of(file);
+
+        assertArrayEquals(new byte[] { (byte) 0xFE, (byte) 0xFF }, reader.bom());
+
+        assertEquals(0, reader.index().get(0));
+        assertEquals(4 + 2, reader.index().get(1));
+        assertEquals(10 + 2, reader.index().get(2));
+
+        assertEquals(StandardCharsets.UTF_16BE, reader.charset());
+
+    }
+
+
 }
