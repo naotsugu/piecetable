@@ -43,7 +43,7 @@ public class DocumentImpl implements Document {
      * @param pt the {@link PieceTable}
      * @param path the {@link Path} of document
      */
-    private DocumentImpl(PieceTable pt, Path path) {
+    DocumentImpl(PieceTable pt, Path path) {
         this.pt = pt;
         this.path = path;
         var reader = Reader.of(path);
@@ -74,7 +74,6 @@ public class DocumentImpl implements Document {
 
     @Override
     public void insert(int row, int col, CharSequence cs) {
-        col += (row == 0) ? bom.length : 0;
         insert(row, col, cs.toString().getBytes(charset));
     }
 

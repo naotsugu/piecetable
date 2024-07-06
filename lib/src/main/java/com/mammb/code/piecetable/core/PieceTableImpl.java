@@ -47,7 +47,7 @@ public class PieceTableImpl implements PieceTable {
      * Constructor.
      * @param initial the initial piece
      */
-    private PieceTableImpl(Piece initial) {
+    PieceTableImpl(Piece initial) {
         appendBuffer = AppendBuffer.of();
         pieces = new ArrayList<>();
         indices = new TreeMap<>();
