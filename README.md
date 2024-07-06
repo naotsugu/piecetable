@@ -5,10 +5,6 @@
 
 Piece table data structure in Java.
 
-For memory efficiency, Unicode retention is handled as a UTF-8 byte array instead of UTF-16.
-
-Supports undo and redo.
-
 
 ## Operations
 
@@ -48,35 +44,7 @@ Single character deletion can be one of two possible conditions:
 ![piecetable3](docs/images/piecetable3.png)
 
 
-## Project detail
-
-|directory| description                 |
-|--------------|-----------------------------|
-|`lib`| Piece table implementation  |
-|`app`| Example editor app (sloppy) |
-
-
-### How to run example
-
-Clone repository.
-
-```
-$ git clone https://github.com/naotsugu/piecetable.git
-$ cd piecetable
-```
-
-Run app
-
-```
-$ .gradlew run
-```
-
-![editor](docs/images/editor.png)
-
-
-
 ## Sample applications using this library
 
 * [min-editor](https://github.com/naotsugu/min-editor)
-
 

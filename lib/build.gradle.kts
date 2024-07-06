@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.named<Test>("test") {
@@ -27,7 +28,7 @@ java {
     withJavadocJar()
 }
 
-version = "0.4.0"
+version = "0.5.0"
 group = "com.github.naotsugu"
 base.archivesName.set("piecetable")
 
