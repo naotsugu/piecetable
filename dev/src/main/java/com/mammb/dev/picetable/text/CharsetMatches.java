@@ -25,14 +25,25 @@ import java.nio.charset.StandardCharsets;
  */
 public class CharsetMatches {
 
+    /**
+     * Create a new utf-8 {@link CharsetMatch}.
+     * @return a new utf-8 {@link CharsetMatch}
+     */
     static CharsetMatch utf8() {
         return new Utf8Match();
     }
 
+    /**
+     * Create a new ms932 {@link CharsetMatch}.
+     * @return a new ms932 {@link CharsetMatch}
+     */
     static CharsetMatch ms932() {
         return new Ms932Match();
     }
 
+    /**
+     * The utf-8 {@link CharsetMatch}.
+     */
     static class Utf8Match implements CharsetMatch {
 
         private int confidence = 50;
@@ -87,6 +98,9 @@ public class CharsetMatches {
         }
     }
 
+    /**
+     * The ms932 {@link CharsetMatch}.
+     */
     static class Ms932Match implements CharsetMatch {
         private int confidence = 50;
         @Override

@@ -26,12 +26,21 @@ import java.nio.file.Path;
  */
 public class DocumentImpl implements Document {
 
+    /** The {@link PieceTable}. */
     private PieceTable pt;
+    /** The {@link Path} of Document. */
     private Path path;
+    /** The {@link Charset} of Document. */
     private Charset charset;
+    /** The {@link RowIndex}. */
     private RowIndex index;
 
-    public DocumentImpl(PieceTable pt, Path path) {
+    /**
+     * Constructor.
+     * @param pt the {@link PieceTable}
+     * @param path the {@link Path} of document
+     */
+    private DocumentImpl(PieceTable pt, Path path) {
         this.pt = pt;
         this.path = path;
         var reader = Reader.of(path);
@@ -39,11 +48,19 @@ public class DocumentImpl implements Document {
         this.charset = reader.charset();
     }
 
+    /**
+     * Create a new {@link Document}.
+     * @return a new {@link Document}
+     */
     public static DocumentImpl of() {
         return new DocumentImpl(PieceTable.of(), null);
     }
 
-
+    /**
+     * Create a new {@link Document}.
+     * @param path the {@link Path} of document
+     * @return a new {@link Document}
+     */
     public static DocumentImpl of(Path path) {
         return new DocumentImpl(PieceTable.of(path), path);
     }
