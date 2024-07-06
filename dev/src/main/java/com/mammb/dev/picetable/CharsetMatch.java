@@ -23,14 +23,29 @@ import java.nio.charset.Charset;
  */
 public interface CharsetMatch {
 
+    /**
+     * Put the byte array.
+     * @param bytes the byte array
+     * @return the match result
+     */
     Result put(byte[] bytes);
 
 
+    /**
+     * Create a fixed charset {@link CharsetMatch}.
+     * @param charset the charset
+     * @return a new {@link CharsetMatch}
+     */
     static CharsetMatch of(Charset charset) {
         return bytes -> new Result(charset, 100);
     }
 
 
+    /**
+     * The {@link CharsetMatch} result.
+     * @param charset the charset
+     * @param confidence the confidence
+     */
     record Result(Charset charset, int confidence) implements Comparable<Result> {
         @Override
         public int compareTo(Result o) {

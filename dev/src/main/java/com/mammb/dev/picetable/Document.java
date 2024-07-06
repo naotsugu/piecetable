@@ -116,7 +116,7 @@ public interface Document {
     /**
      * Create a new {@link Document}.
      * @param path the path of the file to read
-     * @param charsetMatches the {@link CharsetMatch)
+     * @param charsetMatches the charset matches
      * @return a new {@link Document}
      */
     static Document of(Path path, CharsetMatch... charsetMatches) {
