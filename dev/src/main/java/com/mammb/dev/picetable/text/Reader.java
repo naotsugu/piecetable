@@ -34,12 +34,22 @@ import java.util.List;
  */
 public class Reader {
 
+    /** The row index. */
     private final RowIndex index;
-    private int bom = 0;
+    /** The byte order mark. */
+    private byte[] bom;
+    /** The charset read. */
     private Charset charset;
+    /** The byte length read. */
     private long length;
+    /** The CharsetMatches. */
     private final List<CharsetMatch> matches = new ArrayList<>();
 
+    /**
+     * Constructor.
+     * @param path the path to be read
+     * @param matches the CharsetMatches
+     */
     private Reader(Path path, CharsetMatch... matches) {
         this.index = RowIndex.of();
         this.matches.addAll(Arrays.asList(matches));
@@ -48,27 +58,56 @@ public class Reader {
         }
     }
 
+    /**
+     * Create a new {@link Reader}.
+     * @param path the path to be read
+     * @return a new {@link Reader}.
+     */
     public static Reader of(Path path) {
         return new Reader(path, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
 
+    /**
+     * Create a new {@link Reader}.
+     * @param path the path to be read
+     * @param charset the character set of the file to be read
+     * @return a new {@link Reader}.
+     */
     public static Reader of(Path path, Charset charset) {
         return new Reader(path, CharsetMatch.of(charset));
     }
 
+    /**
+     * Create a new {@link Reader}.
+     * @param path the path to be read
+     * @param matches the {@link CharsetMatch} used in reading the target file
+     * @return a new {@link Reader}.
+     */
     public static Reader of(Path path, CharsetMatch... matches) {
         return new Reader(path, matches);
     }
 
+    /**
+     * Get the {@link RowIndex}.
+     * @return the {@link RowIndex}
+     */
     public RowIndex index() {
         return index;
     }
 
+    /**
+     * Get the {@link Charset}.
+     * @return the {@link Charset}
+     */
     public Charset charset() {
         return (charset == null) ? StandardCharsets.UTF_8 : charset;
     }
 
-    public int bom() {
+    /**
+     * Get the byte order mark.
+     * @return byte order mark
+     */
+    public byte[] bom() {
         return bom;
     }
 
@@ -125,41 +164,41 @@ public class Reader {
         }
     }
 
-    private int checkBom(byte[] bytes) {
+    private byte[] checkBom(byte[] bytes) {
         if (bytes == null) {
-            return 0;
+            return new byte[0];
         } else if (bytes.length >= 3 &&
             (bytes[0] & 0xFF) == 0xef &&
             (bytes[1] & 0xFF) == 0xbb &&
             (bytes[2] & 0xFF) == 0xbf) {
             charset = StandardCharsets.UTF_8;
-            return 3;
+            return new byte[] { bytes[0], bytes[1], bytes[2] };
         } else if (bytes.length >= 2 &&
             (bytes[0] & 0xFF) == 0xfe &&
             (bytes[1] & 0xFF) == 0xff) {
             charset = StandardCharsets.UTF_16BE;
-            return 2;
+            return new byte[] { bytes[0], bytes[1] };
         } else if (bytes.length >= 4 &&
             (bytes[0] & 0xFF) == 0xff &&
             (bytes[1] & 0xFF) == 0xfe &&
-            (bytes[1] & 0xFF) == 0x00 &&
-            (bytes[1] & 0xFF) == 0x00) {
+            (bytes[2] & 0xFF) == 0x00 &&
+            (bytes[3] & 0xFF) == 0x00) {
             charset = Charset.forName("UTF_32LE");
-            return 4;
+            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] };
         } else if (bytes.length >= 2 &&
             (bytes[0] & 0xFF) == 0xff &&
             (bytes[1] & 0xFF) == 0xfe) {
             charset = StandardCharsets.UTF_16LE;
-            return 2;
+            return new byte[] { bytes[0], bytes[1] };
         } else if (bytes.length >= 4 &&
             (bytes[0] & 0xFF) == 0x00 &&
             (bytes[1] & 0xFF) == 0x00 &&
-            (bytes[1] & 0xFF) == 0xfe &&
-            (bytes[1] & 0xFF) == 0xff) {
+            (bytes[2] & 0xFF) == 0xfe &&
+            (bytes[3] & 0xFF) == 0xff) {
             charset = Charset.forName("UTF_32BE");
-            return 4;
+            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] };
         }
-        return 0;
+        return new byte[0];
     }
 
     private Charset checkCharset(byte[] bytes) {
