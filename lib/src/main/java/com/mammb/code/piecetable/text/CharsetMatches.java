@@ -104,6 +104,7 @@ public class CharsetMatches {
      */
     private static class Ms932Match implements CharsetMatch {
         private int confidence = 50;
+        private int trail = 0;
         @Override
         public Result put(byte[] bytes) {
             for (int i = 0; i < bytes.length; i++) {
@@ -115,12 +116,18 @@ public class CharsetMatches {
                 }
                 if ((0x81 <= b && b <= 0x9f) || b >= 0xe0) {
                     // double width
+                    trail = 1;
+                    if (i + 1 >= bytes.length) {
+                        break;
+                    }
+
                     int s = Byte.toUnsignedInt(bytes[++i]);
                     if ((0x40 <= s && s <= 0x7e) || (0x80 <= s && s <= 0xfc)) {
                         confidence = clamp(++confidence);
                     } else {
                         confidence = clamp(--confidence);
                     }
+                    trail = 0;
                 }
             }
             return new Result(Charset.forName("windows-31j"), confidence);

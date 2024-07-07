@@ -81,10 +81,34 @@ public interface Document {
     CharSequence getText(int row);
 
     /**
+     * Get the row size.
+     * @return the row size
+     */
+    int rows();
+
+    /**
      * Get the bytes length of this document holds.
      * @return the bytes length of this document holds
      */
     long length();
+
+    /**
+     * Get the charset.
+     * @return the charset
+     */
+    Charset charset();
+
+    /**
+     * Fet the path.
+     * @return the path
+     */
+    Path path();
+
+    /**
+     * Save this document.
+     * @param path the path
+     */
+    void save(Path path);
 
     /**
      * Create a new {@link Document}.

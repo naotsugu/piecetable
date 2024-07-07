@@ -154,13 +154,13 @@ public class PieceTableImpl implements PieceTable {
 
 
     @Override
-    public byte[] get(long offset, int len) {
+    public byte[] get(long pos, int len) {
 
-        PiecePoint[] range = range(offset, offset + len - 1);
+        PiecePoint[] range = range(pos, pos + len - 1);
         if (range.length == 0) return new byte[0];
 
         byte[] ret = new byte[len];
-        int start = Math.toIntExact(offset - range[0].position);
+        int start = Math.toIntExact(pos - range[0].position);
         int destPos = 0;
 
         for (PiecePoint pp : range) {
@@ -182,6 +182,18 @@ public class PieceTableImpl implements PieceTable {
     }
 
 
+    @Override
+    public void save(Path path) {
+        write(path);
+        pieces.clear();
+        appendBuffer.clear();
+        indices.clear();
+        var cb = ChannelBuffer.of(path);
+        pieces.add(new Piece(cb, 0, cb.length()));
+        length = cb.length();
+    }
+
+
     /**
      * Get the all bytes.
      * @return the all bytes
@@ -199,7 +211,7 @@ public class PieceTableImpl implements PieceTable {
      * Writes the contents of the PieceTable to the specified path.
      * @param path the specified path
      */
-    public void write(Path path) {
+    private void write(Path path) {
 
         try (FileChannel channel = FileChannel.open(path,
             StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {

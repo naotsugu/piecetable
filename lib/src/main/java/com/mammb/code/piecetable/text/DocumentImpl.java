@@ -28,12 +28,16 @@ public class DocumentImpl implements Document {
 
     /** The {@link PieceTable}. */
     private PieceTable pt;
+
     /** The {@link Path} of Document. */
     private Path path;
+
     /** The {@link Charset} of Document. */
     private Charset charset;
+
     /** The {@link RowIndex}. */
     private RowIndex index;
+
     /** The byte order mark. */
     private byte[] bom;
 
@@ -123,8 +127,32 @@ public class DocumentImpl implements Document {
 
 
     @Override
+    public int rows() {
+        return index.roeSize();
+    }
+
+
+    @Override
     public long length() {
         return pt.length() - bom.length;
+    }
+
+
+    @Override
+    public Charset charset() {
+        return charset;
+    }
+
+
+    @Override
+    public Path path() {
+        return path;
+    }
+
+
+    @Override
+    public void save(Path path) {
+        pt.save(path);
     }
 
 }

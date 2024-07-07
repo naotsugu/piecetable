@@ -68,17 +68,23 @@ public interface PieceTable {
 
     /**
      * Get the byte array of the specified range of this piece table.
-     * @param offset the start index of the range to be copied, inclusive
+     * @param pos the start index of the range to be copied, inclusive
      * @param len the length of the range to be copied
      * @return the byte array of the specified range of this piece table
      */
-    byte[] get(long offset, int len);
+    byte[] get(long pos, int len);
 
     /**
      * Get the length of bytes this piece table holds.
      * @return the length of bytes
      */
     long length();
+
+    /**
+     * Save this piece table.
+     * @param path the path
+     */
+    void save(Path path);
 
     /**
      * Get the default implementation of the piece table.

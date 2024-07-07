@@ -26,7 +26,7 @@ public class RowIndex {
 
     /** The row lengths. */
     private int[] rowLengths;
-    /** The length of line lengths array. */
+    /** The length of row lengths array. */
     private int length;
 
     /** The sub-total cache. */
@@ -220,6 +220,14 @@ public class RowIndex {
                 length - (row + 1 + lines));
             length -= lines;
         }
+    }
+
+    /**
+     * Get the size of rows.
+     * @return the size of rows
+     */
+    public int roeSize() {
+        return length;
     }
 
 
