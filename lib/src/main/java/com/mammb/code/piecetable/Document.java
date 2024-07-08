@@ -99,7 +99,7 @@ public interface Document {
     Charset charset();
 
     /**
-     * Fet the path.
+     * Get the path.
      * @return the path
      */
     Path path();
