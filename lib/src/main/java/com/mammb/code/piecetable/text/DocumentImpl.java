@@ -15,9 +15,11 @@
  */
 package com.mammb.code.piecetable.text;
 
+import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.PieceTable;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /**
@@ -46,14 +48,20 @@ public class DocumentImpl implements Document {
      * Constructor.
      * @param pt the {@link PieceTable}
      * @param path the {@link Path} of document
+     * @param reader the {@link Reader}
      */
-    DocumentImpl(PieceTable pt, Path path) {
+    DocumentImpl(PieceTable pt, Path path, Reader reader) {
         this.pt = pt;
         this.path = path;
-        var reader = Reader.of(path);
-        this.index = reader.index();
-        this.charset = reader.charset();
-        this.bom = reader.bom();
+        if (reader == null) {
+            this.index = RowIndex.of();
+            this.charset = StandardCharsets.UTF_8;
+            this.bom = new byte[0];
+        } else {
+            this.index = reader.index();
+            this.charset = reader.charset();
+            this.bom = reader.bom();
+        }
     }
 
 
@@ -62,17 +70,39 @@ public class DocumentImpl implements Document {
      * @return a new {@link Document}
      */
     public static DocumentImpl of() {
-        return new DocumentImpl(PieceTable.of(), null);
+        return new DocumentImpl(PieceTable.of(), null, null);
     }
 
 
     /**
      * Create a new {@link Document}.
-     * @param path the {@link Path} of document
+     * @param path the {@link Path} of the document
      * @return a new {@link Document}
      */
     public static DocumentImpl of(Path path) {
-        return new DocumentImpl(PieceTable.of(path), path);
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path));
+    }
+
+
+    /**
+     * Create a new {@link Document}.
+     * @param path the {@link Path} of the document
+     * @param charset the {@link Charset} of the document
+     * @return a new {@link Document}
+     */
+    public static DocumentImpl of(Path path, Charset charset) {
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, charset));
+    }
+
+
+    /**
+     * Create a new {@link Document}.
+     * @param path the {@link Path} of the document
+     * @param charsetMatches the {@link CharsetMatch}
+     * @return a new {@link Document}
+     */
+    public static DocumentImpl of(Path path, CharsetMatch... charsetMatches) {
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path,charsetMatches));
     }
 
 

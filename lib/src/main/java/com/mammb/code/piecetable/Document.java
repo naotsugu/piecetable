@@ -15,6 +15,7 @@
  */
 package com.mammb.code.piecetable;
 
+import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
@@ -115,7 +116,7 @@ public interface Document {
      * @return a new {@link Document}
      */
     static Document of() {
-        return Document.of();
+        return DocumentImpl.of();
     }
 
     /**
@@ -124,7 +125,7 @@ public interface Document {
      * @return a new {@link Document}
      */
     static Document of(Path path) {
-        return Document.of(path);
+        return DocumentImpl.of(path);
     }
 
     /**
@@ -134,7 +135,7 @@ public interface Document {
      * @return a new {@link Document}
      */
     static Document of(Path path, Charset charset) {
-        return Document.of(path, charset);
+        return DocumentImpl.of(path, charset);
     }
 
     /**
@@ -144,7 +145,7 @@ public interface Document {
      * @return a new {@link Document}
      */
     static Document of(Path path, CharsetMatch... charsetMatches) {
-        return Document.of(path, charsetMatches);
+        return DocumentImpl.of(path, charsetMatches);
     }
 
 }

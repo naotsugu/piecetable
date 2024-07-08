@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.text;
+package com.mammb.code.piecetable;
 
-import com.mammb.code.piecetable.PieceTable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -27,26 +26,20 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * The test of {@link DocumentImpl}.
+ * The test of {@link Document}.
  * @author Naotsugu Kobayashi
  */
-class DocumentImplTest {
+class DocumentTest {
 
     @Test
-    void utf16(@TempDir Path tempDir) throws IOException {
+    void test(@TempDir Path tempDir) throws IOException {
+        var path = tempDir.resolve("test.txt");
+        Files.writeString(path, "ab\ncd");
+        var doc = Document.of(path);
+        doc.insert(1, 2, "\nef");
 
-        var file = tempDir.resolve("file.txt");
-        Files.write(file, "a\nbc\ndef\n".getBytes(StandardCharsets.UTF_16));
+        assertEquals("ab\n", doc.getText(0));
+        assertEquals("d", doc.getText(1, 1, 1));
 
-        var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
-
-        doc.insert(0, 0, "0");
-        assertEquals("0a\n", doc.getText(0));
-
-        doc.insert(1, 0, "1");
-        assertEquals("1bc\n", doc.getText(1));
-
-        doc.insert(2, 0, "2");
-        assertEquals("2def\n", doc.getText(2));
     }
 }
