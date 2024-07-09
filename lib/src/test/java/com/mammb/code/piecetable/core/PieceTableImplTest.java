@@ -55,6 +55,8 @@ class PieceTableImplTest {
 
         assertEquals("abcdef", new String(pieceTable.get(0, 6)));
         assertEquals("bcdef", new String(pieceTable.get(1, 5)));
+        assertEquals("cde", new String(pieceTable.get(2, 3)));
+        assertEquals("def", new String(pieceTable.get(3, 3)));
         assertEquals("abcde", new String(pieceTable.get(0, 5)));
 
 

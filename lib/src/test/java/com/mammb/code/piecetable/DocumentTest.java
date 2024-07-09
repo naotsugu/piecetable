@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DocumentTest {
 
     @Test
-    void test(@TempDir Path tempDir) throws IOException {
+    void simpleText(@TempDir Path tempDir) throws IOException {
         var path = tempDir.resolve("test.txt");
         Files.writeString(path, "ab\ncd");
         var doc = Document.of(path);
@@ -42,4 +42,20 @@ class DocumentTest {
         assertEquals("d", doc.getText(1, 1, 1));
 
     }
+
+    @Test
+    void bomText(@TempDir Path tempDir) throws IOException {
+        var path = tempDir.resolve("test.txt");
+        Files.write(path, new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF, 0x61, 0x62, 0x0a, 0x63, 0x64});
+
+        var doc = Document.of(path);
+        doc.insert(1, 2, "\nef");
+
+        assertEquals("ab\n", doc.getText(0));
+        assertEquals("d", doc.getText(1, 1, 1));
+
+    }
+
+
+
 }
