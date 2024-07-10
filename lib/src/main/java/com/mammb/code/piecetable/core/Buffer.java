@@ -33,6 +33,7 @@ public interface Buffer {
      */
     byte get(long index);
 
+
     /**
      * Get the byte array at the specified index.
      * @param startIndex the start raw index of the byte value
@@ -41,11 +42,13 @@ public interface Buffer {
      */
     byte[] bytes(long startIndex, long endIndex);
 
+
     /**
      * Get the length of buffer.
      * @return the count of bytes
      */
     long length();
+
 
     /**
      * Get whether this buffer is empty.
