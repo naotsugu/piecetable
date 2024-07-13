@@ -20,7 +20,23 @@ package com.mammb.code.piecetable;
  * @author Naotsugu Kobayashi
  */
 public interface Found {
+
+    /**
+     * The number of row(zero origin)
+     * @return the number of row
+     */
     int row();
+
+    /**
+     * The byte position on the row
+     * @return the byte position on the row
+     */
     int col();
+
+    /**
+     * The byte length
+     * @return the byte length
+     */
     int len();
+
 }
