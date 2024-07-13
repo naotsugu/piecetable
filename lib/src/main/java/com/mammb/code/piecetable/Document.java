@@ -18,6 +18,7 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * The document.
@@ -80,6 +81,13 @@ public interface Document {
      * @return the char sequence of the specified row
      */
     CharSequence getText(int row);
+
+    /**
+     * Searches for the specified char sequence.
+     * @param cs the specified char sequence
+     * @return found list
+     */
+    List<Found> findAll(CharSequence cs);
 
     /**
      * Get the row size.

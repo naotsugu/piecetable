@@ -17,26 +17,9 @@ package com.mammb.code.piecetable;
 
 /**
  * The found.
+ * @param row the number of row
+ * @param col the byte position on the row
+ * @param len the byte length
  * @author Naotsugu Kobayashi
  */
-public interface Found {
-
-    /**
-     * The number of row(zero origin)
-     * @return the number of row
-     */
-    int row();
-
-    /**
-     * The byte position on the row
-     * @return the byte position on the row
-     */
-    int col();
-
-    /**
-     * The byte length
-     * @return the byte length
-     */
-    int len();
-
-}
+public record Found(int row, int col, int len) { }

@@ -17,10 +17,13 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.PieceTable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The document implementation.
@@ -155,6 +158,10 @@ public class DocumentImpl implements Document {
         return new String(get(row), charset);
     }
 
+    @Override
+    public List<Found> findAll(CharSequence cs) {
+        return search(cs, 0, 0, Short.MAX_VALUE);
+    }
 
     @Override
     public int rows() {
@@ -183,6 +190,41 @@ public class DocumentImpl implements Document {
     @Override
     public void save(Path path) {
         pt.save(path);
+    }
+
+
+    private List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
+
+        List<Found> founds = new ArrayList<>();
+        byte[] str = cs.toString().getBytes(charset);
+        byte first = str[0];
+
+        for (int row = fromRow; row < rows(); row++) {
+            byte[] value = get(row);
+            int max = value.length - str.length;
+            int colOffset = (row == fromRow) ? fromCol : 0;
+            for (int col = colOffset; col <= max; col++) {
+                // look for first character
+                if (value[col] != first) {
+                    while (++col <= max && value[col] != first);
+                }
+                // found first character, now look at the rest of value
+                if (col <= max) {
+                    int j = col + 1;
+                    int end = j + str.length - 1;
+                    for (int k = 1; j < end && value[j] == str[k]; j++, k++);
+                    if (j == end) {
+                        // found whole charSequence
+                        founds.add(new Found(row, col, str.length));
+                        if (founds.size() >= maxFound) {
+                            return founds;
+                        }
+                        col += str.length;
+                    }
+                }
+            }
+        }
+        return founds;
     }
 
 }
