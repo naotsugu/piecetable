@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The document implementation.
@@ -161,6 +162,11 @@ public class DocumentImpl implements Document {
     @Override
     public List<Found> findAll(CharSequence cs) {
         return search(cs, 0, 0, Short.MAX_VALUE);
+    }
+
+    @Override
+    public Optional<Found> findNext(CharSequence cs, int row, int col) {
+        return search(cs, 0, 0, Short.MAX_VALUE).stream().findFirst();
     }
 
     @Override
