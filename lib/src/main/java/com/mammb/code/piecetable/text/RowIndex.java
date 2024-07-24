@@ -226,7 +226,7 @@ public class RowIndex {
      * Get the size of rows.
      * @return the size of rows
      */
-    public int roeSize() {
+    public int rowSize() {
         return length;
     }
 

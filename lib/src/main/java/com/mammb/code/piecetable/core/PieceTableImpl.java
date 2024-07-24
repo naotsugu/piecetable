@@ -156,6 +156,7 @@ public class PieceTableImpl implements PieceTable {
     @Override
     public byte[] get(long pos, int len) {
 
+        if (len <= 0) return new byte[0];
         PiecePoint[] range = range(pos, pos + len - 1);
         if (range.length == 0) return new byte[0];
 

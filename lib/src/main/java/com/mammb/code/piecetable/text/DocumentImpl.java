@@ -171,7 +171,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public int rows() {
-        return index.roeSize();
+        return index.rowSize();
     }
 
 
