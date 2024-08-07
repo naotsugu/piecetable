@@ -141,11 +141,11 @@ public class PieceTableImpl implements PieceTable {
         indices.tailMap(from.position).clear();
 
         // derive the split pieces
-        PiecePoint to = range.length > 1 ? range[range.length - 1] : null;
-        if (to != null && to.endPosition() < pos + len) {
+        PiecePoint to = range[range.length - 1];
+        if (to.endPosition() != pos + len) {
             pieces.add(from.tableIndex, to.piece.split(pos + len - to.position)[1]);
         }
-        if (from.position < pos) {
+        if (from.position != pos) {
             pieces.add(from.tableIndex, from.piece.split(pos - from.position)[0]);
         }
 
@@ -236,7 +236,6 @@ public class PieceTableImpl implements PieceTable {
         // 0  |x|x|x|  length:3
         // 3  |x|x|    length:2
         // 5  |x|x|    length:2
-
         PiecePoint piecePoint = Optional.ofNullable(indices.floorEntry(pos))
                     .map(Map.Entry::getValue).orElse(null);
         if (piecePoint == null) {
@@ -256,9 +255,9 @@ public class PieceTableImpl implements PieceTable {
         PiecePoint pp = at(startPos);
         PiecePoint to = at(endPos);
         PiecePoint[] org = new PiecePoint[to.tableIndex - pp.tableIndex + 1];
-        for (int i = 0; i < org.length; i++) {
-            org[i] = pp;
-            pp = at(pp.endPosition());
+        org[0] = pp;
+        for (int i = 1; i < org.length; i++) {
+            org[i] = pp = at(pp.endPosition());;
         }
         return org;
     }

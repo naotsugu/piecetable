@@ -33,10 +33,28 @@ import static org.junit.jupiter.api.Assertions.*;
 class DocumentImplTest {
 
     @Test
+    void utf8(@TempDir Path tempDir) throws IOException {
+
+        var file = tempDir.resolve("file.txt");
+        Files.write(file, "a\nb\nc\n".getBytes(StandardCharsets.UTF_8));
+        // |a|$|
+        // |b|$|
+        // |c|$|
+
+        var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
+
+        assertEquals("b\n", doc.getText(1));
+        doc.delete(1, 0, 1);
+        assertEquals("\n", doc.getText(1));
+        doc.insert(1, 0, "b");
+        assertEquals("b\n", doc.getText(1));
+    }
+
+    @Test
     void utf16(@TempDir Path tempDir) throws IOException {
 
         var file = tempDir.resolve("file.txt");
-        Files.write(file, "a\nbc\ndef\n".getBytes(StandardCharsets.UTF_16));
+        Files.write(file, "a\nbc\ndef\n".getBytes(StandardCharsets.UTF_16)); // contains bom
 
         var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
 
@@ -49,4 +67,5 @@ class DocumentImplTest {
         doc.insert(2, 0, "2");
         assertEquals("2def\n", doc.getText(2));
     }
+
 }
