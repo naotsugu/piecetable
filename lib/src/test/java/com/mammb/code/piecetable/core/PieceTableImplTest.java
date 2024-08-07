@@ -28,36 +28,127 @@ class PieceTableImplTest {
     @Test
     void edit() {
 
-        var pieceTable = PieceTableImpl.of();
+        var pt = PieceTableImpl.of();
 
-        pieceTable.insert(0, "ac".getBytes());
-        pieceTable.insert(1, "b".getBytes());
-        assertEquals("abc", new String(pieceTable.bytes()));
+        pt.insert(0, "ac".getBytes());
+        pt.insert(1, "b".getBytes());
+        assertEquals("abc", new String(pt.bytes()));
 
-        pieceTable.delete(1, 1);
-        assertEquals("ac", new String(pieceTable.bytes()));
+        pt.delete(1, 1);
+        assertEquals("ac", new String(pt.bytes()));
 
-        pieceTable.delete(1, 1);
-        assertEquals("a", new String(pieceTable.bytes()));
+        pt.delete(1, 1);
+        assertEquals("a", new String(pt.bytes()));
 
-        pieceTable.delete(0, 1);
-        assertEquals("", new String(pieceTable.bytes()));
+        pt.delete(0, 1);
+        assertEquals("", new String(pt.bytes()));
     }
 
+    @Test
+    void deleteWithSinglePiece() {
+
+        var pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.delete(0, 1);
+        assertEquals("bc", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.delete(1, 1);
+        assertEquals("ac", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.delete(2, 1);
+        assertEquals("ab", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.delete(0, 2);
+        assertEquals("c", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.delete(1, 2);
+        assertEquals("a", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.delete(0, 3);
+        assertEquals("def", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.delete(3, 3);
+        assertEquals("abc", new String(pt.bytes()));
+    }
+
+    @Test
+    void deleteWithSomePiece() {
+
+        var pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.delete(0, 4);
+        assertEquals("ef", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.delete(1, 4);
+        assertEquals("af", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.insert(6, "ghi".getBytes());
+        pt.delete(0, 5);
+        assertEquals("fghi", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.insert(6, "ghi".getBytes());
+        pt.delete(1, 5);
+        assertEquals("aghi", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.insert(6, "ghi".getBytes());
+        pt.delete(2, 5);
+        assertEquals("abhi", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.insert(6, "ghi".getBytes());
+        pt.delete(3, 5);
+        assertEquals("abci", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "def".getBytes());
+        pt.insert(6, "ghi".getBytes());
+        pt.delete(4, 5);
+        assertEquals("abcd", new String(pt.bytes()));
+    }
 
     @Test
     void get() {
 
-        var pieceTable = PieceTableImpl.of();
-        pieceTable.insert(0, "ab".getBytes());
-        pieceTable.insert(2, "cd".getBytes());
-        pieceTable.insert(4, "ef".getBytes());
+        var pt = PieceTableImpl.of();
+        pt.insert(0, "ab".getBytes());
+        pt.insert(2, "cd".getBytes());
+        pt.insert(4, "ef".getBytes());
 
-        assertEquals("abcdef", new String(pieceTable.get(0, 6)));
-        assertEquals("bcdef", new String(pieceTable.get(1, 5)));
-        assertEquals("cde", new String(pieceTable.get(2, 3)));
-        assertEquals("def", new String(pieceTable.get(3, 3)));
-        assertEquals("abcde", new String(pieceTable.get(0, 5)));
+        assertEquals("abcdef", new String(pt.get(0, 6)));
+        assertEquals("bcdef", new String(pt.get(1, 5)));
+        assertEquals("cde", new String(pt.get(2, 3)));
+        assertEquals("def", new String(pt.get(3, 3)));
+        assertEquals("abcde", new String(pt.get(0, 5)));
 
 
     }

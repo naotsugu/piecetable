@@ -131,9 +131,9 @@ public class PieceTableImpl implements PieceTable {
         }
 
         PiecePoint[] range = range(pos, pos + len - 1);
-        for (PiecePoint del : range) {
+        for (int i = range.length - 1; i >= 0; i--) {
             // remove all pieces of range
-            pieces.remove(del.tableIndex);
+            pieces.remove(range[i].tableIndex);
         }
 
         // disable indices
