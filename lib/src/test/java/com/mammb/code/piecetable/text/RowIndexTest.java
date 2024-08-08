@@ -138,6 +138,9 @@ class RowIndexTest {
         assertEquals(2, index.rowLengths().length);
         assertEquals(3, index.rowLengths()[0]);
         assertEquals(0, index.rowLengths()[1]);
+        index.delete(0, 0, 3);
+        assertEquals(1, index.rowLengths().length);
+        assertEquals(0, index.rowLengths()[0]);
     }
 
     @Test

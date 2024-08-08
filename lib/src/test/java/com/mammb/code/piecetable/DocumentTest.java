@@ -61,6 +61,8 @@ class DocumentTest {
 
         var doc = Document.of();
         int row = 0;
+        assertEquals("", doc.getText(row));
+
         doc.insert(row, 0, "a large text");
         doc.insert(row, 8, "span of ");
         doc.delete(row, 1, 6);
