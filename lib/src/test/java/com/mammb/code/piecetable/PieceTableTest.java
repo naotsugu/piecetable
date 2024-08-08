@@ -15,6 +15,7 @@
  */
 package com.mammb.code.piecetable;
 
+import com.mammb.code.piecetable.core.PieceTableImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -47,4 +48,14 @@ class PieceTableTest {
 
     }
 
+    @Test
+    void test() {
+        var pt = PieceTable.of();
+        pt.insert(0, "a large text".getBytes());
+        pt.insert(8, "span of ".getBytes());
+        pt.delete(1, 6);
+
+        var bytes = pt.get(0, (int) pt.length());
+        assertEquals("a span of text", new String(bytes));
+    }
 }

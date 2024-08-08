@@ -44,6 +44,63 @@ Single character deletion can be one of two possible conditions:
 ![piecetable3](docs/images/piecetable3.png)
 
 
+## Usage
+
+There are two classes.
+
+- PieceTable - Text manipulation with byte
+- Document - Text manipulation with row-column number and charset infer
+
+### PieceTable
+
+```java
+var pt = PieceTable.of();
+
+pt.insert(0, "a large text".getBytes());
+pt.insert(8, "span of ".getBytes());
+pt.delete(1, 6);
+
+var bytes = pt.get(0, (int) pt.length());
+assertEquals("a span of text", new String(bytes));
+```
+
+
+### Document
+
+```java
+var doc = Document.of();
+
+doc.insert(0, 0, "a large text"); // row:0 col:0
+doc.insert(0, 8, "span of ");     // row:0 col:8
+doc.delete(0, 1, 6);              // row:0 col:1
+
+var text = doc.getText(0);        // get the text of row:0
+assertEquals("a span of text", text);
+```
+
+
+To load an existing file, use the following
+
+```java
+var path = Path.of("sample.txt");
+var doc = Document.of(path);
+```
+
+
+The charset is inferred from the loaded file, but can also be specified explicitly.
+
+```java
+var doc = Document.of(path, Charset.forName("xxx"));
+```
+
+`CharsetMatch` can also be used to customize charset infer.
+
+```java
+CharsetMatch customCharsetMatch = // ...
+var doc = Document.of(path, customCharsetMatch);
+```
+
+
 ## Sample applications using this library
 
 * [min-editor](https://github.com/naotsugu/min-editor)

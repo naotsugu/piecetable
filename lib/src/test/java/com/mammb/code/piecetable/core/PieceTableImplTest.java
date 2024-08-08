@@ -45,6 +45,30 @@ class PieceTableImplTest {
     }
 
     @Test
+    void insert() {
+
+        var pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(0, "123".getBytes());
+        assertEquals("123abc", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(1, "123".getBytes());
+        assertEquals("a123bc", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(2, "123".getBytes());
+        assertEquals("ab123c", new String(pt.bytes()));
+
+        pt = PieceTableImpl.of();
+        pt.insert(0, "abc".getBytes());
+        pt.insert(3, "123".getBytes());
+        assertEquals("abc123", new String(pt.bytes()));
+    }
+
+    @Test
     void deleteWithSinglePiece() {
 
         var pt = PieceTableImpl.of();

@@ -140,6 +140,12 @@ public class RowIndex {
      * @param bytes the specified byte array to be inserted
      */
     public void insert(int row, int col, byte[] bytes) {
+
+        if (length == 0 && cacheLength == 0) {
+            add(bytes);
+            return;
+        }
+
         int[] rows = rows(bytes);
         if (rows.length == 0) {
             return;
@@ -157,7 +163,7 @@ public class RowIndex {
 
         } else {
 
-            // insert operation across multiple rowss
+            // insert operation across multiple rows
             System.arraycopy(rowLengths, row + 1,
                 rowLengths, row + rows.length,
                 length - (row + 1));
