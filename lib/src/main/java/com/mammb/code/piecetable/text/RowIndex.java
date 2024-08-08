@@ -20,6 +20,17 @@ import java.util.Arrays;
 /**
  * The RowIndex.
  * Holds the byte length of each row as an index.
+ * <p>
+ * <pre>
+ *     |0|1|2|3|4|5|
+ *  0|  a b $         rowLengths[0] = 3     stCache[0] = 0
+ *  1|  c d e $       rowLengths[1] = 4
+ *  2|  f g h i $     rowLengths[2] = 5
+ *  3|  1 $           rowLengths[3] = 2
+ *  4|  1 2 $         rowLengths[4] = 3
+ *  5|  1 2 3 $       rowLengths[5] = 4     stCache[1] = 17
+ * </pre>
+ * </p>
  * @author Naotsugu Kobayashi
  */
 public class RowIndex {
@@ -141,7 +152,7 @@ public class RowIndex {
      */
     public void insert(int row, int col, byte[] bytes) {
 
-        if (length == 0 && cacheLength == 0) {
+        if (length == 0) {
             add(bytes);
             return;
         }
