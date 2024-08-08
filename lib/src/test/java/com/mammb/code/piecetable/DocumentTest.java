@@ -58,15 +58,20 @@ class DocumentTest {
 
     @Test
     void test() {
+
         var doc = Document.of();
         int row = 0;
         doc.insert(row, 0, "a large text");
         doc.insert(row, 8, "span of ");
         doc.delete(row, 1, 6);
+        assertEquals("a span of text", doc.getText(row));
 
-        var text = doc.getText(row);
-        assertEquals("a span of text", text);
+        doc.delete(row, 0, 14);
+        assertEquals("", doc.getText(row));
+
     }
+
+
 
 
 }

@@ -20,7 +20,6 @@ import java.util.Arrays;
 /**
  * The RowIndex.
  * Holds the byte length of each row as an index.
- * <p>
  * <pre>
  *     |0|1|2|3|4|5|
  *  0|  a b $         rowLengths[0] = 3     stCache[0] = 0
@@ -30,7 +29,6 @@ import java.util.Arrays;
  *  4|  1 2 $         rowLengths[4] = 3
  *  5|  1 2 3 $       rowLengths[5] = 4     stCache[1] = 17
  * </pre>
- * </p>
  * @author Naotsugu Kobayashi
  */
 public class RowIndex {
@@ -231,11 +229,13 @@ public class RowIndex {
 
             rowLengths[row] += (-len); // merge the rest to the first row
 
-            System.arraycopy(
-                rowLengths, row + 1 + lines,
-                rowLengths, row + 1,
-                length - (row + 1 + lines));
-            length -= lines;
+            if (length > 1) {
+                System.arraycopy(
+                    rowLengths, row + 1 + lines,
+                    rowLengths, row + 1,
+                    length - (row + 1 + lines));
+                length -= lines;
+            }
         }
     }
 
