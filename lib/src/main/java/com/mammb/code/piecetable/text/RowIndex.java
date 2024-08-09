@@ -23,10 +23,10 @@ import java.util.Arrays;
  * <pre>
  *     |0|1|2|3|4|5|
  *  0|  a b $         rowLengths[0] = 3     stCache[0] = 0
- *  1|  c d e $       rowLengths[1] = 4
- *  2|  f g h i $     rowLengths[2] = 5
- *  3|  1 $           rowLengths[3] = 2
- *  4|  1 2 $         rowLengths[4] = 3
+ *  1|  c d e $       rowLengths[1] = 4           ^
+ *  2|  f g h i $     rowLengths[2] = 5           |
+ *  3|  1 $           rowLengths[3] = 2      cacheInterval = 5
+ *  4|  1 2 $         rowLengths[4] = 3           |
  *  5|  1 2 3 $       rowLengths[5] = 4     stCache[1] = 17
  * </pre>
  * @author Naotsugu Kobayashi
