@@ -48,7 +48,7 @@ Single character deletion can be one of two possible conditions:
 
 There are two classes.
 
-- PieceTable - Text manipulation with byte
+- PieceTable - Plain piece table implantation by bytes
 - Document - Text manipulation with row-column number and charset infer
 
 ### PieceTable
