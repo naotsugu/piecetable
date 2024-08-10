@@ -39,8 +39,8 @@ sealed interface Edit {
      */
     default Edit flip() {
         return switch (this) {
-            case Ins e -> new Del(e.range.flip(), e.text, e.occurredOn);
-            case Del e -> new Ins(e.range.flip(), e.text, e.occurredOn);
+            case Ins e -> new Del(e.range, e.text, e.occurredOn);
+            case Del e -> new Ins(e.range, e.text, e.occurredOn);
             case Cmp e -> {
                 List<Edit> flipped = e.edits.stream().map(Edit::flip).collect(Collectors.toList());
                 Collections.reverse(flipped);
