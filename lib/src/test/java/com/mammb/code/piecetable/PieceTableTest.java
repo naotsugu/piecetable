@@ -15,15 +15,13 @@
  */
 package com.mammb.code.piecetable;
 
-import com.mammb.code.piecetable.core.PieceTableImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * The test of {@link PieceTable}.

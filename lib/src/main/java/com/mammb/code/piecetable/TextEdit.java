@@ -18,12 +18,30 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * The text edit.
  * @author Naotsugu Kobayashi
  */
 public interface TextEdit {
+
+    void insert(int row, int col, String text);
+
+    void delete(int row, int col, int len);
+
+    void backspace(int row, int col, int len);
+
+    String getText(int row);
+
+    List<Pos> undo();
+
+    List<Pos> redo();
+
+    void flush();
+
+    void clear();
+
 
     /**
      * Create a new {@link TextEdit}.
@@ -51,32 +69,7 @@ public interface TextEdit {
         return new TextEditImpl(document);
     }
 
-    /**
-     * |0|1|2|3|4|
-     *   ^ 1..-1
-     *
-     * |0|1|2|3|4|
-     *   ^^^^^^ 1..4
-     * @param fromRow
-     * @param fromCol
-     * @param toRow
-     * @param toCol
-     * @param left
-     */
-    record Range(int fromRow, int fromCol, int toRow, int toCol, boolean left) {
-        public Range {
-            if (fromRow < 0 || fromCol < 0 || toRow < 0 || toCol < 0)
-                throw new IllegalArgumentException(String.format("(%d, %d)(%d, %d)", fromRow, fromCol, toRow, toCol));
-        }
 
-        public static Range leftOf(int row, int col) { return new Range(row, col, row, col, true); }
-        public static Range rightOf(int row, int col) { return new Range(row, col, row, col, false); }
-
-        public Range flip() { return new Range(fromRow, fromCol, toRow, toCol, !left); }
-        public int row() { return fromRow; }
-        public int col() { return fromCol; }
-        public boolean right() { return !left; }
-        public boolean mono() { return fromRow == toRow && fromCol == toCol; }
-    }
+    record Pos(int row, int col) { }
 
 }

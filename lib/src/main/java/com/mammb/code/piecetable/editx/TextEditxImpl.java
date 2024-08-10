@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.edit;
+package com.mammb.code.piecetable.editx;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.TextEdit;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import com.mammb.code.piecetable.TextEditx;
 
 /**
  * The document edit.
  * @author Naotsugu Kobayashi
  */
-public class TextEditImpl implements TextEdit {
+public class TextEditxImpl implements TextEditx {
 
     /** The edit queue. */
     private final Deque<Edit> deque = new ArrayDeque<>();
@@ -49,99 +48,24 @@ public class TextEditImpl implements TextEdit {
      * Constructor.
      * @param doc the source document
      */
-    public TextEditImpl(Document doc) {
+    public TextEditxImpl(Document doc) {
         this.doc = doc;
     }
 
     @Override
     public void insert(int row, int col, String text) {
-        Edit e;
-        int index = text.lastIndexOf('\n');
-        if (index < 0) {
-            e = new Edit.Ins(
-                new Pos(row, col),
-                new Pos(row, col + text.length()),
-                text,
-                System.currentTimeMillis());
-        } else {
-            int nRow = row + (int) text.chars().mapToLong(c -> c == '\n' ? 1 : 0).sum();
-            int nCol = text.substring(index + 1).length();
-            e = new Edit.Ins(
-                new Pos(row, col),
-                new Pos(nRow, nCol),
-                text,
-                System.currentTimeMillis());
-        }
-        push(e);
+        push(Edit.insert(row, col, text));
     }
 
     @Override
     public void delete(int row, int col, int len) {
-        String rowText = getText(row);
-        Edit e;
-        if (rowText.length() > col + len) {
-            e = new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col),
-                rowText.substring(col, col + len),
-                System.currentTimeMillis());
-        } else {
-            StringBuilder sb = new StringBuilder(rowText.substring(col));
-            int nRow = row + 1;
-            for (;;) {
-                rowText = getText(nRow);
-                if (len - rowText.length() <= 0) {
-                    sb.append(rowText.substring(0, len));
-                    break;
-                }
-                len -= rowText.length();
-                nRow++;
-                sb.append(rowText);
-            }
-            e = new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col),
-                sb.toString(),
-                System.currentTimeMillis());
-        }
-        push(e);
+        push(Edit.delete(row, col, getText(row).substring(col, col + len)));
     }
 
     @Override
     public void backspace(int row, int col, int len) {
-        String rowText = getText(row);
-        Edit e;
-        if (col - len >= 0) {
-            e = new Edit.Del(
-                new Pos(row, col - len),
-                new Pos(row, col),
-                rowText.substring(col - len, len),
-                System.currentTimeMillis());
-        } else {
-            StringBuilder sb = new StringBuilder(rowText.substring(0, col));
-            int nRow = row - 1;
-            int nCol;
-            len -= col;
-            for (;;) {
-                rowText = getText(nRow);
-                if (len - rowText.length() <= 0) {
-                    nCol = rowText.length() - len;
-                    sb.insert(0, rowText.substring(nCol));
-                    break;
-                }
-                len -= rowText.length();
-                nRow--;
-                sb.insert(0, rowText);
-            }
-            e = new Edit.Del(
-                new Pos(row, col),
-                new Pos(nRow, nCol),
-                sb.toString(),
-                System.currentTimeMillis());
-        }
-        push(e);
+        push(Edit.backspace(row, col, getText(row).substring(col - len, col)));
     }
-
 
     @Override
     public String getText(int row) {
@@ -155,15 +79,15 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public List<Pos> undo() {
+    public Optional<Range> undo() {
         Optional<Edit> e = undoEdit();
-        return List.of();
+        return Optional.empty();
     }
 
     @Override
-    public List<Pos> redo() {
+    public Optional<Range> redo() {
         Optional<Edit> e = redoEdit();
-        return List.of();
+        return Optional.empty();
     }
 
     @Override
@@ -229,9 +153,11 @@ public class TextEditImpl implements TextEdit {
     }
 
     private void apply(Edit edit) {
+System.out.println("  " + edit);
         switch (edit) {
-            case Edit.Ins e -> doc.insert(e.min().row(), e.min().col(), e.text());
-            case Edit.Del e -> doc.delete(e.min().row(), e.min().col(), e.text().length());
+            case Edit.Ins e -> doc.insert(e.range().row(), e.range().col(), e.text());
+            case Edit.Del e when e.range().right() -> doc.delete(e.range().row(), e.range().col(), e.text().length());
+            case Edit.Del e -> doc.delete(e.range().row(), e.range().col() - e.text().length(), e.text().length());
             case Edit.Cmp e -> e.edits().forEach(this::apply);
         }
     }
@@ -244,20 +170,24 @@ public class TextEditImpl implements TextEdit {
     private void dryApply(Edit edit) {
         switch (edit) {
             case Edit.Ins e -> {
-                String row = dryBuffer.get(e.from().row());
+                String row = dryBuffer.get(e.range().row());
                 if (row == null) {
-                    row = doc.getText(e.from().row()).toString();
+                    row = doc.getText(e.range().row()).toString();
                 }
-                row = row.substring(0, e.min().col()) + e.text() + row.substring(e.min().col());
-                dryBuffer.put(e.from().row(), row);
+                row = row.substring(0, e.range().col()) + e.text() + row.substring(e.range().col());
+                dryBuffer.put(e.range().row(), row);
             }
             case Edit.Del e -> {
-                String row = dryBuffer.get(e.from().row());
+                String row = dryBuffer.get(e.range().row());
                 if (row == null) {
-                    row = doc.getText(e.from().row()).toString();
+                    row = doc.getText(e.range().row()).toString();
                 }
-                row = row.substring(0, e.min().col()) + row.substring(e.min().col() + e.text().length());
-                dryBuffer.put(e.from().row(), row);
+                if (e.range().left()) {
+                    row = row.substring(0, e.range().col() - e.text().length()) + row.substring(e.range().col());
+                } else {
+                    row = row.substring(0, e.range().col()) + row.substring(e.range().col() + e.text().length());
+                }
+                dryBuffer.put(e.range().row(), row);
             }
             case Edit.Cmp e -> e.edits().forEach(this::dryApply);
         }

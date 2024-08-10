@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.edit;
+package com.mammb.code.piecetable.editx;
 
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +57,7 @@ class EditTest {
         var e = (Edit.Del) Edit.insert(0, 0, "a").flip();
         assertEquals(e.range().row(), 0);
         assertEquals(e.range().col(), 0);
-        assertTrue(e.range().left());
+        assertTrue(e.range().right());
         assertEquals(e.text(), "a");
     }
 
