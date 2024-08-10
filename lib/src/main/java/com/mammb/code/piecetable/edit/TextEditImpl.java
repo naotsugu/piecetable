@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.edit;
 import com.mammb.code.piecetable.Document;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 import com.mammb.code.piecetable.TextEdit;
 
 /**
@@ -43,40 +44,61 @@ public class TextEditImpl implements TextEdit {
         this.doc = doc;
     }
 
+    /**
+     * Push the edit.
+     * @param edit the edit
+     */
+    public void push(Edit edit) {
+        Edit last = deque.peekLast();
+        if (last != null) {
+            Optional<Edit> merge = last.merge(edit);
+            if (merge.isPresent()) {
+                deque.removeLast();
+                edit = merge.get();
+            }
+        }
+        if (!deque.isEmpty()) {
+            flush();
+        }
+        deque.push(edit);
+        //if (edit.acrossRows()) {
+        //    flush();
+        //}
+    }
+
     public void flush() {
         while (!deque.isEmpty()) {
             Edit edit = deque.pop();
-            if (edit == Edit.empty) continue;
             apply(edit);
             undo.push(edit.flip());
             redo.clear();
         }
     }
 
-    public Edit undo() {
+    public Optional<Edit> undo() {
         flush();
-        if (undo.isEmpty()) return Edit.empty;
+        if (undo.isEmpty()) return Optional.empty();
         Edit edit = undo.pop();
         apply(edit);
         redo.push(edit.flip());
-        return edit;
+        return Optional.of(edit);
     }
 
-    public Edit redo() {
+    public Optional<Edit> redo() {
         flush();
-        if (redo.isEmpty()) return Edit.empty;
+        if (redo.isEmpty()) return Optional.empty();
         Edit edit = redo.pop();
         apply(edit);
         undo.push(edit.flip());
-        return edit;
+        return Optional.of(edit);
     }
 
     private void apply(Edit edit) {
         switch (edit) {
-            case Edit.Ins ins -> doc.insert(ins.row(), ins.col(), ins.text());
-            case Edit.Del del -> doc.delete(del.row(), del.col(), del.text().length());
+            case Edit.Ins e -> doc.insert(e.range().row(), e.range().col(), e.text());
+            case Edit.Del e when e.range().right() -> doc.delete(e.range().row(), e.range().col(), e.text().length());
+            case Edit.Del e when e.range().left()  -> doc.delete(e.range().row(), e.range().col() - e.text().length(), e.text().length());
             default -> { }
         }
     }
-
 }

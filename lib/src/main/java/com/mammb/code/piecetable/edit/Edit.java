@@ -15,23 +15,17 @@
  */
 package com.mammb.code.piecetable.edit;
 
+import com.mammb.code.piecetable.TextEdit;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * The edit.
  * @author Naotsugu Kobayashi
  */
-public sealed interface Edit {
-
-    /**
-     * Get the number of row(zero origin).
-     * @return the number of row(zero origin)
-     */
-    int row();
-
-    /**
-     * Get the byte position on the row where the char sequence is to be edited.
-     * @return the byte position on the row
-     */
-    int col();
+sealed interface Edit {
 
     /**
      * Get the occurrence time of this edit.
@@ -45,29 +39,91 @@ public sealed interface Edit {
      */
     default Edit flip() {
         return switch (this) {
-            case Insert e -> new Delete(e.row(), e.col(), e.text(), e.occurredOn());
-            case Delete e -> new Insert(e.row(), e.col(), e.text(), e.occurredOn());
-            case BsInsert e -> new BsDelete(e.row(), e.col(), e.text(), e.occurredOn());
-            case BsDelete e -> new BsInsert(e.row(), e.col(), e.text(), e.occurredOn());
-            default -> empty;
+            case Ins e -> new Del(e.range.flip(), e.text, e.occurredOn);
+            case Del e -> new Ins(e.range.flip(), e.text, e.occurredOn);
+            case Cmp e -> {
+                List<Edit> flipped = e.edits.stream().map(Edit::flip).collect(Collectors.toList());
+                Collections.reverse(flipped);
+                yield new Cmp(flipped, e.occurredOn);
+            }
         };
     }
 
-    /** The empty edit. */
-    Edit empty = new Empty();
 
-    interface Txt { String text(); }
-    sealed interface Ins extends Edit, Txt { }
-    sealed interface Del extends Edit, Txt { }
+    default Optional<Edit> merge(Edit that) {
+        return switch (this) {
+            case Ins e when that instanceof Ins t &&
+                nearly(e, t) && e.range.left() &&
+                e.range.col() + e.text.length() == t.range.col() ->
+                Optional.of(new Ins(e.range, e.text + t.text, t.occurredOn));
+            case Ins e when that instanceof Ins t &&
+                nearly(e, t) && e.range.right() &&
+                e.range.col() - e.text.length() == t.range.col() ->
+                Optional.of(new Ins(e.range, t.text + e.text, t.occurredOn));
+            case Del e when that instanceof Del t &&
+                nearly(e, t) && e.range.left() &&
+                e.range.col() - e.text.length() == t.range.col() ->
+                Optional.of(new Del(e.range, t.text + e.text, t.occurredOn));
+            case Del e when that instanceof Del t &&
+                nearly(e, t) && e.range.right() &&
+                e.range.col() == t.range.col() ->
+                Optional.of(new Del(e.range, e.text + t.text, t.occurredOn));
+            default -> Optional.empty();
+        };
+    }
 
-    record Insert(int row, int col, String text, long occurredOn) implements Edit, Ins {}
-    record Delete(int row, int col, String text, long occurredOn) implements Edit, Del {}
-    record BsInsert(int row, int col, String text, long occurredOn) implements Edit, Ins {}
-    record BsDelete(int row, int col, String text, long occurredOn) implements Edit, Del {}
-    record Empty() implements Edit {
-        @Override public int row() { return 0; }
-        @Override public int col() { return 0; }
-        @Override public long occurredOn() { return 0; }
+
+    private static boolean nearly(ConcreteEdit e1, ConcreteEdit e2) {
+        return e1.occurredOn() - e2.occurredOn() < 2500 &&
+            !e1.text().contains("\n") && !e2.text().contains("\n") &&
+            e1.range().left() == e2.range().left() &&
+            e1.range().row() == e2.range().row();
+    }
+
+
+    sealed interface ConcreteEdit extends Edit {
+        TextEdit.Range range();
+        String text();
+    }
+
+    record Cmp(List<Edit> edits, long occurredOn) implements Edit {}
+    record Ins(TextEdit.Range range, String text, long occurredOn) implements ConcreteEdit {}
+    record Del(TextEdit.Range range, String text, long occurredOn) implements ConcreteEdit {}
+
+    static Edit insert(int row, int col, String text) {
+        return new Ins(TextEdit.Range.leftOf(row, col), text, System.currentTimeMillis());
+    }
+
+    static Edit delete(int row, int col, String text) {
+        return new Del(TextEdit.Range.rightOf(row, col), text, System.currentTimeMillis());
+    }
+
+    static Edit backspace(int row, int col, String text) {
+        return new Del(TextEdit.Range.leftOf(row, col), text, System.currentTimeMillis());
+    }
+
+    static Edit replace(int fromRow, int fromCol, int toRow, int toCol, String beforeText, String afterText) {
+        long occurredOn = System.currentTimeMillis();
+        boolean forward = (fromRow < toRow || (fromRow == toRow && fromCol < toCol));
+        if (forward) {
+            //  |0|1|2|3|4|5|
+            //    ^     ^
+            //    |     |
+            //    |     caret(to)
+            //    select start(from)
+            return new Cmp(List.of(
+                new Del(TextEdit.Range.leftOf(toRow, toCol), beforeText, occurredOn),
+                new Ins(TextEdit.Range.leftOf(fromRow, fromCol), afterText, occurredOn)), occurredOn);
+        } else {
+            //  |0|1|2|3|4|5|
+            //    ^     ^
+            //    |     |
+            //    |     select start(from)
+            //    caret(to)
+            return new Cmp(List.of(
+                new Del(TextEdit.Range.rightOf(fromRow, fromCol), beforeText, occurredOn),
+                new Del(TextEdit.Range.rightOf(fromRow, fromCol), beforeText, occurredOn)), occurredOn);
+        }
     }
 
 }
