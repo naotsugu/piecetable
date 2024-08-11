@@ -62,33 +62,37 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public void delete(int row, int col, int len) {
-        push(deleteEdit(row, col, len, System.currentTimeMillis()));
+    public String delete(int row, int col, int len) {
+        Edit.Del e = deleteEdit(row, col, len, System.currentTimeMillis());
+        push(e);
+        return e.text();
     }
 
     @Override
-    public void backspace(int row, int col, int len) {
-        push(backspaceEdit(row, col, len, System.currentTimeMillis()));
+    public String backspace(int row, int col, int len) {
+        Edit.Del e = backspaceEdit(row, col, len, System.currentTimeMillis());
+        push(e);
+        return e.text();
     }
 
     @Override
-    public void replace(int row, int col, int len, String text) {
+    public String replace(int row, int col, int len, String text) {
         long occurredOn = System.currentTimeMillis();
         Edit e;
+        String ret = "";
         if (len == 0) {
             e = insertEdit(row, col, text, occurredOn);
         } else if (len > 0) {
-            e = new Edit.Cmp(List.of(
-                deleteEdit(row, col, len, occurredOn),
-                insertEdit(row, col, text, occurredOn)
-            ), occurredOn);
+            Edit.ConcreteEdit del = deleteEdit(row, col, len, occurredOn);
+            e = new Edit.Cmp(List.of(del, insertEdit(row, col, text, occurredOn)), occurredOn);
+            ret = del.text();
         } else {
             Edit.ConcreteEdit bs = backspaceEdit(row, col, -len, occurredOn);
-            e = new Edit.Cmp(List.of(bs,
-                insertEdit(bs.to().row(), bs.to().col(), text, occurredOn)
-            ), occurredOn);
+            e = new Edit.Cmp(List.of(bs, insertEdit(bs.to().row(), bs.to().col(), text, occurredOn)), occurredOn);
+            ret = bs.text();
         }
         push(e);
+        return ret;
     }
 
     @Override
