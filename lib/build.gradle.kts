@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
+    signing
 }
 
 repositories {
@@ -29,7 +30,7 @@ java {
 }
 
 version = "0.5.0"
-group = "com.github.naotsugu"
+group = "com.mammb"
 base.archivesName.set("piecetable")
 
 tasks.jar {
@@ -39,12 +40,22 @@ tasks.jar {
     }
 }
 
+val sonatypeUsername: String? by project
+val sonatypePassword: String? by project
 
 publishing {
     publications {
-        register<MavenPublication>("gpr") {
+        register<MavenPublication>("mavenJava") {
             artifactId = "piecetable"
             from(components["java"])
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+                usage("java-runtime") {
+                    fromResolutionResult()
+                }
+            }
             pom {
                 name.set("piecetable")
                 description.set("Java implementation of PieceTable data structure.")
@@ -72,13 +83,24 @@ publishing {
     }
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/naotsugu/piecetable")
+            name = "MavenCentral"
+            val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+            val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+                username = sonatypeUsername
+                password = sonatypePassword
             }
         }
     }
 }
 
+signing {
+    sign(publishing.publications["mavenJava"])
+}
+
+tasks.javadoc {
+    if (JavaVersion.current().isJava9Compatible) {
+        (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+    }
+}
