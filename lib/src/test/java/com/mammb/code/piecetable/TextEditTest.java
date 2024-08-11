@@ -88,4 +88,22 @@ class TextEditTest {
         assertEquals("", te.getText(0));
 
     }
+
+    @Test
+    void test() {
+
+        var edit = TextEdit.of();
+
+        edit.insert(0, 0, "a large text");
+        edit.insert(0, 8, "span of ");
+        edit.delete(0, 1, 6);
+        assertEquals("a span of text", edit.getText(0));
+
+        edit.undo();
+        assertEquals("a large span of text", edit.getText(0));
+
+        edit.redo();
+        assertEquals("a span of text", edit.getText(0));
+
+    }
 }

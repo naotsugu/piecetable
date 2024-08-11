@@ -46,10 +46,14 @@ Single character deletion can be one of two possible conditions:
 
 ## Usage
 
-There are two classes.
+There are three classes.
 
 - PieceTable - Plain piece table implantation by bytes
 - Document - Text manipulation with row-column number and charset infer
+- TextEdit - Advanced text editing abstraction, with undo/redo
+
+Use `TextEdit` in most cases.
+
 
 ### PieceTable
 
@@ -65,7 +69,7 @@ assertEquals("a span of text", new String(bytes));
 ```
 
 
-### Document
+### TextEdit
 
 ```java
 var doc = Document.of();
@@ -100,8 +104,26 @@ CharsetMatch customCharsetMatch = // ...
 var doc = Document.of(path, customCharsetMatch);
 ```
 
+### TextEdit
+
+```java
+var edit = TextEdit.of();
+
+edit.insert(0, 0, "a large text");
+edit.insert(0, 8, "span of ");
+edit.delete(0, 1, 6);
+assertEquals("a span of text", edit.getText(0));
+
+edit.undo();
+assertEquals("a large span of text", edit.getText(0));
+
+edit.redo();
+assertEquals("a span of text", edit.getText(0));
+```
+
 
 ## Sample applications using this library
 
-* [min-editor](https://github.com/naotsugu/min-editor)
+* [min-editor](https://github.com/naotsugu/min-editor)([version 0.4.0](https://github.com/naotsugu/piecetable/tree/release-0.4) is used)
+
 
