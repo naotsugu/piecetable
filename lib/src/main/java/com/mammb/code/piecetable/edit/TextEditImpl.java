@@ -112,9 +112,9 @@ public class TextEditImpl implements TextEdit {
         Edit e;
         if (col - len >= 0) {
             e = new Edit.Del(
-                new Pos(row, col - len),
                 new Pos(row, col),
-                rowText.substring(col - len, len),
+                new Pos(row, col - len),
+                rowText.substring(col - len, col),
                 System.currentTimeMillis());
         } else {
             StringBuilder sb = new StringBuilder(rowText.substring(0, col));
