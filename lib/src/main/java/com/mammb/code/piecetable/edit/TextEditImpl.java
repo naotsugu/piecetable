@@ -55,87 +55,38 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public void insert(int row, int col, String text) {
-        Edit e;
-        int index = text.lastIndexOf('\n');
-        if (index < 0) {
-            e = new Edit.Ins(
-                new Pos(row, col),
-                new Pos(row, col + text.length()),
-                text);
-        } else {
-            int nRow = row + (int) text.chars().mapToLong(c -> c == '\n' ? 1 : 0).sum();
-            int nCol = text.substring(index + 1).length();
-            e = new Edit.Ins(
-                new Pos(row, col),
-                new Pos(nRow, nCol),
-                text);
-        }
-        push(e);
+        push(insertEdit(row, col, text, System.currentTimeMillis()));
     }
 
     @Override
     public void delete(int row, int col, int len) {
-        String rowText = getText(row);
-        Edit e;
-        if (rowText.length() > col + len) {
-            e = new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col),
-                rowText.substring(col, col + len));
-        } else {
-            StringBuilder sb = new StringBuilder(rowText.substring(col));
-            len -= sb.length();
-            for (int nRow = row + 1; nRow < doc.rows(); nRow++) {
-                rowText = getText(nRow);
-                if (len - rowText.length() <= 0) {
-                    sb.append(rowText, 0, len);
-                    break;
-                }
-                len -= rowText.length();
-                sb.append(rowText);
-            }
-            e = new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col),
-                sb.toString());
-        }
-        push(e);
+        push(deleteEdit(row, col, len, System.currentTimeMillis()));
     }
 
     @Override
     public void backspace(int row, int col, int len) {
-        String rowText = getText(row);
+        push(backspaceEdit(row, col, len, System.currentTimeMillis()));
+    }
+
+    @Override
+    public void replace(int row, int col, int len, String text) {
+        long occurredOn = System.currentTimeMillis();
         Edit e;
-        if (col - len >= 0) {
-            e = new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col - len),
-                rowText.substring(col - len, col),
-                System.currentTimeMillis());
+        if (len == 0) {
+            e = insertEdit(row, col, text, occurredOn);
+        } else if (len > 0) {
+            e = new Edit.Cmp(List.of(
+                deleteEdit(row, col, len, occurredOn),
+                insertEdit(row, col, text, occurredOn)
+            ), occurredOn);
         } else {
-            StringBuilder sb = new StringBuilder(rowText.substring(0, col));
-            int nRow = row - 1;
-            int nCol;
-            len -= col;
-            for (;;) {
-                rowText = getText(nRow);
-                if (len - rowText.length() <= 0) {
-                    nCol = rowText.length() - len;
-                    sb.insert(0, rowText.substring(nCol));
-                    break;
-                }
-                len -= rowText.length();
-                nRow--;
-                sb.insert(0, rowText);
-            }
-            e = new Edit.Del(
-                new Pos(row, col),
-                new Pos(nRow, nCol),
-                sb.toString());
+            Edit.ConcreteEdit bs = backspaceEdit(row, col, -len, occurredOn);
+            e = new Edit.Cmp(List.of(bs,
+                insertEdit(bs.to().row(), bs.to().col(), text, occurredOn)
+            ), occurredOn);
         }
         push(e);
     }
-
 
     @Override
     public String getText(int row) {
@@ -150,14 +101,26 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public List<Pos> undo() {
-        Optional<Edit> e = undoEdit();
-        return List.of(); // TODO impl
+        final Optional<Edit> undo = undoEdit();
+        if (undo.isEmpty()) {
+            return List.of();
+        }
+        return switch (undo.get()) {
+            case Edit.ConcreteEdit e -> List.of(e.to());
+            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).toList();
+        };
     }
 
     @Override
     public List<Pos> redo() {
-        Optional<Edit> e = redoEdit();
-        return List.of(); // TODO impl
+        final Optional<Edit> redo = redoEdit();
+        if (redo.isEmpty()) {
+            return List.of();
+        }
+        return switch (redo.get()) {
+            case Edit.ConcreteEdit e -> List.of(e.to());
+            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).toList();
+        };
     }
 
     @Override
@@ -176,6 +139,85 @@ public class TextEditImpl implements TextEdit {
         flush();
         undo.clear();
         redo.clear();
+    }
+
+    Edit.Ins insertEdit(int row, int col, String text, long occurredOn) {
+        int index = text.lastIndexOf('\n');
+        if (index < 0) {
+            return new Edit.Ins(
+                new Pos(row, col),
+                new Pos(row, col + text.length()),
+                text,
+                occurredOn);
+        } else {
+            int nRow = row + (int) text.chars().mapToLong(c -> c == '\n' ? 1 : 0).sum();
+            int nCol = text.substring(index + 1).length();
+            return new Edit.Ins(
+                new Pos(row, col),
+                new Pos(nRow, nCol),
+                text,
+                occurredOn);
+        }
+    }
+
+    Edit.Del deleteEdit(int row, int col, int len, long occurredOn) {
+        String rowText = getText(row);
+        if (rowText.length() > col + len) {
+            return new Edit.Del(
+                new Pos(row, col),
+                new Pos(row, col),
+                rowText.substring(col, col + len),
+                occurredOn);
+        } else {
+            StringBuilder sb = new StringBuilder(rowText.substring(col));
+            len -= sb.length();
+            for (int nRow = row + 1; nRow < doc.rows(); nRow++) {
+                rowText = getText(nRow);
+                if (len - rowText.length() <= 0) {
+                    sb.append(rowText, 0, len);
+                    break;
+                }
+                len -= rowText.length();
+                sb.append(rowText);
+            }
+            return new Edit.Del(
+                new Pos(row, col),
+                new Pos(row, col),
+                sb.toString(),
+                occurredOn);
+        }
+    }
+
+    Edit.Del backspaceEdit(int row, int col, int len, long occurredOn) {
+        String rowText = getText(row);
+        if (col - len >= 0) {
+            return new Edit.Del(
+                new Pos(row, col),
+                new Pos(row, col - len),
+                rowText.substring(col - len, col),
+                occurredOn);
+        } else {
+            StringBuilder sb = new StringBuilder(rowText.substring(0, col));
+            int nRow = row - 1;
+            int nCol;
+            len -= col;
+            for (;;) {
+                rowText = getText(nRow);
+                if (len - rowText.length() <= 0) {
+                    nCol = rowText.length() - len;
+                    sb.insert(0, rowText.substring(nCol));
+                    break;
+                }
+                len -= rowText.length();
+                nRow--;
+                sb.insert(0, rowText);
+            }
+            return new Edit.Del(
+                new Pos(row, col),
+                new Pos(nRow, nCol),
+                sb.toString(),
+                occurredOn);
+        }
     }
 
     /**
@@ -256,30 +298,6 @@ public class TextEditImpl implements TextEdit {
             case Edit.Cmp e -> e.edits().forEach(this::dryApply);
         }
     }
-
-//    static Edit replace(int fromRow, int fromCol, int toRow, int toCol, String beforeText, String afterText) {
-//        long occurredOn = System.currentTimeMillis();
-//        boolean forward = (fromRow < toRow || (fromRow == toRow && fromCol < toCol));
-//        if (forward) {
-//            //  |0|1|2|3|4|5|
-//            //    ^     ^
-//            //    |     |
-//            //    |     caret(to)
-//            //    select start(from)
-//            return new Cmp(List.of(
-//                new Del(TextEditx.Range.leftOf(toRow, toCol), beforeText, occurredOn),
-//                new Ins(TextEditx.Range.leftOf(fromRow, fromCol), afterText, occurredOn)), occurredOn);
-//        } else {
-//            //  |0|1|2|3|4|5|
-//            //    ^     ^
-//            //    |     |
-//            //    |     select start(from)
-//            //    caret(to)
-//            return new Cmp(List.of(
-//                new Del(TextEditx.Range.rightOf(fromRow, fromCol), beforeText, occurredOn),
-//                new Del(TextEditx.Range.rightOf(fromRow, fromCol), beforeText, occurredOn)), occurredOn);
-//        }
-//    }
 
     Document getDoc() { return doc; }
     Map<Integer, String> getDryBuffer() { return dryBuffer; }

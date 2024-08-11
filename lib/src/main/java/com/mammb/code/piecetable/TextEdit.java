@@ -26,22 +26,67 @@ import java.util.List;
  */
 public interface TextEdit {
 
+    /**
+     * Inserts the text into this {@code TextEdit}.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row where the text is to be inserted
+     * @param text the char sequence is to be inserted
+     */
     void insert(int row, int col, String text);
 
+    /**
+     * Delete the text from this {@code TextEdit}.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row where the text to be deleted
+     * @param len the byte length to be deleted
+     */
     void delete(int row, int col, int len);
 
+    /**
+     * Backspace delete the text from this {@code TextEdit}.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row where the text to be deleted
+     * @param len the byte length to be deleted
+     */
     void backspace(int row, int col, int len);
 
+    /**
+     * Replace the text from this {@code TextEdit}.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row where the text to be replaced
+     * @param len the byte length to be replaced
+     * @param text the char sequence is to be inserted
+     */
+    void replace(int row, int col, int len, String text);
+
+    /**
+     * Gets the text at the specified row.
+     * @param row the number of row(zero origin)
+     * @return the text of the specified row
+     */
     String getText(int row);
 
+    /**
+     * Undo.
+     * @return the undo position
+     */
     List<Pos> undo();
 
+    /**
+     * Redo.
+     * @return the redo position
+     */
     List<Pos> redo();
 
+    /**
+     * Flush.
+     */
     void flush();
 
+    /**
+     * Clear undo/redo buffer.
+     */
     void clear();
-
 
     /**
      * Create a new {@link TextEdit}.
@@ -69,7 +114,11 @@ public interface TextEdit {
         return new TextEditImpl(document);
     }
 
-
+    /**
+     * The position record.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row
+     */
     record Pos(int row, int col) { }
 
 }

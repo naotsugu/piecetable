@@ -23,7 +23,11 @@ import java.nio.charset.StandardCharsets;
  * The CharsetMatch simple implementation collections.
  * @author Naotsugu Kobayashi
  */
-public class CharsetMatches {
+public abstract class CharsetMatches {
+
+
+    private CharsetMatches() {
+    }
 
     /**
      * Create a new utf-8 {@link CharsetMatch}.
