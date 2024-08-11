@@ -108,6 +108,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public List<Pos> undo() {
+        flush();
         final Optional<Edit> undo = undoEdit();
         if (undo.isEmpty()) {
             return List.of();
@@ -120,6 +121,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public List<Pos> redo() {
+        flush();
         final Optional<Edit> redo = redoEdit();
         if (redo.isEmpty()) {
             return List.of();
@@ -150,11 +152,13 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public List<Found> findAll(String text) {
+        flush();
         return doc.findAll(text);
     }
 
     @Override
     public Optional<Found> findNext(String text, int row, int col) {
+        flush();
         return doc.findNext(text, row, col);
     }
 
@@ -165,6 +169,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public long length() {
+        flush();
         return doc.length();
     }
 
@@ -180,6 +185,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public void save(Path path) {
+        flush();
         doc.save(path);
     }
 
