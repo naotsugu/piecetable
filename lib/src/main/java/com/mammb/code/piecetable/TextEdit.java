@@ -17,8 +17,10 @@ package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import com.mammb.code.piecetable.text.DocumentImpl;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The text edit.
@@ -87,6 +89,52 @@ public interface TextEdit {
      * Clear undo/redo buffer.
      */
     void clear();
+
+    /**
+     * Searches for the specified char sequence.
+     * @param text the specified char sequence
+     * @return found list
+     */
+    List<Found> findAll(String text);
+
+    /**
+     * Searches for the specified char sequence.
+     * @param text the specified char sequence
+     * @param row the number of start row(zero origin)
+     * @param col the start byte position on the row
+     * @return found
+     */
+    Optional<Found> findNext(String text, int row, int col);
+
+    /**
+     * Get the row size.
+     * @return the row size
+     */
+    int rows();
+
+    /**
+     * Get the bytes length of this document holds.
+     * @return the bytes length of this document holds
+     */
+    long length();
+
+    /**
+     * Get the charset.
+     * @return the charset
+     */
+    Charset charset();
+
+    /**
+     * Get the path.
+     * @return the path
+     */
+    Path path();
+
+    /**
+     * Save this document.
+     * @param path the path
+     */
+    void save(Path path);
 
     /**
      * Create a new {@link TextEdit}.

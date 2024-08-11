@@ -16,7 +16,10 @@
 package com.mammb.code.piecetable.edit;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.TextEdit;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -139,6 +142,41 @@ public class TextEditImpl implements TextEdit {
         flush();
         undo.clear();
         redo.clear();
+    }
+
+    @Override
+    public List<Found> findAll(String text) {
+        return doc.findAll(text);
+    }
+
+    @Override
+    public Optional<Found> findNext(String text, int row, int col) {
+        return doc.findNext(text, row, col);
+    }
+
+    @Override
+    public int rows() {
+        return doc.rows();
+    }
+
+    @Override
+    public long length() {
+        return doc.length();
+    }
+
+    @Override
+    public Charset charset() {
+        return doc.charset();
+    }
+
+    @Override
+    public Path path() {
+        return doc.path();
+    }
+
+    @Override
+    public void save(Path path) {
+        doc.save(path);
     }
 
     Edit.Ins insertEdit(int row, int col, String text, long occurredOn) {
