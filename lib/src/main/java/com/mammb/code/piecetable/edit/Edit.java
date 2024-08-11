@@ -219,8 +219,14 @@ sealed interface Edit {
             return backward() ? to() : from();
         }
     }
-    record Cmp(List<? extends ConcreteEdit> edits, long occurredOn) implements Edit {}
-    record Ins(Pos from, Pos to, String text, long occurredOn) implements ConcreteEdit {}
-    record Del(Pos from, Pos to, String text, long occurredOn) implements ConcreteEdit {}
+    record Cmp(List<? extends ConcreteEdit> edits, long occurredOn) implements Edit {
+        public Cmp(List<? extends ConcreteEdit> edits) { this(edits, edits.getFirst().occurredOn()); }
+    }
+    record Ins(Pos from, Pos to, String text, long occurredOn) implements ConcreteEdit {
+        public Ins(Pos from, Pos to, String text) { this(from, to, text, System.currentTimeMillis()); }
+    }
+    record Del(Pos from, Pos to, String text, long occurredOn) implements ConcreteEdit {
+        public Del(Pos from, Pos to, String text) { this(from, to, text, System.currentTimeMillis()); }
+    }
 
 }

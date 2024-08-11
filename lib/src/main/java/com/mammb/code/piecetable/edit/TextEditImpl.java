@@ -61,16 +61,14 @@ public class TextEditImpl implements TextEdit {
             e = new Edit.Ins(
                 new Pos(row, col),
                 new Pos(row, col + text.length()),
-                text,
-                System.currentTimeMillis());
+                text);
         } else {
             int nRow = row + (int) text.chars().mapToLong(c -> c == '\n' ? 1 : 0).sum();
             int nCol = text.substring(index + 1).length();
             e = new Edit.Ins(
                 new Pos(row, col),
                 new Pos(nRow, nCol),
-                text,
-                System.currentTimeMillis());
+                text);
         }
         push(e);
     }
@@ -83,10 +81,10 @@ public class TextEditImpl implements TextEdit {
             e = new Edit.Del(
                 new Pos(row, col),
                 new Pos(row, col),
-                rowText.substring(col, col + len),
-                System.currentTimeMillis());
+                rowText.substring(col, col + len));
         } else {
             StringBuilder sb = new StringBuilder(rowText.substring(col));
+            len -= sb.length();
             for (int nRow = row + 1; nRow < doc.rows(); nRow++) {
                 rowText = getText(nRow);
                 if (len - rowText.length() <= 0) {
@@ -94,14 +92,12 @@ public class TextEditImpl implements TextEdit {
                     break;
                 }
                 len -= rowText.length();
-                nRow++;
                 sb.append(rowText);
             }
             e = new Edit.Del(
                 new Pos(row, col),
                 new Pos(row, col),
-                sb.toString(),
-                System.currentTimeMillis());
+                sb.toString());
         }
         push(e);
     }
@@ -135,8 +131,7 @@ public class TextEditImpl implements TextEdit {
             e = new Edit.Del(
                 new Pos(row, col),
                 new Pos(nRow, nCol),
-                sb.toString(),
-                System.currentTimeMillis());
+                sb.toString());
         }
         push(e);
     }
@@ -156,13 +151,13 @@ public class TextEditImpl implements TextEdit {
     @Override
     public List<Pos> undo() {
         Optional<Edit> e = undoEdit();
-        return List.of();
+        return List.of(); // TODO impl
     }
 
     @Override
     public List<Pos> redo() {
         Optional<Edit> e = redoEdit();
-        return List.of();
+        return List.of(); // TODO impl
     }
 
     @Override
@@ -285,4 +280,14 @@ public class TextEditImpl implements TextEdit {
 //                new Del(TextEditx.Range.rightOf(fromRow, fromCol), beforeText, occurredOn)), occurredOn);
 //        }
 //    }
+
+    Document getDoc() { return doc; }
+    Map<Integer, String> getDryBuffer() { return dryBuffer; }
+    Deque<Edit> getDeque() { return deque; }
+    Deque<Edit> getUndo() { return undo; }
+    Deque<Edit> getRedo() { return redo; }
+    void testPush(final Edit edit) { push(edit); }
+    void testDryApply() { dryApply(); }
+    void testDryApply(Edit edit) { dryApply(edit); }
+
 }
