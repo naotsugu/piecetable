@@ -87,11 +87,10 @@ public class TextEditImpl implements TextEdit {
                 System.currentTimeMillis());
         } else {
             StringBuilder sb = new StringBuilder(rowText.substring(col));
-            int nRow = row + 1;
-            for (;;) {
+            for (int nRow = row + 1; nRow < doc.rows(); nRow++) {
                 rowText = getText(nRow);
                 if (len - rowText.length() <= 0) {
-                    sb.append(rowText.substring(0, len));
+                    sb.append(rowText, 0, len);
                     break;
                 }
                 len -= rowText.length();
@@ -263,4 +262,27 @@ public class TextEditImpl implements TextEdit {
         }
     }
 
+//    static Edit replace(int fromRow, int fromCol, int toRow, int toCol, String beforeText, String afterText) {
+//        long occurredOn = System.currentTimeMillis();
+//        boolean forward = (fromRow < toRow || (fromRow == toRow && fromCol < toCol));
+//        if (forward) {
+//            //  |0|1|2|3|4|5|
+//            //    ^     ^
+//            //    |     |
+//            //    |     caret(to)
+//            //    select start(from)
+//            return new Cmp(List.of(
+//                new Del(TextEditx.Range.leftOf(toRow, toCol), beforeText, occurredOn),
+//                new Ins(TextEditx.Range.leftOf(fromRow, fromCol), afterText, occurredOn)), occurredOn);
+//        } else {
+//            //  |0|1|2|3|4|5|
+//            //    ^     ^
+//            //    |     |
+//            //    |     select start(from)
+//            //    caret(to)
+//            return new Cmp(List.of(
+//                new Del(TextEditx.Range.rightOf(fromRow, fromCol), beforeText, occurredOn),
+//                new Del(TextEditx.Range.rightOf(fromRow, fromCol), beforeText, occurredOn)), occurredOn);
+//        }
+//    }
 }

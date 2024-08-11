@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * The test of {@link TextEditx}.
+ * The test of {@link TextEdit}.
  * @author Naotsugu Kobayashi
  */
 class TextEditTest {
@@ -28,7 +28,7 @@ class TextEditTest {
     @Test
     void testInsert() {
 
-        var te = TextEditx.of();
+        var te = TextEdit.of();
         te.insert(0, 0, "a");
         te.insert(0, 1, "b");
         te.insert(0, 2, "c");
@@ -44,7 +44,7 @@ class TextEditTest {
     @Test
     void testDelete() {
 
-        var te = TextEditx.of();
+        var te = TextEdit.of();
         te.insert(0, 0, "abc");
         assertEquals("abc", te.getText(0));
 
