@@ -40,8 +40,8 @@ tasks.jar {
     }
 }
 
-val sonatypeUsername: String? by project
-val sonatypePassword: String? by project
+val ossrhToken: String? by project
+val ossrhTokenPassword: String? by project
 
 publishing {
     publications {
@@ -88,8 +88,8 @@ publishing {
             val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
-                username = sonatypeUsername
-                password = sonatypePassword
+                username = ossrhToken
+                password = ossrhTokenPassword
             }
         }
     }

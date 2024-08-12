@@ -46,6 +46,14 @@ Single character deletion can be one of two possible conditions:
 
 ## Usage
 
+Add dependencies.
+
+```kotlin
+dependencies {
+    implementation("com.mammb:piecetable:0.5.0")
+}
+```
+
 There are three classes.
 
 - PieceTable - Plain piece table implantation by bytes
