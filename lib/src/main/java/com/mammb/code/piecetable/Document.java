@@ -36,26 +36,44 @@ public interface Document {
     void insert(int row, int col, CharSequence cs);
 
     /**
+     * Delete the characters from this {@code Document}.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row where the char sequence to be deleted
+     * @param cs the char sequence is to be deleted
+     */
+    void delete(int row, int col, CharSequence cs);
+
+    /**
+     * Gets the char sequence at the specified row.
+     * @param row the number of row(zero origin)
+     * @return the char sequence of the specified row
+     */
+    CharSequence getText(int row);
+
+    /**
+     * Usually use {@link Document#insert(int, int, CharSequence)}.
      * Inserts the byte array into this {@code Document}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the char sequence is to be inserted
-     * @param bytes the byte array is to be inserted
+     * @param bytes the byte array is to be inserted(The value must be encoded in the appropriate Charset)
      */
     void insert(int row, int col, byte[] bytes);
 
     /**
+     * Usually use {@link Document#delete(int, int, CharSequence)}.
      * Delete the characters from this {@code Document}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the char sequence to be deleted
-     * @param len the byte length to be deleted
+     * @param len the byte length to be deleted(The value must be encoded in the appropriate Charset)
      */
     void delete(int row, int col, int len);
 
     /**
+     * Usually use {@link Document#get(int)}.
      * Gets the byte array at the specified position.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row
-     * @param len the byte length
+     * @param len the byte length(The value must be encoded in the appropriate Charset)
      * @return the byte array
      */
     byte[] get(int row, int col, int len);
@@ -68,20 +86,14 @@ public interface Document {
     byte[] get(int row);
 
     /**
+     * Usually use {@link Document#getText(int)}.
      * Gets the char sequence at the specified position.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row
-     * @param len the byte length
+     * @param len the byte length(The value must be encoded in the appropriate Charset)
      * @return the char sequence
      */
     CharSequence getText(int row, int col, int len);
-
-    /**
-     * Gets the char sequence at the specified row.
-     * @param row the number of row(zero origin)
-     * @return the char sequence of the specified row
-     */
-    CharSequence getText(int row);
 
     /**
      * Searches for the specified char sequence.

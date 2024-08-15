@@ -123,6 +123,10 @@ public class DocumentImpl implements Document {
         index.insert(row, col, bytes);
     }
 
+    @Override
+    public void delete(int row, int col, CharSequence cs) {
+        delete(row, col, cs.toString().getBytes(charset).length);
+    }
 
     @Override
     public void delete(int row, int col, int len) {
