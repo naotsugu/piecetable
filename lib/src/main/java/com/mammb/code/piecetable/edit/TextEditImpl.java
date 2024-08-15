@@ -170,7 +170,7 @@ public class TextEditImpl implements TextEdit {
     @Override
     public long length() {
         flush();
-        return doc.length();
+        return doc.rawLength();
     }
 
     @Override

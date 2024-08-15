@@ -112,36 +112,41 @@ public class DocumentImpl implements Document {
 
     @Override
     public void insert(int row, int col, CharSequence cs) {
+        col = getText(row).toString().substring(0, col).getBytes().length;
         insert(row, col, cs.toString().getBytes(charset));
-    }
-
-
-    @Override
-    public void insert(int row, int col, byte[] bytes) {
-        col += (row == 0) ? bom.length : 0;
-        pt.insert(index.get(row) + col, bytes);
-        index.insert(row, col, bytes);
     }
 
     @Override
     public void delete(int row, int col, CharSequence cs) {
+        col = getText(row).toString().substring(0, col).getBytes().length;
         delete(row, col, cs.toString().getBytes(charset).length);
     }
 
     @Override
-    public void delete(int row, int col, int len) {
-        col += (row == 0) ? bom.length : 0;
-        pt.delete(index.get(row) + col, len);
-        index.delete(row, col, len);
+    public CharSequence getText(int row) {
+        return new String(get(row), charset);
+    }
+
+    @Override
+    public void insert(int row, int rawCol, byte[] bytes) {
+        rawCol += (row == 0) ? bom.length : 0;
+        pt.insert(index.get(row) + rawCol, bytes);
+        index.insert(row, rawCol, bytes);
     }
 
 
     @Override
-    public byte[] get(int row, int col, int len) {
-        col += (row == 0) ? bom.length : 0;
-        return pt.get(index.get(row) + col, len);
+    public void delete(int row, int rawCol, int rawLen) {
+        rawCol += (row == 0) ? bom.length : 0;
+        pt.delete(index.get(row) + rawCol, rawLen);
+        index.delete(row, rawCol, rawLen);
     }
 
+    @Override
+    public byte[] get(int row, int rawCol, int rawLen) {
+        rawCol += (row == 0) ? bom.length : 0;
+        return pt.get(index.get(row) + rawCol, rawLen);
+    }
 
     @Override
     public byte[] get(int row) {
@@ -151,16 +156,9 @@ public class DocumentImpl implements Document {
         return pt.get(col, len);
     }
 
-
     @Override
-    public CharSequence getText(int row, int col, int len) {
-        return new String(get(row, col, len), charset);
-    }
-
-
-    @Override
-    public CharSequence getText(int row) {
-        return new String(get(row), charset);
+    public CharSequence getText(int row, int rawCol, int rawLen) {
+        return new String(get(row, rawCol, rawLen), charset);
     }
 
     @Override
@@ -170,7 +168,8 @@ public class DocumentImpl implements Document {
 
     @Override
     public Optional<Found> findNext(CharSequence cs, int row, int col) {
-        return search(cs, 0, 0, Short.MAX_VALUE).stream().findFirst();
+        col = getText(row).toString().substring(0, col).getBytes().length;
+        return search(cs, row, col, Short.MAX_VALUE).stream().findFirst();
     }
 
     @Override
@@ -180,7 +179,7 @@ public class DocumentImpl implements Document {
 
 
     @Override
-    public long length() {
+    public long rawLength() {
         return pt.length() - bom.length;
     }
 
