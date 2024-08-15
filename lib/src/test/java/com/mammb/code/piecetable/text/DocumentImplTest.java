@@ -51,6 +51,39 @@ class DocumentImplTest {
     }
 
     @Test
+    void utf8Multibyte(@TempDir Path tempDir) throws IOException {
+
+        var file = tempDir.resolve("file.txt");
+        Files.write(file, "あいう\nえお\nΩ𠀋\n".getBytes(StandardCharsets.UTF_8));
+        // |あ|い|う|$|
+        // |え|お||$|
+        // |Ω|𠀋|$|
+
+        var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
+
+        assertEquals("あいう\n", doc.getText(0));
+        assertEquals("えお\n", doc.getText(1));
+        assertEquals("Ω𠀋\n", doc.getText(2));
+
+        // あ:2byte on UTF-16  1char  3byte on UTF-8
+        doc.insert(0, 2, "アイウ");
+        assertEquals("あいアイウう\n", doc.getText(0));
+
+        doc.delete(0, 2, "アイウ");
+        assertEquals("あいう\n", doc.getText(0));
+
+        // Ω:2byte on UTF-16  1char
+        // 𠀋:4byte on UTF-16 2char
+        doc.insert(2, 3, "アイウ");
+        assertEquals("Ω𠀋アイウ\n", doc.getText(2));
+
+        doc.delete(2, 3, "アイウ");
+        assertEquals("Ω𠀋\n", doc.getText(2));
+    }
+
+
+
+    @Test
     void utf16(@TempDir Path tempDir) throws IOException {
 
         var file = tempDir.resolve("file.txt");
