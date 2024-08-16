@@ -168,9 +168,9 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public long length() {
+    public long rawSize() {
         flush();
-        return doc.rawLength();
+        return doc.rawSize();
     }
 
     @Override

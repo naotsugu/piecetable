@@ -117,9 +117,10 @@ public interface TextEdit {
 
     /**
      * Get the bytes length of this document holds.
+     * Not the javas UTF-16 encoded memory size.
      * @return the bytes length of this document holds
      */
-    long length();
+    long rawSize();
 
     /**
      * Get the charset.

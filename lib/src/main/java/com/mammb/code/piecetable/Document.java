@@ -119,10 +119,10 @@ public interface Document {
 
     /**
      * Get the bytes length of this document holds.
-     * Not the byte size in Javas UTF-16 encoded memory size.
+     * Not the javas UTF-16 encoded memory size.
      * @return the bytes length of this document holds
      */
-    long rawLength();
+    long rawSize();
 
     /**
      * Get the charset.

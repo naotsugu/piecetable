@@ -179,7 +179,7 @@ public class DocumentImpl implements Document {
 
 
     @Override
-    public long rawLength() {
+    public long rawSize() {
         return pt.length() - bom.length;
     }
 
