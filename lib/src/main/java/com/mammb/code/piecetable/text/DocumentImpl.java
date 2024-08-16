@@ -112,13 +112,13 @@ public class DocumentImpl implements Document {
 
     @Override
     public void insert(int row, int col, CharSequence cs) {
-        col = getText(row).toString().substring(0, col).getBytes().length;
+        col = getText(row).toString().substring(0, col).getBytes(charset).length;
         insert(row, col, cs.toString().getBytes(charset));
     }
 
     @Override
     public void delete(int row, int col, CharSequence cs) {
-        col = getText(row).toString().substring(0, col).getBytes().length;
+        col = getText(row).toString().substring(0, col).getBytes(charset).length;
         delete(row, col, cs.toString().getBytes(charset).length);
     }
 

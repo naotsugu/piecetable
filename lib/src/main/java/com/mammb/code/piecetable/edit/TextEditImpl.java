@@ -315,7 +315,7 @@ public class TextEditImpl implements TextEdit {
     private void apply(Edit edit) {
         switch (edit) {
             case Edit.Ins e -> doc.insert(e.min().row(), e.min().col(), e.text());
-            case Edit.Del e -> doc.delete(e.min().row(), e.min().col(), e.text().length());
+            case Edit.Del e -> doc.delete(e.min().row(), e.min().col(), e.text());
             case Edit.Cmp e -> e.edits().forEach(this::apply);
         }
     }
