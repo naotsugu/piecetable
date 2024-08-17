@@ -42,9 +42,9 @@ public interface TextEdit {
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @param len the byte length to be deleted
-     * @return the new position
+     * @return the deleted text
      */
-    Pos delete(int row, int col, int len);
+    String delete(int row, int col, int len);
 
     /**
      * Backspace delete the text from this {@code TextEdit}.

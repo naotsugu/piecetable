@@ -64,10 +64,10 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public Pos delete(int row, int col, int len) {
+    public String delete(int row, int col, int len) {
         Edit.Del edit = deleteEdit(row, col, len, System.currentTimeMillis());
         push(edit);
-        return edit.to();
+        return edit.text();
     }
 
     @Override
