@@ -57,42 +57,47 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public void insert(int row, int col, String text) {
-        push(insertEdit(row, col, text, System.currentTimeMillis()));
+    public Pos insert(int row, int col, String text) {
+        var edit = insertEdit(row, col, text, System.currentTimeMillis());
+        push(edit);
+        return edit.to();
     }
 
     @Override
-    public String delete(int row, int col, int len) {
-        Edit.Del e = deleteEdit(row, col, len, System.currentTimeMillis());
-        push(e);
-        return e.text();
+    public Pos delete(int row, int col, int len) {
+        Edit.Del edit = deleteEdit(row, col, len, System.currentTimeMillis());
+        push(edit);
+        return edit.to();
     }
 
     @Override
-    public String backspace(int row, int col, int len) {
-        Edit.Del e = backspaceEdit(row, col, len, System.currentTimeMillis());
-        push(e);
-        return e.text();
+    public Pos backspace(int row, int col, int len) {
+        Edit.Del edit = backspaceEdit(row, col, len, System.currentTimeMillis());
+        push(edit);
+        return edit.to();
     }
 
     @Override
-    public String replace(int row, int col, int len, String text) {
+    public Pos replace(int row, int col, int len, String text) {
         long occurredOn = System.currentTimeMillis();
         Edit e;
-        String ret = "";
+        Pos pos;
         if (len == 0) {
             e = insertEdit(row, col, text, occurredOn);
+            pos = ((Edit.Ins) e).to();
         } else if (len > 0) {
             Edit.ConcreteEdit del = deleteEdit(row, col, len, occurredOn);
-            e = new Edit.Cmp(List.of(del, insertEdit(row, col, text, occurredOn)), occurredOn);
-            ret = del.text();
+            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
+            e = new Edit.Cmp(List.of(del, ins), occurredOn);
+            pos = ins.to();
         } else {
             Edit.ConcreteEdit bs = backspaceEdit(row, col, -len, occurredOn);
-            e = new Edit.Cmp(List.of(bs, insertEdit(bs.to().row(), bs.to().col(), text, occurredOn)), occurredOn);
-            ret = bs.text();
+            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
+            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
+            pos = ins.to();
         }
         push(e);
-        return ret;
+        return pos;
     }
 
     @Override

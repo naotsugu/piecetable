@@ -33,26 +33,27 @@ public interface TextEdit {
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text is to be inserted
      * @param text the char sequence is to be inserted
+     * @return the new position
      */
-    void insert(int row, int col, String text);
+    Pos insert(int row, int col, String text);
 
     /**
      * Delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @param len the byte length to be deleted
-     * @return the deleted text
+     * @return the new position
      */
-    String delete(int row, int col, int len);
+    Pos delete(int row, int col, int len);
 
     /**
      * Backspace delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @param len the byte length to be deleted
-     * @return the deleted text
+     * @return the new position
      */
-    String backspace(int row, int col, int len);
+    Pos backspace(int row, int col, int len);
 
     /**
      * Replace the text from this {@code TextEdit}.
@@ -60,9 +61,9 @@ public interface TextEdit {
      * @param col the byte position on the row where the text to be replaced
      * @param len the byte length to be replaced
      * @param text the char sequence is to be inserted
-     * @return the deleted text
+     * @return the new position
      */
-    String replace(int row, int col, int len, String text);
+    Pos replace(int row, int col, int len, String text);
 
     /**
      * Gets the text at the specified row.
