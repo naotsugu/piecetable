@@ -33,6 +33,23 @@ import static org.junit.jupiter.api.Assertions.*;
 class DocumentImplTest {
 
     @Test
+    void test() {
+
+        var doc = DocumentImpl.of();
+        assertEquals(0, doc.rows());
+        assertEquals("", doc.getText(0));
+
+        doc.insert(0, 0, "a");
+        assertEquals(1, doc.rows());
+        assertEquals("a", doc.getText(0));
+
+        doc.delete(0, 0, 1);
+        assertEquals(1, doc.rows());
+        assertEquals("", doc.getText(0));
+
+    }
+
+    @Test
     void utf8(@TempDir Path tempDir) throws IOException {
 
         var file = tempDir.resolve("file.txt");
@@ -42,6 +59,7 @@ class DocumentImplTest {
         // |c|$|
 
         var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
+        assertEquals(4, doc.rows());
 
         assertEquals("b\n", doc.getText(1));
         doc.delete(1, 0, 1);
@@ -60,6 +78,7 @@ class DocumentImplTest {
         // |Ω|𠀋|$|
 
         var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
+        assertEquals(4, doc.rows());
 
         assertEquals("あいう\n", doc.getText(0));
         assertEquals("えお\n", doc.getText(1));
@@ -90,6 +109,7 @@ class DocumentImplTest {
         Files.write(file, "a\nbc\ndef\n".getBytes(StandardCharsets.UTF_16)); // contains bom
 
         var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
+        assertEquals(4, doc.rows());
 
         doc.insert(0, 0, "0");
         assertEquals("0a\n", doc.getText(0));

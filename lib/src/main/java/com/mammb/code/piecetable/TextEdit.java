@@ -49,10 +49,11 @@ public interface TextEdit {
      * Delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
-     * @param len the byte length to be deleted
+     * @param chCount the character count to be deleted
      * @return the deleted text
      */
-    String delete(int row, int col, int len);
+    String delete(int row, int col, int chCount);
+    String deleteByte(int row, int col, int byteLen);
 
     /**
      * Delete the multi text from this {@code TextEdit}.
@@ -66,10 +67,11 @@ public interface TextEdit {
      * Backspace delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
-     * @param len the byte length to be deleted
+     * @param chCount the character count to be deleted
      * @return the new position
      */
-    Pos backspace(int row, int col, int len);
+    Pos backspace(int row, int col, int chCount);
+    Pos backspaceByte(int row, int col, int byteLen);
 
     /**
      * Backspace delete the multi text from this {@code TextEdit}.
@@ -83,11 +85,12 @@ public interface TextEdit {
      * Replace the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be replaced
-     * @param len the byte length to be replaced
+     * @param chCount the character count to be replaced
      * @param text the char sequence is to be inserted
      * @return the new position
      */
-    Pos replace(int row, int col, int len, String text);
+    Pos replace(int row, int col, int chCount, String text);
+    Pos replaceByte(int row, int col, int byteLen, String text);
 
     /**
      * Replace the multi text from this {@code TextEdit}.

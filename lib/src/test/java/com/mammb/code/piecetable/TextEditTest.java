@@ -48,7 +48,8 @@ class TextEditTest {
     void testDelete() {
 
         var te = TextEdit.of();
-        te.insert(0, 0, "abc");
+        te.insert(0, 0, "abc");te.flush();
+        assertEquals(1, te.rows());
         assertEquals("abc", te.getText(0));
 
         te.delete(0, 0, 1);

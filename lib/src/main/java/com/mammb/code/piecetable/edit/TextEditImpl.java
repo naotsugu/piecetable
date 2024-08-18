@@ -30,8 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import java.util.stream.IntStream;
+
+import static com.mammb.code.piecetable.edit.Texts.*;
 
 /**
  * The document edit.
@@ -93,11 +94,87 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public String delete(int row, int col, int len) {
-        Edit.Del edit = deleteEdit(row, col, len, System.currentTimeMillis());
+    public String delete(int row, int col, int chCount) {
+        var del = join(rangeTextRight(row, col, chCount));
+        Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
         push(edit);
         return edit.text();
     }
+
+    @Override
+    public String deleteByte(int row, int col, int byteLen) {
+        var del = join(rangeTextRightByte(row, col, byteLen));
+        Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
+        push(edit);
+        return edit.text();
+    }
+
+    @Override
+    public Pos backspace(int row, int col, int chCount) {
+        var del = join(rangeTextLeft(row, col, chCount));
+        Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
+        push(edit);
+        return edit.to();
+    }
+
+    @Override
+    public Pos backspaceByte(int row, int col, int byteLen) {
+        var del = join(rangeTextLeftByte(row, col, byteLen));
+        Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
+        push(edit);
+        return edit.to();
+    }
+
+    @Override
+    public Pos replace(int row, int col, int chCount, String text) {
+        if (chCount == 0) {
+            return insert(row, col, text);
+        }
+        long occurredOn = System.currentTimeMillis();
+        Edit e;
+        Pos pos;
+        if (chCount > 0) {
+            var delText = join(rangeTextRight(row, col, chCount));
+            Edit.ConcreteEdit del = deleteEdit(row, col, delText, occurredOn);
+            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
+            e = new Edit.Cmp(List.of(del, ins), occurredOn);
+            pos = ins.to();
+        } else {
+            var delText = join(rangeTextLeft(row, col, -chCount));
+            Edit.ConcreteEdit bs = backspaceEdit(row, col, delText, occurredOn);
+            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
+            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
+            pos = ins.to();
+        }
+        push(e);
+        return pos;
+    }
+
+    @Override
+    public Pos replaceByte(int row, int col, int byteLen, String text) {
+        if (byteLen == 0) {
+            return insert(row, col, text);
+        }
+        long occurredOn = System.currentTimeMillis();
+        Edit e;
+        Pos pos;
+        if (byteLen > 0) {
+            var delText = join(rangeTextRightByte(row, col, byteLen));
+            Edit.ConcreteEdit del = deleteEdit(row, col, delText, occurredOn);
+            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
+            e = new Edit.Cmp(List.of(del, ins), occurredOn);
+            pos = ins.to();
+        } else {
+            var delText = join(rangeTextLeftByte(row, col, -byteLen));
+            Edit.ConcreteEdit bs = backspaceEdit(row, col, delText, occurredOn);
+            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
+            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
+            pos = ins.to();
+        }
+        push(e);
+        return pos;
+    }
+
 
     @Override
     public List<Pos> delete(List<Pos> posList, int len) {
@@ -120,12 +197,6 @@ public class TextEditImpl implements TextEdit {
         return posList(row, distances);
     }
 
-    @Override
-    public Pos backspace(int row, int col, int len) {
-        Edit.Del edit = backspaceEdit(row, col, len, System.currentTimeMillis());
-        push(edit);
-        return edit.to();
-    }
 
     @Override
     public List<Pos> backspace(List<Pos> posList, int len) {
@@ -146,29 +217,6 @@ public class TextEditImpl implements TextEdit {
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
         return posList(row, distances);
-    }
-
-    @Override
-    public Pos replace(int row, int col, int len, String text) {
-        long occurredOn = System.currentTimeMillis();
-        Edit e;
-        Pos pos;
-        if (len == 0) {
-            e = insertEdit(row, col, text, occurredOn);
-            pos = ((Edit.Ins) e).to();
-        } else if (len > 0) {
-            Edit.ConcreteEdit del = deleteEdit(row, col, len, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
-            e = new Edit.Cmp(List.of(del, ins), occurredOn);
-            pos = ins.to();
-        } else {
-            Edit.ConcreteEdit bs = backspaceEdit(row, col, -len, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
-            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
-            pos = ins.to();
-        }
-        push(e);
-        return pos;
     }
 
     @Override
@@ -286,7 +334,7 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public int rows() {
+    public int rows() {flush();
         return doc.rows();
     }
 
@@ -331,6 +379,27 @@ public class TextEditImpl implements TextEdit {
         }
     }
 
+    Edit.Del deleteEdit(int row, int col, String text, long occurredOn) {
+        return new Edit.Del(
+            new Pos(row, col),
+            new Pos(row, col),
+            text,
+            occurredOn);
+    }
+
+    Edit.Del backspaceEdit(int row, int col, String text, long occurredOn) {
+        int newRow = row - countRowBreak(text);
+        int newCol = (row == newRow)
+            ? col - text.length()
+            : getText(newRow).length() - leftCol(text);
+        return new Edit.Del(
+            new Pos(row, col),
+            new Pos(newRow, newCol),
+            text,
+            occurredOn);
+    }
+
+    @Deprecated
     Edit.Del deleteEdit(int row, int col, int len, long occurredOn) {
         String rowText = getText(row);
         if (rowText.length() > col + len) {
@@ -359,6 +428,7 @@ public class TextEditImpl implements TextEdit {
         }
     }
 
+    @Deprecated
     Edit.Del backspaceEdit(int row, int col, int len, long occurredOn) {
         String rowText = getText(row);
         if (col - len >= 0) {
@@ -502,8 +572,9 @@ public class TextEditImpl implements TextEdit {
         List<Pos> poss = new ArrayList<>();
         int total = 0;
         int index = 0;
-        for (int i = row; i < rows() && index < distances.length; i++) {
+        for (int i = row; index < distances.length; i++) {
             String rowText = getText(i);
+            if (rowText.isEmpty()) break;
             while (total + rowText.length() >= distances[index]) {
                 poss.add(new Pos(i, distances[index] - total));
                 index++;
@@ -514,6 +585,74 @@ public class TextEditImpl implements TextEdit {
         return poss;
     }
 
+    List<String> rangeTextRight(int row, int col, int chLen) {
+        List<String> ret = new ArrayList<>();
+        for (int i = row; ; i++) { // i < doc.rows() : cannot get correct value if not flushed
+            var text = getText(i).substring(col);
+            if (text.isEmpty()) break;
+            int len = Texts.chLength(text);
+            if (chLen - len <= 0) {
+                ret.add(Texts.chLeft(text, chLen));
+                break;
+            }
+            ret.add(text);
+            chLen -= len;
+            col = 0;
+        }
+        return ret;
+    }
+
+    List<String> rangeTextLeft(int row, int col, int chLen) {
+        List<String> ret = new ArrayList<>();
+        for (int i = row; i >= 0; i--) {
+            var s = getText(i);
+            var text = (col > 0) ? s.substring(0, col) : s;
+            int len = Texts.chLength(text);
+            if (chLen - len <= 0) {
+                ret.addFirst(Texts.chRight(text, chLen));
+                break;
+            }
+            ret.addFirst(text);
+            chLen -= len;
+            col = 0;
+        }
+        return ret;
+    }
+
+
+    List<String> rangeTextRightByte(int row, int col, int byteLen) {
+        List<String> ret = new ArrayList<>();
+        for (int i = row; ; i++) { // i < doc.rows() : cannot get correct value if not flushed
+            var text = getText(i).substring(col);
+            if (text.isEmpty()) break;
+            int len = text.length();
+            if (byteLen - len <= 0) {
+                ret.add(text.substring(0, byteLen));
+                break;
+            }
+            ret.add(text);
+            byteLen -= len;
+            col = 0;
+        }
+        return ret;
+    }
+
+    List<String> rangeTextLeftByte(int row, int col, int byteLen) {
+        List<String> ret = new ArrayList<>();
+        for (int i = row; i >= 0; i--) {
+            var s = getText(i);
+            var text = (col > 0) ? s.substring(0, col) : s;
+            int len = text.length();
+            if (byteLen - len <= 0) {
+                ret.addFirst(text.substring(byteLen));
+                break;
+            }
+            ret.addFirst(text);
+            byteLen -= len;
+            col = 0;
+        }
+        return ret;
+    }
     Document getDoc() { return doc; }
     Map<Integer, String> getDryBuffer() { return dryBuffer; }
     Deque<Edit> getDeque() { return deque; }
