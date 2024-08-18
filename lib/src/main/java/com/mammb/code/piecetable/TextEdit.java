@@ -38,6 +38,14 @@ public interface TextEdit {
     Pos insert(int row, int col, String text);
 
     /**
+     * Inserts the multi text from this {@code TextEdit}.
+     * @param posList the position list
+     * @param text the char sequence is to be inserted
+     * @return the new position
+     */
+    List<Pos> insert(List<Pos> posList, String text);
+
+    /**
      * Delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
@@ -64,6 +72,14 @@ public interface TextEdit {
     Pos backspace(int row, int col, int len);
 
     /**
+     * Backspace delete the multi text from this {@code TextEdit}.
+     * @param posList the position list
+     * @param len the byte length to be deleted
+     * @return the new position
+     */
+    List<Pos> backspace(List<Pos> posList, int len);
+
+    /**
      * Replace the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be replaced
@@ -72,6 +88,15 @@ public interface TextEdit {
      * @return the new position
      */
     Pos replace(int row, int col, int len, String text);
+
+    /**
+     * Replace the multi text from this {@code TextEdit}.
+     * @param posList the position list
+     * @param len the byte length to be replaced
+     * @param text the char sequence is to be inserted
+     * @return the new position
+     */
+    List<Pos> replace(List<Pos> posList, int len, String text);
 
     /**
      * Gets the text at the specified row.

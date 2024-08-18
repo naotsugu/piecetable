@@ -52,6 +52,24 @@ class TextEditImplTest {
     }
 
     @Test
+    void testInsertMulti() {
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc123\ndef");
+
+        // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
+        // |           |                   |
+        // ------------------------------------------
+        // | * | * | a | b | c | * | * | 1 | 2 | 3 | $ | d | * | * | e | f |
+        //         |                   |                           |
+        var posList = te.insert(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)), "**");
+        assertEquals("**abc**123\nd**ef", te.getText(0, 2));
+        assertEquals(new Pos(0, 2), posList.get(0));
+        assertEquals(new Pos(0, 7), posList.get(1));
+        assertEquals(new Pos(1, 3), posList.get(2));
+    }
+
+
+    @Test
     void testDelete() {
         var te = new TextEditImpl(Document.of());
         te.getDoc().insert(0, 0, "abc");

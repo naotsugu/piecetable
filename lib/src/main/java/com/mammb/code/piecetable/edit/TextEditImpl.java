@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import java.util.stream.IntStream;
 
 /**
@@ -68,6 +70,29 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
+    public List<Pos> insert(List<Pos> posList, String text) {
+
+        posList = posList.stream().sorted().distinct().toList();
+        int row = posList.getFirst().row();
+        int[] distances = distances(posList);
+        int increase = text.length();
+        for (int i = 0; i < distances.length; i++) {
+            distances[i] += increase;
+            increase += text.length();
+        }
+
+        long occurredOn = System.currentTimeMillis();
+        var edits = posList.stream()
+            .sorted(Comparator.reverseOrder())
+            .map(p -> insertEdit(p.row(), p.col(), text, occurredOn))
+            .toList();
+        Edit edit = new Edit.Cmp(edits, occurredOn);
+        push(edit);
+
+        return posList(row, distances);
+    }
+
+    @Override
     public String delete(int row, int col, int len) {
         Edit.Del edit = deleteEdit(row, col, len, System.currentTimeMillis());
         push(edit);
@@ -103,6 +128,27 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
+    public List<Pos> backspace(List<Pos> posList, int len) {
+        posList = posList.stream().sorted().distinct().toList();
+        int row = posList.getFirst().row();
+        int[] distances = distances(posList);
+        int increase = len;
+        for (int i = 0; i < distances.length; i++) {
+            distances[i] -= increase;
+            increase += len;
+        }
+
+        long occurredOn = System.currentTimeMillis();
+        var edits = posList.stream()
+            .sorted(Comparator.reverseOrder())
+            .map(p -> backspaceEdit(p.row(), p.col(), len, occurredOn))
+            .toList();
+        Edit edit = new Edit.Cmp(edits, occurredOn);
+        push(edit);
+        return posList(row, distances);
+    }
+
+    @Override
     public Pos replace(int row, int col, int len, String text) {
         long occurredOn = System.currentTimeMillis();
         Edit e;
@@ -123,6 +169,48 @@ public class TextEditImpl implements TextEdit {
         }
         push(e);
         return pos;
+    }
+
+    @Override
+    public List<Pos> replace(List<Pos> posList, int len, String text) {
+        posList = posList.stream().sorted().distinct().toList();
+        int row = posList.getFirst().row();
+        int[] distances = distances(posList);
+        int increase = text.length() - len;
+        for (int i = 0; i < distances.length; i++) {
+            distances[i] += increase;
+            increase += len;
+        }
+
+        long occurredOn = System.currentTimeMillis();
+        Edit edit;
+        if (len == 0) {
+            var edits = posList.stream()
+                .sorted(Comparator.reverseOrder())
+                .map(p -> insertEdit(p.row(), p.col(), text, occurredOn))
+                .toList();
+            edit = new Edit.Cmp(edits, occurredOn);
+        } else if (len > 0) {
+            var edits = posList.stream()
+                .sorted(Comparator.reverseOrder())
+                .map(p -> List.of(
+                    deleteEdit(p.row(), p.col(), len, occurredOn),
+                    insertEdit(p.row(), p.col(), text, occurredOn)))
+                .flatMap(Collection::stream).toList();
+            edit = new Edit.Cmp(edits, occurredOn);
+        } else {
+            var edits = posList.stream()
+                .sorted(Comparator.reverseOrder())
+                .map(p -> {
+                    Edit.ConcreteEdit bs = backspaceEdit(p.row(), p.col(), -len, occurredOn);
+                    Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
+                    return List.of(bs, ins); })
+                .flatMap(Collection::stream).toList();
+            edit = new Edit.Cmp(edits, occurredOn);
+        }
+        push(edit);
+
+        return posList(row, distances);
     }
 
     @Override
