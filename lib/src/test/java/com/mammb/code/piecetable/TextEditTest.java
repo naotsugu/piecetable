@@ -17,6 +17,9 @@ package com.mammb.code.piecetable;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Comparator;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -86,6 +89,39 @@ class TextEditTest {
 
         te.redo();
         assertEquals("", te.getText(0));
+
+    }
+
+    @Test
+    void testPos() {
+        var pos1 = new TextEdit.Pos(0, 0);
+        var pos2 = new TextEdit.Pos(0, 2);
+        var pos3 = new TextEdit.Pos(0, 2);
+        var pos4 = new TextEdit.Pos(1, 2);
+        var pos5 = new TextEdit.Pos(1, 4);
+        var pos6 = new TextEdit.Pos(4, 4);
+        var pos7 = new TextEdit.Pos(4, 5);
+
+        var list1 = List.of(pos4, pos2, pos7, pos1, pos3, pos6, pos5)
+            .stream().sorted().toList();
+
+        assertEquals(pos1, list1.get(0));
+        assertEquals(pos2, list1.get(1));
+        assertEquals(pos3, list1.get(2));
+        assertEquals(pos4, list1.get(3));
+        assertEquals(pos5, list1.get(4));
+        assertEquals(pos6, list1.get(5));
+        assertEquals(pos7, list1.get(6));
+
+        list1 = list1.stream().sorted(Comparator.reverseOrder()).toList();
+
+        assertEquals(pos7, list1.get(0));
+        assertEquals(pos6, list1.get(1));
+        assertEquals(pos5, list1.get(2));
+        assertEquals(pos4, list1.get(3));
+        assertEquals(pos3, list1.get(4));
+        assertEquals(pos2, list1.get(5));
+        assertEquals(pos1, list1.get(6));
 
     }
 

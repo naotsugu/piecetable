@@ -21,11 +21,15 @@ import com.mammb.code.piecetable.TextEdit;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * The document edit.
@@ -71,6 +75,27 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
+    public List<Pos> delete(List<Pos> posList, int len) {
+        posList = posList.stream().sorted().distinct().toList();
+        int row = posList.getFirst().row();
+        int[] distances = distances(posList);
+        int increase = len;
+        for (int i = 1; i < distances.length; i++) {
+            distances[i] -= increase;
+            increase += len;
+        }
+
+        long occurredOn = System.currentTimeMillis();
+        var edits = posList.stream()
+            .sorted(Comparator.reverseOrder())
+            .map(p -> deleteEdit(p.row(), p.col(), len, occurredOn))
+            .toList();
+        Edit edit = new Edit.Cmp(edits, occurredOn);
+        push(edit);
+        return posList(row, distances);
+    }
+
+    @Override
     public Pos backspace(int row, int col, int len) {
         Edit.Del edit = backspaceEdit(row, col, len, System.currentTimeMillis());
         push(edit);
@@ -109,6 +134,11 @@ public class TextEditImpl implements TextEdit {
             return dryBuffer.get(row);
         }
         return doc.getText(row).toString();
+    }
+
+    @Override
+    public String getText(int fromRow, int toRowExclusive) {
+        return IntStream.range(fromRow, toRowExclusive).mapToObj(this::getText).collect(Collectors.joining());
     }
 
     @Override
@@ -350,6 +380,50 @@ public class TextEditImpl implements TextEdit {
             }
             case Edit.Cmp e -> e.edits().forEach(this::dryApply);
         }
+    }
+
+    /**
+     * Converts the relationship between positions into the distances.
+     * @param poss the positions
+     * @return the distances
+     */
+    int[] distances(List<Pos> poss) {
+        int distance = 0;
+        int index = 0;
+        int[] ret = new int[poss.size()];
+        Pos pos = poss.get(index);
+        for (int i = poss.getFirst().row(); i <= poss.getLast().row(); i++) {
+            String rowText = getText(i);
+            while (pos.row() == i) {
+                ret[index++] = distance + pos.col();
+                if (index >= poss.size()) break;
+                pos = poss.get(index);
+            }
+            distance += rowText.length();
+        }
+        return ret;
+    }
+
+    /**
+     * Converts the distances into the positions.
+     * @param row the base row
+     * @param distances the distances
+     * @return the positions
+     */
+    List<Pos> posList(int row, int[] distances) {
+        List<Pos> poss = new ArrayList<>();
+        int total = 0;
+        int index = 0;
+        for (int i = row; i < rows() && index < distances.length; i++) {
+            String rowText = getText(i);
+            while (total + rowText.length() >= distances[index]) {
+                poss.add(new Pos(i, distances[index] - total));
+                index++;
+                if (index >= distances.length) break;
+            }
+            total += rowText.length();
+        }
+        return poss;
     }
 
     Document getDoc() { return doc; }

@@ -47,6 +47,14 @@ public interface TextEdit {
     String delete(int row, int col, int len);
 
     /**
+     * Delete the multi text from this {@code TextEdit}.
+     * @param posList the position list
+     * @param len the byte length to be deleted
+     * @return the new position
+     */
+    List<Pos> delete(List<Pos> posList, int len);
+
+    /**
      * Backspace delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
@@ -71,6 +79,14 @@ public interface TextEdit {
      * @return the text of the specified row
      */
     String getText(int row);
+
+    /**
+     * Gets the text at the specified row range.
+     * @param startRow the start row
+     * @param endRowExclusive the end row (exclusive)
+     * @return the text of the specified rows
+     */
+    String getText(int startRow, int endRowExclusive);
 
     /**
      * Undo.
@@ -172,6 +188,12 @@ public interface TextEdit {
      * @param row the number of row(zero origin)
      * @param col the byte position on the row
      */
-    record Pos(int row, int col) { }
+    record Pos(int row, int col) implements Comparable<Pos> {
+        @Override
+        public int compareTo(Pos that) {
+            int c = Integer.compare(this.row, that.row);
+            return c == 0 ? Integer.compare(this.col, that.col) : c;
+        }
+    }
 
 }

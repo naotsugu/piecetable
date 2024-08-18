@@ -19,6 +19,8 @@ import com.mammb.code.piecetable.Document;
 import org.junit.jupiter.api.Test;
 import com.mammb.code.piecetable.edit.Edit.*;
 import com.mammb.code.piecetable.TextEdit.*;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -61,6 +63,25 @@ class TextEditImplTest {
         assertEquals(new Pos(0, 1), e.to());
         assertEquals("b", e.text());
     }
+
+    @Test
+    void testDeleteMulti() {
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc123\ndef");
+
+        // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
+        // |           |                   |
+        // ------------------------------------------
+        // | c | 3 | $ | d |
+        // |   |           |
+        var posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)), 2);
+        assertEquals("c3\nd", te.getText(0, 2));
+        assertEquals(new Pos(0, 0), posList.get(0));
+        assertEquals(new Pos(0, 1), posList.get(1));
+        assertEquals(new Pos(1, 1), posList.get(2));
+    }
+
+
 
     @Test
     void testDeleteMultiRow() {
@@ -138,6 +159,40 @@ class TextEditImplTest {
         assertEquals("c", te.getDryBuffer().get(0));
         assertEquals("c", te.getText(0));
         assertEquals("abc", te.getDoc().getText(0));
+
+    }
+
+    @Test
+    void testDistances() {
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\ndef\nghi");
+
+        // | a | b | c | $ | d | e | f | $ | g | h | i |
+        // |   |               |   |                   |
+        // (0, 0)              (1, 1)                  (2, 3)
+        //     (0, 1)              (1, 2)
+        // 0   1               5   6                   11
+        var p1 = new Pos(0, 0);
+        var p2 = new Pos(0, 1);
+        var p3 = new Pos(1, 1);
+        var p4 = new Pos(1, 2);
+        var p5 = new Pos(2, 3);
+
+        int[] distances = te.distances(List.of(p1, p2, p3, p4, p5));
+
+        assertEquals(0, distances[0]);
+        assertEquals(1, distances[1]);
+        assertEquals(5, distances[2]);
+        assertEquals(6, distances[3]);
+        assertEquals(11, distances[4]);
+
+        List<Pos> posList = te.posList(0, distances);
+
+        assertEquals(p1, posList.get(0));
+        assertEquals(p2, posList.get(1));
+        assertEquals(p3, posList.get(2));
+        assertEquals(p4, posList.get(3));
+        assertEquals(p5, posList.get(4));
 
     }
 
