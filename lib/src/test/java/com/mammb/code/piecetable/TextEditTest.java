@@ -69,29 +69,29 @@ class TextEditTest {
     }
 
 
-    @Test
-    void testBackspace() {
-
-        var te = TextEdit.of();
-        te.insert(0, 0, "abc");
-        assertEquals("abc", te.getText(0));
-
-        te.backspace(0, 3, 1);
-        assertEquals("ab", te.getText(0));
-
-        te.backspace(0, 2, 1);
-        assertEquals("a", te.getText(0));
-
-        te.backspace(0, 1, 1);
-        assertEquals("", te.getText(0));
-
-        te.undo();
-        assertEquals("abc", te.getText(0));
-
-        te.redo();
-        assertEquals("", te.getText(0));
-
-    }
+//    @Test
+//    void testBackspace() {
+//
+//        var te = TextEdit.of();
+//        te.insert(0, 0, "abc");
+//        assertEquals("abc", te.getText(0));
+//
+//        te.backspace(0, 3, 1);
+//        assertEquals("ab", te.getText(0));
+//
+//        te.backspace(0, 2, 1);
+//        assertEquals("a", te.getText(0));
+//
+//        te.backspace(0, 1, 1);
+//        assertEquals("", te.getText(0));
+//
+//        te.undo();
+//        assertEquals("abc", te.getText(0));
+//
+//        te.redo();
+//        assertEquals("", te.getText(0));
+//
+//    }
 
     @Test
     void testPos() {

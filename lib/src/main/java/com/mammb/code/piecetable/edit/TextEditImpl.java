@@ -22,8 +22,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +61,8 @@ public class TextEditImpl implements TextEdit {
         this.doc = doc;
     }
 
+    // -- Insert --------------------------------------------------------------
+
     @Override
     public Pos insert(int row, int col, String text) {
         if (text.isEmpty()) return new Pos(row, col);
@@ -73,107 +73,62 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public List<Pos> insert(List<Pos> posList, String text) {
+        long occurredOn = System.currentTimeMillis();
+        List<Edit.ConcreteEdit> edits = new ArrayList<>();
 
-        posList = posList.stream().sorted().distinct().toList();
-        int row = posList.getFirst().row();
-        int[] distances = distances(posList);
-        int increase = text.length();
-        for (int i = 0; i < distances.length; i++) {
-            distances[i] += increase;
-            increase += text.length();
+        List<String> lines = splitRowBreak(text);
+        int prevLastLine = lines.getLast().length();
+
+        int prevRow = -1;
+        int piled = 0;
+        for (Pos pos : posList.stream().sorted().distinct().toList()) {
+            int row = pos.row();
+            int col = pos.col();
+            if (row == prevRow) {
+                col += prevLastLine;
+            }
+            prevRow = row;
+            row += piled;
+            edits.add(insertEdit(row, col, text, occurredOn));
+            piled += (lines.size() - 1);
         }
 
-        long occurredOn = System.currentTimeMillis();
-        var edits = posList.stream()
-            .sorted(Comparator.reverseOrder())
-            .map(p -> insertEdit(p.row(), p.col(), text, occurredOn))
-            .toList();
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
+        return edits.stream().map(e -> new Pos(e.to().row(), e.to().col())).toList();
+    }
 
-        return posList(row, distances);
+    // -- Delete --------------------------------------------------------------
+
+    @Override
+    public String delete(int row, int col) {
+        return deleteChar(row, col, 1);
     }
 
     @Override
-    public String delete(int row, int col, int chCount) {
+    public String delete(int row, int col, int len) {
+        var del = join(rangeTextRightByte(row, col, len));
+        Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
+        push(edit);
+        return edit.text();
+    }
+
+    @Override
+    public List<Pos> delete(List<Pos> posList) {
+        return deleteChar(posList, 1);
+    }
+
+    @Override
+    public List<Pos> delete(List<Pos> posList, List<Integer> lenList) {
+        // TODO
+        return null;
+    }
+
+    private String deleteChar(int row, int col, int chCount) {
         var del = join(rangeTextRight(row, col, chCount));
         Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
         push(edit);
         return edit.text();
-    }
-
-    @Override
-    public String deleteByte(int row, int col, int byteLen) {
-        var del = join(rangeTextRightByte(row, col, byteLen));
-        Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
-        push(edit);
-        return edit.text();
-    }
-
-    @Override
-    public Pos backspace(int row, int col, int chCount) {
-        var del = join(rangeTextLeft(row, col, chCount));
-        Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
-        push(edit);
-        return edit.to();
-    }
-
-    @Override
-    public Pos backspaceByte(int row, int col, int byteLen) {
-        var del = join(rangeTextLeftByte(row, col, byteLen));
-        Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
-        push(edit);
-        return edit.to();
-    }
-
-    @Override
-    public Pos replace(int row, int col, int chCount, String text) {
-        if (chCount == 0) {
-            return insert(row, col, text);
-        }
-        long occurredOn = System.currentTimeMillis();
-        Edit e;
-        Pos pos;
-        if (chCount > 0) {
-            var delText = join(rangeTextRight(row, col, chCount));
-            Edit.ConcreteEdit del = deleteEdit(row, col, delText, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
-            e = new Edit.Cmp(List.of(del, ins), occurredOn);
-            pos = ins.to();
-        } else {
-            var delText = join(rangeTextLeft(row, col, -chCount));
-            Edit.ConcreteEdit bs = backspaceEdit(row, col, delText, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
-            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
-            pos = ins.to();
-        }
-        push(e);
-        return pos;
-    }
-
-    @Override
-    public Pos replaceByte(int row, int col, int byteLen, String text) {
-        if (byteLen == 0) {
-            return insert(row, col, text);
-        }
-        long occurredOn = System.currentTimeMillis();
-        Edit e;
-        Pos pos;
-        if (byteLen > 0) {
-            var delText = join(rangeTextRightByte(row, col, byteLen));
-            Edit.ConcreteEdit del = deleteEdit(row, col, delText, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
-            e = new Edit.Cmp(List.of(del, ins), occurredOn);
-            pos = ins.to();
-        } else {
-            var delText = join(rangeTextLeftByte(row, col, -byteLen));
-            Edit.ConcreteEdit bs = backspaceEdit(row, col, delText, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
-            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
-            pos = ins.to();
-        }
-        push(e);
-        return pos;
     }
 
     //
@@ -191,13 +146,12 @@ public class TextEditImpl implements TextEdit {
     //                  ^   ^   ^
     //  | m | $ |
     //      ^
-    @Override
-    public List<Pos> delete(List<Pos> posList, int chCount) {
+    List<Pos> deleteChar(List<Pos> posList, int chCount) {
 
         long occurredOn = System.currentTimeMillis();
         List<Edit.ConcreteEdit> edits = new ArrayList<>();
 
-        String prevLastLine = "";
+        int prevLastLine = 0;
         Pos prevPos = new Pos(0, 0);
         int piled = 0;
 
@@ -209,104 +163,128 @@ public class TextEditImpl implements TextEdit {
 
             row -= piled;
             if (row == prevPos.row()) {
-                col = prevPos.col() + Math.max(0, col - prevLastLine.length());
+                col = prevPos.col() + Math.max(0, col - prevLastLine);
             }
 
             edits.add(deleteEdit(row, col, join(lines), occurredOn));
 
             prevPos = new Pos(row, col);
             piled += (lines.size() - 1);
-            prevLastLine = lines.getLast();
+            prevLastLine = lines.getLast().length();
         }
 
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
         return edits.stream().map(e -> new Pos(e.to().row(), e.to().col())).toList();
     }
-    public List<Pos> deleteByte(List<Pos> posList, int byteLen) {
+
+    // -- Backspace -----------------------------------------------------------
+
+    @Override
+    public Pos backspace(int row, int col) {
+        return backspaceChar(row, col, 1);
+    }
+
+    @Override
+    public Pos backspace(int row, int col, int len) {
+        var del = join(rangeTextLeftByte(row, col, len));
+        Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
+        push(edit);
+        return edit.to();
+    }
+
+    @Override
+    public List<Pos> backspace(List<Pos> posList) {
+        return backspaceChar(posList, 1);
+    }
+
+    @Override
+    public List<Pos> backspace(List<Pos> posList, List<Integer> lenList) {
         // TODO
         return null;
     }
 
+    Pos backspaceChar(int row, int col, int chCount) {
+        var del = join(rangeTextLeft(row, col, chCount));
+        Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
+        push(edit);
+        return edit.to();
+    }
+    List<Pos> backspaceChar(List<Pos> posList, int chCount) {
+        long occurredOn = System.currentTimeMillis();
+        List<Edit.ConcreteEdit> edits = new ArrayList<>();
 
-    @Override
-    public List<Pos> backspace(List<Pos> posList, int len) {
-        posList = posList.stream().sorted().distinct().toList();
-        int row = posList.getFirst().row();
-        int[] distances = distances(posList);
-        int increase = len;
-        for (int i = 0; i < distances.length; i++) {
-            distances[i] -= increase;
-            increase += len;
+        int prevToCol = 0;
+        int prevRow = -1;
+        int piledRow = 0;
+        int piledCol = -1;
+
+        // TODO
+        for (Pos pos : posList.stream().sorted().distinct().toList()) {
+
+            int row = pos.row();
+            int col = pos.col();
+            var lines = rangeTextLeft(row, col, chCount);
+
+            if (row == prevRow) {
+                col -= piledCol;
+            } else {
+                piledCol = 0;
+            }
+            row -= piledRow;
+            if (row == prevRow) {
+                col += prevToCol;
+            } else {
+                piledCol += lines.getLast().length();
+            }
+            Edit.Del del = backspaceEdit(row, col, join(lines), occurredOn);
+            edits.add(del);
+
+            prevRow = pos.row();
+            piledRow += (lines.size() - 1);
+            prevToCol = del.to().col();
         }
 
-        long occurredOn = System.currentTimeMillis();
-        var edits = posList.stream()
-            .sorted(Comparator.reverseOrder())
-            .map(p -> backspaceEdit(p.row(), p.col(), len, occurredOn))
-            .toList();
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
-        return posList(row, distances);
+        return edits.stream().map(e -> new Pos(e.to().row(), e.to().col())).toList();
+
     }
 
-    @Override
-    public List<Pos> replace(List<Pos> posList, int len, String text) {
-        posList = posList.stream().sorted().distinct().toList();
-        int row = posList.getFirst().row();
-        int[] distances = distances(posList);
-        int increase = text.length() - len;
-        for (int i = 0; i < distances.length; i++) {
-            distances[i] += increase;
-            increase += len;
-        }
+    // -- Replace -------------------------------------------------------------
 
-        long occurredOn = System.currentTimeMillis();
-        Edit edit;
+    @Override
+    public Pos replace(int row, int col, int len, String text) {
         if (len == 0) {
-            var edits = posList.stream()
-                .sorted(Comparator.reverseOrder())
-                .map(p -> insertEdit(p.row(), p.col(), text, occurredOn))
-                .toList();
-            edit = new Edit.Cmp(edits, occurredOn);
-        } else if (len > 0) {
-            var edits = posList.stream()
-                .sorted(Comparator.reverseOrder())
-                .map(p -> List.of(
-                    deleteEdit(p.row(), p.col(), len, occurredOn),
-                    insertEdit(p.row(), p.col(), text, occurredOn)))
-                .flatMap(Collection::stream).toList();
-            edit = new Edit.Cmp(edits, occurredOn);
+            return insert(row, col, text);
+        }
+        long occurredOn = System.currentTimeMillis();
+        Edit e;
+        Pos pos;
+        if (len > 0) {
+            var delText = join(rangeTextRightByte(row, col, len));
+            Edit.ConcreteEdit del = deleteEdit(row, col, delText, occurredOn);
+            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
+            e = new Edit.Cmp(List.of(del, ins), occurredOn);
+            pos = ins.to();
         } else {
-            var edits = posList.stream()
-                .sorted(Comparator.reverseOrder())
-                .map(p -> {
-                    Edit.ConcreteEdit bs = backspaceEdit(p.row(), p.col(), -len, occurredOn);
-                    Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
-                    return List.of(bs, ins); })
-                .flatMap(Collection::stream).toList();
-            edit = new Edit.Cmp(edits, occurredOn);
+            var delText = join(rangeTextLeftByte(row, col, -len));
+            Edit.ConcreteEdit bs = backspaceEdit(row, col, delText, occurredOn);
+            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
+            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
+            pos = ins.to();
         }
-        push(edit);
-
-        return posList(row, distances);
+        push(e);
+        return pos;
     }
 
     @Override
-    public String getText(int row) {
-        if (!deque.isEmpty() && dryBuffer.isEmpty()) {
-            dryApply();
-        }
-        if (dryBuffer.containsKey(row)) {
-            return dryBuffer.get(row);
-        }
-        return doc.getText(row).toString();
+    public List<Pos> replace(List<Pos> posList, List<Integer> lenList, String text) {
+        // TODO
+        return null;
     }
 
-    @Override
-    public String getText(int fromRow, int toRowExclusive) {
-        return IntStream.range(fromRow, toRowExclusive).mapToObj(this::getText).collect(Collectors.joining());
-    }
+    // -- Undo/RedoReplace ----------------------------------------------------
 
     @Override
     public List<Pos> undo() {
@@ -332,6 +310,23 @@ public class TextEditImpl implements TextEdit {
             case Edit.ConcreteEdit e -> List.of(e.to());
             case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).toList();
         };
+    }
+
+
+    @Override
+    public String getText(int row) {
+        if (!deque.isEmpty() && dryBuffer.isEmpty()) {
+            dryApply();
+        }
+        if (dryBuffer.containsKey(row)) {
+            return dryBuffer.get(row);
+        }
+        return doc.getText(row).toString();
+    }
+
+    @Override
+    public String getText(int fromRow, int toRowExclusive) {
+        return IntStream.range(fromRow, toRowExclusive).mapToObj(this::getText).collect(Collectors.joining());
     }
 
     @Override
@@ -428,68 +423,6 @@ public class TextEditImpl implements TextEdit {
             new Pos(newRow, newCol),
             text,
             occurredOn);
-    }
-
-    @Deprecated
-    Edit.Del deleteEdit(int row, int col, int len, long occurredOn) {
-        String rowText = getText(row);
-        if (rowText.length() > col + len) {
-            return new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col),
-                rowText.substring(col, col + len),
-                occurredOn);
-        } else {
-            StringBuilder sb = new StringBuilder(rowText.substring(col));
-            len -= sb.length();
-            for (int nRow = row + 1; nRow < doc.rows(); nRow++) {
-                rowText = getText(nRow);
-                if (len - rowText.length() <= 0) {
-                    sb.append(rowText, 0, len);
-                    break;
-                }
-                len -= rowText.length();
-                sb.append(rowText);
-            }
-            return new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col),
-                sb.toString(),
-                occurredOn);
-        }
-    }
-
-    @Deprecated
-    Edit.Del backspaceEdit(int row, int col, int len, long occurredOn) {
-        String rowText = getText(row);
-        if (col - len >= 0) {
-            return new Edit.Del(
-                new Pos(row, col),
-                new Pos(row, col - len),
-                rowText.substring(col - len, col),
-                occurredOn);
-        } else {
-            StringBuilder sb = new StringBuilder(rowText.substring(0, col));
-            int nRow = row - 1;
-            int nCol;
-            len -= col;
-            for (;;) {
-                rowText = getText(nRow);
-                if (len - rowText.length() <= 0) {
-                    nCol = rowText.length() - len;
-                    sb.insert(0, rowText.substring(nCol));
-                    break;
-                }
-                len -= rowText.length();
-                nRow--;
-                sb.insert(0, rowText);
-            }
-            return new Edit.Del(
-                new Pos(row, col),
-                new Pos(nRow, nCol),
-                sb.toString(),
-                occurredOn);
-        }
     }
 
     /**
@@ -637,7 +570,7 @@ public class TextEditImpl implements TextEdit {
         List<String> ret = new ArrayList<>();
         for (int i = row; i >= 0; i--) {
             var s = getText(i);
-            var text = (col > 0) ? s.substring(0, col) : s;
+            var text = (i == row) ? s.substring(0, col) : s;
             int len = Texts.chLength(text);
             if (chLen - len <= 0) {
                 ret.addFirst(Texts.chRight(text, chLen));
@@ -645,7 +578,6 @@ public class TextEditImpl implements TextEdit {
             }
             ret.addFirst(text);
             chLen -= len;
-            col = 0;
         }
         return ret;
     }
@@ -675,7 +607,7 @@ public class TextEditImpl implements TextEdit {
             var text = (col > 0) ? s.substring(0, col) : s;
             int len = text.length();
             if (byteLen - len <= 0) {
-                ret.addFirst(text.substring(byteLen));
+                ret.addFirst(text.substring(len - byteLen));
                 break;
             }
             ret.addFirst(text);

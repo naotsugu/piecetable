@@ -32,27 +32,24 @@ class TextEditImplTest {
     @Test
     void testInsert() {
         var te = new TextEditImpl(Document.of());
-        te.insert(0, 0, "abc");
 
-        var e = (Ins) te.getDeque().peek();
-        assertEquals(new Pos(0, 0), e.from());
-        assertEquals(new Pos(0, 3), e.to());
-        assertEquals("abc", e.text());
+        var pos = te.insert(0, 0, "abc");
+        assertEquals("abc", te.getText(0, 1));
+        assertEquals(new Pos(0, 3), pos);
     }
 
     @Test
     void testInsertMultiRow() {
         var te = new TextEditImpl(Document.of());
-        te.insert(0, 0, "abc\ndef\ngh");
 
-        var e = (Ins) te.getUndo().peek().flip();
-        assertEquals(new Pos(0, 0), e.from());
-        assertEquals(new Pos(2, 2), e.to());
-        assertEquals("abc\ndef\ngh", e.text());
+        var pos = te.insert(0, 0, "abc\ndef\ngh");
+
+        assertEquals("abc\ndef\ngh", te.getText(0, 3));
+        assertEquals(new Pos(2, 2), pos);
     }
 
     @Test
-    void testInsertMulti() {
+    void testInsertMultiPos() {
         var te = new TextEditImpl(Document.of());
         te.insert(0, 0, "abc123\ndef");
 
@@ -68,18 +65,47 @@ class TextEditImplTest {
         assertEquals(new Pos(1, 3), posList.get(2));
     }
 
+    @Test
+    void testInsertMultiPosMultiLine() {
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc123\ndef");
+
+        // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
+        // |           |                   |
+        // ------------------------------------------
+        // | * | $
+        // | * | a | b | c | * | $ |
+        //     ^
+        // | * | 1 | 2 | 3 | $ |
+        //     ^
+        // | d | * | $
+        // | * | e | f |
+        //     ^
+        var posList = te.insert(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)), "*\n*");
+        assertEquals("*\n*abc*\n*123\nd*\n*ef", te.getText(0, 5));
+        assertEquals(new Pos(1, 1), posList.get(0));
+        assertEquals(new Pos(2, 1), posList.get(1));
+        assertEquals(new Pos(4, 1), posList.get(2));
+    }
 
     @Test
     void testDelete() {
         var te = new TextEditImpl(Document.of());
-        te.getDoc().insert(0, 0, "abc");
+        te.getDoc().insert(0, 0, "abc\r\n");
 
-        te.delete(0, 1, 1);
+        var delText = te.delete(0, 3);
+        assertEquals("\r\n", delText);
+        assertEquals("abc", te.getText(0, 1));
+    }
 
-        var e = (Del) te.getDeque().peek();
-        assertEquals(new Pos(0, 1), e.from());
-        assertEquals(new Pos(0, 1), e.to());
-        assertEquals("b", e.text());
+    @Test
+    void testDeleteMultiRow() {
+        var te = new TextEditImpl(Document.of());
+        te.getDoc().insert(0, 0, "abc\ndef\ngh");
+
+        var delText = te.delete(0, 1, 8);
+        assertEquals("bc\ndef\ng", delText);
+        assertEquals("ah", te.getText(0, 1));
     }
 
     @Test
@@ -90,28 +116,13 @@ class TextEditImplTest {
         // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
         // |           |                   |
         // ------------------------------------------
-        // | c | 3 | $ | d |
-        // |   |           |
-        var posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)), 2);
-        assertEquals("c3\nd", te.getText(0, 2));
+        // | b | c | 2 | 3 | $ | d | f |
+        // |       |               |
+        var posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)));
+        assertEquals("bc23\ndf", te.getText(0, 2));
         assertEquals(new Pos(0, 0), posList.get(0));
-        assertEquals(new Pos(0, 1), posList.get(1));
+        assertEquals(new Pos(0, 2), posList.get(1));
         assertEquals(new Pos(1, 1), posList.get(2));
-    }
-
-
-
-    @Test
-    void testDeleteMultiRow() {
-        var te = new TextEditImpl(Document.of());
-        te.getDoc().insert(0, 0, "abc\ndef\ngh");
-
-        te.delete(0, 1, 8);
-
-        var e = (Del) te.getUndo().peek().flip();
-        assertEquals(new Pos(0, 1), e.from());
-        assertEquals(new Pos(0, 1), e.to());
-        assertEquals("bc\ndef\ng", e.text());
     }
 
     @Test
@@ -119,12 +130,19 @@ class TextEditImplTest {
         var te = new TextEditImpl(Document.of());
         te.getDoc().insert(0, 0, "abc");
 
-        te.backspace(0, 2, 1);
+        var pos = te.backspace(0, 2);
+        assertEquals("ac", te.getText(0, 1));
+        assertEquals(new Pos(0, 1), pos);
+    }
 
-        var e = (Del) te.getDeque().peek();
-        assertEquals(new Pos(0, 2), e.from());
-        assertEquals(new Pos(0, 1), e.to());
-        assertEquals("b", e.text());
+    @Test
+    void testBackspaceRowBreak() {
+        var te = new TextEditImpl(Document.of());
+        te.getDoc().insert(0, 0, "abc\r\n");
+
+        var pos = te.backspace(1, 0);
+        assertEquals("abc", te.getText(0, 1));
+        assertEquals(new Pos(0, 3), pos);
     }
 
     @Test
@@ -132,14 +150,28 @@ class TextEditImplTest {
         var te = new TextEditImpl(Document.of());
         te.getDoc().insert(0, 0, "abc\ndef\ngh");
 
-        te.backspace(2, 1, 8);
-
-        var e = (Del) te.getUndo().peek().flip();
-        assertEquals(new Pos(2, 1), e.from());
-        assertEquals(new Pos(0, 1), e.to());
-        assertEquals("bc\ndef\ng", e.text());
+        var pos = te.backspace(2, 1, 8);
+        assertEquals("ah", te.getText(0, 1));
+        assertEquals(new Pos(0, 1), pos);
     }
 
+//    @Test
+//    void testBackspaceMulti() {
+//        var te = new TextEditImpl(Document.of());
+//        te.insert(0, 0, "abc123\ndef");
+//
+//        // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
+//        //     |           |           |           |
+//        // ------------------------------------------
+//        // | b | c | 2 | 3 | d | e |
+//        // |       |       |       |
+//        var posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 4), new Pos(1, 0), new Pos(1, 3)));
+//        assertEquals("bc23de", te.getText(0, 1));
+//        assertEquals(new Pos(0, 0), posList.get(0));
+//        assertEquals(new Pos(0, 2), posList.get(1));
+//        assertEquals(new Pos(0, 4), posList.get(2));
+//        assertEquals(new Pos(0, 6), posList.get(3));
+//    }
     @Test
     void testDryApplyInsert() {
 
@@ -265,6 +297,8 @@ class TextEditImplTest {
 
         assertEquals("i", te.rangeTextLeft(2, 3, 1).get(0));
         assertEquals("h", te.rangeTextLeft(2, 2, 1).get(0));
+        assertEquals("g", te.rangeTextLeft(2, 1, 1).get(0));
+        assertEquals("\n", te.rangeTextLeft(2, 0, 1).get(0));
         assertEquals("\n", te.rangeTextLeft(2, 2, 3).get(0));
         assertEquals("gh", te.rangeTextLeft(2, 2, 3).get(1));
 

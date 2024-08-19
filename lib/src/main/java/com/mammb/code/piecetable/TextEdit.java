@@ -49,57 +49,96 @@ public interface TextEdit {
      * Delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
-     * @param chCount the character count to be deleted
      * @return the deleted text
      */
-    String delete(int row, int col, int chCount);
-    String deleteByte(int row, int col, int byteLen);
+    String delete(int row, int col);
+
+    /**
+     * Delete the text from this {@code TextEdit}.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row where the text to be deleted
+     * @param len the byte length to be deleted
+     * @return the deleted text
+     */
+    String delete(int row, int col, int len);
 
     /**
      * Delete the multi text from this {@code TextEdit}.
      * @param posList the position list
-     * @param len the byte length to be deleted
      * @return the new position
      */
-    List<Pos> delete(List<Pos> posList, int len);
+    List<Pos> delete(List<Pos> posList);
+
+    /**
+     * Delete the multi text from this {@code TextEdit}.
+     * @param posList the position list
+     * @param lenList the byte length list to be deleted
+     * @return the new position
+     */
+    List<Pos> delete(List<Pos> posList, List<Integer> lenList);
 
     /**
      * Backspace delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
-     * @param chCount the character count to be deleted
      * @return the new position
      */
-    Pos backspace(int row, int col, int chCount);
-    Pos backspaceByte(int row, int col, int byteLen);
+    Pos backspace(int row, int col);
+
+    /**
+     * Backspace delete the text from this {@code TextEdit}.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row where the text to be deleted
+     * @param len the byte length to be deleted
+     * @return the new position
+     */
+    Pos backspace(int row, int col, int len);
 
     /**
      * Backspace delete the multi text from this {@code TextEdit}.
      * @param posList the position list
-     * @param len the byte length to be deleted
      * @return the new position
      */
-    List<Pos> backspace(List<Pos> posList, int len);
+    List<Pos> backspace(List<Pos> posList);
+
+    /**
+     * Backspace delete the multi text from this {@code TextEdit}.
+     * @param posList the position list
+     * @param lenList the byte length list to be deleted
+     * @return the new position
+     */
+    List<Pos> backspace(List<Pos> posList, List<Integer> lenList);
 
     /**
      * Replace the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be replaced
-     * @param chCount the character count to be replaced
-     * @param text the char sequence is to be inserted
-     * @return the new position
-     */
-    Pos replace(int row, int col, int chCount, String text);
-    Pos replaceByte(int row, int col, int byteLen, String text);
-
-    /**
-     * Replace the multi text from this {@code TextEdit}.
-     * @param posList the position list
      * @param len the byte length to be replaced
      * @param text the char sequence is to be inserted
      * @return the new position
      */
-    List<Pos> replace(List<Pos> posList, int len, String text);
+    Pos replace(int row, int col, int len, String text);
+
+    /**
+     * Replace the multi text from this {@code TextEdit}.
+     * @param posList the position list
+     * @param lenList the byte length list to be deleted
+     * @param text the char sequence is to be inserted
+     * @return the new position
+     */
+    List<Pos> replace(List<Pos> posList, List<Integer> lenList, String text);
+
+    /**
+     * Undo.
+     * @return the undo position
+     */
+    List<Pos> undo();
+
+    /**
+     * Redo.
+     * @return the redo position
+     */
+    List<Pos> redo();
 
     /**
      * Gets the text at the specified row.
@@ -115,18 +154,6 @@ public interface TextEdit {
      * @return the text of the specified rows
      */
     String getText(int startRow, int endRowExclusive);
-
-    /**
-     * Undo.
-     * @return the undo position
-     */
-    List<Pos> undo();
-
-    /**
-     * Redo.
-     * @return the redo position
-     */
-    List<Pos> redo();
 
     /**
      * Flush.

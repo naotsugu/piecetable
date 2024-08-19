@@ -26,6 +26,22 @@ import static org.junit.jupiter.api.Assertions.*;
 class TextsTest {
 
     @Test
+    void splitRowBreak() {
+        var ret = Texts.splitRowBreak("");
+        assertEquals(1, ret.size());
+        assertEquals("", ret.get(0));
+
+        ret = Texts.splitRowBreak("a");
+        assertEquals(1, ret.size());
+        assertEquals("a", ret.get(0));
+
+        ret = Texts.splitRowBreak("a\n");
+        assertEquals(2, ret.size());
+        assertEquals("a\n", ret.get(0));
+        assertEquals("", ret.get(1));
+    }
+
+    @Test
     void chLength() {
         assertEquals(0, Texts.chLength(""));
         assertEquals(1, Texts.chLength("a"));

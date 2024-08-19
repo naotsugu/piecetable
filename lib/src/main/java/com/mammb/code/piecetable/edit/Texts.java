@@ -15,6 +15,10 @@
  */
 package com.mammb.code.piecetable.edit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * The text utility.
  * @author Naotsugu Kobayashi
@@ -27,6 +31,16 @@ class Texts {
 
     static int countRowBreak(String str) {
         return (int) str.chars().filter(c -> c == '\n').count();
+    }
+
+    static List<String> splitRowBreak(String str) {
+        // TODO Optimization
+        var ret = Arrays.asList(str.split("(?<=\\n)"));
+        if (ret.getLast().endsWith("\n")) {
+            ret = new ArrayList<>(ret);
+            ret .add("");
+        }
+        return ret;
     }
 
     static int leftCol(String str) {
