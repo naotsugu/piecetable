@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -213,42 +214,30 @@ public class TextEditImpl implements TextEdit {
     List<Pos> backspaceChar(List<Pos> posList, int chCount) {
         long occurredOn = System.currentTimeMillis();
         List<Edit.ConcreteEdit> edits = new ArrayList<>();
-
-        int prevToCol = 0;
-        int prevRow = -1;
-        int piledRow = 0;
-        int piledCol = -1;
-
-        // TODO
-        for (Pos pos : posList.stream().sorted().distinct().toList()) {
-
-            int row = pos.row();
-            int col = pos.col();
-            var lines = rangeTextLeft(row, col, chCount);
-
-            if (row == prevRow) {
-                col -= piledCol;
-            } else {
-                piledCol = 0;
-            }
-            row -= piledRow;
-            if (row == prevRow) {
-                col += prevToCol;
-            } else {
-                piledCol += lines.getLast().length();
-            }
-            Edit.Del del = backspaceEdit(row, col, join(lines), occurredOn);
+        for (Pos pos : posList.stream().sorted(Comparator.reverseOrder()).distinct().toList()) {
+            var lines = rangeTextLeft(pos.row(), pos.col(), chCount);
+            Edit.Del del = backspaceEdit(pos.row(), pos.col(), join(lines), occurredOn);
             edits.add(del);
-
-            prevRow = pos.row();
-            piledRow += (lines.size() - 1);
-            prevToCol = del.to().col();
         }
-
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
-        return edits.stream().map(e -> new Pos(e.to().row(), e.to().col())).toList();
 
+        Edit.ConcreteEdit prevEdit = null;
+        int piledRow = 0;
+        List<Pos> ret = new ArrayList<>();
+        for (Edit.ConcreteEdit e : edits.stream()
+            .sorted(Comparator.comparing(Edit.ConcreteEdit::to)).toList()) {
+            int row = e.to().row();
+            int col = e.to().col();
+            row -= piledRow;
+            if (prevEdit != null && row == prevEdit.to().row()) {
+                col += (prevEdit.to().col() + e.to().col() - prevEdit.from().col());
+            }
+            ret.add(new Pos(row, col));
+            prevEdit = e;
+            piledRow += countRowBreak(e.text());
+        }
+        return ret;
     }
 
     // -- Replace -------------------------------------------------------------
