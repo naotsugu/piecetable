@@ -65,6 +65,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public Pos insert(int row, int col, String text) {
+        if (text.isEmpty()) return new Pos(row, col);
         var edit = insertEdit(row, col, text, System.currentTimeMillis());
         push(edit);
         return edit.to();
@@ -175,26 +176,56 @@ public class TextEditImpl implements TextEdit {
         return pos;
     }
 
-
+    //
+    //  | a | b | c | d | $ |
+    //                  ^****
+    //  | e | f | g | h | i | j | k | l | $ |
+    //  ****    ^*******    ^*******
+    //  | m | n | o | $ |
+    //      ^*******
+    //  ------------------------------
+    //  delete [$ e][g h][j k][n o]
+    //  ------------------------------
+    //
+    //  | a | b | c | d | f | i | l | $ |
+    //                  ^   ^   ^
+    //  | m | $ |
+    //      ^
     @Override
-    public List<Pos> delete(List<Pos> posList, int len) {
-        posList = posList.stream().sorted().distinct().toList();
-        int row = posList.getFirst().row();
-        int[] distances = distances(posList);
-        int increase = len;
-        for (int i = 1; i < distances.length; i++) {
-            distances[i] -= increase;
-            increase += len;
-        }
+    public List<Pos> delete(List<Pos> posList, int chCount) {
 
         long occurredOn = System.currentTimeMillis();
-        var edits = posList.stream()
-            .sorted(Comparator.reverseOrder())
-            .map(p -> deleteEdit(p.row(), p.col(), len, occurredOn))
-            .toList();
+        List<Edit.ConcreteEdit> edits = new ArrayList<>();
+
+        String prevLastLine = "";
+        Pos prevPos = new Pos(0, 0);
+        int piled = 0;
+
+        for (Pos pos : posList.stream().sorted().distinct().toList()) {
+
+            int row = pos.row();
+            int col = pos.col();
+            var lines = rangeTextRight(row, col, chCount);
+
+            row -= piled;
+            if (row == prevPos.row()) {
+                col = prevPos.col() + Math.max(0, col - prevLastLine.length());
+            }
+
+            edits.add(deleteEdit(row, col, join(lines), occurredOn));
+
+            prevPos = new Pos(row, col);
+            piled += (lines.size() - 1);
+            prevLastLine = lines.getLast();
+        }
+
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
-        return posList(row, distances);
+        return edits.stream().map(e -> new Pos(e.to().row(), e.to().col())).toList();
+    }
+    public List<Pos> deleteByte(List<Pos> posList, int byteLen) {
+        // TODO
+        return null;
     }
 
 
