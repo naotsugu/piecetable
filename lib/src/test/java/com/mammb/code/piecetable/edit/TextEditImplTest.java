@@ -214,14 +214,14 @@ class TextEditImplTest {
 //    @Test
 //    void testBackspaceMulti2() {
 //        var te = new TextEditImpl(Document.of());
-//        te.insert(0, 0, "123\ndef");
+//        te.insert(0, 0, "abc123\ndef");
 //
-//        // | 1 | 2 | 3 | $ | d | e | f |
-//        //                 |           |
+//        // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
+//        //     |           |           |           |
 //        // ------------------------------------------
-//        // | 1 | 2 | 3 | d | e |
-//        //             |       |
-//        var posList = te.backspace(List.of(new Pos(1, 0), new Pos(1, 3)));
+//        // | b | c | 2 | 3 | d | e |
+//        // |       |       |       |
+//        var posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 4), new Pos(1, 0), new Pos(1, 3)));
 //        assertEquals("bc23de", te.getText(0, 1));
 //        assertEquals(new Pos(0, 0), posList.get(0));
 //        assertEquals(new Pos(0, 2), posList.get(1));

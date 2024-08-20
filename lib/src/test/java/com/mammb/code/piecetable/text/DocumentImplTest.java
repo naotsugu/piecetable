@@ -49,13 +49,14 @@ class DocumentImplTest {
 
     }
 
-//    @Test
-//    void testEdit() {
-//        var doc = DocumentImpl.of();
-//        doc.insert(0, 0, "ab\ncd");
-//        doc.delete(1, 1, 1);
-//    }
-
+    @Test
+    void testEdit() {
+        var doc = DocumentImpl.of();
+        doc.insert(0, 0, "ab\ncd");
+        doc.delete(1, 1, 1);
+        assertEquals("ab\n", doc.getText(0));
+        assertEquals("c", doc.getText(1));
+    }
 
     @Test
     void utf8(@TempDir Path tempDir) throws IOException {
