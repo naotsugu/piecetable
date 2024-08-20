@@ -235,7 +235,7 @@ public class TextEditImpl implements TextEdit {
                 piledCol = 0;
             }
             if (prevEdit.to().row() != prevEdit.from().row()) {
-                piledCol = -(prevEdit.to().col() - 1);
+                piledCol = -(prevEdit.to().col() - 1); // TODO
             }
             row -= piledRow;
             col -= piledCol;

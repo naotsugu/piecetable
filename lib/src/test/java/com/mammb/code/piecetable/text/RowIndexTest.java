@@ -131,14 +131,39 @@ class RowIndexTest {
     }
 
     @Test
+    void deleteEnd() {
+        var index = RowIndex.of(5);
+        index.add("12".getBytes());
+        index.delete(0, 1, 1);
+        assertEquals(1, index.rowLengths().length);
+        assertEquals(1, index.rowLengths()[0]);
+
+        index.delete(0, 0, 1);
+        assertEquals(1, index.rowLengths().length);
+        assertEquals(0, index.rowLengths()[0]);
+    }
+
+    @Test
+    void deleteEnd2() {
+        var index = RowIndex.of(5);
+        index.add("abc\n12".getBytes());
+        index.delete(1, 1, 1);
+        assertEquals(2, index.rowLengths().length);
+        assertEquals(4, index.rowLengths()[0]);
+        assertEquals(1, index.rowLengths()[1]);
+    }
+
+    @Test
     void deleteWithinSingleLine() {
         var index = RowIndex.of(5);
         index.add("abcd\n".getBytes());
         index.delete(0, 1, 2);
+        // abcd$ -> ad$
         assertEquals(2, index.rowLengths().length);
         assertEquals(3, index.rowLengths()[0]);
         assertEquals(0, index.rowLengths()[1]);
         index.delete(0, 0, 3);
+        // ad$ ->
         assertEquals(1, index.rowLengths().length);
         assertEquals(0, index.rowLengths()[0]);
     }

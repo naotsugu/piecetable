@@ -224,13 +224,13 @@ public class RowIndex {
             rowLengths[row] = col;
             int lines = 0;
             do {
+                if ((row + lines + 1) >= length) break;
                 len -= rowLengths[row + ++lines];
             } while (len > 0);
 
             rowLengths[row] += (-len); // merge the rest to the first row
 
-            // TODO
-            if (length > 1 && (length - (row + 1 + lines)) > 0) {
+            if (lines > 0) {
                 System.arraycopy(
                     rowLengths, row + 1 + lines,
                     rowLengths, row + 1,
