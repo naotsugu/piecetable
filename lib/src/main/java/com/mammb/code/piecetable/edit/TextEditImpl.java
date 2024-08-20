@@ -212,6 +212,7 @@ public class TextEditImpl implements TextEdit {
         return edit.to();
     }
     List<Pos> backspaceChar(List<Pos> posList, int chCount) {
+
         long occurredOn = System.currentTimeMillis();
         List<Edit.ConcreteEdit> edits = new ArrayList<>();
         for (Pos pos : posList.stream().sorted(Comparator.reverseOrder()).distinct().toList()) {
@@ -222,20 +223,26 @@ public class TextEditImpl implements TextEdit {
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
 
-        Edit.ConcreteEdit prevEdit = null;
+        Edit.ConcreteEdit prevEdit = edits.getLast();
         int piledRow = 0;
+        int piledCol = 0;
         List<Pos> ret = new ArrayList<>();
         for (Edit.ConcreteEdit e : edits.stream()
             .sorted(Comparator.comparing(Edit.ConcreteEdit::to)).toList()) {
             int row = e.to().row();
             int col = e.to().col();
-            row -= piledRow;
-            if (prevEdit != null && row == prevEdit.to().row()) {
-                col += (prevEdit.to().col() + e.to().col() - prevEdit.from().col());
+            if (row != prevEdit.to().row()) {
+                piledCol = 0;
             }
+            if (prevEdit.to().row() != prevEdit.from().row()) {
+                piledCol = -(prevEdit.to().col() - 1);
+            }
+            row -= piledRow;
+            col -= piledCol;
             ret.add(new Pos(row, col));
             prevEdit = e;
             piledRow += countRowBreak(e.text());
+            piledCol += splitRowBreak(e.text()).getLast().length();
         }
         return ret;
     }

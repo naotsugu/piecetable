@@ -155,23 +155,80 @@ class TextEditImplTest {
         assertEquals(new Pos(0, 1), pos);
     }
 
+    @Test
+    void testBackspaceMulti() {
+
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc123");
+        // | a | b | c | 1 | 2 | 3 |
+        //  ***^        ***^    ***^
+        // ------------------------------------------
+        // | b | c | 2 |
+        // ^       ^   ^
+        var posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 4), new Pos(0, 6)));
+        assertEquals("bc2", te.getText(0, 1));
+        assertEquals(new Pos(0, 0), posList.get(0));
+        assertEquals(new Pos(0, 2), posList.get(1));
+        assertEquals(new Pos(0, 3), posList.get(2));
+
+        te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\n123");
+        // | a | b | c | $ | 1 | 2 | 3 |
+        //      ***^        ***^
+        // ------------------------------------------
+        // | a | c | $ | 2 | 3 |
+        //     ^       ^
+        posList = te.backspace(List.of(new Pos(0, 2), new Pos(1, 1)));
+        assertEquals("ac\n23", te.getText(0, 2));
+        assertEquals(new Pos(0, 1), posList.get(0));
+        assertEquals(new Pos(1, 0), posList.get(1));
+
+        te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\n123");
+        // | a | b | c | $ | 1 | 2 | 3 |
+        //  ***^    ***^    ***^    ***^
+        // ------------------------------------------
+        // | b | $ | 2 |
+        // ^   ^   ^   ^
+        posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 3), new Pos(1, 1), new Pos(1, 3)));
+        assertEquals("b\n2", te.getText(0, 2));
+        assertEquals(new Pos(0, 0), posList.get(0));
+        assertEquals(new Pos(0, 1), posList.get(1));
+        assertEquals(new Pos(1, 0), posList.get(2));
+        assertEquals(new Pos(1, 1), posList.get(3));
+
+        te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\n123");
+        // | a | b | c | $ | 1 | 2 | 3 |
+        //     ***^     ***^    ***^
+        // ------------------------------------------
+        // | a | c | 1 | 3 |
+        //     ^   ^   ^
+        posList = te.backspace(List.of(new Pos(0, 2), new Pos(1, 0), new Pos(1, 2)));
+        assertEquals("ac13", te.getText(0, 1));
+        assertEquals(new Pos(0, 1), posList.get(0));
+        assertEquals(new Pos(0, 2), posList.get(1));
+        assertEquals(new Pos(0, 3), posList.get(2));
+    }
+
 //    @Test
-//    void testBackspaceMulti() {
+//    void testBackspaceMulti2() {
 //        var te = new TextEditImpl(Document.of());
-//        te.insert(0, 0, "abc123\ndef");
+//        te.insert(0, 0, "123\ndef");
 //
-//        // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
-//        //     |           |           |           |
+//        // | 1 | 2 | 3 | $ | d | e | f |
+//        //                 |           |
 //        // ------------------------------------------
-//        // | b | c | 2 | 3 | d | e |
-//        // |       |       |       |
-//        var posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 4), new Pos(1, 0), new Pos(1, 3)));
+//        // | 1 | 2 | 3 | d | e |
+//        //             |       |
+//        var posList = te.backspace(List.of(new Pos(1, 0), new Pos(1, 3)));
 //        assertEquals("bc23de", te.getText(0, 1));
 //        assertEquals(new Pos(0, 0), posList.get(0));
 //        assertEquals(new Pos(0, 2), posList.get(1));
 //        assertEquals(new Pos(0, 4), posList.get(2));
 //        assertEquals(new Pos(0, 6), posList.get(3));
 //    }
+
     @Test
     void testDryApplyInsert() {
 

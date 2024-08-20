@@ -230,6 +230,9 @@ public class RowIndex {
             rowLengths[row] += (-len); // merge the rest to the first row
 
             if (length > 1) {
+                System.out.println("length " + length);
+                System.out.println("row " + row);
+                System.out.println("lines " + lines);
                 System.arraycopy(
                     rowLengths, row + 1 + lines,
                     rowLengths, row + 1,
