@@ -148,30 +148,35 @@ public class TextEditImpl implements TextEdit {
     //  | m | $ |
     //      ^
     List<Pos> deleteChar(List<Pos> posList, int chCount) {
-
         long occurredOn = System.currentTimeMillis();
         List<Edit.ConcreteEdit> edits = new ArrayList<>();
 
-        int prevLastLine = 0;
-        Pos prevPos = new Pos(0, 0);
-        int piled = 0;
-
+        Edit.ConcreteEdit prevEdit = null;
+        int piledRow = 0;
+        int piledCol = 0;
         for (Pos pos : posList.stream().sorted().distinct().toList()) {
 
             int row = pos.row();
             int col = pos.col();
-            var lines = rangeTextRight(row, col, chCount);
+            List<String> lines = rangeTextRight(row, col, chCount);
 
-            row -= piled;
-            if (row == prevPos.row()) {
-                col = prevPos.col() + Math.max(0, col - prevLastLine);
+            row -= piledRow;
+            if (prevEdit != null && countRowBreak(prevEdit.text()) > 0 && prevEdit.from().row() == row) {
+                // merged
+                piledCol = -(prevEdit.to().col() - splitRowBreak(prevEdit.text()).getLast().length());
+            } else if (prevEdit != null && prevEdit.from().row() != row) {
+                // different lines
+                piledCol = 0;
             }
+            col -= piledCol;
 
-            edits.add(deleteEdit(row, col, join(lines), occurredOn));
+            Edit.Del edit = deleteEdit(row, col, join(lines), occurredOn);
+            System.out.println(edit);
+            edits.add(edit);
 
-            prevPos = new Pos(row, col);
-            piled += (lines.size() - 1);
-            prevLastLine = lines.getLast().length();
+            prevEdit = edit;
+            piledRow += countRowBreak(edit.text());
+            piledCol += lines.getLast().length();
         }
 
         Edit edit = new Edit.Cmp(edits, occurredOn);

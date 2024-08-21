@@ -110,19 +110,49 @@ class TextEditImplTest {
 
     @Test
     void testDeleteMulti() {
+
         var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc123");
+
+        // | a | b | c | 1 | 2 | 3 |
+        // ^***    ^***    ^***
+        // ------------------------------------------
+        // | b | 1 | 3 |
+        // ^   ^   ^
+        var posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 2), new Pos(0, 4)));
+        assertEquals("b13", te.getText(0, 1));
+        assertEquals(new Pos(0, 0), posList.get(0));
+        assertEquals(new Pos(0, 1), posList.get(1));
+        assertEquals(new Pos(0, 2), posList.get(2));
+
+        te = new TextEditImpl(Document.of());
         te.insert(0, 0, "abc123\ndef");
 
         // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
-        // |           |                   |
+        // ^***        ^***                ^***
         // ------------------------------------------
         // | b | c | 2 | 3 | $ | d | f |
-        // |       |               |
-        var posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)));
+        // ^       ^               ^
+        posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)));
         assertEquals("bc23\ndf", te.getText(0, 2));
         assertEquals(new Pos(0, 0), posList.get(0));
         assertEquals(new Pos(0, 2), posList.get(1));
         assertEquals(new Pos(1, 1), posList.get(2));
+
+        te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc123\ndef");
+
+        // | a | b | c | 1 | 2 | 3 | $ | d | e | f |
+        // ^***        ^***        ^***        ^***
+        // ------------------------------------------
+        // | b | c | 2 | 3 | d | e |
+        // ^       ^       ^       ^
+        posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(0, 6), new Pos(1, 2)));
+        assertEquals("bc23de", te.getText(0, 1));
+        assertEquals(new Pos(0, 0), posList.get(0));
+        assertEquals(new Pos(0, 2), posList.get(1));
+        assertEquals(new Pos(0, 4), posList.get(2));
+        assertEquals(new Pos(0, 6), posList.get(3));
     }
 
     @Test
