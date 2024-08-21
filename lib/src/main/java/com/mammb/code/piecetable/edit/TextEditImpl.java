@@ -231,11 +231,12 @@ public class TextEditImpl implements TextEdit {
             .sorted(Comparator.comparing(Edit.ConcreteEdit::to)).toList()) {
             int row = e.to().row();
             int col = e.to().col();
-            if (row != prevEdit.to().row()) {
+            if (prevEdit.to().row() != prevEdit.from().row() && prevEdit.from().row() == row) {
+                // merged
+                piledCol -= prevEdit.to().col();
+            } else if (row != prevEdit.from().row()) {
+                // different lines
                 piledCol = 0;
-            }
-            if (prevEdit.to().row() != prevEdit.from().row()) {
-                piledCol = -(prevEdit.to().col() - 1);
             }
             row -= piledRow;
             col -= piledCol;
