@@ -78,27 +78,38 @@ public class TextEditImpl implements TextEdit {
         List<Edit.ConcreteEdit> edits = new ArrayList<>();
 
         List<String> lines = splitRowBreak(text);
-        int prevLastLine = lines.getLast().length();
 
-        int prevRow = -1;
-        int piled = 0;
+        Edit.ConcreteEdit prevEdit = null;
+        Pos prevPos = null;
+        int piledRow = 0;
+        int piledCol = 0;
         for (Pos pos : posList.stream().sorted().distinct().toList()) {
             int row = pos.row();
             int col = pos.col();
-            if (row == prevRow) {
-                col += prevLastLine;
+
+            row += piledRow;
+            if (prevEdit != null && prevEdit.from().row() != prevEdit.to().row() && prevEdit.to().row() == row) {
+                piledCol -= prevPos.col();
+            } else if (prevEdit != null && prevEdit.to().row() != row) {
+                // different lines
+                piledCol = 0;
             }
-            prevRow = row;
-            row += piled;
-            edits.add(insertEdit(row, col, text, occurredOn));
-            piled += (lines.size() - 1);
+            col += piledCol;
+            Edit.Ins edit = insertEdit(row, col, text, occurredOn);
+            edits.add(edit);
+
+            prevEdit = edit;
+            prevPos = pos;
+            piledRow += (lines.size() - 1);
+            piledCol = (lines.size() > 1)
+                ? lines.getLast().length()
+                : piledCol + lines.getFirst().length();
         }
 
         Edit edit = new Edit.Cmp(edits, occurredOn);
         push(edit);
         return edits.stream().map(e -> new Pos(e.to().row(), e.to().col())).toList();
     }
-
     // -- Delete --------------------------------------------------------------
 
     @Override
@@ -171,7 +182,6 @@ public class TextEditImpl implements TextEdit {
             col -= piledCol;
 
             Edit.Del edit = deleteEdit(row, col, join(lines), occurredOn);
-            System.out.println(edit);
             edits.add(edit);
 
             prevEdit = edit;
