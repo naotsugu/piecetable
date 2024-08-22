@@ -336,12 +336,14 @@ class TextEditImplTest {
     @Test
     void testRangeTextRight() {
 
+
         var te = new TextEditImpl(Document.of());
         te.insert(0, 0, "abc\ndef\nghi");
 
         assertEquals("a", te.rangeTextRight(0, 0, 1).get(0));
         assertEquals("b", te.rangeTextRight(0, 1, 1).get(0));
         assertEquals("bc\n", te.rangeTextRight(0, 1, 3).get(0));
+        assertEquals("", te.rangeTextRight(0, 1, 3).get(1));
 
         var ret = te.rangeTextRight(0, 1, 4);
         assertEquals(2, ret.size());

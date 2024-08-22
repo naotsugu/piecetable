@@ -568,13 +568,15 @@ public class TextEditImpl implements TextEdit {
             if (text.isEmpty()) break;
             int len = Texts.chLength(text);
             if (chLen - len <= 0) {
-                ret.add(Texts.chLeft(text, chLen));
+                var left = Texts.chLeft(text, chLen);
+                ret.add(left);
                 break;
             }
             ret.add(text);
             chLen -= len;
             col = 0;
         }
+        if (!ret.isEmpty() && ret.getLast().endsWith("\n")) ret.add("");
         return ret;
     }
 
