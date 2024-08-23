@@ -25,6 +25,12 @@ import java.util.List;
  */
 class Texts {
 
+    /**
+     * Gets a new {@code String} composed of copies of the
+     * {@code CharSequence elements} joined together.
+     * @param elements an {@code Iterable} that will have its {@code elements} joined together.
+     * @return a new {@code String} that is composed of the {@code elements} argument
+     */
     static String join(Iterable<? extends CharSequence> elements) {
         return String.join("", elements);
     }
