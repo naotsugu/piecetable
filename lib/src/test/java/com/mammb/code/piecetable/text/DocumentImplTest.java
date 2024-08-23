@@ -36,7 +36,7 @@ class DocumentImplTest {
     void test() {
 
         var doc = DocumentImpl.of();
-        assertEquals(0, doc.rows());
+        assertEquals(1, doc.rows());
         assertEquals("", doc.getText(0));
 
         doc.insert(0, 0, "a");

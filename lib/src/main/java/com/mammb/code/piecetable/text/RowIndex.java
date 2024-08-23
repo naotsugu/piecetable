@@ -51,11 +51,11 @@ public class RowIndex {
      * @param cacheInterval the sub-total cache interval
      */
     private RowIndex(int cacheInterval) {
-        rowLengths = new int[0];
-        length = 0;
+        rowLengths = new int[] { 0 };
+        length = 1;
 
-        stCache = new long[0];
-        cacheLength = 0;
+        stCache = new long[] { 0 };
+        cacheLength = 1;
         this.cacheInterval = cacheInterval;
     }
 
@@ -149,11 +149,6 @@ public class RowIndex {
      * @param bytes the specified byte array to be inserted
      */
     public void insert(int row, int col, byte[] bytes) {
-
-        if (length == 0) {
-            add(bytes);
-            return;
-        }
 
         int[] rows = rows(bytes);
         if (rows.length == 0) {
