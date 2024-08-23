@@ -16,7 +16,6 @@
 package com.mammb.code.piecetable.edit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,6 +27,9 @@ class Texts {
     /**
      * Gets a new {@code String} composed of copies of the
      * {@code CharSequence elements} joined together.
+     * <pre>
+     *     ["abc", "def", "ghi"]  - join -> "abcdefghi"
+     * </pre>
      * @param elements an {@code Iterable} that will have its {@code elements} joined together.
      * @return a new {@code String} that is composed of the {@code elements} argument
      */
@@ -35,30 +37,54 @@ class Texts {
         return String.join("", elements);
     }
 
-    static int countRowBreak(String str) {
-        return (int) str.chars().filter(c -> c == '\n').count();
+    /**
+     * Get a count of row break on the specified text.
+     * <pre>
+     *     "abc\r\ndef\r\nghi"  ->  2
+     * </pre>
+     * @param text the specified text
+     * @return a count of row break
+     */
+    static int countRowBreak(String text) {
+        return (int) text.chars().filter(c -> c == '\n').count();
     }
 
-    static List<String> splitRowBreak(String str) {
-        // TODO Optimization
-        var ret = Arrays.asList(str.split("(?<=\\n)"));
-        if (ret.getLast().endsWith("\n")) {
-            ret = new ArrayList<>(ret);
-            ret .add("");
+    /**
+     * Splits the specified string with a row break symbol.
+     * <pre>
+     *     "ab\ncd\n"  ->  ["ab\n", "cd\n", ""]
+     * </pre>
+     * @param text the specified text
+     * @return the list of split strings
+     */
+    static List<String> splitRowBreak(String text) {
+        if (text == null) return List.of("");
+        List<String> list = new ArrayList<>();
+        for (int begin = 0; begin <= text.length();) {
+            int end = text.indexOf('\n', begin) + 1;
+            if (end > 0) {
+                list.add(text.substring(begin, end));
+                begin = end;
+            } else {
+                list.add(text.substring(begin));
+                break;
+            }
         }
-        return ret;
+        return list;
     }
 
-    static int leftCol(String str) {
-        int index = str.indexOf('\n');
-        return index < 0 ? str.length() : index + 1;
-    }
-
-    static int chLength(String str) {
+    /**
+     * Gets the count of the characters on the display.
+     * Surrogate pairs and CR LF, count as one character.
+     * Ligatures are not taken into consideration.
+     * @param text the specified text
+     * @return the count of the characters on the display
+     */
+    static int chLength(String text) {
         int chLen = 0;
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            chLen += chCountLeft(ch);
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            chLen += chCountForward(ch);
         }
         return chLen;
     }
@@ -67,7 +93,7 @@ class Texts {
         if (chLen == 0) return "";
         char[] ca = str.toCharArray();
         for (int i = 0; i < ca.length; i++) {
-            chLen -= chCountLeft(ca[i]);
+            chLen -= chCountForward(ca[i]);
             if (chLen <= 0) {
                 return new String(ca, 0, i + 1);
             }
@@ -80,7 +106,7 @@ class Texts {
         char[] ca = str.toCharArray();
         for (int i = ca.length - 1; i >= 0; i--) {
             char next = ((i - 1) >= 0) ? ca[i - 1] : 0;
-            chLen -= chCountRight(ca[i], next);
+            chLen -= chCountBackward(ca[i], next);
             if (chLen <= 0) {
                 return new String(ca, i, ca.length - i);
             }
@@ -88,14 +114,18 @@ class Texts {
         return str;
     }
 
-    private static int chCountLeft(char c) {
+    private static int chCountForward(char c) {
         return (Character.isHighSurrogate(c) || c == '\r') ? 0 : 1;
     }
 
-    // | c2 | c1 |
-    // | \r | \n |
-    // |    | \n |
-    private static int chCountRight(char c1, char c2) {
+    /**
+     * <pre>
+     *  | c2 | c1 |
+     *  | \r | \n |
+     *  |    | \n |
+     * </pre>
+     */
+    private static int chCountBackward(char c1, char c2) {
         return (Character.isLowSurrogate(c1) || (c1 == '\n' && c2 == '\r')) ? 0 : 1;
     }
 

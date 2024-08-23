@@ -39,6 +39,17 @@ class TextsTest {
         assertEquals(2, ret.size());
         assertEquals("a\n", ret.get(0));
         assertEquals("", ret.get(1));
+
+        ret = Texts.splitRowBreak("a\nb");
+        assertEquals(2, ret.size());
+        assertEquals("a\n", ret.get(0));
+        assertEquals("b", ret.get(1));
+
+        ret = Texts.splitRowBreak("ab\ncd\nef");
+        assertEquals(3, ret.size());
+        assertEquals("ab\n", ret.get(0));
+        assertEquals("cd\n", ret.get(1));
+        assertEquals("ef", ret.get(2));
     }
 
     @Test

@@ -226,6 +226,7 @@ public class TextEditImpl implements TextEdit {
         push(edit);
         return edit.to();
     }
+
     List<Pos> backspaceChar(List<Pos> posList, int chCount) {
 
         long occurredOn = System.currentTimeMillis();
@@ -372,7 +373,7 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public int rows() {flush();
+    public int rows() {
         return doc.rows();
     }
 
@@ -418,18 +419,14 @@ public class TextEditImpl implements TextEdit {
     }
 
     Edit.Del deleteEdit(int row, int col, String text, long occurredOn) {
-        return new Edit.Del(
-            new Pos(row, col),
-            new Pos(row, col),
-            text,
-            occurredOn);
+        return new Edit.Del(new Pos(row, col), text, occurredOn);
     }
 
     Edit.Del backspaceEdit(int row, int col, String text, long occurredOn) {
         int newRow = row - countRowBreak(text);
         int newCol = (row == newRow)
             ? col - text.length()
-            : getText(newRow).length() - leftCol(text);
+            : getText(newRow).length() - (text.indexOf('\n') + 1);
         return new Edit.Del(
             new Pos(row, col),
             new Pos(newRow, newCol),
@@ -514,51 +511,6 @@ public class TextEditImpl implements TextEdit {
             }
             case Edit.Cmp e -> e.edits().forEach(this::dryApply);
         }
-    }
-
-    /**
-     * Converts the relationship between positions into the distances.
-     * @param poss the positions
-     * @return the distances
-     */
-    int[] distances(List<Pos> poss) {
-        int distance = 0;
-        int index = 0;
-        int[] ret = new int[poss.size()];
-        Pos pos = poss.get(index);
-        for (int i = poss.getFirst().row(); i <= poss.getLast().row(); i++) {
-            String rowText = getText(i);
-            while (pos.row() == i) {
-                ret[index++] = distance + pos.col();
-                if (index >= poss.size()) break;
-                pos = poss.get(index);
-            }
-            distance += rowText.length();
-        }
-        return ret;
-    }
-
-    /**
-     * Converts the distances into the positions.
-     * @param row the base row
-     * @param distances the distances
-     * @return the positions
-     */
-    List<Pos> posList(int row, int[] distances) {
-        List<Pos> poss = new ArrayList<>();
-        int total = 0;
-        int index = 0;
-        for (int i = row; index < distances.length; i++) {
-            String rowText = getText(i);
-            if (rowText.isEmpty()) break;
-            while (total + rowText.length() >= distances[index]) {
-                poss.add(new Pos(i, distances[index] - total));
-                index++;
-                if (index >= distances.length) break;
-            }
-            total += rowText.length();
-        }
-        return poss;
     }
 
     /**
@@ -666,5 +618,51 @@ public class TextEditImpl implements TextEdit {
     void testPush(final Edit edit) { push(edit); }
     void testDryApply() { dryApply(); }
     void testDryApply(Edit edit) { dryApply(edit); }
+
+    /**
+     * Converts the relationship between positions into the distances.
+     * @param poss the positions
+     * @return the distances
+     */
+    int[] distances(List<Pos> poss) {
+        int distance = 0;
+        int index = 0;
+        int[] ret = new int[poss.size()];
+        Pos pos = poss.get(index);
+        for (int i = poss.getFirst().row(); i <= poss.getLast().row(); i++) {
+            String rowText = getText(i);
+            while (pos.row() == i) {
+                ret[index++] = distance + pos.col();
+                if (index >= poss.size()) break;
+                pos = poss.get(index);
+            }
+            distance += rowText.length();
+        }
+        return ret;
+    }
+
+    /**
+     * Converts the distances into the positions.
+     * @param row the base row
+     * @param distances the distances
+     * @return the positions
+     */
+    List<Pos> posList(int row, int[] distances) {
+        List<Pos> poss = new ArrayList<>();
+        int total = 0;
+        int index = 0;
+        for (int i = row; index < distances.length; i++) {
+            String rowText = getText(i);
+            if (rowText.isEmpty()) break;
+            while (total + rowText.length() >= distances[index]) {
+                poss.add(new Pos(i, distances[index] - total));
+                index++;
+                if (index >= distances.length) break;
+            }
+            total += rowText.length();
+        }
+        return poss;
+    }
+
 
 }
