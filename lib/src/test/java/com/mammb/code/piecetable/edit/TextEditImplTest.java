@@ -423,21 +423,21 @@ class TextEditImplTest {
     }
 
     @Test
-    void testRangeTextRightByte() {
+    void testTextRightByte() {
 
         var te = new TextEditImpl(Document.of());
         te.insert(0, 0, "abc\ndef\nghi");
 
-        assertEquals("a", te.rangeTextRightByte(0, 0, 1).get(0));
-        assertEquals("b", te.rangeTextRightByte(0, 1, 1).get(0));
-        assertEquals("bc\n", te.rangeTextRightByte(0, 1, 3).get(0));
+        assertEquals("a", te.textRightByte(0, 0, 1).get(0));
+        assertEquals("b", te.textRightByte(0, 1, 1).get(0));
+        assertEquals("bc\n", te.textRightByte(0, 1, 3).get(0));
 
-        var ret = te.rangeTextRightByte(0, 1, 4);
+        var ret = te.textRightByte(0, 1, 4);
         assertEquals(2, ret.size());
         assertEquals("bc\n", ret.get(0));
         assertEquals("d", ret.get(1));
 
-        ret = te.rangeTextRightByte(0, 1, 8);
+        ret = te.textRightByte(0, 1, 8);
         assertEquals(3, ret.size());
         assertEquals("bc\n", ret.get(0));
         assertEquals("def\n", ret.get(1));

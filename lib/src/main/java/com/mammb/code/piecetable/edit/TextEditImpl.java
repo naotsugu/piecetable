@@ -119,7 +119,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public String delete(int row, int col, int len) {
-        var del = join(rangeTextRightByte(row, col, len));
+        var del = join(textRightByte(row, col, len));
         Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
         push(edit);
         return edit.text();
@@ -133,7 +133,7 @@ public class TextEditImpl implements TextEdit {
     @Override
     public List<Pos> delete(List<Pos> posList, List<Integer> lenList) {
         // TODO
-        return null;
+        return List.of();
     }
 
     private String deleteChar(int row, int col, int chCount) {
@@ -203,7 +203,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public Pos backspace(int row, int col, int len) {
-        var del = join(rangeTextLeftByte(row, col, len));
+        var del = join(textLeftByte(row, col, len));
         Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
         push(edit);
         return edit.to();
@@ -217,7 +217,7 @@ public class TextEditImpl implements TextEdit {
     @Override
     public List<Pos> backspace(List<Pos> posList, List<Integer> lenList) {
         // TODO
-        return null;
+        return List.of();
     }
 
     Pos backspaceChar(int row, int col, int chCount) {
@@ -274,13 +274,13 @@ public class TextEditImpl implements TextEdit {
         Edit e;
         Pos pos;
         if (len > 0) {
-            var delText = join(rangeTextRightByte(row, col, len));
+            var delText = join(textRightByte(row, col, len));
             Edit.ConcreteEdit del = deleteEdit(row, col, delText, occurredOn);
             Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
             e = new Edit.Cmp(List.of(del, ins), occurredOn);
             pos = ins.to();
         } else {
-            var delText = join(rangeTextLeftByte(row, col, -len));
+            var delText = join(textLeftByte(row, col, -len));
             Edit.ConcreteEdit bs = backspaceEdit(row, col, delText, occurredOn);
             Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
             e = new Edit.Cmp(List.of(bs, ins), occurredOn);
@@ -293,7 +293,7 @@ public class TextEditImpl implements TextEdit {
     @Override
     public List<Pos> replace(List<Pos> posList, List<Integer> lenList, String text) {
         // TODO
-        return null;
+        return List.of();
     }
 
     // -- Undo/RedoReplace ----------------------------------------------------
@@ -623,7 +623,7 @@ public class TextEditImpl implements TextEdit {
     }
 
 
-    List<String> rangeTextRightByte(int row, int col, int byteLen) {
+    List<String> textRightByte(int row, int col, int byteLen) {
         List<String> ret = new ArrayList<>();
         for (int i = row; ; i++) { // i < doc.rows() : cannot get correct value if not flushed
             var text = getText(i).substring(col);
@@ -641,7 +641,7 @@ public class TextEditImpl implements TextEdit {
         return ret;
     }
 
-    List<String> rangeTextLeftByte(int row, int col, int byteLen) {
+    List<String> textLeftByte(int row, int col, int byteLen) {
         List<String> ret = new ArrayList<>();
         for (int i = row; i >= 0; i--) {
             var s = getText(i);
@@ -657,6 +657,7 @@ public class TextEditImpl implements TextEdit {
         }
         return ret;
     }
+
     Document getDoc() { return doc; }
     Map<Integer, String> getDryBuffer() { return dryBuffer; }
     Deque<Edit> getDeque() { return deque; }
