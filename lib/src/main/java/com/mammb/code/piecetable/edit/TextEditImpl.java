@@ -137,7 +137,7 @@ public class TextEditImpl implements TextEdit {
     }
 
     private String deleteChar(int row, int col, int chCount) {
-        var del = join(rangeTextRight(row, col, chCount));
+        var del = join(textRight(row, col, chCount));
         Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
         push(edit);
         return edit.text();
@@ -169,7 +169,7 @@ public class TextEditImpl implements TextEdit {
 
             int row = pos.row();
             int col = pos.col();
-            List<String> lines = rangeTextRight(row, col, chCount);
+            List<String> lines = textRight(row, col, chCount);
 
             row -= piledRow;
             if (prevEdit != null && countRowBreak(prevEdit.text()) > 0 && prevEdit.from().row() == row) {
@@ -221,7 +221,7 @@ public class TextEditImpl implements TextEdit {
     }
 
     Pos backspaceChar(int row, int col, int chCount) {
-        var del = join(rangeTextLeft(row, col, chCount));
+        var del = join(textLeft(row, col, chCount));
         Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
         push(edit);
         return edit.to();
@@ -231,7 +231,7 @@ public class TextEditImpl implements TextEdit {
         long occurredOn = System.currentTimeMillis();
         List<Edit.ConcreteEdit> edits = new ArrayList<>();
         for (Pos pos : posList.stream().sorted(Comparator.reverseOrder()).distinct().toList()) {
-            var lines = rangeTextLeft(pos.row(), pos.col(), chCount);
+            var lines = textLeft(pos.row(), pos.col(), chCount);
             Edit.Del del = backspaceEdit(pos.row(), pos.col(), join(lines), occurredOn);
             edits.add(del);
         }
@@ -561,7 +561,20 @@ public class TextEditImpl implements TextEdit {
         return poss;
     }
 
-    List<String> rangeTextRight(int row, int col, int chLen) {
+    /**
+     * <pre>
+     *         textRight(0, 1, 7)
+     *  row                             ->    list
+     *   0   | * | * | * | \r | \n |            0  | * | * | \r | \n |
+     *             1   2   3
+     *   1   | h | l | * | * | * | * |          1  | h | l | * | * | * |
+     *         4       5   6   7
+     *
+     *   h: high surrogate
+     *   l: low surrogate
+     * </pre>
+     */
+    List<String> textRight(int row, int col, int chLen) {
         List<String> ret = new ArrayList<>();
         for (int i = row; ; i++) { // i < doc.rows() : cannot get correct value if not flushed
             var text = getText(i).substring(col);
@@ -580,7 +593,20 @@ public class TextEditImpl implements TextEdit {
         return ret;
     }
 
-    List<String> rangeTextLeft(int row, int col, int chLen) {
+    /**
+     * <pre>
+     *         textLeft(1, 5, 7)
+     *  row                             ->    list
+     *   0   | * | * | * | \r | \n |            0  | * | * | \r | \n |
+     *             7   6        5
+     *   1   | h | l | * | * | * | * |          1  | h | l | * | * | * |
+     *             4   3   2   1
+     *
+     *   h: high surrogate
+     *   l: low surrogate
+     * </pre>
+     */
+    List<String> textLeft(int row, int col, int chLen) {
         List<String> ret = new ArrayList<>();
         for (int i = row; i >= 0; i--) {
             var s = getText(i);
@@ -611,6 +637,7 @@ public class TextEditImpl implements TextEdit {
             byteLen -= len;
             col = 0;
         }
+        if (!ret.isEmpty() && ret.getLast().endsWith("\n")) ret.add("");
         return ret;
     }
 

@@ -334,23 +334,22 @@ class TextEditImplTest {
     }
 
     @Test
-    void testRangeTextRight() {
-
+    void testTextRight() {
 
         var te = new TextEditImpl(Document.of());
         te.insert(0, 0, "abc\ndef\nghi");
 
-        assertEquals("a", te.rangeTextRight(0, 0, 1).get(0));
-        assertEquals("b", te.rangeTextRight(0, 1, 1).get(0));
-        assertEquals("bc\n", te.rangeTextRight(0, 1, 3).get(0));
-        assertEquals("", te.rangeTextRight(0, 1, 3).get(1));
+        assertEquals("a", te.textRight(0, 0, 1).get(0));
+        assertEquals("b", te.textRight(0, 1, 1).get(0));
+        assertEquals("bc\n", te.textRight(0, 1, 3).get(0));
+        assertEquals("", te.textRight(0, 1, 3).get(1));
 
-        var ret = te.rangeTextRight(0, 1, 4);
+        var ret = te.textRight(0, 1, 4);
         assertEquals(2, ret.size());
         assertEquals("bc\n", ret.get(0));
         assertEquals("d", ret.get(1));
 
-        ret = te.rangeTextRight(0, 1, 8);
+        ret = te.textRight(0, 1, 8);
         assertEquals(3, ret.size());
         assertEquals("bc\n", ret.get(0));
         assertEquals("def\n", ret.get(1));
@@ -360,18 +359,18 @@ class TextEditImplTest {
         te = new TextEditImpl(Document.of());
         te.insert(0, 0, "a𠀋c\r\nd𠀋f\r\ng𠀋i");
 
-        ret = te.rangeTextRight(0, 1, 4);
+        ret = te.textRight(0, 1, 4);
         assertEquals(2, ret.size());
         assertEquals("𠀋c\r\n", ret.get(0));
         assertEquals("d", ret.get(1));
 
-        ret = te.rangeTextRight(0, 1, 8);
+        ret = te.textRight(0, 1, 8);
         assertEquals(3, ret.size());
         assertEquals("𠀋c\r\n", ret.get(0));
         assertEquals("d𠀋f\r\n", ret.get(1));
         assertEquals("g", ret.get(2));
 
-        ret = te.rangeTextRight(0, 4, 8);
+        ret = te.textRight(0, 4, 8);
         assertEquals(3, ret.size());
         assertEquals("\r\n", ret.get(0));
         assertEquals("d𠀋f\r\n", ret.get(1));
@@ -379,24 +378,24 @@ class TextEditImplTest {
     }
 
     @Test
-    void testRangeTextLeft() {
+    void testTextLeft() {
 
         var te = new TextEditImpl(Document.of());
         te.insert(0, 0, "abc\ndef\nghi");
 
-        assertEquals("i", te.rangeTextLeft(2, 3, 1).get(0));
-        assertEquals("h", te.rangeTextLeft(2, 2, 1).get(0));
-        assertEquals("g", te.rangeTextLeft(2, 1, 1).get(0));
-        assertEquals("\n", te.rangeTextLeft(2, 0, 1).get(0));
-        assertEquals("\n", te.rangeTextLeft(2, 2, 3).get(0));
-        assertEquals("gh", te.rangeTextLeft(2, 2, 3).get(1));
+        assertEquals("i", te.textLeft(2, 3, 1).get(0));
+        assertEquals("h", te.textLeft(2, 2, 1).get(0));
+        assertEquals("g", te.textLeft(2, 1, 1).get(0));
+        assertEquals("\n", te.textLeft(2, 0, 1).get(0));
+        assertEquals("\n", te.textLeft(2, 2, 3).get(0));
+        assertEquals("gh", te.textLeft(2, 2, 3).get(1));
 
-        var ret = te.rangeTextLeft(2, 1, 4);
+        var ret = te.textLeft(2, 1, 4);
         assertEquals(2, ret.size());
         assertEquals("ef\n", ret.get(0));
         assertEquals("g", ret.get(1));
 
-        ret = te.rangeTextLeft(2, 3, 9);
+        ret = te.textLeft(2, 3, 9);
         assertEquals(3, ret.size());
         assertEquals("c\n", ret.get(0));
         assertEquals("def\n", ret.get(1));
@@ -406,18 +405,18 @@ class TextEditImplTest {
         te = new TextEditImpl(Document.of());
         te.insert(0, 0, "a𠀋c\r\nd𠀋f\r\ng𠀋i");
 
-        ret = te.rangeTextLeft(2, 3, 4);
+        ret = te.textLeft(2, 3, 4);
         assertEquals(2, ret.size());
         assertEquals("f\r\n", ret.get(0));
         assertEquals("g𠀋", ret.get(1));
 
-        ret = te.rangeTextLeft(2, 4, 10);
+        ret = te.textLeft(2, 4, 10);
         assertEquals(3, ret.size());
         assertEquals("𠀋c\r\n", ret.get(0));
         assertEquals("d𠀋f\r\n", ret.get(1));
         assertEquals("g𠀋i", ret.get(2));
 
-        ret = te.rangeTextLeft(1, 4, 7);
+        ret = te.textLeft(1, 4, 7);
         assertEquals(2, ret.size());
         assertEquals("a𠀋c\r\n", ret.get(0));
         assertEquals("d𠀋f", ret.get(1));
