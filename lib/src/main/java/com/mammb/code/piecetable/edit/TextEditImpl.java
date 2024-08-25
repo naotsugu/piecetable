@@ -533,7 +533,7 @@ public class TextEditImpl implements TextEdit {
             if (text.isEmpty()) break;
             int len = Texts.chLength(text);
             if (chLen - len <= 0) {
-                var left = Texts.chLeft(text, chLen);
+                var left = Texts.left(text, chLen);
                 ret.add(left);
                 break;
             }
@@ -565,7 +565,7 @@ public class TextEditImpl implements TextEdit {
             var text = (i == row) ? s.substring(0, col) : s;
             int len = Texts.chLength(text);
             if (chLen - len <= 0) {
-                ret.addFirst(Texts.chRight(text, chLen));
+                ret.addFirst(Texts.right(text, chLen));
                 break;
             }
             ret.addFirst(text);

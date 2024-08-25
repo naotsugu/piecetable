@@ -40,7 +40,9 @@ class Texts {
     /**
      * Get a count of row break on the specified text.
      * <pre>
-     *     "abc\r\ndef\r\nghi"  ->  2
+     *     "***\r\n***\r\n***"  ->  2
+     *
+     *     "***\n***\n***"      ->  2
      * </pre>
      * @param text the specified text
      * @return a count of row break
@@ -84,48 +86,97 @@ class Texts {
         int chLen = 0;
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            chLen += chCountForward(ch);
+            chLen += countForward(ch);
         }
         return chLen;
     }
 
-    static String chLeft(String str, int chLen) {
-        if (chLen == 0) return "";
-        char[] ca = str.toCharArray();
+
+    /**
+     * Gets the leftmost count characters of a text.
+     * <pre>
+     *     | * | * | h | l | * | \r | \n | * | * |
+     *       1   2       3            4    5
+     *   h: high surrogate
+     *   l: low surrogate
+     * </pre>
+     *
+     * @param text the text
+     * @param count the count
+     * @return the leftmost count characters of a text
+     */
+    static String left(String text, int count) {
+        if (count <= 0) return "";
+        char[] ca = text.toCharArray();
         for (int i = 0; i < ca.length; i++) {
-            chLen -= chCountForward(ca[i]);
-            if (chLen <= 0) {
+            count -= countForward(ca[i]);
+            if (count <= 0) {
                 return new String(ca, 0, i + 1);
             }
         }
-        return str;
+        return text;
     }
 
-    static String chRight(String str, int chLen) {
-        if (chLen == 0) return "";
-        char[] ca = str.toCharArray();
+
+    /**
+     * Gets the rightmost count characters of a text.
+     * <pre>
+     *     | * | * | h | l | * | \r | \n | * | * |
+     *               5       4   3         2   1
+     *   h: high surrogate
+     *   l: low surrogate
+     * </pre>
+     * @param text the text
+     * @param count the count
+     * @return the rightmost count characters of a text
+     */
+    static String right(String text, int count) {
+        if (count <= 0) return "";
+        char[] ca = text.toCharArray();
         for (int i = ca.length - 1; i >= 0; i--) {
             char next = ((i - 1) >= 0) ? ca[i - 1] : 0;
-            chLen -= chCountBackward(ca[i], next);
-            if (chLen <= 0) {
+            count -= countBackward(ca[i], next);
+            if (count <= 0) {
                 return new String(ca, i, ca.length - i);
             }
         }
-        return str;
+        return text;
     }
 
-    private static int chCountForward(char c) {
+    /**
+     * <pre>
+     *     | h | l | * | \r | \n |
+     *       ^   ^   ^   ^    ^
+     *       0   1   1   0    1
+     *   h: high surrogate
+     *   l: low surrogate
+     * </pre>
+     * @param c the character
+     * @return the count of character
+     */
+    private static int countForward(char c) {
         return (Character.isHighSurrogate(c) || c == '\r') ? 0 : 1;
     }
 
     /**
      * <pre>
+     *     | h | l | * | \r | \n |
+     *       ^   ^   ^   ^    ^
+     *       1   0   1   1    0
+     *   h: high surrogate
+     *   l: low surrogate
+     * </pre>
+     * <pre>
      *  | c2 | c1 |
      *  | \r | \n |
      *  |    | \n |
      * </pre>
+     *
+     * @param c1 the right character
+     * @param c2 the left character
+     * @return the count of character
      */
-    private static int chCountBackward(char c1, char c2) {
+    private static int countBackward(char c1, char c2) {
         return (Character.isLowSurrogate(c1) || (c1 == '\n' && c2 == '\r')) ? 0 : 1;
     }
 

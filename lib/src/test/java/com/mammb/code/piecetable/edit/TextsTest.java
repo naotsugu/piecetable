@@ -64,56 +64,56 @@ class TextsTest {
     }
 
     @Test
-    void chLeft() {
-        assertEquals("", Texts.chLeft("", 0));
-        assertEquals("", Texts.chLeft("a", 0));
-        assertEquals("a", Texts.chLeft("a", 1));
-        assertEquals("a", Texts.chLeft("ab", 1));
-        assertEquals("a", Texts.chLeft("abc", 1));
-        assertEquals("ab", Texts.chLeft("abc", 2));
-        assertEquals("abc", Texts.chLeft("abc", 3));
-        assertEquals("abc", Texts.chLeft("abc", 4));
+    void left() {
+        assertEquals("", Texts.left("", 0));
+        assertEquals("", Texts.left("a", 0));
+        assertEquals("a", Texts.left("a", 1));
+        assertEquals("a", Texts.left("ab", 1));
+        assertEquals("a", Texts.left("abc", 1));
+        assertEquals("ab", Texts.left("abc", 2));
+        assertEquals("abc", Texts.left("abc", 3));
+        assertEquals("abc", Texts.left("abc", 4));
 
-        assertEquals("ab", Texts.chLeft("ab\n", 2));
-        assertEquals("ab\n", Texts.chLeft("ab\n", 3));
-        assertEquals("ab\n", Texts.chLeft("ab\n", 4));
+        assertEquals("ab", Texts.left("ab\n", 2));
+        assertEquals("ab\n", Texts.left("ab\n", 3));
+        assertEquals("ab\n", Texts.left("ab\n", 4));
 
-        assertEquals("ab", Texts.chLeft("ab\r\n", 2));
-        assertEquals("ab\r\n", Texts.chLeft("ab\r\n", 3));
-        assertEquals("ab\r\n", Texts.chLeft("ab\r\n", 4));
-        assertEquals("ab\r\n", Texts.chLeft("ab\r\n", 5));
+        assertEquals("ab", Texts.left("ab\r\n", 2));
+        assertEquals("ab\r\n", Texts.left("ab\r\n", 3));
+        assertEquals("ab\r\n", Texts.left("ab\r\n", 4));
+        assertEquals("ab\r\n", Texts.left("ab\r\n", 5));
 
-        assertEquals("a𠀋", Texts.chLeft("a𠀋b\r\n", 2));
-        assertEquals("a𠀋b", Texts.chLeft("a𠀋b\r\n", 3));
-        assertEquals("a𠀋b\r\n", Texts.chLeft("a𠀋b\r\n", 4));
-        assertEquals("a𠀋b\r\n", Texts.chLeft("a𠀋b\r\n", 5));
+        assertEquals("a𠀋", Texts.left("a𠀋b\r\n", 2));
+        assertEquals("a𠀋b", Texts.left("a𠀋b\r\n", 3));
+        assertEquals("a𠀋b\r\n", Texts.left("a𠀋b\r\n", 4));
+        assertEquals("a𠀋b\r\n", Texts.left("a𠀋b\r\n", 5));
 
     }
 
     @Test
-    void chRight() {
-        assertEquals("", Texts.chRight("", 0));
-        assertEquals("", Texts.chRight("a", 0));
-        assertEquals("a", Texts.chRight("a", 1));
-        assertEquals("b", Texts.chRight("ab", 1));
-        assertEquals("c", Texts.chRight("abc", 1));
-        assertEquals("bc", Texts.chRight("abc", 2));
-        assertEquals("abc", Texts.chRight("abc", 3));
-        assertEquals("abc", Texts.chRight("abc", 4));
+    void right() {
+        assertEquals("", Texts.right("", 0));
+        assertEquals("", Texts.right("a", 0));
+        assertEquals("a", Texts.right("a", 1));
+        assertEquals("b", Texts.right("ab", 1));
+        assertEquals("c", Texts.right("abc", 1));
+        assertEquals("bc", Texts.right("abc", 2));
+        assertEquals("abc", Texts.right("abc", 3));
+        assertEquals("abc", Texts.right("abc", 4));
 
-        assertEquals("b\n", Texts.chRight("ab\n", 2));
-        assertEquals("ab\n", Texts.chRight("ab\n", 3));
-        assertEquals("ab\n", Texts.chRight("ab\n", 4));
+        assertEquals("b\n", Texts.right("ab\n", 2));
+        assertEquals("ab\n", Texts.right("ab\n", 3));
+        assertEquals("ab\n", Texts.right("ab\n", 4));
 
-        assertEquals("b\r\n", Texts.chRight("ab\r\n", 2));
-        assertEquals("ab\r\n", Texts.chRight("ab\r\n", 3));
-        assertEquals("ab\r\n", Texts.chRight("ab\r\n", 4));
-        assertEquals("ab\r\n", Texts.chRight("ab\r\n", 5));
+        assertEquals("b\r\n", Texts.right("ab\r\n", 2));
+        assertEquals("ab\r\n", Texts.right("ab\r\n", 3));
+        assertEquals("ab\r\n", Texts.right("ab\r\n", 4));
+        assertEquals("ab\r\n", Texts.right("ab\r\n", 5));
 
-        assertEquals("b\r\n", Texts.chRight("a𠀋b\r\n", 2));
-        assertEquals("𠀋b\r\n", Texts.chRight("a𠀋b\r\n", 3));
-        assertEquals("a𠀋b\r\n", Texts.chRight("a𠀋b\r\n", 4));
-        assertEquals("a𠀋b\r\n", Texts.chRight("a𠀋b\r\n", 5));
+        assertEquals("b\r\n", Texts.right("a𠀋b\r\n", 2));
+        assertEquals("𠀋b\r\n", Texts.right("a𠀋b\r\n", 3));
+        assertEquals("a𠀋b\r\n", Texts.right("a𠀋b\r\n", 4));
+        assertEquals("a𠀋b\r\n", Texts.right("a𠀋b\r\n", 5));
 
     }
 
