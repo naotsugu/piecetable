@@ -130,6 +130,16 @@ assertEquals("a span of text", edit.getText(0));
 ```
 
 
+## How to run the example application
+
+```shell
+./gradlew build
+cd examples/fx-editor
+./gradlew run
+```
+
+
+
 ## Sample applications using this library
 
 * [min-editor](https://github.com/naotsugu/min-editor)([version 0.4.0](https://github.com/naotsugu/piecetable/tree/release-0.4) is used)

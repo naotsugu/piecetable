@@ -343,6 +343,18 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
+    public List<String> getText(int startRow, int startCol, int endRow, int endCol) {
+        List<String> list = new ArrayList<>();
+        for (int i = startRow; i <= endRow; i++) {
+            String row = getText(i);
+            row = (i == startRow) ? row.substring(startCol) : row;
+            row = (i == endRow) ? row.substring(0, endCol) : row;
+            list.add(row);
+        }
+        return list;
+    }
+
+    @Override
     public void flush() {
         while (!deque.isEmpty()) {
             Edit edit = deque.pop();
