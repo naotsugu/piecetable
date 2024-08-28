@@ -2,22 +2,17 @@ package com.mammb.code.piecetable.examples;
 
 import com.mammb.code.piecetable.Document;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
@@ -31,7 +26,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         var editorPane = new EditorPane();
-        Scene scene = new Scene(new VBox(editorPane.menuBar(), editorPane), 640, 480);
+        Scene scene = new Scene(editorPane, 640, 480);
         scene.getStylesheets().add(String.join(",", "data:text/css;base64", css));
         stage.setScene(scene);
         stage.setTitle("editor");
@@ -109,32 +104,7 @@ public class App extends Application {
             setOnKeyTyped((KeyEvent e) -> execute(st, Action.of(e)));
 
         }
-        MenuBar menuBar() {
-            MenuBar menuBar = new MenuBar();
-            Menu menuFile = new Menu("File");
-            MenuItem menuOpen = new MenuItem("Open");
-            MenuItem menuSave = new MenuItem("Save");
-            MenuItem menuSaveAs = new MenuItem("Save As");
-            MenuItem menuQuit = new MenuItem("Quit");
-            menuFile.getItems().addAll(menuOpen, menuSave, menuSaveAs, menuQuit);
-            Menu menuEdit = new Menu("Edit");
-            MenuItem menuCut = new MenuItem("Cut");
-            MenuItem menuCopy = new MenuItem("Copy");
-            MenuItem menuPaste = new MenuItem("Paste");
-            menuEdit.getItems().addAll(menuCut, menuCopy, menuPaste);
-            menuBar.getMenus().addAll(menuFile, menuEdit);
 
-            menuOpen.setOnAction(e -> {  });
-            menuSave.setOnAction(e -> {  });
-            menuSaveAs.setOnAction(e -> {  });
-            menuQuit.setOnAction(e -> { Platform.exit(); });
-
-            menuCut.setOnAction(e -> {  });
-            menuCopy.setOnAction(e -> {  });
-            menuPaste.setOnAction(e -> {  });
-
-            return menuBar;
-        }
         private Action execute(ScreenText st, Action action) {
             switch (action.type()) {
                 case TYPED              -> { st.input(action.attr()); draw(); }
