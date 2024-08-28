@@ -58,6 +58,10 @@ public interface Action {
         else if (SC_X.match(e)) return Action.of(Action.Type.CUT);
         else if (SC_Z.match(e)) return Action.of(Action.Type.UNDO);
         else if (SC_Y.match(e) || SC_SZ.match(e)) return Action.of(Action.Type.REDO);
+        else if (SC_O.match(e)) return Action.of(Action.Type.OPEN);
+        else if (SC_S.match(e)) return Action.of(Action.Type.SAVE);
+        else if (SC_SA.match(e)) return Action.of(Action.Type.SAVE_AS);
+        else if (SC_N.match(e)) return Action.of(Action.Type.NEW);
 
         else {
             if (keyInput.test(e)) {
@@ -88,6 +92,7 @@ public interface Action {
         PAGE_DOWN, SELECT_PAGE_DOWN,
         COPY, PASTE, CUT,
         UNDO, REDO,
+        OPEN, SAVE, SAVE_AS, NEW,
         EMPTY,
         ;
     }
@@ -100,6 +105,10 @@ public interface Action {
     KeyCombination SC_SZ= new KeyCharacterCombination("z", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     KeyCombination SC_END  = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHORTCUT_DOWN);
     KeyCombination SC_HOME = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHORTCUT_DOWN);
+    KeyCombination SC_N = new KeyCharacterCombination("n", KeyCombination.SHORTCUT_DOWN);
+    KeyCombination SC_O = new KeyCharacterCombination("o", KeyCombination.SHORTCUT_DOWN);
+    KeyCombination SC_S = new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN);
+    KeyCombination SC_SA= new KeyCharacterCombination("s", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     Predicate<KeyEvent> controlKeysFilter = e ->
         System.getProperty("os.name").toLowerCase().startsWith("windows")

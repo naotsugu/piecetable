@@ -4,9 +4,15 @@ import com.mammb.code.piecetable.examples.Text.RowDecorator;
 import com.mammb.code.piecetable.examples.Style.*;
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.TextEdit;
+import com.mammb.code.piecetable.TextEdit.Pos;
+import javafx.scene.input.DataFormat;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public interface ScreenText {
     int MARGIN_TOP = 5, MARGIN_LEFT = 5;
@@ -45,6 +51,11 @@ public interface ScreenText {
     void click(double x, double y);
     void clickDouble(double x, double y);
     void clickTriple(double x, double y);
+    void pasteFromClipboard();
+    void copyToClipboard();
+    void cutToClipboard();
+    Path path();
+    void save(Path path);
     int screenLineSize();
 
     static ScreenText of(Document doc, FontMetrics fm, Syntax syntax) {
@@ -254,17 +265,23 @@ public interface ScreenText {
 
         @Override
         public void undo() {
-            carets.clear();
-            ed.undo().forEach(p -> carets.add(new Caret(p.row(), p.col())));
-            refreshBufferAt(carets);
-            scrollToCaret();
+            var newCarets = ed.undo().stream().map(p-> new Caret(p.row(), p.col())).toList();
+            if (!newCarets.isEmpty()) {
+                carets.clear();
+                carets.addAll(newCarets);
+                scrollToCaret();
+                refreshBufferRange(carets.getFirst().row);
+            }
         }
         @Override
         public void redo() {
-            carets.clear();
-            ed.redo().forEach(p -> carets.add(new Caret(p.row(), p.col())));
-            refreshBufferAt(carets);
-            scrollToCaret();
+            var newCarets = ed.redo().stream().map(p-> new Caret(p.row(), p.col())).toList();
+            if (!newCarets.isEmpty()) {
+                carets.clear();
+                carets.addAll(newCarets);
+                scrollToCaret();
+                refreshBufferRange(carets.getFirst().row);
+            }
         }
         @Override
         public void clickDouble(double x, double y) { /* Not yet implemented. */ }
@@ -292,6 +309,43 @@ public interface ScreenText {
         protected int screenLineSize(double h) {
             return (int) Math.ceil(Math.max(0, h - MARGIN_TOP) / fm.getLineHeight());
         }
+        @Override
+        public void pasteFromClipboard() {
+            var clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+            var text = clipboard.hasString() ? clipboard.getString() : "";
+            if (text == null || text.isEmpty()) {
+                return;
+            }
+            input(text);
+        }
+        @Override
+        public void copyToClipboard() {
+            String copy = carets.stream().sorted().filter(Caret::hasMark)
+                .map(c -> ed.getText(c.markedMin(), c.markedMax()))
+                .flatMap(Collection::stream)
+                .collect(Collectors.joining());
+            javafx.scene.input.Clipboard.getSystemClipboard()
+                .setContent(Map.of(DataFormat.PLAIN_TEXT, copy));
+        }
+        @Override
+        public void cutToClipboard() {
+            List<Caret> select = carets.stream().sorted().filter(Caret::hasMark).toList();
+            List<String> texts = select.stream()
+                .map(c -> String.join("", ed.getText(c.markedMin(), c.markedMax())))
+                .toList();
+            for (int i = 0; i < select.size(); i++) {
+                Caret c = select.get(i);
+                ed.delete(c.markedMin().row(), c.markedMin().col(), texts.get(i).length());
+                // TODO transaction delete
+            }
+            javafx.scene.input.Clipboard.getSystemClipboard()
+                .setContent(Map.of(DataFormat.PLAIN_TEXT, String.join("", texts)));
+        }
+        @Override
+        public Path path() { return ed.path(); }
+        @Override
+        public void save(Path path) { ed.save(path); }
+        @Override
         public int screenLineSize() { return screenLineSize; }
     }
 
@@ -457,7 +511,11 @@ public interface ScreenText {
         protected void refreshBufferRange(int fromRow) {
             int bufferIndex = bufferIndexOf(fromRow);
             for (int i = bufferIndex; i <= screenLineSize && i < ed.rows(); i++) {
-                buffer.set(i, createStyledRow(fromRow++));
+                if (i >= buffer.size()) {
+                    buffer.add(createStyledRow(fromRow++));
+                } else {
+                    buffer.set(i, createStyledRow(fromRow++));
+                }
             }
         }
         @Override
@@ -547,7 +605,11 @@ public interface ScreenText {
         public void mark() { markedRow = row; markedCol = col; }
         public void clearMark() { markedRow = -1; markedCol = -1; }
         public boolean isZero() { return row == 0 && col == 0; }
-        public boolean hasMark() { return markedRow >= 0 && markedCol >= 0; }
+        public boolean hasMark() { return markedRow >= 0 && markedCol >= 0 && !(row == markedRow && col == markedCol); }
+        public boolean isMarkForward() { return hasMark() && ((row == markedRow && col > markedCol) || (row > markedRow)); }
+        public boolean isMarkBackward() { return hasMark() && !isMarkForward(); }
+        public Pos markedMin() { return isMarkForward() ? new Pos(markedRow, markedCol) : new Pos(row, col); }
+        public Pos markedMax() { return isMarkBackward() ? new Pos(markedRow, markedCol) : new Pos(row, col);}
         @Override public int compareTo(Caret that) {
             int c = Integer.compare(this.row, that.row);
             return c == 0 ? Integer.compare(this.col, that.col) : c;

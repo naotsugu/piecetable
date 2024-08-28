@@ -52,6 +52,7 @@ public abstract class CharsetMatches {
 
         private int confidence = 50;
         private int trail = 0;
+        private int miss = 0;
 
         @Override
         public Result put(byte[] bytes) {
@@ -63,7 +64,10 @@ public abstract class CharsetMatches {
                 if (trail == 0) {
                     byte b = bytes[i];
                     trail = trail(b);
-                    if (trail == -1) confidence = clamp(--confidence);
+                    if (trail == -1) {
+                        confidence = clamp(--confidence);
+                        miss++;
+                    }
                     if (trail <= 0) continue;
                 }
 
@@ -75,6 +79,7 @@ public abstract class CharsetMatches {
                     byte b = bytes[i];
                     if ((b & 0xc0) != 0x80) {
                         confidence = clamp(--confidence);
+                        miss++;
                         trail = 0;
                         break;
                     }
@@ -84,7 +89,7 @@ public abstract class CharsetMatches {
                     }
                 }
             }
-            return new Result(StandardCharsets.UTF_8, confidence);
+            return new Result(StandardCharsets.UTF_8, clamp(confidence - miss));
         }
 
         private int trail(byte b) {
@@ -109,6 +114,7 @@ public abstract class CharsetMatches {
     private static class Ms932Match implements CharsetMatch {
         private int confidence = 50;
         private int trail = 0;
+        private int miss = 0;
         @Override
         public Result put(byte[] bytes) {
             for (int i = 0; i < bytes.length; i++) {
@@ -116,6 +122,7 @@ public abstract class CharsetMatches {
                 if (b == 0x80 || b == 0xa0 || b >= 0xfd) {
                     // unused
                     confidence = clamp(--confidence);
+                    miss++;
                     continue;
                 }
                 if ((0x81 <= b && b <= 0x9f) || b >= 0xe0) {
@@ -130,11 +137,12 @@ public abstract class CharsetMatches {
                         confidence = clamp(++confidence);
                     } else {
                         confidence = clamp(--confidence);
+                        miss++;
                     }
                     trail = 0;
                 }
             }
-            return new Result(Charset.forName("windows-31j"), confidence);
+            return new Result(Charset.forName("windows-31j"), clamp(confidence - miss));
         }
     }
 

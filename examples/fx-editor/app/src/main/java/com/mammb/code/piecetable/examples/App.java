@@ -18,10 +18,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Optional;
 
 public class App extends Application {
 
@@ -52,8 +55,7 @@ public class App extends Application {
             getChildren().add(canvas);
 
             draw = new Draw.FxDraw(canvas.getGraphicsContext2D());
-            var doc = Document.of(Path.of("build.gradle.kts"));
-            st = ScreenText.of(doc, draw.fontMetrics(), Syntax.of("java"));
+            st = ScreenText.of(Document.of(), draw.fontMetrics(), Syntax.of("java"));
 
             vs.setCursor(Cursor.DEFAULT);
             vs.setOrientation(Orientation.VERTICAL);
@@ -156,8 +158,52 @@ public class App extends Application {
                 case SELECT_PAGE_DOWN   -> { st.moveCaretSelectPageDown(); draw(); }
                 case UNDO               -> { st.undo(); draw(); }
                 case REDO               -> { st.redo(); draw(); }
+                case COPY               -> { st.copyToClipboard(); }
+                case PASTE              -> { st.pasteFromClipboard(); draw(); }
+                case CUT                -> { st.cutToClipboard(); draw(); }
+                case OPEN               -> open();
+                case SAVE               -> save();
+                case SAVE_AS            -> saveAs();
+                case NEW                -> openNew();
             }
             return action;
+        }
+
+        private void open() {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Select file...");
+            fc.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
+            File file = fc.showOpenDialog(getScene().getWindow());
+            if (file == null) return;
+            Path path = file.toPath();
+            String ext = Optional.of(path.getFileName().toString())
+                .filter(f -> f.contains("."))
+                .map(f -> f.substring(f.lastIndexOf(".") + 1))
+                .orElse("");
+            st = ScreenText.of(Document.of(path), draw.fontMetrics(), Syntax.of(ext));
+            st.setSize(getWidth(), getHeight());
+            draw();
+        }
+        private void save() {
+            if (st.path() == null) {
+                saveAs();
+            } else {
+                st.save(st.path());
+            }
+        }
+        private void saveAs() {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Save As...");
+            fc.setInitialDirectory((st.path() == null)
+                ? Path.of(System.getProperty("user.home")).toFile()
+                : st.path().getParent().toFile());
+            File file = fc.showSaveDialog(getScene().getWindow());
+            st.save(file.toPath());
+        }
+        private void openNew() {
+            st = ScreenText.of(Document.of(), draw.fontMetrics(), Syntax.of(""));
+            st.setSize(getWidth(), getHeight());
+            draw();
         }
 
         private void draw() {
