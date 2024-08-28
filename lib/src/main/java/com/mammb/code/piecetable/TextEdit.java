@@ -156,6 +156,14 @@ public interface TextEdit {
     List<String> getText(int startRow, int endRowInclusive);
 
     /**
+     * Gets the text list at the specified range.
+     * @param start the start pos
+     * @param end the end pos
+     * @return the text list of the specified range
+     */
+    List<String> getText(Pos start, Pos end);
+
+    /**
      * Flush.
      */
     void flush();
