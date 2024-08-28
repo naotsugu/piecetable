@@ -338,20 +338,8 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public String getText(int fromRow, int toRowExclusive) {
-        return IntStream.range(fromRow, toRowExclusive).mapToObj(this::getText).collect(Collectors.joining());
-    }
-
-    @Override
-    public List<String> getText(int startRow, int startCol, int endRow, int endCol) {
-        List<String> list = new ArrayList<>();
-        for (int i = startRow; i <= endRow; i++) {
-            String row = getText(i);
-            row = (i == startRow) ? row.substring(startCol) : row;
-            row = (i == endRow) ? row.substring(0, endCol) : row;
-            list.add(row);
-        }
-        return list;
+    public List<String> getText(int fromRow, int endRowInclusive) {
+        return IntStream.rangeClosed(fromRow, endRowInclusive).mapToObj(this::getText).toList();
     }
 
     @Override
