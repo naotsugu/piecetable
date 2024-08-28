@@ -352,8 +352,8 @@ public class TextEditImpl implements TextEdit {
         List<String> list = new ArrayList<>();
         for (int i = start.row(); i <= end.row(); i++) {
             String row = getText(i);
-            row = (i == start.row()) ? row.substring(start.col()) : row;
             row = (i == end.row()) ? row.substring(0, end.col()) : row;
+            row = (i == start.row()) ? row.substring(start.col()) : row;
             list.add(row);
         }
         return list;
