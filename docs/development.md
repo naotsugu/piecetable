@@ -17,6 +17,10 @@ build.gradle.kts
 README.md
 ```
 
+```
+examples/fx-editor/build.gradle.kts
+```
+
 
 Commit changes.
 

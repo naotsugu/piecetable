@@ -446,7 +446,7 @@ public interface ScreenText {
                 return;
             }
 
-            int next = top + 1;
+            int next = buffer.isEmpty() ? 0 : buffer.getLast().row() + 1;
             buffer.subList(0, Math.min(delta, buffer.size())).clear();
             for (int i = next; i < (next + delta) && i < ed.rows(); i++) {
                 buffer.add(createStyledRow(i));
