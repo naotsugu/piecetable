@@ -344,7 +344,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public List<String> getText(Pos start, Pos end) {
-        if (start.compareTo(end) < 0) {
+        if (end.compareTo(start) < 0) {
             Pos temp = start;
             start = end;
             end = temp;
