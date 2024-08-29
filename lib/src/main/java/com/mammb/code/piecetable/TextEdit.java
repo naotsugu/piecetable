@@ -150,10 +150,30 @@ public interface TextEdit {
     /**
      * Gets the text at the specified row range.
      * @param startRow the start row
-     * @param endRowInclusive the end row
+     * @param endRowExclusive the end row
      * @return the text of the specified rows
      */
-    List<String> getText(int startRow, int endRowInclusive);
+    String getText(int startRow, int endRowExclusive);
+
+    /**
+      * Gets the text at the specified range.
+      * @param startRow the start row
+      * @param startCol the start col
+      * @param endRow the end row
+      * @param endCol the end col
+      * @return the text of the specified range
+      */
+    default String getText(int startRow, int startCol, int endRow, int endCol) {
+        return getText(new Pos(startRow, startCol), new Pos(endRow, endCol));
+    }
+
+    /**
+     * Gets the text list at the specified range.
+     * @param start the start pos
+     * @param end the end pos
+     * @return the text of the specified range
+     */
+    String getText(Pos start, Pos end);
 
     /**
      * Gets the text list at the specified range.
@@ -161,7 +181,7 @@ public interface TextEdit {
      * @param end the end pos
      * @return the text list of the specified range
      */
-    List<String> getText(Pos start, Pos end);
+    List<String> getTexts(Pos start, Pos end);
 
     /**
      * Flush.

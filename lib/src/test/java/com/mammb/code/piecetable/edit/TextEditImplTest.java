@@ -35,7 +35,7 @@ class TextEditImplTest {
         var te = new TextEditImpl(Document.of());
 
         var pos = te.insert(0, 0, "abc");
-        assertEquals("abc", String.join("", te.getText(0, 1)));
+        assertEquals("abc", te.getText(0, 1));
         assertEquals(new Pos(0, 3), pos);
     }
 
@@ -45,7 +45,7 @@ class TextEditImplTest {
 
         var pos = te.insert(0, 0, "abc\ndef\ngh");
 
-        assertEquals("abc\ndef\ngh", String.join("", te.getText(0, 3)));
+        assertEquals("abc\ndef\ngh", te.getText(0, 3));
         assertEquals(new Pos(2, 2), pos);
     }
 
@@ -60,7 +60,7 @@ class TextEditImplTest {
         // | * | * | a | b | c | * | * | 1 | 2 | 3 | $ | d | * | * | e | f |
         //         |                   |                           |
         var posList = te.insert(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)), "**");
-        assertEquals("**abc**123\nd**ef", String.join("", te.getText(0, 2)));
+        assertEquals("**abc**123\nd**ef", te.getText(0, 2));
         assertEquals(new Pos(0, 2), posList.get(0));
         assertEquals(new Pos(0, 7), posList.get(1));
         assertEquals(new Pos(1, 3), posList.get(2));
@@ -83,7 +83,7 @@ class TextEditImplTest {
         // | * | e | f |
         //     ^
         var posList = te.insert(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)), "*\n*");
-        assertEquals("*\n*abc*\n*123\nd*\n*ef", String.join("", te.getText(0, 5)));
+        assertEquals("*\n*abc*\n*123\nd*\n*ef", te.getText(0, 5));
         assertEquals(new Pos(1, 1), posList.get(0));
         assertEquals(new Pos(2, 1), posList.get(1));
         assertEquals(new Pos(4, 1), posList.get(2));
@@ -96,7 +96,7 @@ class TextEditImplTest {
 
         var delText = te.delete(0, 3);
         assertEquals("\r\n", delText);
-        assertEquals("abc", String.join("", te.getText(0, 1)));
+        assertEquals("abc", te.getText(0, 1));
     }
 
     @Test
@@ -106,7 +106,7 @@ class TextEditImplTest {
 
         var delText = te.delete(0, 1, 8);
         assertEquals("bc\ndef\ng", delText);
-        assertEquals("ah", String.join("", te.getText(0, 1)));
+        assertEquals("ah", te.getText(0, 1));
     }
 
     @Test
@@ -121,7 +121,7 @@ class TextEditImplTest {
         // | b | 1 | 3 |
         // ^   ^   ^
         var posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 2), new Pos(0, 4)));
-        assertEquals("b13", String.join("", te.getText(0, 1)));
+        assertEquals("b13", te.getText(0, 1));
         assertEquals(new Pos(0, 0), posList.get(0));
         assertEquals(new Pos(0, 1), posList.get(1));
         assertEquals(new Pos(0, 2), posList.get(2));
@@ -135,7 +135,7 @@ class TextEditImplTest {
         // | b | c | 2 | 3 | $ | d | f |
         // ^       ^               ^
         posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(1, 1)));
-        assertEquals("bc23\ndf", String.join("", te.getText(0, 2)));
+        assertEquals("bc23\ndf", te.getText(0, 2));
         assertEquals(new Pos(0, 0), posList.get(0));
         assertEquals(new Pos(0, 2), posList.get(1));
         assertEquals(new Pos(1, 1), posList.get(2));
@@ -149,7 +149,7 @@ class TextEditImplTest {
         // | b | c | 2 | 3 | d | e |
         // ^       ^       ^       ^
         posList = te.delete(List.of(new Pos(0, 0), new Pos(0, 3), new Pos(0, 6), new Pos(1, 2)));
-        assertEquals("bc23de", String.join("", te.getText(0, 1)));
+        assertEquals("bc23de", te.getText(0, 1));
         assertEquals(new Pos(0, 0), posList.get(0));
         assertEquals(new Pos(0, 2), posList.get(1));
         assertEquals(new Pos(0, 4), posList.get(2));
@@ -162,7 +162,7 @@ class TextEditImplTest {
         te.getDoc().insert(0, 0, "abc");
 
         var pos = te.backspace(0, 2);
-        assertEquals("ac", String.join("", te.getText(0, 1)));
+        assertEquals("ac", te.getText(0, 1));
         assertEquals(new Pos(0, 1), pos);
     }
 
@@ -172,7 +172,7 @@ class TextEditImplTest {
         te.getDoc().insert(0, 0, "abc\r\n");
 
         var pos = te.backspace(1, 0);
-        assertEquals("abc", String.join("", te.getText(0, 1)));
+        assertEquals("abc", te.getText(0, 1));
         assertEquals(new Pos(0, 3), pos);
     }
 
@@ -182,7 +182,7 @@ class TextEditImplTest {
         te.getDoc().insert(0, 0, "abc\ndef\ngh");
 
         var pos = te.backspace(2, 1, 8);
-        assertEquals("ah", String.join("", te.getText(0, 1)));
+        assertEquals("ah", te.getText(0, 1));
         assertEquals(new Pos(0, 1), pos);
     }
 
@@ -197,7 +197,7 @@ class TextEditImplTest {
         // | b | c | 2 |
         // ^       ^   ^
         var posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 4), new Pos(0, 6)));
-        assertEquals("bc2", String.join("", te.getText(0, 1)));
+        assertEquals("bc2", te.getText(0, 1));
         assertEquals(new Pos(0, 0), posList.get(0));
         assertEquals(new Pos(0, 2), posList.get(1));
         assertEquals(new Pos(0, 3), posList.get(2));
@@ -210,7 +210,7 @@ class TextEditImplTest {
         // | a | c | $ | 2 | 3 |
         //     ^       ^
         posList = te.backspace(List.of(new Pos(0, 2), new Pos(1, 1)));
-        assertEquals("ac\n23", String.join("", te.getText(0, 2)));
+        assertEquals("ac\n23", te.getText(0, 2));
         assertEquals(new Pos(0, 1), posList.get(0));
         assertEquals(new Pos(1, 0), posList.get(1));
 
@@ -222,7 +222,7 @@ class TextEditImplTest {
         // | b | $ | 2 |
         // ^   ^   ^   ^
         posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 3), new Pos(1, 1), new Pos(1, 3)));
-        assertEquals("b\n2", String.join("", te.getText(0, 2)));
+        assertEquals("b\n2", te.getText(0, 2));
         assertEquals(new Pos(0, 0), posList.get(0));
         assertEquals(new Pos(0, 1), posList.get(1));
         assertEquals(new Pos(1, 0), posList.get(2));
@@ -236,7 +236,7 @@ class TextEditImplTest {
         // | a | c | 1 | 3 |
         //     ^   ^   ^
         posList = te.backspace(List.of(new Pos(0, 2), new Pos(1, 0), new Pos(1, 2)));
-        assertEquals("ac13", String.join("", te.getText(0, 1)));
+        assertEquals("ac13", te.getText(0, 1));
         assertEquals(new Pos(0, 1), posList.get(0));
         assertEquals(new Pos(0, 2), posList.get(1));
         assertEquals(new Pos(0, 3), posList.get(2));
@@ -253,7 +253,7 @@ class TextEditImplTest {
         // | b | c | 2 | 3 | d | e |
         // |       |       |       |
         var posList = te.backspace(List.of(new Pos(0, 1), new Pos(0, 4), new Pos(1, 0), new Pos(1, 3)));
-        assertEquals("bc23de", String.join("", te.getText(0, 1)));
+        assertEquals("bc23de", te.getText(0, 1));
         assertEquals(new Pos(0, 0), posList.get(0));
         assertEquals(new Pos(0, 2), posList.get(1));
         assertEquals(new Pos(0, 4), posList.get(2));
@@ -445,5 +445,24 @@ class TextEditImplTest {
         assertEquals("g", ret.get(2));
     }
 
+    @Test
+    void testGetText() {
+
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\ndef\nghi");
+
+        assertEquals("", te.getText(0, 0, 0, 0));
+        assertEquals("a", te.getText(0, 0, 0, 1));
+        assertEquals("ab", te.getText(0, 0, 0, 2));
+        assertEquals("abc", te.getText(0, 0, 0, 3));
+        assertEquals("abc\n", te.getText(0, 0, 0, 4));
+
+        assertEquals("abc\n", te.getText(0, 4, 0, 0));
+
+        assertEquals("f\ngh", te.getText(1, 2, 2, 2));
+        assertEquals("abc\ndef\nghi", te.getText(0, 0, 2, 3));
+        assertEquals("abc\ndef\nghi", te.getText(2, 3, 0, 0));
+
+    }
 
 }

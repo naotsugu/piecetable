@@ -322,7 +322,6 @@ public interface ScreenText {
         public void copyToClipboard() {
             String copy = carets.stream().sorted().filter(Caret::hasMark)
                 .map(c -> ed.getText(c.markedMin(), c.markedMax()))
-                .flatMap(Collection::stream)
                 .collect(Collectors.joining());
             javafx.scene.input.Clipboard.getSystemClipboard()
                 .setContent(Map.of(DataFormat.PLAIN_TEXT, copy));

@@ -338,12 +338,31 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public List<String> getText(int fromRow, int endRowInclusive) {
-        return IntStream.rangeClosed(fromRow, endRowInclusive).mapToObj(this::getText).toList();
+    public String getText(int fromRow, int endRowExclusive) {
+        return IntStream.range(fromRow, endRowExclusive)
+            .mapToObj(this::getText)
+            .collect(Collectors.joining());
     }
 
     @Override
-    public List<String> getText(Pos start, Pos end) {
+    public String getText(Pos start, Pos end) {
+        if (end.compareTo(start) < 0) {
+                Pos temp = start;
+                start = end;
+                end = temp;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = start.row(); i <= end.row(); i++) {
+                String row = getText(i);
+                row = (i == end.row()) ? row.substring(0, end.col()) : row;
+                row = (i == start.row()) ? row.substring(start.col()) : row;
+                sb.append(row);
+            }
+        return sb.toString();
+    }
+
+    @Override
+    public List<String> getTexts(Pos start, Pos end) {
         if (end.compareTo(start) < 0) {
             Pos temp = start;
             start = end;
