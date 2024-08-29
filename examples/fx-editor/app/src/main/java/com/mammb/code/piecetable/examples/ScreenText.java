@@ -51,6 +51,7 @@ public interface ScreenText {
     void click(double x, double y);
     void clickDouble(double x, double y);
     void clickTriple(double x, double y);
+    void moveDragged(double x, double y);
     void pasteFromClipboard();
     void copyToClipboard();
     void cutToClipboard();
@@ -287,6 +288,8 @@ public interface ScreenText {
         public void clickDouble(double x, double y) { /* Not yet implemented. */ }
         @Override
         public void clickTriple(double x, double y) { /* Not yet implemented. */ }
+        @Override
+        public void moveDragged(double x, double y) { /* Not yet implemented. */ }
         protected void refreshBufferAt(List<Caret> carets) {
             carets.stream().mapToInt(c -> c.row).distinct().forEach(this::refreshBufferAt);
         }

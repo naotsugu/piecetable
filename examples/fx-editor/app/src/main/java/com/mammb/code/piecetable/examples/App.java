@@ -8,15 +8,19 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
@@ -100,8 +104,30 @@ public class App extends Application {
                     draw();
                 }
             });
+            setOnMouseDragged((MouseEvent e) -> {
+                if (e.getButton() == MouseButton.PRIMARY) {
+                    st.moveDragged(e.getX(), e.getY());
+                }
+            });
             setOnKeyPressed((KeyEvent e) -> execute(st, Action.of(e)));
             setOnKeyTyped((KeyEvent e) -> execute(st, Action.of(e)));
+
+            setOnDragOver((DragEvent e) -> {
+                if (e.getDragboard().hasFiles()) e.acceptTransferModes(TransferMode.MOVE);
+            });
+            setOnDragDropped((DragEvent e) -> {
+                Dragboard board = e.getDragboard();
+                if (board.hasFiles()) {
+                    var path = board.getFiles().stream().map(File::toPath)
+                        .filter(Files::isReadable).filter(Files::isRegularFile).findFirst();
+                    if (path.isPresent()) {
+                        open(path.get());
+                        e.setDropCompleted(true);
+                        return;
+                    }
+                }
+                e.setDropCompleted(false);
+            });
 
         }
 
@@ -144,8 +170,9 @@ public class App extends Application {
             fc.setTitle("Select file...");
             fc.setInitialDirectory(Path.of(System.getProperty("user.home")).toFile());
             File file = fc.showOpenDialog(getScene().getWindow());
-            if (file == null) return;
-            Path path = file.toPath();
+            if (file != null) open(file.toPath());
+        }
+        private void open(Path path) {
             String ext = Optional.of(path.getFileName().toString())
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(f.lastIndexOf(".") + 1))
@@ -205,6 +232,7 @@ public class App extends Application {
               -fx-light-text-color:app-text;
               -fx-mark-color: -fx-light-text-color;
               -fx-mark-highlight-color: derive(-fx-mark-color,20%);
+              -fx-background-color:app-back;
             }
             .text-input, .label {
               -fx-font: 14px "Consolas";
