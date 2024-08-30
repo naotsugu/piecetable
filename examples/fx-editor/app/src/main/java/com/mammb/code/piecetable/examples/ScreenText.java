@@ -200,10 +200,7 @@ public interface ScreenText {
             if (carets.size() == 1) {
                 Caret caret = carets.getFirst();
                 if (caret.hasMark()) {
-                    var pos = ed.replace(caret.markedMin(), caret.markedMax(), text);
-                    refreshBufferRange(caret.markedMin().row());
-                    caret.clearMark();
-                    caret.at(pos.row(), pos.col());
+                    selectionReplace(caret, text);
                 } else {
                     var pos = ed.insert(caret.row, caret.col, text);
                     if (caret.row == pos.row()) {
@@ -229,11 +226,15 @@ public interface ScreenText {
         public void delete() {
             if (carets.size() == 1) {
                 Caret caret = carets.getFirst();
-                var del = ed.delete(caret.row, caret.col);
-                if (!del.contains("\n")) {
-                    refreshBufferAt(caret.row);
+                if (caret.hasMark()) {
+                    selectionReplace(caret, "");
                 } else {
-                    refreshBufferRange(caret.row);
+                    var del = ed.delete(caret.row, caret.col);
+                    if (!del.contains("\n")) {
+                        refreshBufferAt(caret.row);
+                    } else {
+                        refreshBufferRange(caret.row);
+                    }
                 }
             } else {
                 Collections.sort(carets);
@@ -252,13 +253,17 @@ public interface ScreenText {
             if (carets.size() == 1) {
                 Caret caret = carets.getFirst();
                 if (caret.isZero()) return;
-                var pos = ed.backspace(caret.row, caret.col);
-                if (caret.row == pos.row()) {
-                    refreshBufferAt(caret.row);
+                if (caret.hasMark()) {
+                    selectionReplace(caret, "");
                 } else {
-                    refreshBufferRange(pos.row());
+                    var pos = ed.backspace(caret.row, caret.col);
+                    if (caret.row == pos.row()) {
+                        refreshBufferAt(caret.row);
+                    } else {
+                        refreshBufferRange(pos.row());
+                    }
+                    caret.at(pos.row(), pos.col());
                 }
-                caret.at(pos.row(), pos.col());
             } else {
                 Collections.sort(carets);
                 var poss = ed.backspace(carets.stream().map(c -> new TextEdit.Pos(c.row, c.col)).toList());
@@ -269,6 +274,14 @@ public interface ScreenText {
                 }
             }
             scrollToCaret();
+        }
+
+        private void selectionReplace(Caret caret, String text) {
+            assert caret.hasMark();
+            var pos = ed.replace(caret.row, caret.col, caret.markedRow, caret.markedCol, text);
+            refreshBufferRange(caret.markedMin().row());
+            caret.clearMark();
+            caret.at(pos.row(), pos.col());
         }
 
         @Override
