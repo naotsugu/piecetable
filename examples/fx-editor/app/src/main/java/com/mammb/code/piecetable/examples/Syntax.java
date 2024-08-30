@@ -35,6 +35,7 @@ public interface Syntax {
     enum Palette {
         DEEP_GREEN("#6A8759"),
         ORANGE("#CC7832"),
+        GRAY("#808080"),
         ;
         Palette(String colorString) {
             this.colorString = colorString;
@@ -95,9 +96,9 @@ public interface Syntax {
             if (text == null || text.isBlank()) {
                 return Collections.emptyList();
             }
-            scopes.tailMap(new Anchor(row, 0), true).clear();
+            scopes.subMap(new Anchor(row, 0), new Anchor(row, Integer.MAX_VALUE)).clear();
             boolean inBlockComment = false;
-            for (var e : scopes.entrySet()) {
+            for (var e : scopes.headMap(new Anchor(row, 0)).entrySet()) {
                 if (inBlockComment && e.getValue().equals("*/")) {
                     inBlockComment = false;
                 } else if (!inBlockComment && e.getValue().equals("/*")) {
@@ -136,6 +137,10 @@ public interface Syntax {
                             new TextColor(Palette.DEEP_GREEN.colorString), i, text.length()));
                         return spans;
                     }
+                } else if (ch == '/' && i + 1 < text.length() && text.charAt(i + 1) == '/') {
+                    spans.add(new StyleSpan(
+                        new TextColor(Palette.GRAY.colorString), i, text.length()));
+                    return spans;
                 } else if (ch == '"') {
                     i = Syntax.read('"', '\\', Palette.DEEP_GREEN.colorString, text, i, spans);
                 } else if (Character.isAlphabetic(ch)) {
