@@ -107,6 +107,7 @@ public class App extends Application {
             setOnMouseDragged((MouseEvent e) -> {
                 if (e.getButton() == MouseButton.PRIMARY) {
                     st.moveDragged(e.getX(), e.getY());
+                    st.draw(draw);
                 }
             });
             setOnKeyPressed((KeyEvent e) -> execute(st, Action.of(e)));

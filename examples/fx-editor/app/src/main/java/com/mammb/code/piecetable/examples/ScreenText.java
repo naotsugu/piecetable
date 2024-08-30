@@ -288,8 +288,6 @@ public interface ScreenText {
         public void clickDouble(double x, double y) { /* Not yet implemented. */ }
         @Override
         public void clickTriple(double x, double y) { /* Not yet implemented. */ }
-        @Override
-        public void moveDragged(double x, double y) { /* Not yet implemented. */ }
         protected void refreshBufferAt(List<Caret> carets) {
             carets.stream().mapToInt(c -> c.row).distinct().forEach(this::refreshBufferAt);
         }
@@ -367,11 +365,13 @@ public interface ScreenText {
 
             for (Caret caret : carets) {
                 if (!caret.hasMark()) continue;
-                Loc mLoc = posToLoc(caret.markedRow, caret.markedCol);
-                Loc cLoc = posToLoc(caret.row, caret.col);
+                Pos min = caret.markedMin();
+                Pos max = caret.markedMax();
+                Loc minLoc = posToLoc(min.row(), min.col());
+                Loc maxLoc = posToLoc(max.row(), max.col());
                 draw.fillSelection(
-                    mLoc.x() + MARGIN_LEFT - xShift, mLoc.y() + MARGIN_TOP,
-                    cLoc.x() + MARGIN_LEFT - xShift, cLoc.y() + MARGIN_TOP,
+                    maxLoc.x() + MARGIN_LEFT - xShift, maxLoc.y() + MARGIN_TOP,
+                    minLoc.x() + MARGIN_LEFT - xShift, minLoc.y() + MARGIN_TOP,
                     MARGIN_LEFT, width);
             }
 
@@ -505,8 +505,17 @@ public interface ScreenText {
         public void click(double x, double y) {
             int top = buffer.isEmpty() ? 0 : buffer.getFirst().row();
             TextEdit.Pos pos = locToPos(x + xShift, y + top * fm.getLineHeight());
-            carets.clear();
-            carets.add(new Caret(pos.row(), pos.col()));
+            Caret caret = carets.getFirst();
+            if (!caret.hasMarkOpen()) caret.clearMark();
+            caret.at(pos.row(), pos.col());
+        }
+        @Override
+        public void moveDragged(double x, double y) {
+            int top = buffer.isEmpty() ? 0 : buffer.getFirst().row();
+            Pos pos = locToPos(x + xShift, y + top * fm.getLineHeight());
+            Caret caret = carets.getFirst();
+            caret.atOpen(pos.row(), pos.col());
+            if (!caret.hasMark()) caret.mark();
         }
 
         @Override
@@ -601,13 +610,16 @@ public interface ScreenText {
         int row = 0, col = 0;
         double vPos = 0; // not contains margin
         int markedRow = -1, markedCol = -1;
-        Caret(int row, int col) { this.row = row; this.col = col; this.vPos = -1; }
-        public void at(int row, int col) { this.row = row; this.col = col; this.vPos = -1; }
+        boolean markOpened;
+        Caret(int row, int col) { this.row = row; this.col = col; vPos = -1; }
+        public void at(int row, int col) { this.row = row; this.col = col; vPos = -1; markOpened = false; }
+        public void atOpen(int row, int col) { this.row = row; this.col = col; vPos = -1; markOpened = true; }
         public void mark(int row, int col) { markedRow = row; markedCol = col; }
         public void mark() { markedRow = row; markedCol = col; }
-        public void clearMark() { markedRow = -1; markedCol = -1; }
+        public void clearMark() { markedRow = -1; markedCol = -1; markOpened = false; }
         public boolean isZero() { return row == 0 && col == 0; }
         public boolean hasMark() { return markedRow >= 0 && markedCol >= 0 && !(row == markedRow && col == markedCol); }
+        public boolean hasMarkOpen() { return hasMark() && markOpened; }
         public boolean isMarkForward() { return hasMark() && ((row == markedRow && col > markedCol) || (row > markedRow)); }
         public boolean isMarkBackward() { return hasMark() && !isMarkForward(); }
         public Pos markedMin() { return isMarkForward() ? new Pos(markedRow, markedCol) : new Pos(row, col); }
