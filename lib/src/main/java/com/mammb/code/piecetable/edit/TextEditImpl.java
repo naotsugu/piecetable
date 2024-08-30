@@ -308,7 +308,7 @@ public class TextEditImpl implements TextEdit {
         }
         return switch (undo.get()) {
             case Edit.ConcreteEdit e -> List.of(e.to());
-            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).toList();
+            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).distinct().toList();
         };
     }
 
@@ -321,7 +321,7 @@ public class TextEditImpl implements TextEdit {
         }
         return switch (redo.get()) {
             case Edit.ConcreteEdit e -> List.of(e.to());
-            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).toList();
+            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).distinct().toList();
         };
     }
 

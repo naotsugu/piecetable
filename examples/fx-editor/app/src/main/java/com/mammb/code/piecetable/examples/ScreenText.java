@@ -199,13 +199,20 @@ public interface ScreenText {
         public void input(String text) {
             if (carets.size() == 1) {
                 Caret caret = carets.getFirst();
-                var pos = ed.insert(caret.row, caret.col, text);
-                if (caret.row == pos.row()) {
-                    refreshBufferAt(caret.row);
+                if (caret.hasMark()) {
+                    var pos = ed.replace(caret.markedMin(), caret.markedMax(), text);
+                    refreshBufferRange(caret.markedMin().row());
+                    caret.clearMark();
+                    caret.at(pos.row(), pos.col());
                 } else {
-                    refreshBufferRange(caret.row);
+                    var pos = ed.insert(caret.row, caret.col, text);
+                    if (caret.row == pos.row()) {
+                        refreshBufferAt(caret.row);
+                    } else {
+                        refreshBufferRange(caret.row);
+                    }
+                    caret.at(pos.row(), pos.col());
                 }
-                caret.at(pos.row(), pos.col());
             } else {
                 Collections.sort(carets);
                 var poss = ed.insert(carets.stream().map(c -> new TextEdit.Pos(c.row, c.col)).toList(), text);
@@ -370,8 +377,8 @@ public interface ScreenText {
                 Loc minLoc = posToLoc(min.row(), min.col());
                 Loc maxLoc = posToLoc(max.row(), max.col());
                 draw.fillSelection(
-                    maxLoc.x() + MARGIN_LEFT - xShift, maxLoc.y() + MARGIN_TOP,
                     minLoc.x() + MARGIN_LEFT - xShift, minLoc.y() + MARGIN_TOP,
+                    maxLoc.x() + MARGIN_LEFT - xShift, maxLoc.y() + MARGIN_TOP,
                     MARGIN_LEFT, width);
             }
 

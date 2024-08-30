@@ -20,6 +20,7 @@ import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -118,6 +119,18 @@ public interface TextEdit {
      * @return the new position
      */
     Pos replace(int row, int col, int len, String text);
+
+
+    default Pos replace(int startRow, int startCol, int endRow, int endCol, String text) {
+        return replace(new Pos(startRow, startCol), new Pos(endRow, endCol), text);
+    }
+
+    default Pos replace(Pos start, Pos end, String text) {
+        return replace(
+            start.row(), start.col(),
+            getText(start, end).length() * (int) Math.signum(end.compareTo(start)),
+            text);
+    }
 
     /**
      * Replace the multi text from this {@code TextEdit}.
@@ -278,5 +291,7 @@ public interface TextEdit {
             return c == 0 ? Integer.compare(this.col, that.col) : c;
         }
     }
+
+    record Range(Pos from, Pos to) { }
 
 }
