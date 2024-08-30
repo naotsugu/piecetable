@@ -276,14 +276,14 @@ public class TextEditImpl implements TextEdit {
         Pos pos;
         if (len > 0) {
             var delText = join(textRightByte(row, col, len));
-            Edit.ConcreteEdit del = deleteEdit(row, col, delText, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(row, col, text, occurredOn);
+            Edit.Del del = deleteEdit(row, col, delText, occurredOn);
+            Edit.Ins ins = insertEdit(row, col, text, occurredOn);
             e = new Edit.Cmp(List.of(del, ins), occurredOn);
             pos = ins.to();
         } else {
             var delText = join(textLeftByte(row, col, -len));
-            Edit.ConcreteEdit bs = backspaceEdit(row, col, delText, occurredOn);
-            Edit.ConcreteEdit ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
+            Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
+            Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
             e = new Edit.Cmp(List.of(bs, ins), occurredOn);
             pos = ins.to();
         }
@@ -308,7 +308,7 @@ public class TextEditImpl implements TextEdit {
         }
         return switch (undo.get()) {
             case Edit.ConcreteEdit e -> List.of(e.to());
-            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).distinct().toList();
+            case Edit.Cmp e -> List.of(e.edits().getLast().to());
         };
     }
 
@@ -321,7 +321,7 @@ public class TextEditImpl implements TextEdit {
         }
         return switch (redo.get()) {
             case Edit.ConcreteEdit e -> List.of(e.to());
-            case Edit.Cmp e -> e.edits().stream().map(Edit.ConcreteEdit::to).distinct().toList();
+            case Edit.Cmp e -> List.of(e.edits().getLast().to());
         };
     }
 
