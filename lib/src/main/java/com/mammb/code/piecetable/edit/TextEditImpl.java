@@ -130,12 +130,6 @@ public class TextEditImpl implements TextEdit {
         return deleteChar(posList, 1);
     }
 
-    @Override
-    public List<Pos> delete(List<Pos> posList, List<Integer> lenList) {
-        // TODO
-        return List.of();
-    }
-
     private String deleteChar(int row, int col, int chCount) {
         var del = join(textRight(row, col, chCount));
         Edit.Del edit = deleteEdit(row, col, del, System.currentTimeMillis());
@@ -214,12 +208,6 @@ public class TextEditImpl implements TextEdit {
         return backspaceChar(posList, 1);
     }
 
-    @Override
-    public List<Pos> backspace(List<Pos> posList, List<Integer> lenList) {
-        // TODO
-        return List.of();
-    }
-
     Pos backspaceChar(int row, int col, int chCount) {
         var del = join(textLeft(row, col, chCount));
         Edit.Del edit = backspaceEdit(row, col, del, System.currentTimeMillis());
@@ -291,13 +279,7 @@ public class TextEditImpl implements TextEdit {
         return pos;
     }
 
-    @Override
-    public List<Pos> replace(List<Pos> posList, List<Integer> lenList, String text) {
-        // TODO
-        return List.of();
-    }
-
-    // -- Undo/RedoReplace ----------------------------------------------------
+    // -- Undo / Redo ---------------------------------------------------------
 
     @Override
     public List<Pos> undo() {
@@ -324,7 +306,6 @@ public class TextEditImpl implements TextEdit {
             case Edit.Cmp e -> List.of(e.edits().getLast().to());
         };
     }
-
 
     @Override
     public String getText(int row) {

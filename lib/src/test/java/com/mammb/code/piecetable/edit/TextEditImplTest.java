@@ -465,4 +465,42 @@ class TextEditImplTest {
 
     }
 
+    @Test
+    void testReplace() {
+
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\ndef\nghi");
+
+        var ret = te.replace(0, 0, 3, "123");
+
+        assertEquals(0, ret.row());
+        assertEquals(3, ret.col());
+        assertEquals("123\ndef\nghi", te.getText(0, 3));
+
+        ret = te.replace(0, 1, 9, "*");
+        assertEquals(0, ret.row());
+        assertEquals(2, ret.col());
+        assertEquals("1*i", te.getText(0, 1));
+
+    }
+
+    @Test
+    void testReplaceBackward() {
+
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\ndef\nghi");
+
+        var ret = te.replace(2, 3, -2, "123");
+
+        assertEquals(2, ret.row());
+        assertEquals(4, ret.col());
+        assertEquals("abc\ndef\ng123", te.getText(0, 3));
+
+        ret = te.replace(2, 3, -9, "*");
+        assertEquals(0, ret.row());
+        assertEquals(3, ret.col());
+        assertEquals("ab*3", te.getText(0, 1));
+
+    }
+
 }

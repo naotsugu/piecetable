@@ -71,14 +71,6 @@ public interface TextEdit {
     List<Pos> delete(List<Pos> posList);
 
     /**
-     * Delete the multi text from this {@code TextEdit}.
-     * @param posList the position list
-     * @param lenList the byte length list to be deleted
-     * @return the new position
-     */
-    List<Pos> delete(List<Pos> posList, List<Integer> lenList);
-
-    /**
      * Backspace delete the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
@@ -103,14 +95,6 @@ public interface TextEdit {
     List<Pos> backspace(List<Pos> posList);
 
     /**
-     * Backspace delete the multi text from this {@code TextEdit}.
-     * @param posList the position list
-     * @param lenList the byte length list to be deleted
-     * @return the new position
-     */
-    List<Pos> backspace(List<Pos> posList, List<Integer> lenList);
-
-    /**
      * Replace the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be replaced
@@ -120,26 +104,32 @@ public interface TextEdit {
      */
     Pos replace(int row, int col, int len, String text);
 
-
+    /**
+     * Replace the text in the specified range from this {@code TextEdit}.
+     * @param startRow the range start row
+     * @param startCol the range start col
+     * @param endRow the range end row
+     * @param endCol the range end col
+     * @param text the char sequence is to be inserted
+     * @return the new position
+     */
     default Pos replace(int startRow, int startCol, int endRow, int endCol, String text) {
         return replace(new Pos(startRow, startCol), new Pos(endRow, endCol), text);
     }
 
+    /**
+     * Replace the text in the specified range from this {@code TextEdit}.
+     * @param start the start position
+     * @param end the end position
+     * @param text the char sequence is to be inserted
+     * @return the new position
+     */
     default Pos replace(Pos start, Pos end, String text) {
         return replace(
             start.row(), start.col(),
             getText(start, end).length() * (int) Math.signum(end.compareTo(start)),
             text);
     }
-
-    /**
-     * Replace the multi text from this {@code TextEdit}.
-     * @param posList the position list
-     * @param lenList the byte length list to be deleted
-     * @param text the char sequence is to be inserted
-     * @return the new position
-     */
-    List<Pos> replace(List<Pos> posList, List<Integer> lenList, String text);
 
     /**
      * Undo.
