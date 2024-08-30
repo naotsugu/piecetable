@@ -50,7 +50,7 @@ Add dependencies.
 
 ```kotlin
 dependencies {
-    implementation("com.mammb:piecetable:0.5.3")
+    implementation("com.mammb:piecetable:0.5.4")
 }
 ```
 
@@ -138,7 +138,7 @@ cd examples/fx-editor
 ./gradlew run
 ```
 
-
+![screenshot-example](docs/images/screenshot-1.png)
 
 ## Sample applications using this library
 
