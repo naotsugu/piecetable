@@ -17,6 +17,8 @@ package com.mammb.code.piecetable.text;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -177,6 +179,122 @@ class RowIndexTest {
         assertEquals(3, index.rowLengths()[0]);
         assertEquals(3, index.rowLengths()[1]);
         assertEquals(0, index.rowLengths()[2]);
+    }
+
+    @Test
+    void rowSizeWithInsertAndDelete() {
+
+        var index = RowIndex.of(5);
+        assertEquals(1, index.rowSize());
+
+        index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
+        assertEquals(3, index.rowSize());
+
+        int[] rowLengths = index.rowLengths();
+        assertEquals(3, rowLengths.length);
+        assertEquals(4, rowLengths[0]);
+        assertEquals(4, rowLengths[1]);
+        assertEquals(3, rowLengths[2]);
+
+        assertEquals(0, index.get(0));
+        assertEquals(4, index.get(1));
+        assertEquals(8, index.get(2));
+
+        index.delete(0, 0, 8);
+        // aaa$bbb$ccc -> ccc
+        // ^^^^^^^^
+        // -------------------------
+        // aaa$ : 4       ccc : 3
+        // bbb$ : 4
+        // ccc  : 3
+        assertEquals(1, index.rowSize());
+
+        rowLengths = index.rowLengths();
+        assertEquals(1, rowLengths.length);
+        assertEquals(3, rowLengths[0]);
+
+        assertEquals(0, index.get(0));
+
+    }
+
+    @Test
+    void rowSizeWithInsertAndDelete2() {
+
+        var index = RowIndex.of(5);
+        assertEquals(1, index.rowSize());
+
+        index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
+        assertEquals(3, index.rowSize());
+
+        index.delete(0, 1, 8);
+        // aaa$bbb$ccc -> acc
+        //  ^^^^^^^^
+        // -------------------------
+        // aaa$ : 4       acc : 3
+        // bbb$ : 4
+        // ccc  : 3
+        assertEquals(1, index.rowSize());
+
+        int[] rowLengths = index.rowLengths();
+        assertEquals(1, rowLengths.length);
+        assertEquals(3, rowLengths[0]);
+
+        assertEquals(0, index.get(0));
+
+    }
+
+    @Test
+    void rowSizeWithInsertAndDelete3() {
+
+        var index = RowIndex.of(5);
+        assertEquals(1, index.rowSize());
+
+        index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
+        assertEquals(3, index.rowSize());
+
+        index.delete(0, 3, 8);
+        // aaa$bbb$ccc -> acc
+        //    ^^^^^^^^
+        // -------------------------
+        // aaa$ : 4       aaa : 3
+        // bbb$ : 4
+        // ccc  : 3
+        assertEquals(1, index.rowSize());
+
+        int[] rowLengths = index.rowLengths();
+        assertEquals(1, rowLengths.length);
+        assertEquals(3, rowLengths[0]);
+
+        assertEquals(0, index.get(0));
+
+    }
+
+    @Test
+    void rowSizeWithInsertAndDelete4() {
+
+        var index = RowIndex.of(5);
+        assertEquals(1, index.rowSize());
+
+        index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
+        assertEquals(3, index.rowSize());
+
+        index.delete(1, 0, 7);
+        // aaa$bbb$ccc -> aaa$
+        //     ^^^^^^^
+        // -------------------------
+        // aaa$ : 4       aaa$ : 4
+        // bbb$ : 4            : 1
+        // ccc  : 3
+        assertEquals(2, index.rowSize());
+
+        int[] rowLengths = index.rowLengths();
+        assertEquals(2, rowLengths.length);
+        assertEquals(4, rowLengths[0]);
+        assertEquals(0, rowLengths[1]);
+
+        assertEquals(0, index.get(0));
+        assertEquals(4, index.get(1));
+
     }
 
     @Test

@@ -112,9 +112,14 @@ public class RowIndex {
 
 
     /**
-     * Gets the byte length of the specified row.
+     * Gets the total byte length of the specified row from the head.
+     * <pre>
+     *   0  | * | * |
+     *   2  | * | * |
+     *   4  | * | * |
+     * </pre>
      * @param row the specified row
-     * @return the byte length of the specified row
+     * @return the total byte length of the specified row from the head
      */
     public long get(int row) {
 
@@ -168,20 +173,19 @@ public class RowIndex {
         } else {
 
             // insert operation across multiple rows
+            int head = col + rows[0];
+            int tail = (rowLengths[row] - col) + rows[rows.length - 1];
+
             System.arraycopy(rowLengths, row + 1,
                 rowLengths, row + rows.length,
                 length - (row + 1));
 
-            int tail = rowLengths[row] - col;
-            rowLengths[row++] = col + rows[0];
-
-            for (int i = 1; i < rows.length - 1; i++) {
-                rowLengths[row++] = rows[i];
-            }
-
-            rowLengths[row] = tail + rows[rows.length - 1];
+            rowLengths[row] = head;
+            System.arraycopy(rows, 1, rowLengths, row + 1, rows.length - 1 - 1);
+            rowLengths[row + rows.length - 1] = tail;
 
         }
+
         length += rows.length - 1;
     }
 
@@ -221,7 +225,7 @@ public class RowIndex {
             do {
                 if ((row + lines + 1) >= length) break;
                 len -= rowLengths[row + ++lines];
-            } while (len > 0);
+            } while (len >= 0);
 
             rowLengths[row] += (-len); // merge the rest to the first row
 
