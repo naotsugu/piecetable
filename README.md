@@ -77,7 +77,7 @@ assertEquals("a span of text", new String(bytes));
 ```
 
 
-### TextEdit
+### Document
 
 ```java
 var doc = Document.of();
