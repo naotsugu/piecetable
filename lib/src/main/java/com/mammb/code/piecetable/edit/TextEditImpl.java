@@ -308,6 +308,11 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
+    public boolean hasUndoRecord() {
+        return !undo.isEmpty();
+    }
+
+    @Override
     public String getText(int row) {
         if (!deque.isEmpty() && dryBuffer.isEmpty()) {
             dryApply();

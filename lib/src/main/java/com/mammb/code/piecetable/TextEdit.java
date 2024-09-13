@@ -144,6 +144,12 @@ public interface TextEdit {
     List<Pos> redo();
 
     /**
+     * Gets whether there is an undo record.
+     * @return {@code true} if there is an undo record
+     */
+    boolean hasUndoRecord();
+
+    /**
      * Gets the text at the specified row.
      * @param row the number of row(zero origin)
      * @return the text of the specified row
