@@ -343,7 +343,7 @@ public class TextEditImpl implements TextEdit {
                 row = (i == end.row()) ? row.substring(0, end.col()) : row;
                 row = (i == start.row()) ? row.substring(start.col()) : row;
                 sb.append(row);
-            }
+        }
         return sb.toString();
     }
 
