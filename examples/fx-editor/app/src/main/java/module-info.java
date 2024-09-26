@@ -1,5 +1,7 @@
-module com.mammb.code.piecetable.examples {
+module code.editor {
+    requires javafx.graphics;
     requires javafx.controls;
     requires com.mammb.code.piecetable;
-    exports com.mammb.code.piecetable.examples;
+    exports com.mammb.code.editor;
+    exports com.mammb.code.editor.fx;
 }

@@ -21,8 +21,8 @@ java {
 }
 
 application {
-    mainClass = "com.mammb.code.piecetable.examples.App"
-    mainModule = "com.mammb.code.piecetable.examples"
+    mainClass = "com.mammb.code.editor.Main"
+    mainModule = "code.editor"
     if (providers.systemProperty("debug").isPresent) {
         applicationDefaultJvmArgs = applicationDefaultJvmArgs.plus(listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"))
     }
@@ -86,19 +86,19 @@ extraJavaModuleInfo {
             "javafx.swing")
         exports("com.sun.javafx.font",
             "javafx.web",
-            "com.mammb.code.piecetable.examples")
+            "code.editor")
         exports("com.sun.javafx.geom",
             "javafx.controls",
             "javafx.media",
             "javafx.swing",
             "javafx.web",
-            "com.mammb.code.piecetable.examples")
+            "code.editor")
         exports("com.sun.javafx.geom.transform",
             "javafx.controls",
             "javafx.media",
             "javafx.swing",
             "javafx.web",
-            "com.mammb.code.piecetable.examples")
+            "code.editor")
         exports("com.sun.javafx.iio",
             "javafx.web")
         exports("com.sun.javafx.menu",
@@ -118,7 +118,7 @@ extraJavaModuleInfo {
         exports("com.sun.javafx.scene.text",
             "javafx.controls",
             "javafx.web",
-            "com.mammb.code.piecetable.examples")
+            "code.editor")
         exports("com.sun.javafx.scene.traversal",
             "javafx.controls",
             "javafx.web")
@@ -136,7 +136,7 @@ extraJavaModuleInfo {
             "javafx.media",
             "javafx.swing",
             "javafx.web",
-            "com.mammb.code.piecetable.examples")
+            "code.editor")
         exports("com.sun.javafx.util",
             "javafx.controls",
             "javafx.fxml",
