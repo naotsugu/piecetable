@@ -24,6 +24,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollBar;
@@ -39,6 +40,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.input.InputMethodTextRun;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -91,6 +93,7 @@ public class EditorPane extends StackPane {
         canvas.setOnInputMethodTextChanged(this::handleInputMethodTextChanged);
     }
 
+
     private void handleLayoutBoundsChanged(
             ObservableValue<? extends Bounds> ob, Bounds o, Bounds n) {
         canvas.setWidth(n.getWidth());
@@ -98,6 +101,7 @@ public class EditorPane extends StackPane {
         model.setSize(n.getWidth(), n.getHeight());
         draw();
     }
+
 
     private void handleScroll(ScrollEvent e) {
         if (e.getEventType() == ScrollEvent.SCROLL && e.getDeltaY() != 0) {
@@ -110,6 +114,7 @@ public class EditorPane extends StackPane {
         }
     }
 
+
     private void handleMouseClicked(MouseEvent e) {
         if (e.getButton() == MouseButton.PRIMARY && e.getTarget() == canvas) {
             switch (e.getClickCount()) {
@@ -121,6 +126,7 @@ public class EditorPane extends StackPane {
         }
     }
 
+
     private void handleMouseDragged(MouseEvent e) {
         if (e.getButton() == MouseButton.PRIMARY) {
             model.moveDragged(e.getX(), e.getY());
@@ -128,15 +134,18 @@ public class EditorPane extends StackPane {
         }
     }
 
+
     private void handleKeyAction(KeyEvent e) {
         execute(FxActions.of(e));
     }
+
 
     private void handleDragOver(DragEvent e) {
         if (e.getDragboard().hasFiles()) {
             e.acceptTransferModes(TransferMode.COPY);
         }
     }
+
 
     private void handleDragDropped(DragEvent e) {
         Dragboard board = e.getDragboard();
@@ -154,15 +163,18 @@ public class EditorPane extends StackPane {
         e.setDropCompleted(false);
     }
 
+
     private void handleVerticalScroll(ObservableValue<? extends Number> ob, Number o, Number n) {
         model.scrollAt(n.intValue());
         draw();
     }
 
+
     private void handleHorizontalScroll(ObservableValue<? extends Number> ob, Number o, Number n) {
         model.scrollX(n.doubleValue());
         draw();
     }
+
 
     private void handleInputMethodTextChanged(InputMethodEvent e) {
         if (!e.getCommitted().isEmpty()) {
@@ -179,6 +191,7 @@ public class EditorPane extends StackPane {
         }
         draw();
     }
+
 
     private Action execute(Action action) {
         if (model.isImeOn()) return Action.EMPTY;
@@ -219,6 +232,7 @@ public class EditorPane extends StackPane {
         return action;
     }
 
+
     private ScreenScroll screenScroll() {
         return new ScreenScroll() {
             @Override
@@ -236,7 +250,6 @@ public class EditorPane extends StackPane {
                 hScroll.setVisibleAmount(len);
                 hScroll.setVisible(max > len);
             }
-
             @Override
             public double xVal() {
                 return hScroll.getValue();
@@ -244,9 +257,11 @@ public class EditorPane extends StackPane {
         };
     }
 
+
     private void draw() {
         model.draw(draw);
     }
+
 
     private void openWithChooser() {
         if (!canDiscardCurrent()) return;
@@ -262,10 +277,12 @@ public class EditorPane extends StackPane {
         if (file != null) open(file.toPath());
     }
 
+
     private void open(Path path) {
         model = EditorModel.of(path, draw.fontMetrics(), screenScroll());
         model.setSize(getWidth(), getHeight());
     }
+
 
     private boolean canDiscardCurrent() {
         if (model.isModified()) {
@@ -277,6 +294,7 @@ public class EditorPane extends StackPane {
         }
     }
 
+
     private void save() {
         if (model.path().isPresent()) {
             model.save(model.path().get());
@@ -284,6 +302,7 @@ public class EditorPane extends StackPane {
             saveAs();
         }
     }
+
 
     private void saveAs() {
         FileChooser fc = new FileChooser();
@@ -295,9 +314,20 @@ public class EditorPane extends StackPane {
         if (file != null) model.save(file.toPath());
     }
 
+
     private void newEdit() {
-        // TODO
+        Stage current = (Stage) getScene().getWindow();
+        Stage stage = new Stage();
+        stage.setX(current.getX() + (current.isFullScreen() ? 0 : 15));
+        stage.setY(current.getY() + (current.isFullScreen() ? 0 : 15));
+        var editorPane = new EditorPane();
+        Scene scene = new Scene(editorPane, current.getWidth(), current.getHeight());
+        scene.getStylesheets().addAll(getScene().getStylesheets());
+        stage.setScene(scene);
+        stage.setTitle("min-editor");
+        stage.show();
     }
+
 
     private InputMethodRequests inputMethodRequests() {
         return new InputMethodRequests() {

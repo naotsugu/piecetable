@@ -110,13 +110,15 @@ public class LexerSource {
         return ret;
     }
 
-    public void rollbackPeek() {
+    public LexerSource rollbackPeek() {
         peek = 0;
+        return this;
     }
 
-    public void commitPeek() {
+    public LexerSource commitPeek() {
         index += peek;
         peek = 0;
+        return this;
     }
 
     public record Indexed(int index, String string, int parentLength) {

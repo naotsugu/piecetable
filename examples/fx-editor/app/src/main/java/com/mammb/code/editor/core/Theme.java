@@ -15,6 +15,10 @@
  */
 package com.mammb.code.editor.core;
 
+/**
+ * The Theme.
+ * @author Naotsugu Kobayashi
+ */
 public interface Theme {
 
     Theme dark = new ThemeRecord(

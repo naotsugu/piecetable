@@ -15,7 +15,10 @@
  */
 package com.mammb.code.editor.core.text;
 
+import java.text.BreakIterator;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * The Text.
@@ -87,6 +90,24 @@ public interface Text {
 
     default boolean isEmpty() {
         return value().isEmpty();
+    }
+
+    default List<Text> words() {
+        List<Text> ret = new ArrayList<>();
+        var text = value();
+        BreakIterator boundary = BreakIterator.getWordInstance();
+        boundary.setText(text);
+        int start = boundary.first();
+        for (int end = boundary.next();
+             end != BreakIterator.DONE;
+             start = end, end = boundary.next()) {
+            ret.add(Text.of(
+                    row(),
+                    text.substring(start, end),
+                    Arrays.copyOfRange(advances(), start, end),
+                    height()));
+        }
+        return ret;
     }
 
     static Text of(int row, String value, double[] advances, double height) {

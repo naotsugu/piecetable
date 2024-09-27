@@ -27,7 +27,10 @@ public interface Caret extends Comparable<Caret>{
     Point point();
     void at(int row, int col);
     void at(int row, int col, double vPos);
+    void floatAt(int row, int col);
     void flushAt(int row, int col);
+    void markTo(int markRow, int markCcol, int row, int col);
+    void clearFloat();
     void clearFlush();
     boolean hasFlush();
     Point pointFlush();
@@ -147,14 +150,30 @@ public interface Caret extends Comparable<Caret>{
 
         @Override
         public void at(int row, int col, double x) {
-            point.at(row, col);
+            at(row, col);
             vPos = x;
-            flush = null;
+        }
+
+        @Override
+        public void floatAt(int row, int col) {
+            at(row, col);
+            floating = true;
         }
 
         @Override
         public void flushAt(int row, int col) {
             flush = Point.of(row, col);
+        }
+
+        @Override
+        public void markTo(int markRow, int markCol, int row, int col) {
+            mark = new PointMut(markRow, markCol);
+            at(row, col);
+        }
+
+        @Override
+        public void clearFloat() {
+            floating = false;
         }
 
         @Override

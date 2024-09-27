@@ -40,6 +40,8 @@ public class JavaSyntax implements Syntax {
         """.split("[,\\s]")).forEach(keywords::put);
     }
     static final BlockType.Range blockComment = BlockType.range("/*", "*/");
+    static final BlockType.Neutral textBlock = BlockType.neutral("\"\"\"");
+
     private final BlockScopes scopes = new BlockScopes();
 
 
@@ -51,7 +53,7 @@ public class JavaSyntax implements Syntax {
     @Override
     public List<StyleSpan> apply(int row, String text) {
 
-        scopes.clearAt(row);
+        scopes.clear(row);
 
         if (text == null || text.isBlank()) {
             return Collections.emptyList();
@@ -67,38 +69,43 @@ public class JavaSyntax implements Syntax {
             Optional<BlockType> block = scopes.inScope(source.row(), peek.index());
 
             if (block.filter(t -> t == blockComment).isPresent()) {
-                spans.add(readBlockClose(source, peek, blockComment, Palette.darkGreen));
+                var span = readBlockClose(source, blockComment, Palette.darkGreen);
+                spans.add(span);
 
             } else if (ch == '/' && source.match("/*")) {
                 scopes.putOpen(source.row(), peek.index(), blockComment);
-                spans.add(readBlockClose(source, peek, blockComment, Palette.darkGreen));
+                var span = readBlockClose(source, blockComment, Palette.darkGreen);
+                spans.add(span);
 
             } else if (ch == '*' && source.match("*/")) {
                 scopes.putClose(source.row(), peek.index(), blockComment);
 
             } else if (ch == '/' && source.match("//")) {
                 var s = source.nextRemaining();
-                spans.add(new StyleSpan(Palette.gray, s.index(), s.length()));
+                var span = new StyleSpan(Palette.gray, s.index(), s.length());
+                spans.add(span);
 
             } else if (ch == '"' && !source.match("\"\"\"")) {
-                char prev = source.next().ch();
-                while (source.hasNext()) {
-                    var s = source.next();
-                    if (prev != '\\' && s.ch() == '"') {
-                        var span = new StyleSpan(Palette.darkGreen, peek.index(), s.index() - peek.index() + 1);
-                        spans.add(span);
-                        break;
-                    }
-                    prev = s.ch();
-                }
+                var span = readInlineBlock(source, '"', '\\', Palette.darkGreen);
+                if (span != null) spans.add(span);
+
             } else if (ch == '\'') {
+                var span = readInlineBlock(source, '\'', '\\', Palette.darkPale);
+                if (span != null) spans.add(span);
+
+            } else if (ch == ';') {
+                var span = new StyleSpan(Palette.darkOrange, peek.index(), 1);
+                spans.add(span);
 
             } else if (Character.isDigit(ch)) {
+                var span = readNumberLiteral(source, Palette.darkPale);
+                if (span != null) spans.add(span);
 
             } else if (Character.isAlphabetic(ch)) {
-                var s = source.nextAlphabetic();
+                var s = source.nextIdentifierPart();
                 if (keywords.match(s.string())) {
-                    spans.add(new StyleSpan(Palette.darkOrange, s.index(), s.length()));
+                    var span = new StyleSpan(Palette.darkOrange, s.index(), s.length());
+                    spans.add(span);
                 }
             }
             source.commitPeek();
@@ -108,15 +115,41 @@ public class JavaSyntax implements Syntax {
     }
 
 
+    private StyleSpan readNumberLiteral(LexerSource source, Style style) {
+        var open = source.rollbackPeek().peek();
+        while (source.hasNext()) {
+            var s = source.peek();
+            if (!(Character.isDigit(s.ch()) || s.ch() == '.' || s.ch() == 'e' || s.ch() == 'E' || s.ch() == '_')) {
+                return new StyleSpan(style, open.index(), s.index() - open.index());
+            }
+            source.commitPeek();
+        }
+        return null;
+    }
 
-    private StyleSpan readBlockClose(LexerSource source, LexerSource.Indexed peek, BlockType blockType, Style style) {
+
+    private StyleSpan readInlineBlock(LexerSource source, char ch, char escape, Style style) {
+        var open = source.rollbackPeek().peek();
+        char prev = source.next().ch();
+        while (source.hasNext()) {
+            var s = source.next();
+            if (prev != escape && s.ch() == ch) {
+                return new StyleSpan(style, open.index(), s.index() - open.index() + 1);
+            }
+            prev = s.ch();
+        }
+        return null;
+    }
+
+    private StyleSpan readBlockClose(LexerSource source, BlockType.Range blockType, Style style) {
+        var open = source.rollbackPeek().peek();
         var close = source.nextMatch(blockType.close());
         if (close.isPresent()) {
             var s = close.get();
-            scopes.putClose(source.row(), s.lastIndex(), blockComment);
-            return new StyleSpan(style, peek.index(), s.index() + s.length() - peek.index());
+            scopes.putClose(source.row(), s.lastIndex(), blockType);
+            return new StyleSpan(style, open.index(), s.index() + s.length() - open.index());
         } else {
-            return new StyleSpan(style, peek.index(), source.length() - peek.index());
+            return new StyleSpan(style, open.index(), source.length() - open.index());
         }
     }
 
