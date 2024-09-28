@@ -39,10 +39,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * The editor model.
+ * The text editor model.
  * @author Naotsugu Kobayashi
  */
-public class PlainEditorModel implements EditorModel {
+public class TextEditorModel implements EditorModel {
 
     private double marginTop = 5, marginLeft = 70;
     private final Content content;
@@ -51,7 +51,7 @@ public class PlainEditorModel implements EditorModel {
     private final CaretGroup carets = CaretGroup.of();
     private final ScreenScroll scroll;
 
-    public PlainEditorModel(Content content, FontMetrics fm, Syntax syntax, ScreenScroll scroll) {
+    public TextEditorModel(Content content, FontMetrics fm, Syntax syntax, ScreenScroll scroll) {
         this.content = content;
         this.view = ScreenLayout.of(content, fm);
         this.syntax = syntax;

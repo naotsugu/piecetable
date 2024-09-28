@@ -16,7 +16,7 @@
 package com.mammb.code.editor.core;
 
 import com.mammb.code.editor.core.layout.Loc;
-import com.mammb.code.editor.core.model.PlainEditorModel;
+import com.mammb.code.editor.core.model.TextEditorModel;
 import com.mammb.code.editor.core.syntax.Syntax;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -28,7 +28,7 @@ import java.util.Optional;
 public interface EditorModel {
 
     static EditorModel of(FontMetrics fm, ScreenScroll scroll) {
-        return new PlainEditorModel(
+        return new TextEditorModel(
                 Content.of(),
                 fm,
                 Syntax.of(""),
@@ -36,7 +36,7 @@ public interface EditorModel {
     }
 
     static EditorModel of(Path path, FontMetrics fm, ScreenScroll scroll) {
-        return new PlainEditorModel(
+        return new TextEditorModel(
                 Content.of(path),
                 fm,
                 Syntax.of(extension(path)),

@@ -13,26 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.editor.core.layout;
-
-import com.mammb.code.editor.core.text.RowText;
-import com.mammb.code.editor.core.text.Text;
-import java.util.List;
-import java.util.Optional;
+package com.mammb.code.editor.core.model;
 
 /**
- * The content layout.
+ * The csv editor model.
  * @author Naotsugu Kobayashi
  */
-interface ContentLayout extends LineLayout {
-
-    void setScreenWidth(double width);
-    void refresh(int line);
-    void refreshAt(int startRow, int endRow);
-    List<Text> texts(int startLine, int endLine);
-    RowText rowText(int line);
-    @Override RowText rowTextAt(int row);
-    double standardCharWidth();
-    Optional<Loc> loc(int row, int col, int rangeLineStart, int rangeLineEnd);
-
+public class CsvEditorModel {
 }

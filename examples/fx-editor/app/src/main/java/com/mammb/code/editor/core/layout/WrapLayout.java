@@ -37,12 +37,14 @@ public class WrapLayout implements ContentLayout {
 
     private double screenWidth = 0;
     private final double lineHeight;
+    private final double standardCharWidth;
     private final Content content;
     private final FontMetrics fm;
     private final List<SubRange> lines = new ArrayList<>();
 
     public WrapLayout(Content content, FontMetrics fm) {
         this.lineHeight = fm.getLineHeight();
+        this.standardCharWidth = fm.getAdvance("0");
         this.content = content;
         this.fm = fm;
     }
@@ -151,13 +153,18 @@ public class WrapLayout implements ContentLayout {
     }
 
     @Override
-    public FontMetrics fontMetrics() {
-        return fm;
+    public double standardCharWidth() {
+        return standardCharWidth;
     }
 
     @Override
     public int lineSize() {
         return lines.size();
+    }
+
+    @Override
+    public int rowSize() {
+        return content.rows();
     }
 
     @Override

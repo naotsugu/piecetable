@@ -144,14 +144,15 @@ public interface ScreenLayout extends LineLayout {
         public List<Text> lineNumbers() {
             List<Text> ret = new ArrayList<>();
             int prev = -1;
-            double w = layout.fontMetrics().getAdvance("0");
             for (Text text : buffer) {
-                if (text.row() == prev) {
+                if (text.row() >= rowSize()) {
+                    break;
+                } if (text.row() == prev) {
                     ret.add(Text.of(text.row(), "", new double[0], text.height()));
                 } else {
-                    String num = String.valueOf(text.row());
+                    String num = String.valueOf(text.row() + 1);
                     double[] advances = new double[num.length()];
-                    Arrays.fill(advances, w);
+                    Arrays.fill(advances, layout.standardCharWidth());
                     ret.add(Text.of(text.row(), num, advances, text.height()));
                 }
             }
@@ -167,6 +168,11 @@ public interface ScreenLayout extends LineLayout {
         @Override
         public int lineSize() {
             return layout.lineSize();
+        }
+
+        @Override
+        public int rowSize() {
+            return layout.rowSize();
         }
 
         @Override

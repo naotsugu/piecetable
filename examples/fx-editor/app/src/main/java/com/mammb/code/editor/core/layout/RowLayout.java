@@ -30,11 +30,14 @@ import java.util.stream.IntStream;
 public class RowLayout implements ContentLayout {
 
     private final double lineHeight;
+    private final double standardCharWidth;
     private final Content content;
     private final FontMetrics fm;
 
+
     public RowLayout(Content content, FontMetrics fm) {
         this.lineHeight = fm.getLineHeight();
+        this.standardCharWidth = fm.getAdvance("0");
         this.content = content;
         this.fm = fm;
     }
@@ -89,12 +92,17 @@ public class RowLayout implements ContentLayout {
     }
 
     @Override
-    public FontMetrics fontMetrics() {
-        return fm;
+    public double standardCharWidth() {
+        return standardCharWidth;
     }
 
     @Override
     public int lineSize() {
+        return content.rows();
+    }
+
+    @Override
+    public int rowSize() {
         return content.rows();
     }
 

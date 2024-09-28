@@ -28,6 +28,7 @@ public interface LineLayout {
     int rowToLine(int row, int col);
     int lineToRow(int line);
     int lineSize();
+    int rowSize();
     Text text(int line);
     Text rowTextAt(int row);
     double lineHeight();
