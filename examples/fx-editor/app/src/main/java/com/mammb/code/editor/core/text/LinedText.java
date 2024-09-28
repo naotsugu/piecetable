@@ -15,6 +15,10 @@
  */
 package com.mammb.code.editor.core.text;
 
+/**
+ * The lined text.
+ * @author Naotsugu Kobayashi
+ */
 public interface LinedText extends Text {
 
     int line();

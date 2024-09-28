@@ -25,6 +25,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The content.
+ * @author Naotsugu Kobayashi
+ */
 public interface Content {
 
     Point insert(Point point, String text);

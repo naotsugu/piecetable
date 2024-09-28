@@ -15,7 +15,11 @@
  */
 package com.mammb.code.editor.core.text;
 
-public interface Style {
+/**
+ * The style.
+ * @author Naotsugu Kobayashi
+ */
+public sealed interface Style {
 
     record TextColor(String colorString) implements Style { }
     record BgColor(String colorString) implements Style { }

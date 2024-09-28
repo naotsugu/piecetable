@@ -15,9 +15,32 @@
  */
 package com.mammb.code.editor.core.layout;
 
+import com.mammb.code.editor.core.text.Text;
+
 /**
- * The location.
+ * The line layout.
  * @author Naotsugu Kobayashi
  */
-public record Loc(double x, double y) {
+public interface LineLayout {
+
+    int rowToFirstLine(int row);
+    int rowToLastLine(int row);
+    int rowToLine(int row, int col);
+    int lineToRow(int line);
+    int lineSize();
+    Text text(int line);
+    Text rowTextAt(int row);
+    double lineHeight();
+
+    int homeColOnRow(int line);
+    default int endColOnRow(int line) { return homeColOnRow(line) + text(line).textLength(); }
+
+    int xToCol(int line, double x);
+    default double xOnLayout(int line, int col) {
+        return text(line).widthTo(col);
+    }
+    default double yOnLayout(int line) {
+        return line * lineHeight();
+    }
+
 }

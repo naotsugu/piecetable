@@ -187,6 +187,7 @@ public class EditorPane extends StackPane {
                     .collect(Collectors.joining()));
             model.draw(draw);
         } else {
+            model.inputImeComposed("");
             model.imeOff();
         }
         draw();

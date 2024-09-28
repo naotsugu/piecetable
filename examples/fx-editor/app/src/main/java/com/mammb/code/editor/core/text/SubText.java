@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The sub text.
+ * @author Naotsugu Kobayashi
+ */
 public interface SubText extends Text {
     int fromIndex();
     int toIndex();

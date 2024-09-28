@@ -19,6 +19,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+/**
+ * The lexer source.
+ * @author Naotsugu Kobayashi
+ */
 public class LexerSource {
     private int row;
     private String text;

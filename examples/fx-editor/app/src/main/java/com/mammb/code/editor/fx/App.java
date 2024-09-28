@@ -22,6 +22,10 @@ import javafx.stage.Stage;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * The application.
+ * @author Naotsugu Kobayashi
+ */
 public class App extends Application {
 
     @Override

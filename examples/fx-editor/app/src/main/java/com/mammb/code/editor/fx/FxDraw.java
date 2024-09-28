@@ -27,6 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The draw.
+ * @author Naotsugu Kobayashi
+ */
 public class FxDraw implements Draw {
     private final GraphicsContext gc;
     private final FontMetrics fontMetrics;

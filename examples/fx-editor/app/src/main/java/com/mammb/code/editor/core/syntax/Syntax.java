@@ -18,6 +18,10 @@ package com.mammb.code.editor.core.syntax;
 import com.mammb.code.editor.core.text.Style.StyleSpan;
 import java.util.List;
 
+/**
+ * The syntax.
+ * @author Naotsugu Kobayashi
+ */
 public interface Syntax {
 
     String name();
@@ -36,14 +40,6 @@ public interface Syntax {
         @Override
         public List<StyleSpan> apply(int row, String text) {
             return List.of();
-        }
-    }
-
-    record Anchor(int row, int col) implements Comparable<Anchor> {
-        @Override
-        public int compareTo(Anchor that) {
-            int c = Integer.compare(this.row, that.row);
-            return c == 0 ? Integer.compare(this.col, that.col) : c;
         }
     }
 

@@ -22,54 +22,19 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The Layout.
+ * The content layout.
  * @author Naotsugu Kobayashi
  */
-interface Layout {
+interface ContentLayout extends LineLayout {
 
-    int rowToFirstLine(int row);
-    int rowToLastLine(int row);
-    int rowToLine(int row, int col);
-    int lineToRow(int line);
-    int lineSize();
-    int rowSize();
-
-    void setWidth(double width);
+    void setScreenWidth(double width);
     void refresh(int line);
     void refreshAt(int startRow, int endRow);
-    Text text(int line);
     List<Text> texts(int startLine, int endLine);
     RowText rowText(int line);
+    @Override
     RowText rowTextAt(int row);
-    double lineHeight();
-    int xToCol(int line, double x);
-    int homeColOnRow(int line);
     FontMetrics fontMetrics();
-
-    /**
-     *
-     * @param row
-     * @param col
-     * @param startLine the limit
-     * @param endLine the limit
-     * @return
-     */
-    Optional<Loc> loc(int row, int col, int startLine, int endLine);
-
-    default double x(int line, int col) {
-        return text(line).widthTo(col);
-    }
-
-    default double y(int line) {
-        return line * lineHeight();
-    }
-
-    default int yToLine(double y) {
-        return (int) (y / lineHeight());
-    }
-
-    default int endColOnRow(int line) {
-        return homeColOnRow(line) + text(line).textLength();
-    }
+    Optional<Loc> loc(int row, int col, int rangeLineStart, int rangeLineEnd);
 
 }

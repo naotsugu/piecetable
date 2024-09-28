@@ -18,6 +18,10 @@ package com.mammb.code.editor.core.syntax;
 import com.mammb.code.editor.core.text.Style;
 import com.mammb.code.editor.core.text.Style.TextColor;
 
+/**
+ * The palette.
+ * @author Naotsugu Kobayashi
+ */
 public interface Palette {
 
     TextColor gray = new Style.TextColor("#888888");

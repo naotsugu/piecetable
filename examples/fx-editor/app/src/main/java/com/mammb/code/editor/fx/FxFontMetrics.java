@@ -29,6 +29,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The fontMetrics.
+ * @author Naotsugu Kobayashi
+ */
 public class FxFontMetrics implements FontMetrics {
 
     /** The font loader. */

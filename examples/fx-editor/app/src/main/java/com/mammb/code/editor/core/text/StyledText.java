@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * The styled text.
+ * @author Naotsugu Kobayashi
+ */
 public interface StyledText extends Text {
 
     List<Style> styles();

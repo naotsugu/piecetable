@@ -22,7 +22,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * The Facade of editor.
+ * The facade of editor.
+ * @author Naotsugu Kobayashi
  */
 public interface EditorModel {
 

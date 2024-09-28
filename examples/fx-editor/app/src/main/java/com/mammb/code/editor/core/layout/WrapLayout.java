@@ -33,9 +33,9 @@ import java.util.stream.IntStream;
  * The WrapLayout.
  * @author Naotsugu Kobayashi
  */
-public class WrapLayout implements Layout {
+public class WrapLayout implements ContentLayout {
 
-    private double width = 0;
+    private double screenWidth = 0;
     private final double lineHeight;
     private final Content content;
     private final FontMetrics fm;
@@ -47,8 +47,8 @@ public class WrapLayout implements Layout {
         this.fm = fm;
     }
 
-    public void setWidth(double width) {
-        this.width = width;
+    public void setScreenWidth(double width) {
+        this.screenWidth = width;
         refresh(0);
     }
 
@@ -94,8 +94,8 @@ public class WrapLayout implements Layout {
     }
 
     public Text text(int line) {
-        var range = lines.get(line);
-        var subs = subTextsAt(range.row());
+        SubRange range = lines.get(line);
+        List<SubText> subs = subTextsAt(range.row());
         return subs.get(range.subLine());
     }
 
@@ -132,7 +132,7 @@ public class WrapLayout implements Layout {
     }
 
     private List<SubText> subTextsAt(int row) {
-        return SubText.of(rowTextAt(row), width);
+        return SubText.of(rowTextAt(row), screenWidth);
     }
 
     @Override
@@ -158,11 +158,6 @@ public class WrapLayout implements Layout {
     @Override
     public int lineSize() {
         return lines.size();
-    }
-
-    @Override
-    public int rowSize() {
-        return content.rows();
     }
 
     @Override
@@ -197,11 +192,11 @@ public class WrapLayout implements Layout {
     }
 
     @Override
-    public Optional<Loc> loc(int row, int col, int startLine, int endLine) {
-        for (int i = startLine; i < endLine; i++) {
+    public Optional<Loc> loc(int row, int col, int rangeLineStart, int rangeLineEnd) {
+        for (int i = rangeLineStart; i < rangeLineEnd; i++) {
             SubRange sub = lines.get(i);
             if (sub.contains(row, col)) {
-                return Optional.of(new Loc(x(i, col), y(i)));
+                return Optional.of(new Loc(xOnLayout(i, col), yOnLayout(i)));
             }
         }
         return Optional.empty();

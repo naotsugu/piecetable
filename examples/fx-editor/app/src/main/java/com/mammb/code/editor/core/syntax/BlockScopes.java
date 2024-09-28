@@ -21,6 +21,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
+/**
+ * The block scopes.
+ * @author Naotsugu Kobayashi
+ */
 public class BlockScopes {
 
     private final TreeMap<Anchor, Token> scopes = new TreeMap<>();
@@ -85,12 +89,9 @@ public class BlockScopes {
     private record StartToken(BlockType.Range type) implements Token { }
     private record EndToken(BlockType.Range type) implements Token { }
 
-
     public interface BlockType {
-
         String open();
         String close();
-
         interface Neutral extends BlockType {
             default String close() { return open(); }
         }
@@ -105,6 +106,5 @@ public class BlockScopes {
             return new RangeRecord(open, close);
         }
     }
-
 
 }

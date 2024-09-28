@@ -25,82 +25,65 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The LayoutView.
+ * The screen layout.
  * @author Naotsugu Kobayashi
  */
-public interface LayoutView {
+public interface ScreenLayout extends LineLayout {
 
-    int rowToFirstLine(int row);
-    int rowToLastLine(int row);
-    int rowToLine(int row, int col);
-    int lineToRow(int line);
-    int lineSize();
-    int rowSize();
-
-    void setSize(double width, double height);
-    void scrollNext(int delta);
-    void scrollPrev(int delta);
+    void setScreenSize(double width, double height);
+    void scrollNext(int lineDelta);
+    void scrollPrev(int lineDelta);
     void scrollAt(int line);
     void scrollX(double x);
     void refreshBuffer(int startRow, int endRow);
     List<Text> texts();
-    Text text(int line);
-    Text textAt(int row);
     List<Text> lineNumbers();
     Optional<Loc> locationOn(int row, int col);
-    double lineToYOnLayout(int line);
-    double lineToYOnView(int line);
-    double colToXOnLayout(int line, int col);
-    double colToXOnView(int line, int col);
-    int xToCol(int line, double x);
-    int yToLineOnView(double y);
-    int homeColOnRow(int line);
-    int endColOnRow(int line);
-    double width();
-    double height();
-    int lineSizeOnView();
-    double lineHeight();
+    int yToLineOnScreen(double y);
+    double screenWidth();
+    double screenHeight();
+    int screenLineSize();
     int topLine();
     void applyScreenScroll(ScreenScroll screenScroll);
 
-    static LayoutView of(Content content, FontMetrics fm) {
-        Layout layout = new RowLayout(content, fm);
-        return new BasicLayoutView(layout);
+    static ScreenLayout of(Content content, FontMetrics fm) {
+        ContentLayout layout = new RowLayout(content, fm);
+        return new BasicScreenLayout(layout);
     }
 
-    static LayoutView wrapOf(Content content, FontMetrics fm) {
-        Layout layout = new WrapLayout(content, fm);
-        return new BasicLayoutView(layout);
+    static ScreenLayout wrapOf(Content content, FontMetrics fm) {
+        ContentLayout layout = new WrapLayout(content, fm);
+        return new BasicScreenLayout(layout);
     }
 
-    class BasicLayoutView implements LayoutView {
-        private double width = 0, height = 0;
+    class BasicScreenLayout implements ScreenLayout {
+        private double screenWidth = 0, screenHeight = 0;
         private double xShift = 0;
         private double xMax = 0;
         private int topLine = 0;
         private final List<Text> buffer = new ArrayList<>();
-        private final Layout layout;
+        private final ContentLayout layout;
 
-        public BasicLayoutView(Layout layout) {
+        private BasicScreenLayout(ContentLayout layout) {
             this.layout = layout;
         }
 
         @Override
-        public void setSize(double width, double height) {
-            layout.setWidth(width);
-            this.width = width;
-            this.height = height;
+        public void setScreenSize(double width, double height) {
+            layout.setScreenWidth(width);
+            this.screenWidth = width;
+            this.screenHeight = height;
             fillBuffer();
         }
 
         @Override
-        public void scrollNext(int delta) {
-            scrollAt(topLine + delta);
+        public void scrollNext(int lineDelta) {
+            scrollAt(topLine + lineDelta);
         }
 
         @Override
-        public void scrollPrev(int delta) {
-            scrollAt(topLine - delta);
+        public void scrollPrev(int lineDelta) {
+            scrollAt(topLine - lineDelta);
         }
 
         @Override
@@ -108,7 +91,7 @@ public interface LayoutView {
             line = Math.clamp(line, 0, layout.lineSize() - 1);
             int delta = line - topLine;
             if (delta == 0) return;
-            if (Math.abs(delta) < lineSizeOnView() * 2 / 3) {
+            if (Math.abs(delta) < screenLineSize() * 2 / 3) {
                 topLine = line;
                 List<Text> texts;
                 if (delta > 0) {
@@ -153,7 +136,7 @@ public interface LayoutView {
         }
 
         @Override
-        public Text textAt(int row) {
+        public Text rowTextAt(int row) {
             return layout.rowTextAt(row);
         }
 
@@ -177,18 +160,8 @@ public interface LayoutView {
 
         @Override
         public Optional<Loc> locationOn(int row, int col) {
-            return layout.loc(row, col, topLine, topLine + lineSizeOnView())
-                    .map(loc -> new Loc(loc.x(), loc.y() - lineToYOnLayout(topLine)));
-        }
-
-        @Override
-        public double lineToYOnLayout(int line) {
-            return layout.y(line);
-        }
-
-        @Override
-        public double lineToYOnView(int line) {
-            return lineToYOnLayout(line) - lineToYOnLayout(topLine);
+            return layout.loc(row, col, topLine, topLine + screenLineSize())
+                    .map(loc -> new Loc(loc.x(), loc.y() - yOnLayout(topLine)));
         }
 
         @Override
@@ -197,18 +170,13 @@ public interface LayoutView {
         }
 
         @Override
-        public int rowSize() {
-            return layout.rowSize();
+        public double yOnLayout(int line) {
+            return layout.yOnLayout(line);
         }
 
         @Override
-        public double colToXOnLayout(int line, int col) {
-            return layout.x(rowToLine(line, col), col);
-        }
-
-        @Override
-        public double colToXOnView(int line, int col) {
-            return colToXOnLayout(line, col) - xShift;
+        public double xOnLayout(int line, int col) {
+            return layout.xOnLayout(line, col);
         }
 
         @Override
@@ -237,7 +205,7 @@ public interface LayoutView {
         }
 
         @Override
-        public int yToLineOnView(double y) {
+        public int yToLineOnScreen(double y) {
             return topLine + (int) (y / layout.lineHeight());
         }
 
@@ -252,18 +220,18 @@ public interface LayoutView {
         }
 
         @Override
-        public double width() {
-            return width;
+        public double screenWidth() {
+            return screenWidth;
         }
 
         @Override
-        public double height() {
-            return height;
+        public double screenHeight() {
+            return screenHeight;
         }
 
         @Override
-        public int lineSizeOnView() {
-            return (int) Math.ceil(Math.max(0, height) / layout.lineHeight());
+        public int screenLineSize() {
+            return (int) Math.ceil(Math.max(0, screenHeight) / layout.lineHeight());
         }
 
         @Override
@@ -278,14 +246,14 @@ public interface LayoutView {
 
         @Override
         public void applyScreenScroll(ScreenScroll scroll) {
-            scroll.vertical(0, layout.lineSize() - 1, topLine, lineSizeOnView());
-            double max = xMax - Math.min(xMax, width / 2);
-            scroll.horizontal(0, max, xShift, width * max / xMax);
+            scroll.vertical(0, layout.lineSize() - 1, topLine, screenLineSize());
+            double max = xMax - Math.min(xMax, screenWidth / 2);
+            scroll.horizontal(0, max, xShift, screenWidth * max / xMax);
         }
 
         private void fillBuffer() {
             buffer.clear();
-            buffer.addAll(layout.texts(topLine, topLine + lineSizeOnView()));
+            buffer.addAll(layout.texts(topLine, topLine + screenLineSize()));
             buffer.stream().mapToDouble(Text::width)
                     .filter(w -> w > xMax).max()
                     .ifPresent(w -> xMax = w);

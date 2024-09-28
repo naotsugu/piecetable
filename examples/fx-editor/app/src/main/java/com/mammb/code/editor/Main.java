@@ -19,7 +19,7 @@ import com.mammb.code.editor.fx.App;
 import java.util.Locale;
 
 /**
- * The Application entry point.
+ * The application entry point.
  * @author Naotsugu Kobayashi
  */
 public class Main {
