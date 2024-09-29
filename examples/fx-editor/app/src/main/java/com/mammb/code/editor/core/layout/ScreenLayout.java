@@ -212,7 +212,7 @@ public interface ScreenLayout extends LineLayout {
 
         @Override
         public int yToLineOnScreen(double y) {
-            return topLine + (int) (y / layout.lineHeight());
+            return Math.clamp(topLine + (int) (y / layout.lineHeight()), 0, lineSize() - 1);
         }
 
         @Override
