@@ -15,6 +15,7 @@
  */
 package com.mammb.code.editor.core.syntax;
 
+import com.mammb.code.editor.core.text.Style;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -138,6 +139,44 @@ public class LexerSource {
         int length() { return string.length(); }
         boolean isFirst() { return index == 0; }
         boolean isLast() { return index == parentLength - 1; }
+    }
+
+
+    Style.StyleSpan readNumberLiteral(Style style) {
+        var open = rollbackPeek().peek();
+        while (hasNext()) {
+            var s = peek();
+            if (!(Character.isDigit(s.ch()) || s.ch() == '.' || s.ch() == 'e' || s.ch() == 'E' || s.ch() == '_')) {
+                return new Style.StyleSpan(style, open.index(), s.index() - open.index());
+            }
+            commitPeek();
+        }
+        return null;
+    }
+
+    Style.StyleSpan readInlineBlock(char ch, char escape, Style style) {
+        var open = rollbackPeek().peek();
+        char prev = next().ch();
+        while (hasNext()) {
+            var s = next();
+            if (prev != escape && s.ch() == ch) {
+                return new Style.StyleSpan(style, open.index(), s.index() - open.index() + 1);
+            }
+            prev = s.ch();
+        }
+        return null;
+    }
+
+    Style.StyleSpan readBlockClose(BlockScopes scopes, BlockScopes.BlockType.Range blockType, Style style) {
+        var open = rollbackPeek().peek();
+        var close = nextMatch(blockType.close());
+        if (close.isPresent()) {
+            var s = close.get();
+            scopes.putClose(row(), s.lastIndex(), blockType);
+            return new Style.StyleSpan(style, open.index(), s.index() + s.length() - open.index());
+        } else {
+            return new Style.StyleSpan(style, open.index(), length() - open.index());
+        }
     }
 
 }

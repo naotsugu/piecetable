@@ -24,14 +24,27 @@ import java.util.List;
  */
 public interface Syntax {
 
+    /**
+     * Get the name
+     * @return the name
+     */
     String name();
 
+    /**
+     * Apply syntax highlights
+     * @param row the number of row
+     * @param text the row text
+     * @return the list of StyleSpan
+     */
     List<StyleSpan> apply(int row, String text);
+
 
     static Syntax of(String name) {
         return switch (name.toLowerCase()) {
             case "java" -> new JavaSyntax();
             case "md" -> new MarkdownSyntax();
+            case "sql" -> new SqlSyntax();
+            case "py" -> new PythonSyntax();
             default -> new PassThrough(name);
         };
     }

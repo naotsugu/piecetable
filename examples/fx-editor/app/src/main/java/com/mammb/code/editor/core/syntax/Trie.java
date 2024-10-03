@@ -18,6 +18,7 @@ package com.mammb.code.editor.core.syntax;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * The Trie.
@@ -29,6 +30,12 @@ public class Trie {
 
     public Trie() {
         root = new TrieNode(null);
+    }
+
+    public static Trie of(String wordSequence) {
+        Trie trie = new Trie();
+        Stream.of(wordSequence.split("[,\\s]")).forEach(trie::put);
+        return trie;
     }
 
     public void put(String word) {
