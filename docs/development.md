@@ -33,8 +33,8 @@ git push origin main:main
 By pushing a tag, the github action creates a release.
 
 ```shell
-git tag v0.5.5
-git push origin v0.5.5
+git tag v0.5.6
+git push origin v0.5.6
 ```
 
 
