@@ -446,6 +446,28 @@ class TextEditImplTest {
     }
 
     @Test
+    void testTextLeftByte() {
+        var te = new TextEditImpl(Document.of());
+        te.insert(0, 0, "abc\ndef\nghi");
+
+        assertEquals("a", te.textLeftByte(0, 1, 1).get(0));
+        assertEquals("ab", te.textLeftByte(0, 2, 2).get(0));
+        assertEquals("abc", te.textLeftByte(0, 3, 3).get(0));
+        assertEquals("abc\n", te.textLeftByte(0, 4, 4).get(0));
+
+        assertEquals("\n", te.textLeftByte(1, 0, 1).get(0));
+        assertEquals("",   te.textLeftByte(1, 0, 1).get(1));
+        assertEquals("c\n", te.textLeftByte(1, 0, 2).get(0));
+        assertEquals("bc\n", te.textLeftByte(1, 0, 3).get(0));
+        assertEquals("abc\n", te.textLeftByte(1, 0, 4).get(0));
+
+        assertEquals("abc\n", te.textLeftByte(2, 3, 11).get(0));
+        assertEquals("def\n", te.textLeftByte(2, 3, 11).get(1));
+        assertEquals("ghi", te.textLeftByte(2, 3, 11).get(2));
+
+    }
+
+    @Test
     void testGetText() {
 
         var te = new TextEditImpl(Document.of());

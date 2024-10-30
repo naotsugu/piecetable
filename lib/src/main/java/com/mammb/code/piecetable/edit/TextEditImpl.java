@@ -617,6 +617,10 @@ public class TextEditImpl implements TextEdit {
 
     List<String> textLeftByte(int row, int col, int byteLen) {
         List<String> ret = new ArrayList<>();
+        if (col == 0) {
+            ret.add("");
+            row--;
+        }
         for (int i = row; i >= 0; i--) {
             var s = getText(i);
             var text = (col > 0) ? s.substring(0, col) : s;
