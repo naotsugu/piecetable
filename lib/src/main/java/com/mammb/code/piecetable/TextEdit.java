@@ -106,6 +106,7 @@ public interface TextEdit {
     Pos replace(int row, int col, int len, String text);
 
     /**
+     * @deprecated
      * Replace the text in the specified range from this {@code TextEdit}.
      * @param startRow the range start row
      * @param startCol the range start col
@@ -119,6 +120,7 @@ public interface TextEdit {
     }
 
     /**
+     * @deprecated
      * Replace the text in the specified range from this {@code TextEdit}.
      * @param start the start position
      * @param end the end position
@@ -127,6 +129,19 @@ public interface TextEdit {
      */
     default Pos replace(Pos start, Pos end, String text) {
         return replace(start, end, org -> text);
+    }
+
+    /**
+     * Replace the text in the specified range from this {@code TextEdit}.
+     * @param startRow the range start row
+     * @param startCol the range start col
+     * @param endRow the range end row
+     * @param endCol the range end col
+     * @param fun the function to convert the original text to the replaced text
+     * @return the new position
+     */
+    default Pos replace(int startRow, int startCol, int endRow, int endCol, Function<String, String> fun) {
+        return replace(new Pos(startRow, startCol), new Pos(endRow, endCol), fun);
     }
 
     /**
