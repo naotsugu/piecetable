@@ -115,6 +115,7 @@ public interface TextEdit {
      * @param text the char sequence is to be inserted
      * @return the new position
      */
+    @Deprecated
     default Pos replace(int startRow, int startCol, int endRow, int endCol, String text) {
         return replace(new Pos(startRow, startCol), new Pos(endRow, endCol), text);
     }
@@ -127,6 +128,7 @@ public interface TextEdit {
      * @param text the char sequence is to be inserted
      * @return the new position
      */
+    @Deprecated
     default Pos replace(Pos start, Pos end, String text) {
         return replace(start, end, org -> text);
     }
