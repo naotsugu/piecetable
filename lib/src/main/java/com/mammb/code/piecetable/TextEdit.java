@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * The text edit.
@@ -125,10 +126,22 @@ public interface TextEdit {
      * @return the new position
      */
     default Pos replace(Pos start, Pos end, String text) {
+        return replace(start, end, org -> text);
+    }
+
+    /**
+     * Replace the text in the specified range from this {@code TextEdit}.
+     * @param start the start position
+     * @param end the end position
+     * @param fun the function to convert the original text to the replaced text
+     * @return the new position
+     */
+    default Pos replace(Pos start, Pos end, Function<String, String> fun) {
+        String text = getText(start, end);
         return replace(
             start.row(), start.col(),
-            getText(start, end).length() * (int) Math.signum(end.compareTo(start)),
-            text);
+            text.length() * (int) Math.signum(end.compareTo(start)),
+            fun.apply(text));
     }
 
     /**
@@ -288,6 +301,11 @@ public interface TextEdit {
         }
     }
 
+    /**
+     * The range of points
+     * @param from the position of from
+     * @param to the position of to
+     */
     record Range(Pos from, Pos to) { }
 
 }
