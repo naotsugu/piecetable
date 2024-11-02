@@ -58,7 +58,7 @@ There are three classes.
 
 - PieceTable - Plain piece table implantation by bytes
 - Document - Text manipulation with row-column number and charset infer
-- TextEdit - Advanced text editing abstraction, with undo/redo
+- TextEdit - Advanced text editing abstraction, with undo/redo, and more
 
 Use `TextEdit` in most cases.
 
@@ -142,6 +142,6 @@ cd examples/fx-editor
 
 ## Sample applications using this library
 
-* [min-editor](https://github.com/naotsugu/min-editor)([version 0.4.0](https://github.com/naotsugu/piecetable/tree/release-0.4) is used)
-
+* [min-editor v0.0](https://github.com/naotsugu/min-editor/tree/releases-0.0)([version 0.4.0](https://github.com/naotsugu/piecetable/tree/release-0.4) is used)
+* [min-editor v0.1](https://github.com/naotsugu/min-editor)(current version is used)
 
