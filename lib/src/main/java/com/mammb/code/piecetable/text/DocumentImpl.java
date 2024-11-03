@@ -47,6 +47,9 @@ public class DocumentImpl implements Document {
     /** The byte order mark. */
     private byte[] bom;
 
+    /** The row ending. */
+    private RowEnding rowEnding;
+
 
     /**
      * Constructor.
@@ -61,10 +64,12 @@ public class DocumentImpl implements Document {
             this.index = RowIndex.of();
             this.charset = StandardCharsets.UTF_8;
             this.bom = new byte[0];
+            this.rowEnding = RowEnding.platform;
         } else {
             this.index = reader.index();
             this.charset = reader.charset();
             this.bom = reader.bom();
+            this.rowEnding = reader.crCount() == reader.lfCount() ? RowEnding.CRLF : RowEnding.LF;
         }
     }
 
@@ -191,6 +196,12 @@ public class DocumentImpl implements Document {
 
 
     @Override
+    public RowEnding rowEnding() {
+        return rowEnding;
+    }
+
+
+    @Override
     public Path path() {
         return path;
     }
@@ -200,7 +211,6 @@ public class DocumentImpl implements Document {
     public void save(Path path) {
         pt.save(path);
     }
-
 
     private List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
 

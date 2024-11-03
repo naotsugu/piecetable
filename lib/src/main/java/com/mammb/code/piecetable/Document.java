@@ -131,6 +131,12 @@ public interface Document {
     Charset charset();
 
     /**
+     * Get the row ending.
+     * @return the row ending
+     */
+    RowEnding rowEnding();
+
+    /**
      * Get the path.
      * @return the path
      */
@@ -141,6 +147,21 @@ public interface Document {
      * @param path the path
      */
     void save(Path path);
+
+    /**
+     * RowEnding.
+     */
+    enum RowEnding {
+        /** CRLF. */
+        CRLF,
+        /** LF. */
+        LF,
+        /** LFCR. */
+        LFCR,
+        ;
+        /** The platform line separator. */
+        public static final RowEnding platform = "\r\n".equals(System.lineSeparator()) ? CRLF : LF;
+    }
 
     /**
      * Create a new {@link Document}.
