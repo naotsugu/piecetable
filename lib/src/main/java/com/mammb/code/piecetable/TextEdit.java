@@ -268,6 +268,12 @@ public interface TextEdit {
     Charset charset();
 
     /**
+     * Get the row ending.
+     * @return the row ending
+     */
+    Document.RowEnding rowEnding();
+
+    /**
      * Get the path.
      * @return the path
      */

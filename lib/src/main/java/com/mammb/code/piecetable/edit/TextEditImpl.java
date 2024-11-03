@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable.edit;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Document.RowEnding;
 import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.TextEdit;
 import java.nio.charset.Charset;
@@ -408,6 +409,11 @@ public class TextEditImpl implements TextEdit {
     @Override
     public Charset charset() {
         return doc.charset();
+    }
+
+    @Override
+    public RowEnding rowEnding() {
+        return doc.rowEnding();
     }
 
     @Override
