@@ -121,16 +121,19 @@ public class DocumentImpl implements Document {
         insert(row, col, cs.toString().getBytes(charset));
     }
 
+
     @Override
     public void delete(int row, int col, CharSequence cs) {
         col = getText(row).toString().substring(0, col).getBytes(charset).length;
         delete(row, col, cs.toString().getBytes(charset).length);
     }
 
+
     @Override
     public CharSequence getText(int row) {
         return new String(get(row), charset);
     }
+
 
     @Override
     public void insert(int row, int rawCol, byte[] bytes) {
@@ -147,11 +150,13 @@ public class DocumentImpl implements Document {
         index.delete(row, rawCol, rawLen);
     }
 
+
     @Override
     public byte[] get(int row, int rawCol, int rawLen) {
         rawCol += (row == 0) ? bom.length : 0;
         return pt.get(index.get(row) + rawCol, rawLen);
     }
+
 
     @Override
     public byte[] get(int row) {
@@ -161,21 +166,25 @@ public class DocumentImpl implements Document {
         return pt.get(col, len);
     }
 
+
     @Override
     public CharSequence getText(int row, int rawCol, int rawLen) {
         return new String(get(row, rawCol, rawLen), charset);
     }
+
 
     @Override
     public List<Found> findAll(CharSequence cs) {
         return search(cs, 0, 0, Short.MAX_VALUE);
     }
 
+
     @Override
     public Optional<Found> findNext(CharSequence cs, int row, int col) {
         col = getText(row).toString().substring(0, col).getBytes().length;
         return search(cs, row, col, Short.MAX_VALUE).stream().findFirst();
     }
+
 
     @Override
     public int rows() {
@@ -211,6 +220,7 @@ public class DocumentImpl implements Document {
     public void save(Path path) {
         pt.save(path);
     }
+
 
     private List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
 
