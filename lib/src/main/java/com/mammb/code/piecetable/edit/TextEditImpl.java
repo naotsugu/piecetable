@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
 import static com.mammb.code.piecetable.edit.Texts.*;
 
 /**
- * The document edit.
+ * The {@link TextEdit} implementation.
  * @author Naotsugu Kobayashi
  */
 public class TextEditImpl implements TextEdit {

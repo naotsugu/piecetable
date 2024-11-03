@@ -44,7 +44,10 @@ public class Reader {
     private long length;
     /** The CharsetMatches. */
     private final List<CharsetMatch> matches = new ArrayList<>();
-
+    /** The count of carriage return. */
+    private int crCount = 0;
+    /** The count of line feed. */
+    private int lfCount = 0;
 
     /**
      * Constructor.
@@ -109,6 +112,21 @@ public class Reader {
         return (charset == null) ? StandardCharsets.UTF_8 : charset;
     }
 
+    /**
+     * Get the count of carriage return.
+     * @return the count of carriage return
+     */
+    public int crCount() {
+        return crCount;
+    }
+
+    /**
+     * Get the count of line feed.
+     * @return the count of line feed
+     */
+    public int lfCount() {
+        return lfCount;
+    }
 
     /**
      * Get the byte order mark.
@@ -150,6 +168,10 @@ public class Reader {
                 }
                 length += read.length;
                 index.add(read);
+                for (byte b : read) {
+                    if (b == '\r') crCount++;
+                    else if (b == '\n') lfCount++;
+                }
             }
 
         } catch (IOException e) {

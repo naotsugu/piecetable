@@ -42,7 +42,8 @@ class ReaderTest {
         assertEquals(0, reader.index().get(0));
         assertEquals(2, reader.index().get(1));
         assertEquals(5, reader.index().get(2));
-
+        assertEquals(0, reader.crCount());
+        assertEquals(3, reader.lfCount());
         assertEquals(StandardCharsets.UTF_8, reader.charset());
 
     }
