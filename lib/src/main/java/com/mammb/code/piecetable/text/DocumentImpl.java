@@ -69,7 +69,7 @@ public class DocumentImpl implements Document {
             this.index = reader.index();
             this.charset = reader.charset();
             this.bom = reader.bom();
-            this.rowEnding = reader.crCount() == reader.lfCount() ? RowEnding.CRLF : RowEnding.LF;
+            this.rowEnding = RowEnding.estimate(reader.crCount(),reader.lfCount());
         }
     }
 

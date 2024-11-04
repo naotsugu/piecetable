@@ -213,6 +213,22 @@ public interface Document {
         }
 
         /**
+         * Estimates the RowEnding symbols from the given number of symbols count.
+         * @param crCount the count of carriage return
+         * @param lfCount the count of line feed
+         * @return the estimated RowEnding
+         */
+        public static RowEnding estimate(int crCount, int lfCount) {
+            return  (crCount == 0 && lfCount == 0)
+                ? RowEnding.platform
+                : (crCount == lfCount)
+                    ? RowEnding.CRLF
+                    : (lfCount == 0)
+                        ? RowEnding.CR
+                        : RowEnding.LF;
+        }
+
+        /**
          * Get the platform line separator.
          * @return the platform line separator
          */
