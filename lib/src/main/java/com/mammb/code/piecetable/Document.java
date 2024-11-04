@@ -196,8 +196,9 @@ public interface Document {
         /** CR. */
         CR,
         ;
+
         /** The platform line separator. */
-        public static final RowEnding platform = CRLF.str().equals(System.lineSeparator()) ? CRLF : LF;
+        public static final RowEnding platform = platform();
 
         /**
          * Get the line ending string.
@@ -208,6 +209,18 @@ public interface Document {
                 case LF -> "\n";
                 case CR -> "\r";
                 case CRLF -> "\r\n";
+            };
+        }
+
+        /**
+         * Get the platform line separator.
+         * @return the platform line separator
+         */
+        private static RowEnding platform() {
+            return switch (System.lineSeparator()) {
+                case "\r"   -> CR;
+                case "\r\n" -> CRLF;
+                default     -> LF;
             };
         }
     }
