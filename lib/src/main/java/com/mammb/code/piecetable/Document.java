@@ -149,21 +149,6 @@ public interface Document {
     void save(Path path);
 
     /**
-     * RowEnding.
-     */
-    enum RowEnding {
-        /** CRLF. */
-        CRLF,
-        /** LF. */
-        LF,
-        /** LFCR. */
-        LFCR,
-        ;
-        /** The platform line separator. */
-        public static final RowEnding platform = "\r\n".equals(System.lineSeparator()) ? CRLF : LF;
-    }
-
-    /**
      * Create a new {@link Document}.
      * @return a new {@link Document}
      */
@@ -198,6 +183,33 @@ public interface Document {
      */
     static Document of(Path path, CharsetMatch... charsetMatches) {
         return DocumentImpl.of(path, charsetMatches);
+    }
+
+    /**
+     * RowEnding.
+     */
+    enum RowEnding {
+        /** CRLF. */
+        CRLF,
+        /** LF. */
+        LF,
+        /** CR. */
+        CR,
+        ;
+        /** The platform line separator. */
+        public static final RowEnding platform = CRLF.str().equals(System.lineSeparator()) ? CRLF : LF;
+
+        /**
+         * Get the line ending string.
+         * @return the line ending string
+         */
+        public String str() {
+            return switch (this) {
+                case LF -> "\n";
+                case CR -> "\r";
+                case CRLF -> "\r\n";
+            };
+        }
     }
 
 }
