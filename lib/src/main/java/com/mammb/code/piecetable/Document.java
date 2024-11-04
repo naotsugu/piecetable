@@ -189,12 +189,12 @@ public interface Document {
      * RowEnding.
      */
     enum RowEnding {
+        /** The line feed. */
+        LF,
+        /** The carriage return. */
+        CR,
         /** CRLF. */
         CRLF,
-        /** LF. */
-        LF,
-        /** CR. */
-        CR,
         ;
 
         /** The platform line separator. */
