@@ -201,6 +201,19 @@ public interface Document {
         public static final RowEnding platform = platform();
 
         /**
+         * Unify line ending.
+         * @param cs unify string
+         * @return the unified string
+         */
+        public CharSequence unify(CharSequence cs) {
+            return switch (this) {
+                case LF -> unifyLf(cs);
+                case CR -> unifyCr(cs);
+                case CRLF -> unifyCrLf(cs);
+            };
+        }
+
+        /**
          * Get the line ending string.
          * @return the line ending string
          */
@@ -239,6 +252,85 @@ public interface Document {
                 default     -> LF;
             };
         }
+
+        static CharSequence unifyLf(CharSequence text) {
+            int prev = 0;
+            StringBuilder sb = null;
+            for (int i = 0; i < text.length(); i++) {
+                char ch = text.charAt(i);
+                if (ch == '\r') {
+                    if (sb == null) sb = new StringBuilder();
+                    sb.append(text.subSequence(prev, i));
+                    sb.append('\n');
+                    if (i + 1 < text.length() && text.charAt(i + 1) == '\n') {
+                        i++;
+                    }
+                    prev = i + 1;
+                }
+            }
+            if (sb != null) {
+                sb.append(text.subSequence(prev, text.length()));
+                return sb;
+            } else {
+                return text;
+            }
+        }
+
+        static CharSequence unifyCr(CharSequence text) {
+            int prev = 0;
+            StringBuilder sb = null;
+            for (int i = 0; i < text.length(); i++) {
+                char ch = text.charAt(i);
+                if (ch == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') {
+                    if (sb == null) sb = new StringBuilder();
+                    sb.append(text.subSequence(prev, i));
+                    sb.append('\r');
+                    i++;
+                    prev = i + 1;
+                } else if (ch == '\n') {
+                    if (sb == null) sb = new StringBuilder();
+                    sb.append(text.subSequence(prev, i));
+                    sb.append('\r');
+                    prev = i + 1;
+                }
+            }
+            if (sb != null) {
+                sb.append(text.subSequence(prev, text.length()));
+                return sb;
+            } else {
+                return text;
+            }
+        }
+
+        static CharSequence unifyCrLf(CharSequence text) {
+            int prev = 0;
+            StringBuilder sb = null;
+            for (int i = 0; i < text.length(); i++) {
+                char ch = text.charAt(i);
+                if (ch == '\n') {
+                    if (sb == null) sb = new StringBuilder();
+                    sb.append(text.subSequence(prev, i));
+                    sb.append("\r\n");
+                    prev = i + 1;
+                } else if (ch == '\r') {
+                    if (i + 1 < text.length() && text.charAt(i + 1) == '\n') {
+                        i++;
+                    } else {
+                        if (sb == null) sb = new StringBuilder();
+                        sb.append(text.subSequence(prev, i));
+                        sb.append("\r\n");
+                        prev = i + 1;
+                    }
+                }
+            }
+            if (sb != null) {
+                sb.append(text.subSequence(prev, text.length()));
+                return sb;
+            } else {
+                return text;
+            }
+        }
+
     }
 
 }
