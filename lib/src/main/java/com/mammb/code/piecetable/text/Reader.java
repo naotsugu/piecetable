@@ -55,10 +55,20 @@ public class Reader {
      * @param matches the CharsetMatches
      */
     private Reader(Path path, CharsetMatch... matches) {
+        this(path, -1, matches);
+    }
+
+    /**
+     * Constructor.
+     * @param path the path to be read
+     * @param rowLimit the limit of row
+     * @param matches the CharsetMatches
+     */
+    private Reader(Path path, int rowLimit, CharsetMatch... matches) {
         this.index = RowIndex.of();
         this.matches.addAll(Arrays.asList(matches));
         if (path != null) {
-            readAll(path);
+            read(path, rowLimit);
         }
     }
 
@@ -137,7 +147,7 @@ public class Reader {
     }
 
 
-    private void readAll(Path path) {
+    private void read(Path path, int rowLimit) {
 
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
@@ -171,6 +181,10 @@ public class Reader {
                 for (byte b : read) {
                     if (b == '\r') crCount++;
                     else if (b == '\n') lfCount++;
+                }
+
+                if (rowLimit >= 0 && (rowLimit < crCount || rowLimit < lfCount)) {
+                    break;
                 }
             }
 
@@ -238,7 +252,7 @@ public class Reader {
         return matches.stream().map(m -> m.put(bytes))
             .max(Comparator.naturalOrder())
             .filter(r -> r.confidence() >= 100)
-            .map(r -> r.charset())
+            .map(CharsetMatch.Result::charset)
             .orElse(null);
     }
 
