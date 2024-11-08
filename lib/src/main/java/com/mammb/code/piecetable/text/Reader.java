@@ -146,7 +146,12 @@ public class Reader {
         return bom;
     }
 
-
+    /**
+     * Read the file at the specified path.
+     * @param path the path of file to be reade
+     * @param rowLimit the limit on the number of rows to read from the file,
+     *                 if -1 is specified, there is no limit
+     */
     private void read(Path path, int rowLimit) {
 
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
