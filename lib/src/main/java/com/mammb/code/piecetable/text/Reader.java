@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
+import com.mammb.code.piecetable.DocumentStat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -32,7 +33,7 @@ import java.util.List;
  * Reader.
  * @author Naotsugu Kobayashi
  */
-public class Reader {
+public class Reader implements DocumentStat {
 
     /** The row index. */
     private final RowIndex index;
@@ -72,7 +73,6 @@ public class Reader {
         }
     }
 
-
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
@@ -81,7 +81,6 @@ public class Reader {
     public static Reader of(Path path) {
         return new Reader(path, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
-
 
     /**
      * Create a new {@link Reader}.
@@ -93,17 +92,16 @@ public class Reader {
         return new Reader(path, CharsetMatch.of(charset));
     }
 
-
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
+     * @param rowLimit the limit of row
      * @param matches the {@link CharsetMatch} used in reading the target file
      * @return a new {@link Reader}.
      */
-    public static Reader of(Path path, CharsetMatch... matches) {
-        return new Reader(path, matches);
+    public static Reader of(Path path, int rowLimit, CharsetMatch... matches) {
+        return new Reader(path, rowLimit, matches);
     }
-
 
     /**
      * Get the {@link RowIndex}.
@@ -113,37 +111,29 @@ public class Reader {
         return index;
     }
 
-
-    /**
-     * Get the {@link Charset}.
-     * @return the {@link Charset}
-     */
+    @Override
     public Charset charset() {
         return (charset == null) ? StandardCharsets.UTF_8 : charset;
     }
 
-    /**
-     * Get the count of carriage return.
-     * @return the count of carriage return
-     */
+    @Override
     public int crCount() {
         return crCount;
     }
 
-    /**
-     * Get the count of line feed.
-     * @return the count of line feed
-     */
+    @Override
     public int lfCount() {
         return lfCount;
     }
 
-    /**
-     * Get the byte order mark.
-     * @return byte order mark
-     */
+    @Override
     public byte[] bom() {
         return bom;
+    }
+
+    @Override
+    public int[] rowLengths() {
+        return index.rowLengths();
     }
 
     /**

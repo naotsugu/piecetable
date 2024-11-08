@@ -111,7 +111,7 @@ public class DocumentImpl implements Document {
      * @return a new {@link Document}
      */
     public static DocumentImpl of(Path path, CharsetMatch... charsetMatches) {
-        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path,charsetMatches));
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, -1, charsetMatches));
     }
 
 
