@@ -131,7 +131,10 @@ public class Reader implements DocumentStat {
         return bom;
     }
 
-    @Override
+    /**
+     * Gets the row lengths array.
+     * @return the row lengths array
+     */
     public int[] rowLengths() {
         return index.rowLengths();
     }

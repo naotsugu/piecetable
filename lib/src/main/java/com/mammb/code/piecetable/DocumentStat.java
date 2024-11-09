@@ -50,12 +50,6 @@ public interface DocumentStat {
     byte[] bom();
 
     /**
-     * Gets the row lengths array.
-     * @return the row lengths array
-     */
-    int[] rowLengths();
-
-    /**
      * Create a new {@link DocumentStat}.
      * @param path the path to be read
      * @param rowLimit the limit of row
