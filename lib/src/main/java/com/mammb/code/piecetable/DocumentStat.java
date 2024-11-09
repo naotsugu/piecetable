@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.text.Reader;
+import com.mammb.code.piecetable.Document.RowEnding;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
@@ -48,6 +49,14 @@ public interface DocumentStat {
      * @return byte order mark
      */
     byte[] bom();
+
+    /**
+     * Get the estimated row terminator.
+     * @return the estimated row terminator
+     */
+    default RowEnding rowEnding() {
+        return RowEnding.estimate(crCount(), lfCount());
+    }
 
     /**
      * Create a new {@link DocumentStat}.
