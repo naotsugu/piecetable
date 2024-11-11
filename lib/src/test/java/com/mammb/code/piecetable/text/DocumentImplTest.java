@@ -47,6 +47,10 @@ class DocumentImplTest {
         assertEquals(1, doc.rows());
         assertEquals("", doc.getText(0));
 
+        doc.insert(0, 0, "a\n");
+        assertEquals(2, doc.rows());
+        assertEquals("a\n", doc.getText(0));
+        assertEquals("", doc.getText(1));
     }
 
     @Test
