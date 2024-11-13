@@ -15,17 +15,18 @@
  */
 package com.mammb.code.piecetable;
 
+import com.mammb.code.piecetable.Document.RowEnding;
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
 /**
  * The text edit.
+ * Provides an abstraction of text editing.
  * @author Naotsugu Kobayashi
  */
 public interface TextEdit {
@@ -271,7 +272,7 @@ public interface TextEdit {
      * Get the row ending.
      * @return the row ending
      */
-    Document.RowEnding rowEnding();
+    RowEnding rowEnding();
 
     /**
      * Get the path.

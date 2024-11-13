@@ -23,6 +23,8 @@ import java.util.Optional;
 
 /**
  * The document.
+ * Provides an abstraction for the document to be edited.
+ * The document manipulation by line number and column number.
  * @author Naotsugu Kobayashi
  */
 public interface Document {
@@ -242,8 +244,8 @@ public interface Document {
         }
 
         /**
-         * Get the platform line separator.
-         * @return the platform line separator
+         * Get the platform row separator.
+         * @return the platform row separator
          */
         private static RowEnding platform() {
             return switch (System.lineSeparator()) {
@@ -253,6 +255,11 @@ public interface Document {
             };
         }
 
+        /**
+         * Unify line separators to LF line breaks.
+         * @param text the text to be converted
+         * @return the converted text
+         */
         static CharSequence unifyLf(CharSequence text) {
             int prev = 0;
             StringBuilder sb = null;
@@ -276,6 +283,11 @@ public interface Document {
             }
         }
 
+        /**
+         * Unify line separators to CR line breaks.
+         * @param text the text to be converted
+         * @return the converted text
+         */
         static CharSequence unifyCr(CharSequence text) {
             int prev = 0;
             StringBuilder sb = null;
@@ -302,6 +314,11 @@ public interface Document {
             }
         }
 
+        /**
+         * Unify line separators to CR LF line breaks.
+         * @param text the text to be converted
+         * @return the converted text
+         */
         static CharSequence unifyCrLf(CharSequence text) {
             int prev = 0;
             StringBuilder sb = null;
