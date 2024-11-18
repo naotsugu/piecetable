@@ -23,7 +23,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -209,6 +211,10 @@ public class DocumentImpl implements Document {
         return rowEnding;
     }
 
+    @Override
+    public byte[] bom() {
+        return Arrays.copyOf(bom, bom.length);
+    }
 
     @Override
     public Path path() {

@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -414,6 +415,11 @@ public class TextEditImpl implements TextEdit {
     @Override
     public RowEnding rowEnding() {
         return doc.rowEnding();
+    }
+
+    @Override
+    public byte[] bom() {
+        return doc.bom();
     }
 
     @Override
