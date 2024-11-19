@@ -19,12 +19,17 @@ import com.mammb.code.piecetable.CharsetMatch;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+
 /**
  * The CharsetMatch simple implementation collections.
  * @author Naotsugu Kobayashi
  */
 public abstract class CharsetMatches {
 
+    private static final System.Logger log = System.getLogger(CharsetMatches.class.getName());
 
     private CharsetMatches() {
     }
@@ -102,7 +107,7 @@ public abstract class CharsetMatches {
             } else if ((b & 0xF8) == 0xF0) {
                 return 3; // 1111 0...
             } else {
-                System.out.println(Byte.toString(b));
+                log.log(DEBUG, "Bytes not expected[{}]", Byte.toString(b));
                 return -1;
             }
         }
