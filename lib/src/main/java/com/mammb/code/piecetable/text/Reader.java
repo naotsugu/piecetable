@@ -36,13 +36,13 @@ import java.util.List;
 public class Reader implements DocumentStat {
 
     /** The row index. */
-    private final RowIndex index;
+    private final RowIndex index = RowIndex.of();
     /** The byte order mark. */
-    private byte[] bom;
+    private byte[] bom = new byte[0];
     /** The charset read. */
     private Charset charset;
     /** The byte length read. */
-    private long length;
+    private long length = 0;
     /** The CharsetMatches. */
     private final List<CharsetMatch> matches = new ArrayList<>();
     /** The count of carriage return. */
@@ -66,7 +66,6 @@ public class Reader implements DocumentStat {
      * @param matches the CharsetMatches
      */
     private Reader(Path path, int rowLimit, CharsetMatch... matches) {
-        this.index = RowIndex.of();
         this.matches.addAll(Arrays.asList(matches));
         if (path != null) {
             read(path, rowLimit);
@@ -150,6 +149,9 @@ public class Reader implements DocumentStat {
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             long size = channel.size();
+            if (size <= 0) {
+                return;
+            }
 
             int cap = 1024 * 64;
             ByteBuffer buf = (size < cap)
