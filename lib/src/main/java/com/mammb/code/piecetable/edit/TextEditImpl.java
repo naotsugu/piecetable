@@ -310,7 +310,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public boolean hasUndoRecord() {
-        return !undo.isEmpty();
+        return !deque.isEmpty() || !undo.isEmpty();
     }
 
     @Override
