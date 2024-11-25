@@ -25,8 +25,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * The document implementation.
@@ -35,22 +35,22 @@ import java.util.Optional;
 public class DocumentImpl implements Document {
 
     /** The {@link PieceTable}. */
-    private PieceTable pt;
+    private final PieceTable pt;
 
     /** The {@link Path} of Document. */
-    private Path path;
+    private final Path path;
 
     /** The {@link Charset} of Document. */
-    private Charset charset;
+    private final Charset charset;
 
     /** The {@link RowIndex}. */
-    private RowIndex index;
+    private final RowIndex index;
 
     /** The byte order mark. */
-    private byte[] bom;
+    private final byte[] bom;
 
     /** The row ending. */
-    private RowEnding rowEnding;
+    private final RowEnding rowEnding;
 
 
     /**
@@ -71,7 +71,7 @@ public class DocumentImpl implements Document {
             this.index = reader.index();
             this.charset = reader.charset();
             this.bom = reader.bom();
-            this.rowEnding = RowEnding.estimate(reader.crCount(),reader.lfCount());
+            this.rowEnding = RowEnding.estimate(reader.crCount(), reader.lfCount());
         }
     }
 
@@ -92,6 +92,17 @@ public class DocumentImpl implements Document {
      */
     public static DocumentImpl of(Path path) {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path));
+    }
+
+
+    /**
+     * Create a new {@link Document}.
+     * @param path the {@link Path} of the document
+     * @param traverseCallback the traverse callback of the document
+     * @return a new {@link Document}
+     */
+    public static DocumentImpl of(Path path, Function<byte[], Boolean> traverseCallback) {
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path).withReadCallback(traverseCallback));
     }
 
 

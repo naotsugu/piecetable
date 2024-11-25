@@ -111,9 +111,11 @@ public class Reader implements DocumentStat {
     /**
      * Set the read callback.
      * @param readCallback the read callback
+     * @return the {@link Reader}.
      */
-    public void setReadCallback(Function<byte[], Boolean> readCallback) {
+    public Reader withReadCallback(Function<byte[], Boolean> readCallback) {
         this.readCallback = readCallback;
+        return this;
     }
 
     /**

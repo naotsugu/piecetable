@@ -311,6 +311,16 @@ public interface TextEdit {
 
     /**
      * Create a new {@link TextEdit}.
+     * @param path the path of the file to read
+     * @param traverseCallback the document traverse callback
+     * @return a new {@link TextEdit}
+     */
+    static TextEdit of(Path path, Function<byte[], Boolean> traverseCallback) {
+        return new TextEditImpl(DocumentImpl.of(path));
+    }
+
+    /**
+     * Create a new {@link TextEdit}.
      * @param document the Document
      * @return a new {@link TextEdit}
      */
