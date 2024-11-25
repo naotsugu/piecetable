@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Reader.
@@ -49,6 +50,8 @@ public class Reader implements DocumentStat {
     private int crCount = 0;
     /** The count of line feed. */
     private int lfCount = 0;
+    /** The read callback. */
+    private Function<byte[], Boolean> readCallback;
 
     /**
      * Constructor.
@@ -56,16 +59,19 @@ public class Reader implements DocumentStat {
      * @param matches the CharsetMatches
      */
     private Reader(Path path, CharsetMatch... matches) {
-        this(path, -1, matches);
+        this(path, -1, null, matches);
     }
 
     /**
      * Constructor.
      * @param path the path to be read
      * @param rowLimit the limit of row
+     * @param readCallback the read callback
      * @param matches the CharsetMatches
      */
-    private Reader(Path path, int rowLimit, CharsetMatch... matches) {
+    private Reader(Path path, int rowLimit,
+            Function<byte[], Boolean> readCallback, CharsetMatch... matches) {
+        this.readCallback = readCallback;
         this.matches.addAll(Arrays.asList(matches));
         if (path != null) {
             read(path, rowLimit);
@@ -99,7 +105,15 @@ public class Reader implements DocumentStat {
      * @return a new {@link Reader}.
      */
     public static Reader of(Path path, int rowLimit, CharsetMatch... matches) {
-        return new Reader(path, rowLimit, matches);
+        return new Reader(path, rowLimit, null, matches);
+    }
+
+    /**
+     * Set the read callback.
+     * @param readCallback the read callback
+     */
+    public void setReadCallback(Function<byte[], Boolean> readCallback) {
+        this.readCallback = readCallback;
     }
 
     /**
@@ -146,6 +160,8 @@ public class Reader implements DocumentStat {
      */
     private void read(Path path, int rowLimit) {
 
+        var callback = readCallback;
+
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             long size = channel.size();
@@ -170,6 +186,11 @@ public class Reader implements DocumentStat {
                 buf.flip();
 
                 byte[] read = asBytes(buf, n, bytes);
+                if (callback != null) {
+                    boolean continuation = callback.apply(read);
+                    if (!continuation) break;
+                }
+
                 if (length == 0) {
                     bom = checkBom(read);
                 }
