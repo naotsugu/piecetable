@@ -316,7 +316,7 @@ public interface TextEdit {
      * @return a new {@link TextEdit}
      */
     static TextEdit of(Path path, Function<byte[], Boolean> traverseCallback) {
-        return new TextEditImpl(DocumentImpl.of(path));
+        return new TextEditImpl(DocumentImpl.of(path, traverseCallback));
     }
 
     /**

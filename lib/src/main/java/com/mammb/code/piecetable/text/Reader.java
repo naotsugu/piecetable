@@ -184,14 +184,8 @@ public class Reader implements DocumentStat {
                 if (n < 0) {
                     break;
                 }
-
                 buf.flip();
-
                 byte[] read = asBytes(buf, n, bytes);
-                if (callback != null) {
-                    boolean continuation = callback.apply(read);
-                    if (!continuation) break;
-                }
 
                 if (length == 0) {
                     bom = checkBom(read);
@@ -204,6 +198,11 @@ public class Reader implements DocumentStat {
                 for (byte b : read) {
                     if (b == '\r') crCount++;
                     else if (b == '\n') lfCount++;
+                }
+
+                if (callback != null) {
+                    boolean continuation = callback.apply(read);
+                    if (!continuation) break;
                 }
 
                 if (rowLimit >= 0 && (rowLimit < crCount || rowLimit < lfCount)) {
