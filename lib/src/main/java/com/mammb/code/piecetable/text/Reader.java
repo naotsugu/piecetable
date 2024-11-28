@@ -16,6 +16,8 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
+import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Document.BytesTraverse;
 import com.mammb.code.piecetable.DocumentStat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -51,7 +53,7 @@ public class Reader implements DocumentStat {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private Function<byte[], Boolean> readCallback;
+    private BytesTraverse bytesTraverse;
 
     /**
      * Constructor.
@@ -66,12 +68,12 @@ public class Reader implements DocumentStat {
      * Constructor.
      * @param path the path to be read
      * @param rowLimit the limit of row
-     * @param readCallback the read callback
+     * @param bytesTraverse the read callback
      * @param matches the CharsetMatches
      */
     private Reader(Path path, int rowLimit,
-            Function<byte[], Boolean> readCallback, CharsetMatch... matches) {
-        this.readCallback = readCallback;
+            BytesTraverse bytesTraverse, CharsetMatch... matches) {
+        this.bytesTraverse = bytesTraverse;
         this.matches.addAll(Arrays.asList(matches));
         if (path != null) {
             read(path, rowLimit);
@@ -110,11 +112,11 @@ public class Reader implements DocumentStat {
 
     /**
      * Set the read callback.
-     * @param readCallback the read callback
+     * @param bytesTraverse the read callback
      * @return the {@link Reader}.
      */
-    public Reader withReadCallback(Function<byte[], Boolean> readCallback) {
-        this.readCallback = readCallback;
+    public Reader withReadCallback(Document.BytesTraverse bytesTraverse) {
+        this.bytesTraverse = bytesTraverse;
         return this;
     }
 
@@ -162,7 +164,7 @@ public class Reader implements DocumentStat {
      */
     private void read(Path path, int rowLimit) {
 
-        var callback = readCallback;
+        var callback = bytesTraverse;
 
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
@@ -201,7 +203,7 @@ public class Reader implements DocumentStat {
                 }
 
                 if (callback != null) {
-                    boolean continuation = callback.apply(read);
+                    boolean continuation = callback.accept(read, charset);
                     if (!continuation) break;
                 }
 

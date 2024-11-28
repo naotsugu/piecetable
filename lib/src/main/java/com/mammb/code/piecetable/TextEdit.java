@@ -312,11 +312,11 @@ public interface TextEdit {
     /**
      * Create a new {@link TextEdit}.
      * @param path the path of the file to read
-     * @param traverseCallback the document traverse callback
+     * @param bytesTraverse the document traverse callback
      * @return a new {@link TextEdit}
      */
-    static TextEdit of(Path path, Function<byte[], Boolean> traverseCallback) {
-        return new TextEditImpl(Document.of(path, traverseCallback));
+    static TextEdit of(Path path, Document.BytesTraverse bytesTraverse) {
+        return new TextEditImpl(Document.of(path, bytesTraverse));
     }
 
     /**

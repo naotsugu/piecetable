@@ -187,11 +187,11 @@ public interface Document {
     /**
      * Create a new {@link Document}.
      * @param path the {@link Path} of the document
-     * @param traverseCallback the traverse callback of the document
+     * @param bytesTraverse the traverse callback of the document
      * @return a new {@link Document}
      */
-    static Document of(Path path, Function<byte[], Boolean> traverseCallback) {
-        return DocumentImpl.of(path, traverseCallback);
+    static Document of(Path path, BytesTraverse bytesTraverse) {
+        return DocumentImpl.of(path, bytesTraverse);
     }
 
     /**
@@ -202,6 +202,19 @@ public interface Document {
      */
     static Document of(Path path, CharsetMatch... charsetMatches) {
         return DocumentImpl.of(path, charsetMatches);
+    }
+
+    /**
+     * Document byte read handler.
+     */
+    interface BytesTraverse {
+        /**
+         * Accepts byte reads.
+         * @param bytes the read bytes
+         * @param cs the estimated character set
+         * @return {@code true} to continue reading
+         */
+        boolean accept(byte[] bytes, Charset cs);
     }
 
     /**

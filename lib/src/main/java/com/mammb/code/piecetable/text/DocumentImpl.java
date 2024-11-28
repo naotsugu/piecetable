@@ -98,11 +98,11 @@ public class DocumentImpl implements Document {
     /**
      * Create a new {@link Document}.
      * @param path the {@link Path} of the document
-     * @param traverseCallback the traverse callback of the document
+     * @param bytesTraverse the traverse callback of the document
      * @return a new {@link Document}
      */
-    public static DocumentImpl of(Path path, Function<byte[], Boolean> traverseCallback) {
-        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path).withReadCallback(traverseCallback));
+    public static DocumentImpl of(Path path, BytesTraverse bytesTraverse) {
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path).withReadCallback(bytesTraverse));
     }
 
 
