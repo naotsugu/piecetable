@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * The document.
@@ -181,6 +182,16 @@ public interface Document {
      */
     static Document of(Path path, Charset charset) {
         return DocumentImpl.of(path, charset);
+    }
+
+    /**
+     * Create a new {@link Document}.
+     * @param path the {@link Path} of the document
+     * @param traverseCallback the traverse callback of the document
+     * @return a new {@link Document}
+     */
+    static Document of(Path path, Function<byte[], Boolean> traverseCallback) {
+        return DocumentImpl.of(path, traverseCallback);
     }
 
     /**
