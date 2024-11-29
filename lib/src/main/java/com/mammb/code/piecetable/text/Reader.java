@@ -16,8 +16,7 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
-import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Document.BytesTraverse;
+import com.mammb.code.piecetable.Document.ProgressListener;
 import com.mammb.code.piecetable.DocumentStat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -52,7 +51,7 @@ public class Reader implements DocumentStat {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private BytesTraverse bytesTraverse;
+    private ProgressListener<byte[]> progressListener;
 
     /**
      * Constructor.
@@ -67,12 +66,12 @@ public class Reader implements DocumentStat {
      * Constructor.
      * @param path the path to be read
      * @param rowLimit the limit of row
-     * @param bytesTraverse the read callback
+     * @param progressListener the read callback
      * @param matches the CharsetMatches
      */
     private Reader(Path path, int rowLimit,
-            BytesTraverse bytesTraverse, CharsetMatch... matches) {
-        this.bytesTraverse = bytesTraverse;
+                   ProgressListener<byte[]> progressListener, CharsetMatch... matches) {
+        this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
         if (path != null) {
             read(path, rowLimit);
@@ -91,11 +90,11 @@ public class Reader implements DocumentStat {
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
-     * @param bytesTraverse the traverse callback of the document
+     * @param progressListener the traverse callback of the document
      * @return a new {@link Reader}.
      */
-    public static Reader of(Path path, BytesTraverse bytesTraverse) {
-        return new Reader(path, -1, bytesTraverse, CharsetMatches.utf8(), CharsetMatches.ms932());
+    public static Reader of(Path path, ProgressListener<byte[]> progressListener) {
+        return new Reader(path, -1, progressListener, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
 
     /**
@@ -117,16 +116,6 @@ public class Reader implements DocumentStat {
      */
     public static Reader of(Path path, int rowLimit, CharsetMatch... matches) {
         return new Reader(path, rowLimit, null, matches);
-    }
-
-    /**
-     * Set the read callback.
-     * @param bytesTraverse the read callback
-     * @return the {@link Reader}.
-     */
-    public Reader withReadCallback(Document.BytesTraverse bytesTraverse) {
-        this.bytesTraverse = bytesTraverse;
-        return this;
     }
 
     /**
@@ -173,7 +162,7 @@ public class Reader implements DocumentStat {
      */
     private void read(Path path, int rowLimit) {
 
-        var callback = bytesTraverse;
+        var listener = progressListener;
 
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
@@ -211,8 +200,8 @@ public class Reader implements DocumentStat {
                     else if (b == '\n') lfCount++;
                 }
 
-                if (callback != null) {
-                    boolean continuation = callback.accept(read);
+                if (listener != null) {
+                    boolean continuation = listener.accept(read);
                     if (!continuation) break;
                 }
 

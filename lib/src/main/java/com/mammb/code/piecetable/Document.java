@@ -20,7 +20,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * The document.
@@ -187,11 +186,11 @@ public interface Document {
     /**
      * Create a new {@link Document}.
      * @param path the {@link Path} of the document
-     * @param bytesTraverse the traverse callback of the document
+     * @param progressListener the traverse callback of the document
      * @return a new {@link Document}
      */
-    static Document of(Path path, BytesTraverse bytesTraverse) {
-        return DocumentImpl.of(path, bytesTraverse);
+    static Document of(Path path, ProgressListener<byte[]> progressListener) {
+        return DocumentImpl.of(path, progressListener);
     }
 
     /**
@@ -205,15 +204,16 @@ public interface Document {
     }
 
     /**
-     * Document byte read handler.
+     * Progress listener.
+     * @param <T> the type of progress value
      */
-    interface BytesTraverse {
+    interface ProgressListener<T> {
         /**
-         * Accepts byte reads.
-         * @param bytes the read bytes
-         * @return {@code true} to continue reading
+         * Accepts the progress.
+         * @param value the progress value
+         * @return {@code true} to continue progress
          */
-        boolean accept(byte[] bytes);
+        boolean accept(T value);
     }
 
     /**

@@ -16,7 +16,7 @@
 package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.Document.RowEnding;
-import com.mammb.code.piecetable.Document.BytesTraverse;
+import com.mammb.code.piecetable.Document.ProgressListener;
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -312,11 +312,11 @@ public interface TextEdit {
     /**
      * Create a new {@link TextEdit}.
      * @param path the path of the file to read
-     * @param bytesTraverse the document traverse callback
+     * @param progressListener the document traverse callback
      * @return a new {@link TextEdit}
      */
-    static TextEdit of(Path path, BytesTraverse bytesTraverse) {
-        return new TextEditImpl(Document.of(path, bytesTraverse));
+    static TextEdit of(Path path, ProgressListener<byte[]> progressListener) {
+        return new TextEditImpl(Document.of(path, progressListener));
     }
 
     /**
