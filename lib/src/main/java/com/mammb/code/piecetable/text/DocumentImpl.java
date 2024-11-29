@@ -102,7 +102,7 @@ public class DocumentImpl implements Document {
      * @return a new {@link Document}
      */
     public static DocumentImpl of(Path path, BytesTraverse bytesTraverse) {
-        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path).withReadCallback(bytesTraverse));
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, bytesTraverse));
     }
 
 

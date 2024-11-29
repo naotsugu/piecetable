@@ -211,10 +211,9 @@ public interface Document {
         /**
          * Accepts byte reads.
          * @param bytes the read bytes
-         * @param cs the estimated character set
          * @return {@code true} to continue reading
          */
-        boolean accept(byte[] bytes, Charset cs);
+        boolean accept(byte[] bytes);
     }
 
     /**

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Reader.
@@ -87,6 +86,16 @@ public class Reader implements DocumentStat {
      */
     public static Reader of(Path path) {
         return new Reader(path, CharsetMatches.utf8(), CharsetMatches.ms932());
+    }
+
+    /**
+     * Create a new {@link Reader}.
+     * @param path the path to be read
+     * @param bytesTraverse the traverse callback of the document
+     * @return a new {@link Reader}.
+     */
+    public static Reader of(Path path, BytesTraverse bytesTraverse) {
+        return new Reader(path, -1, bytesTraverse, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
 
     /**
@@ -203,7 +212,7 @@ public class Reader implements DocumentStat {
                 }
 
                 if (callback != null) {
-                    boolean continuation = callback.accept(read, charset);
+                    boolean continuation = callback.accept(read);
                     if (!continuation) break;
                 }
 
