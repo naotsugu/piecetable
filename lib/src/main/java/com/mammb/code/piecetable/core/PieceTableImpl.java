@@ -16,14 +16,19 @@
 package com.mammb.code.piecetable.core;
 
 import com.mammb.code.piecetable.PieceTable;
+import java.io.Closeable;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -33,6 +38,8 @@ import java.util.TreeMap;
  */
 public class PieceTableImpl implements PieceTable {
 
+    /** The source path. */
+    private Path sourcePath;
     /** The Append buffer. */
     private final AppendBuffer appendBuffer;
     /** The pieces. */
@@ -42,12 +49,13 @@ public class PieceTableImpl implements PieceTable {
     /** The total byte length of the piece table. */
     private long length;
 
-
     /**
      * Constructor.
+     * @param path the source path
      * @param initial the initial piece
      */
-    PieceTableImpl(Piece initial) {
+    PieceTableImpl(Path path, Piece initial) {
+        sourcePath = path;
         appendBuffer = AppendBuffer.of();
         pieces = new ArrayList<>();
         indices = new TreeMap<>();
@@ -64,18 +72,18 @@ public class PieceTableImpl implements PieceTable {
      * @return a new {@code PieceTable}
      */
     public static PieceTableImpl of() {
-        return new PieceTableImpl(null);
+        return new PieceTableImpl(null, null);
     }
 
 
     /**
      * Create a new {@code PieceTable}.
-     * @param path the path
+     * @param path the source path
      * @return a new {@code PieceTable}
      */
     public static PieceTableImpl of(Path path) {
         var cb = ChannelBuffer.of(path);
-        return new PieceTableImpl(new Piece(cb, 0, cb.length()));
+        return new PieceTableImpl(path, new Piece(cb, 0, cb.length()));
     }
 
 
@@ -185,13 +193,51 @@ public class PieceTableImpl implements PieceTable {
 
     @Override
     public void save(Path path) {
-        write(path);
+        try {
+            if (sourcePath != null && Objects.equals(sourcePath.toRealPath(), path.toRealPath())) {
+                Path tmp = Files.createTempFile(sourcePath.getParent(), sourcePath.getFileName().toString(), null);
+                write(tmp);
+                for (Piece piece : pieces) {
+                    if (piece.target() instanceof Closeable closeable) {
+                        closeable.close();
+                    }
+                }
+
+                // we don't use `Files.copy(tmp, sourcePath, ...);`
+                // because the icon position on the OS changes
+                try (FileChannel inCh = new FileInputStream(tmp.toFile()).getChannel();
+                     FileChannel outCh = new FileOutputStream(sourcePath.toFile()).getChannel()) {
+                    long position = 0L;
+                    long size = inCh.size();
+                    while (position < size) {
+                        long ret = inCh.transferTo(position, inCh.size(), outCh);
+                        position += ret;
+                    }
+                    outCh.truncate(size);
+                }
+                Files.delete(tmp);
+            } else {
+                write(path);
+                for (Piece piece : pieces) {
+                    if (piece.target() instanceof Closeable closeable) {
+                        closeable.close();
+                    }
+                }
+                sourcePath = path;
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         pieces.clear();
         appendBuffer.clear();
         indices.clear();
+
         var cb = ChannelBuffer.of(path);
         pieces.add(new Piece(cb, 0, cb.length()));
         length = cb.length();
+
     }
 
 
