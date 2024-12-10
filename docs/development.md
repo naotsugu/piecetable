@@ -26,7 +26,7 @@ Commit changes.
 
 ```shell
 git add -A
-git commit -m "Release v0.5.7"
+git commit -m "Release v0.5.8"
 git push origin main:main
 ```
 
