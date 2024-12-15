@@ -165,7 +165,7 @@ public interface TextEdit {
     /**
      * The function to convert the original text to the replaced text.
      */
-    interface Convert {
+    interface Convert extends Function<String, String> {
         /**
          * Apply the function
          * @param source the source text
