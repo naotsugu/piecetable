@@ -163,18 +163,6 @@ public interface TextEdit {
     }
 
     /**
-     * The function to convert the original text to the replaced text.
-     */
-    interface Convert extends Function<String, String> {
-        /**
-         * Apply the function
-         * @param source the source text
-         * @return the converted text
-         */
-        String apply(String source);
-    }
-
-    /**
      * Undo.
      * @return the undo position
      */
@@ -359,5 +347,18 @@ public interface TextEdit {
      * @param to the position of to
      */
     record Range(Pos from, Pos to) { }
+
+    /**
+     * The function to convert the original text to the replaced text.
+     */
+    interface Convert extends Function<String, String> {
+        /**
+         * Apply the function
+         * @param source the source text
+         * @return the converted text
+         */
+        @Override
+        String apply(String source);
+    }
 
 }
