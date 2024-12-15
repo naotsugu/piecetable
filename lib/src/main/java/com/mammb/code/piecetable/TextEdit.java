@@ -140,26 +140,38 @@ public interface TextEdit {
      * @param startCol the range start col
      * @param endRow the range end row
      * @param endCol the range end col
-     * @param fun the function to convert the original text to the replaced text
+     * @param convert the function to convert the original text to the replaced text
      * @return the new position
      */
-    default Pos replace(int startRow, int startCol, int endRow, int endCol, Function<String, String> fun) {
-        return replace(new Pos(startRow, startCol), new Pos(endRow, endCol), fun);
+    default Pos replace(int startRow, int startCol, int endRow, int endCol, Convert convert) {
+        return replace(new Pos(startRow, startCol), new Pos(endRow, endCol), convert);
     }
 
     /**
      * Replace the text in the specified range from this {@code TextEdit}.
      * @param start the start position
      * @param end the end position
-     * @param fun the function to convert the original text to the replaced text
+     * @param convert the function to convert the original text to the replaced text
      * @return the new position
      */
-    default Pos replace(Pos start, Pos end, Function<String, String> fun) {
+    default Pos replace(Pos start, Pos end, Convert convert) {
         String text = getText(start, end);
         return replace(
             start.row(), start.col(),
             text.length() * (int) Math.signum(end.compareTo(start)),
-            fun.apply(text));
+            convert.apply(text));
+    }
+
+    /**
+     * The function to convert the original text to the replaced text.
+     */
+    interface Convert {
+        /**
+         * Apply the function
+         * @param source the source text
+         * @return the converted text
+         */
+        String apply(String source);
     }
 
     /**
