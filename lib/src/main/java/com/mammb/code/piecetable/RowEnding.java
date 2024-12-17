@@ -20,6 +20,7 @@ package com.mammb.code.piecetable;
  * @author Naotsugu Kobayashi
  */
 public enum RowEnding {
+
     /** The line feed. */
     LF,
     /** The carriage return. */

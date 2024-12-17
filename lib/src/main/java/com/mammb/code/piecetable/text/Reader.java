@@ -51,7 +51,7 @@ public class Reader implements DocumentStat {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private ProgressListener<byte[]> progressListener;
+    private final ProgressListener<byte[]> progressListener;
 
     /**
      * Constructor.

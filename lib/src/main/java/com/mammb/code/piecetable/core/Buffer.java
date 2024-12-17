@@ -93,7 +93,9 @@ public interface Buffer {
      * @return a new in-memory buffer
      */
     static Buffer of(byte[] bytes) {
+
         return new Buffer() {
+
             /** The elements of buffer. */
             private final byte[] elements = bytes;
 

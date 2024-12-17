@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 
 /**
  * The CharsetMatch.
+ * Estimates the character set from a given byte array.
  * @author Naotsugu Kobayashi
  */
 public interface CharsetMatch {
@@ -52,6 +53,5 @@ public interface CharsetMatch {
             return Integer.compare(confidence, o.confidence);
         }
     }
-
 
 }

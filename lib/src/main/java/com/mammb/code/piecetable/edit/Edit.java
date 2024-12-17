@@ -216,10 +216,13 @@ sealed interface Edit {
         }
         default Pos min() { return backward() ? to() : from(); }
     }
+
     record Cmp(List<? extends ConcreteEdit> edits, long occurredOn) implements Edit { }
+
     record Ins(Pos from, Pos to, String text, long occurredOn) implements ConcreteEdit {
         public Ins(Pos from, Pos to, String text) { this(from, to, text, System.currentTimeMillis()); }
     }
+
     record Del(Pos from, Pos to, String text, long occurredOn) implements ConcreteEdit {
         public Del(Pos from, Pos to, String text) { this(from, to, text, System.currentTimeMillis()); }
         public Del(Pos pos, String text, long occurredOn) { this(pos, pos, text, occurredOn); }

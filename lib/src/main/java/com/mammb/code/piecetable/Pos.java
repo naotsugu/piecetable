@@ -17,15 +17,17 @@ package com.mammb.code.piecetable;
 
 /**
  * The position record.
- *
+ * Represents the position of row and column.
  * @param row the number of row(zero origin)
  * @param col the byte position on the row
  * @author Naotsugu Kobayashi
  */
 public record Pos(int row, int col) implements Comparable<Pos> {
+
     @Override
     public int compareTo(Pos that) {
         int c = Integer.compare(this.row, that.row);
         return c == 0 ? Integer.compare(this.col, that.col) : c;
     }
+
 }
