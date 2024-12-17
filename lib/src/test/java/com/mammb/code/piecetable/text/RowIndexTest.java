@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -333,4 +334,67 @@ class RowIndexTest {
         assertEquals(4, ret[1]);
         assertEquals(1, ret[2]);
     }
+
+    @Test
+    void serial() {
+        var index = RowIndex.of(3);
+        index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals(0L, index.serial(0, 0));
+        assertEquals(1L, index.serial(0, 1));
+
+        assertEquals(2L, index.serial(1, 0));
+        assertEquals(3L, index.serial(1, 1));
+        assertEquals(4L, index.serial(1, 2));
+
+        assertEquals(5L, index.serial(2, 0));
+        assertEquals(6L, index.serial(2, 1));
+        assertEquals(7L, index.serial(2, 2));
+        assertEquals(8L, index.serial(2, 3));
+
+        assertEquals(9L,  index.serial(3, 0));
+        assertEquals(10L, index.serial(3, 1));
+        assertEquals(11L, index.serial(3, 2));
+        assertEquals(12L, index.serial(3, 3));
+        assertEquals(13L, index.serial(3, 4));
+
+        assertEquals(14L, index.serial(4, 0));
+        assertEquals(15L, index.serial(4, 1));
+        assertEquals(16L, index.serial(4, 2));
+        assertEquals(17L, index.serial(4, 3));
+        assertEquals(18L, index.serial(4, 4));
+        assertEquals(19L, index.serial(4, 5));
+    }
+
+    @Test
+    void pos() {
+        var index = RowIndex.of(3);
+        index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
+
+        assertArrayEquals(new int[] {0, 0}, index.pos(0));
+        assertArrayEquals(new int[] {0, 1}, index.pos(1));
+
+        assertArrayEquals(new int[] {1, 0}, index.pos(2));
+        assertArrayEquals(new int[] {1, 1}, index.pos(3));
+        assertArrayEquals(new int[] {1, 2}, index.pos(4));
+
+        assertArrayEquals(new int[] {2, 0}, index.pos(5));
+        assertArrayEquals(new int[] {2, 1}, index.pos(6));
+        assertArrayEquals(new int[] {2, 2}, index.pos(7));
+        assertArrayEquals(new int[] {2, 3}, index.pos(8));
+
+        assertArrayEquals(new int[] {3, 0}, index.pos(9));
+        assertArrayEquals(new int[] {3, 1}, index.pos(10));
+        assertArrayEquals(new int[] {3, 2}, index.pos(11));
+        assertArrayEquals(new int[] {3, 3}, index.pos(12));
+        assertArrayEquals(new int[] {3, 4}, index.pos(13));
+
+        assertArrayEquals(new int[] {4, 0}, index.pos(14));
+        assertArrayEquals(new int[] {4, 1}, index.pos(15));
+        assertArrayEquals(new int[] {4, 2}, index.pos(16));
+        assertArrayEquals(new int[] {4, 3}, index.pos(17));
+        assertArrayEquals(new int[] {4, 4}, index.pos(18));
+        assertArrayEquals(new int[] {4, 5}, index.pos(19));
+    }
+
 }

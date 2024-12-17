@@ -247,6 +247,41 @@ public class RowIndex {
         return length;
     }
 
+    /**
+     * Get the serial position.
+     * @param row the specified row
+     * @param col the specified position in a row
+     * @return the serial position
+     */
+    public long serial(int row, int col) {
+        return get(row) + Math.min(rowLengths[row], col);
+    }
+
+    /**
+     * Get the row-col position.
+     * @param serial the serial position
+     * @return the row-col position
+     */
+    public int[] pos(long serial) {
+        int result = Arrays.binarySearch(stCache, serial);
+        if (result >= 0) {
+            return new int[] { result * cacheInterval, 0 };
+        } else {
+            int point = Math.max(~result - 1, 0);
+            long st = stCache[point];
+            for (int i = point * cacheInterval; i < length; i++) {
+                int len = rowLengths[i];
+                if (st + len > serial) {
+                    int col = (int) (serial - st);
+                    return new int[] { i, col };
+                } else {
+                    st += len;
+                }
+            }
+            return new int[] { length - 1, rowLengths[length - 1] };
+        }
+    }
+
 
     /**
      * Converts the specified byte array to line-by-line byte length.
