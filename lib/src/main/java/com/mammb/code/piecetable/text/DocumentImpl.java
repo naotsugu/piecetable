@@ -20,6 +20,7 @@ import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.Pos;
+import com.mammb.code.piecetable.RowEnding;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;

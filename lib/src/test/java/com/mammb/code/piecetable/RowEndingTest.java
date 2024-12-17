@@ -15,7 +15,6 @@
  */
 package com.mammb.code.piecetable;
 
-import com.mammb.code.piecetable.Document.RowEnding;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

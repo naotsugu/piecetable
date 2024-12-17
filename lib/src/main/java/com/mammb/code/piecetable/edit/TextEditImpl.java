@@ -16,7 +16,7 @@
 package com.mammb.code.piecetable.edit;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Document.RowEnding;
+import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.TextEdit;

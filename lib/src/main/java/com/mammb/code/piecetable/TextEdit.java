@@ -15,7 +15,6 @@
  */
 package com.mammb.code.piecetable;
 
-import com.mammb.code.piecetable.Document.RowEnding;
 import com.mammb.code.piecetable.Document.ProgressListener;
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import java.nio.charset.Charset;

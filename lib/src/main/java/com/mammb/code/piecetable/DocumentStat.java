@@ -16,7 +16,6 @@
 package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.text.Reader;
-import com.mammb.code.piecetable.Document.RowEnding;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
