@@ -15,7 +15,7 @@
  */
 package com.mammb.code.piecetable.edit;
 
-import com.mammb.code.piecetable.TextEdit.Pos;
+import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.edit.Edit.Del;
 import com.mammb.code.piecetable.edit.Edit.Ins;
 import org.junit.jupiter.api.Test;

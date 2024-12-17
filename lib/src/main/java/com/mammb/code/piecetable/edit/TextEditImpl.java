@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.edit;
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.Document.RowEnding;
 import com.mammb.code.piecetable.Found;
+import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.TextEdit;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.mammb.code.piecetable.edit.Texts.*;
+import static com.mammb.code.piecetable.edit.Texts.splitRowBreak;
 
 /**
  * The {@link TextEdit} implementation.
@@ -278,6 +280,73 @@ public class TextEditImpl implements TextEdit {
         }
         push(e);
         return pos;
+    }
+
+    @Override
+    public List<Pos> replace(List<Replace> requests) {
+
+        long occurredOn = System.currentTimeMillis();
+        Map<Pos, Edit> posEdit = new HashMap<>();
+        List<Edit> rollupSource = new ArrayList<>();
+        List<Edit.ConcreteEdit> edits = new ArrayList<>();
+
+        for (Replace rep : requests.stream().sorted(Comparator.reverseOrder()).toList()) {
+
+            String src = getText(rep.min(), rep.max());
+            String dst = rep.convert().apply(src);
+            int cp = rep.end().compareTo(rep.start());
+
+            if (cp > 0) {
+                int row = rep.start().row();
+                int col = rep.start().row();
+                var delText = join(textRightByte(row, col, src.length()));
+                Edit.Del del = deleteEdit(row, col, delText, occurredOn);
+                Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
+                Edit.Cmp e = new Edit.Cmp(List.of(del, ins), occurredOn);
+                edits.addAll(e.edits());
+                rollupSource.addFirst(e);
+                posEdit.put(rep.start(), e);
+
+            } else if (cp < 0) {
+                int row = rep.end().row();
+                int col = rep.end().row();
+                var delText = join(textLeftByte(row, col, -src.length()));
+                Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
+                Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), dst, occurredOn);
+                Edit.Cmp e = new Edit.Cmp(List.of(bs, ins), occurredOn);
+                edits.addAll(e.edits());
+                rollupSource.addFirst(e);
+                posEdit.put(rep.start(), e);
+
+            } else {
+                posEdit.put(rep.start(), new Edit.Ins(rep.start(), rep.start(), "", occurredOn));
+            }
+            push(new Edit.Cmp(edits, occurredOn));
+        }
+
+        Map<Edit, Pos> map = rollup(rollupSource);
+        return requests.stream().map(r -> posEdit.get(r.start())).map(map::get).toList();
+    }
+
+    /**
+     * Rollup.
+     * @param edits ordered edits
+     * @return the rollup pos
+     */
+    private Map<Edit, Pos> rollup(List<Edit> edits) {
+        Map<Edit, Pos> ret = new HashMap<>();
+        for (Edit edit : edits) {
+            Edit.ConcreteEdit e;
+            if (edit instanceof Edit.Cmp cmp) {
+                e = cmp.edits().getLast();
+            } else if (edit instanceof Edit.ConcreteEdit cnc) {
+                e = cnc;
+            } else {
+                continue;
+            }
+            ret.put(edit, e.to());
+        }
+        return ret;
     }
 
     // -- Undo / Redo ---------------------------------------------------------

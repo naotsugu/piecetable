@@ -15,7 +15,7 @@
  */
 package com.mammb.code.piecetable.edit;
 
-import com.mammb.code.piecetable.TextEdit.*;
+import com.mammb.code.piecetable.Pos;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

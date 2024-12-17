@@ -95,13 +95,13 @@ class TextEditTest {
 
     @Test
     void testPos() {
-        var pos1 = new TextEdit.Pos(0, 0);
-        var pos2 = new TextEdit.Pos(0, 2);
-        var pos3 = new TextEdit.Pos(0, 2);
-        var pos4 = new TextEdit.Pos(1, 2);
-        var pos5 = new TextEdit.Pos(1, 4);
-        var pos6 = new TextEdit.Pos(4, 4);
-        var pos7 = new TextEdit.Pos(4, 5);
+        var pos1 = new Pos(0, 0);
+        var pos2 = new Pos(0, 2);
+        var pos3 = new Pos(0, 2);
+        var pos4 = new Pos(1, 2);
+        var pos5 = new Pos(1, 4);
+        var pos6 = new Pos(4, 4);
+        var pos7 = new Pos(4, 5);
 
         var list1 = List.of(pos4, pos2, pos7, pos1, pos3, pos6, pos5)
             .stream().sorted().toList();

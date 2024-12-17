@@ -19,6 +19,7 @@ import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.PieceTable;
+import com.mammb.code.piecetable.Pos;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -150,7 +151,7 @@ public class DocumentImpl implements Document {
     @Override
     public void insert(int row, int rawCol, byte[] bytes) {
         rawCol += (row == 0) ? bom.length : 0;
-        pt.insert(index.get(row) + rawCol, bytes);
+        pt.insert(index.serial(row, rawCol), bytes);
         index.insert(row, rawCol, bytes);
     }
 
@@ -158,7 +159,7 @@ public class DocumentImpl implements Document {
     @Override
     public void delete(int row, int rawCol, int rawLen) {
         rawCol += (row == 0) ? bom.length : 0;
-        pt.delete(index.get(row) + rawCol, rawLen);
+        pt.delete(index.serial(row, rawCol), rawLen);
         index.delete(row, rawCol, rawLen);
     }
 
@@ -166,7 +167,7 @@ public class DocumentImpl implements Document {
     @Override
     public byte[] get(int row, int rawCol, int rawLen) {
         rawCol += (row == 0) ? bom.length : 0;
-        return pt.get(index.get(row) + rawCol, rawLen);
+        return pt.get(index.serial(row, rawCol), rawLen);
     }
 
 
@@ -209,6 +210,16 @@ public class DocumentImpl implements Document {
         return pt.length() - bom.length;
     }
 
+    @Override
+    public long serial(int row, int col) {
+        return index.serial(row, col);
+    }
+
+    @Override
+    public Pos pos(long serial) {
+        int[] ret = index.pos(serial);
+        return new Pos(ret[0], ret[1]);
+    }
 
     @Override
     public Charset charset() {

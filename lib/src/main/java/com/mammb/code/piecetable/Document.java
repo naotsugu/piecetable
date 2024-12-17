@@ -127,6 +127,21 @@ public interface Document {
     long rawSize();
 
     /**
+     * Get the serial position.
+     * @param row the specified row
+     * @param col the specified position in a row
+     * @return the serial position
+     */
+    long serial(int row, int col);
+
+    /**
+     * Get the position from the specified serial.
+     * @param serial the serial position
+     * @return the row-col position
+     */
+    Pos pos(long serial);
+
+    /**
      * Get the charset.
      * @return the charset
      */

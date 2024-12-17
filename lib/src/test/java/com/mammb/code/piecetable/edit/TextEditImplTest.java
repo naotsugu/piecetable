@@ -16,11 +16,10 @@
 package com.mammb.code.piecetable.edit;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Pos;
 import org.junit.jupiter.api.Test;
 import com.mammb.code.piecetable.edit.Edit.*;
-import com.mammb.code.piecetable.TextEdit.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 

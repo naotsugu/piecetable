@@ -107,6 +107,13 @@ public interface TextEdit {
     Pos replace(int row, int col, int len, String text);
 
     /**
+     * Replace the multi text from this {@code TextEdit}.
+     * @param requests the replace requests
+     * @return the new position
+     */
+    List<Pos> replace(List<Replace> requests);
+
+    /**
      * @deprecated
      * Replace the text in the specified range from this {@code TextEdit}.
      * @param startRow the range start row
@@ -329,19 +336,6 @@ public interface TextEdit {
     }
 
     /**
-     * The position record.
-     * @param row the number of row(zero origin)
-     * @param col the byte position on the row
-     */
-    record Pos(int row, int col) implements Comparable<Pos> {
-        @Override
-        public int compareTo(Pos that) {
-            int c = Integer.compare(this.row, that.row);
-            return c == 0 ? Integer.compare(this.col, that.col) : c;
-        }
-    }
-
-    /**
      * The range of points
      * @param from the position of from
      * @param to the position of to
@@ -359,6 +353,33 @@ public interface TextEdit {
          */
         @Override
         String apply(String source);
+    }
+
+    /**
+     * The replace request.
+     * @param start the start point(caret point)
+     * @param end the end point(marked point)
+     * @param convert the convert
+     */
+    record Replace(Pos start, Pos end, Convert convert)  implements Comparable<Replace> {
+        /**
+         * Get the min pos.
+         * @return the min pos
+         */
+        public Pos min() {
+            return start.compareTo(end) < 0 ? start : end;
+        }
+        /**
+         * Get the max pos.
+         * @return the max pos
+         */
+        public Pos max() {
+            return start.compareTo(end) > 0 ? start : end;
+        }
+        @Override
+        public int compareTo(Replace that) {
+            return min().compareTo(that.min());
+        }
     }
 
 }
