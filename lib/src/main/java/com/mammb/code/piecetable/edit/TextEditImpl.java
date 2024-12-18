@@ -286,67 +286,66 @@ public class TextEditImpl implements TextEdit {
     public List<Pos> replace(List<Replace> requests) {
 
         long occurredOn = System.currentTimeMillis();
-        Map<Pos, Edit> posEdit = new HashMap<>();
-        List<Edit> rollupSource = new ArrayList<>();
-        List<Edit.ConcreteEdit> edits = new ArrayList<>();
+        List<Pos> pos = new ArrayList<>();
+        List<Edit.ConcreteEdit> unit = new ArrayList<>();
+        List<Integer> shifts = new ArrayList<>();
 
         for (Replace rep : requests.stream().sorted(Comparator.reverseOrder()).toList()) {
 
+            int cp = rep.end().compareTo(rep.start());
             String src = getText(rep.min(), rep.max());
             String dst = rep.convert().apply(src);
-            int cp = rep.end().compareTo(rep.start());
 
             if (cp > 0) {
+                // delete insert
                 int row = rep.start().row();
-                int col = rep.start().row();
+                int col = rep.start().col();
                 var delText = join(textRightByte(row, col, src.length()));
                 Edit.Del del = deleteEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
-                Edit.Cmp e = new Edit.Cmp(List.of(del, ins), occurredOn);
-                edits.addAll(e.edits());
-                rollupSource.addFirst(e);
-                posEdit.put(rep.start(), e);
-
+                unit.add(del);
+                unit.add(ins);
+                pos.addFirst(ins.to());
+                shifts.addFirst(dst.length() - delText.length());
             } else if (cp < 0) {
+                // backspace insert
                 int row = rep.end().row();
-                int col = rep.end().row();
+                int col = rep.end().col();
                 var delText = join(textLeftByte(row, col, -src.length()));
                 Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), dst, occurredOn);
-                Edit.Cmp e = new Edit.Cmp(List.of(bs, ins), occurredOn);
-                edits.addAll(e.edits());
-                rollupSource.addFirst(e);
-                posEdit.put(rep.start(), e);
-
+                unit.add(bs);
+                unit.add(ins);
+                pos.addFirst(ins.to());
+                shifts.addFirst(dst.length() - delText.length());
+            } else if (dst != null && !dst.isEmpty()) {
+                // insert only
+                int row = rep.start().row();
+                int col = rep.start().col();
+                Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
+                unit.add(ins);
+                pos.addFirst(ins.to());
+                shifts.addFirst(dst.length());
             } else {
-                posEdit.put(rep.start(), new Edit.Ins(rep.start(), rep.start(), "", occurredOn));
+                // no operation
+                int row = rep.start().row();
+                int col = rep.start().col();
+                pos.addFirst(new Pos(row, col));
+                shifts.addFirst(0);
             }
-            push(new Edit.Cmp(edits, occurredOn));
         }
 
-        Map<Edit, Pos> map = rollup(rollupSource);
-        return requests.stream().map(r -> posEdit.get(r.start())).map(map::get).toList();
-    }
+        push(new Edit.Cmp(unit, occurredOn));
 
-    /**
-     * Rollup.
-     * @param edits ordered edits
-     * @return the rollup pos
-     */
-    private Map<Edit, Pos> rollup(List<Edit> edits) {
-        Map<Edit, Pos> ret = new HashMap<>();
-        for (Edit edit : edits) {
-            Edit.ConcreteEdit e;
-            if (edit instanceof Edit.Cmp cmp) {
-                e = cmp.edits().getLast();
-            } else if (edit instanceof Edit.ConcreteEdit cnc) {
-                e = cnc;
-            } else {
-                continue;
-            }
-            ret.put(edit, e.to());
+        for (int i = 1; i < pos.size(); i++) {
+            Pos p = pos.get(i);
+            long serial = doc.serial(p.row(), p.col());
+            serial -= shifts.stream().limit(i).mapToInt(l -> l).sum();
+            pos.set(i, doc.pos(serial));
         }
-        return ret;
+
+        // sort by request order
+        return requests.stream().sorted().map(requests::indexOf).map(pos::get).toList();
     }
 
     // -- Undo / Redo ---------------------------------------------------------
