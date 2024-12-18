@@ -295,11 +295,11 @@ public class TextEditImpl implements TextEdit {
             int cp = rep.end().compareTo(rep.start());
             String src = getText(rep.min(), rep.max());
             String dst = rep.convert().apply(src);
+            int row = rep.start().row();
+            int col = rep.start().col();
 
             if (cp > 0) {
                 // delete insert
-                int row = rep.start().row();
-                int col = rep.start().col();
                 var delText = join(textRightByte(row, col, src.length()));
                 Edit.Del del = deleteEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
@@ -309,9 +309,7 @@ public class TextEditImpl implements TextEdit {
                 shifts.addFirst(dst.length() - delText.length());
             } else if (cp < 0) {
                 // backspace insert
-                int row = rep.end().row();
-                int col = rep.end().col();
-                var delText = join(textLeftByte(row, col, -src.length()));
+                var delText = join(textLeftByte(row, col, src.length()));
                 Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), dst, occurredOn);
                 unit.add(bs);
@@ -320,16 +318,12 @@ public class TextEditImpl implements TextEdit {
                 shifts.addFirst(dst.length() - delText.length());
             } else if (dst != null && !dst.isEmpty()) {
                 // insert only
-                int row = rep.start().row();
-                int col = rep.start().col();
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.add(ins);
                 pos.addFirst(ins.to());
                 shifts.addFirst(dst.length());
             } else {
                 // no operation
-                int row = rep.start().row();
-                int col = rep.start().col();
                 pos.addFirst(new Pos(row, col));
                 shifts.addFirst(0);
             }
@@ -337,10 +331,13 @@ public class TextEditImpl implements TextEdit {
 
         push(new Edit.Cmp(unit, occurredOn));
 
+        if (unit.size() > 1) {
+            flush();
+        }
         for (int i = 1; i < pos.size(); i++) {
             Pos p = pos.get(i);
             long serial = doc.serial(p.row(), p.col());
-            serial -= shifts.stream().limit(i).mapToInt(l -> l).sum();
+            serial += shifts.stream().limit(i).mapToInt(l -> l).sum();
             pos.set(i, doc.pos(serial));
         }
 

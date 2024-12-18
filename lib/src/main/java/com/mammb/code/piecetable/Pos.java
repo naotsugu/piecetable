@@ -24,6 +24,45 @@ package com.mammb.code.piecetable;
  */
 public record Pos(int row, int col) implements Comparable<Pos> {
 
+    /**
+     * Constructor.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row
+     */
+    public Pos {
+        if (row < 0 || col < 0) {
+            throw new IllegalArgumentException(String.format("(%d,%d)", row, col));
+        }
+    }
+
+    /**
+     * Create a new position record.
+     * @param row the number of row(zero origin)
+     * @param col the byte position on the row
+     * @return a new position record
+     */
+    public static Pos of(int row, int col) {
+        return new Pos(row, col);
+    }
+
+    /**
+     * Create a new position record with the specified row.
+     * @param row the number of row(zero origin)
+     * @return a new position record
+     */
+    public Pos withRow(int row) {
+        return new Pos(row, this.col);
+    }
+
+    /**
+     * Create a new position record with the specified col.
+     * @param col the byte position on the row
+     * @return a new position record
+     */
+    public Pos withCol(int col) {
+        return new Pos(this.row, col);
+    }
+
     @Override
     public int compareTo(Pos that) {
         int c = Integer.compare(this.row, that.row);

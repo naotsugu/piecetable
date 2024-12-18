@@ -360,7 +360,19 @@ public interface TextEdit {
      * @param end the end point(marked point)
      * @param convert the convert
      */
-    record Replace(Pos start, Pos end, Convert convert)  implements Comparable<Replace> {
+    record Replace(Pos start, Pos end, Convert convert) implements Comparable<Replace> {
+
+        /**
+         * Create a new replace request.
+         * @param start the start point(caret point)
+         * @param end the end point(marked point)
+         * @param text the text to be replaced
+         * @return a new replace request
+         */
+        public static Replace of(Pos start, Pos end, String text) {
+            return new Replace(start, end, o -> text);
+        }
+
         /**
          * Get the min pos.
          * @return the min pos
@@ -375,10 +387,12 @@ public interface TextEdit {
         public Pos max() {
             return start.compareTo(end) > 0 ? start : end;
         }
+
         @Override
         public int compareTo(Replace that) {
             return min().compareTo(that.min());
         }
+
     }
 
 }
