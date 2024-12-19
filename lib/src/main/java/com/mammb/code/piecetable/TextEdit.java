@@ -335,13 +335,6 @@ public interface TextEdit {
     }
 
     /**
-     * The range of points
-     * @param from the position of from
-     * @param to the position of to
-     */
-    record Range(Pos from, Pos to) { }
-
-    /**
      * The function to convert the original text to the replaced text.
      */
     interface Convert extends Function<String, String> {
