@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable.edit;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Range;
 import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.Pos;
@@ -283,48 +284,52 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public List<Pos> replace(List<Replace> requests) {
+    public List<Range> replace(List<Replace> requests) {
 
         long occurredOn = System.currentTimeMillis();
-        List<Pos> pos = new ArrayList<>();
+        List<Range> ranges = new ArrayList<>();
         List<Edit.ConcreteEdit> unit = new ArrayList<>();
         List<Integer> shifts = new ArrayList<>();
 
         for (Replace rep : requests.stream().sorted(Comparator.reverseOrder()).toList()) {
 
-            int cp = rep.end().compareTo(rep.start());
+            int cp = rep.markPos().compareTo(rep.caretPos());
             String src = getText(rep.min(), rep.max());
             String dst = rep.convert().apply(src);
-            int row = rep.start().row();
-            int col = rep.start().col();
+            int row = rep.caretPos().row();
+            int col = rep.caretPos().col();
 
             if (cp > 0) {
                 // delete insert
+                // | a | b | c |
+                // |<-----------
                 var delText = join(textRightByte(row, col, src.length()));
                 Edit.Del del = deleteEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.add(del);
                 unit.add(ins);
-                pos.addFirst(ins.to());
+                ranges.addFirst(Range.of(ins.to(), rep.caretPos()));
                 shifts.addFirst(dst.length() - delText.length());
             } else if (cp < 0) {
                 // backspace insert
+                // | a | b | c |
+                // ----------->|
                 var delText = join(textLeftByte(row, col, src.length()));
                 Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), dst, occurredOn);
                 unit.add(bs);
                 unit.add(ins);
-                pos.addFirst(ins.to());
+                ranges.addFirst(Range.of(rep.markPos(), ins.to()));
                 shifts.addFirst(dst.length() - delText.length());
             } else if (dst != null && !dst.isEmpty()) {
                 // insert only
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.add(ins);
-                pos.addFirst(ins.to());
+                ranges.addFirst(Range.of(ins.to(), ins.to()));
                 shifts.addFirst(dst.length());
             } else {
                 // no operation
-                pos.addFirst(new Pos(row, col));
+                ranges.addFirst(Range.of(rep.caretPos(), rep.caretPos()));
                 shifts.addFirst(0);
             }
         }
@@ -334,15 +339,22 @@ public class TextEditImpl implements TextEdit {
         if (unit.size() > 1) {
             flush();
         }
-        for (int i = 1; i < pos.size(); i++) {
-            Pos p = pos.get(i);
-            long serial = doc.serial(p.row(), p.col());
-            serial += shifts.stream().limit(i).mapToInt(l -> l).sum();
-            pos.set(i, doc.pos(serial));
+        for (int i = 1; i < ranges.size(); i++) {
+            Range r = ranges.get(i);
+            int diff = shifts.stream().limit(i).mapToInt(l -> l).sum();
+            if (r.isMono()) {
+                long serial = doc.serial(r.from().row(), r.from().col()) + diff;
+                Pos from = doc.pos(serial);
+                ranges.set(i, Range.of(from, from));
+            } else {
+                long serialFrom = doc.serial(r.from().row(), r.from().col()) + diff;
+                long serialTo   = doc.serial(r.to().row(), r.to().col()) + diff;
+                ranges.set(i, Range.of(doc.pos(serialFrom), doc.pos(serialTo)));
+            }
         }
 
         // sort by request order
-        return requests.stream().sorted().map(requests::indexOf).map(pos::get).toList();
+        return requests.stream().sorted().map(requests::indexOf).map(ranges::get).toList();
     }
 
     // -- Undo / Redo ---------------------------------------------------------

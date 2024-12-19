@@ -110,7 +110,7 @@ public interface TextEdit {
      * @param requests the replace requests
      * @return the new position
      */
-    List<Pos> replace(List<Replace> requests);
+    List<Range> replace(List<Replace> requests);
 
     /**
      * @deprecated
@@ -349,21 +349,21 @@ public interface TextEdit {
 
     /**
      * The replace request.
-     * @param start the start point(caret point)
-     * @param end the end point(marked point)
+     * @param markPos the end point(marked point)
+     * @param caretPos the start point(caret point)
      * @param convert the convert
      */
-    record Replace(Pos start, Pos end, Convert convert) implements Comparable<Replace> {
+    record Replace(Pos markPos, Pos caretPos, Convert convert) implements Comparable<Replace> {
 
         /**
          * Create a new replace request.
-         * @param start the start point(caret point)
-         * @param end the end point(marked point)
+         * @param caretPos the start point(caret point)
+         * @param markPos the end point(marked point)
          * @param text the text to be replaced
          * @return a new replace request
          */
-        public static Replace of(Pos start, Pos end, String text) {
-            return new Replace(start, end, o -> text);
+        public static Replace of(Pos markPos, Pos caretPos, String text) {
+            return new Replace(markPos, caretPos, o -> text);
         }
 
         /**
@@ -371,14 +371,14 @@ public interface TextEdit {
          * @return the min pos
          */
         public Pos min() {
-            return start.compareTo(end) < 0 ? start : end;
+            return caretPos.compareTo(markPos) < 0 ? caretPos : markPos;
         }
         /**
          * Get the max pos.
          * @return the max pos
          */
         public Pos max() {
-            return start.compareTo(end) > 0 ? start : end;
+            return caretPos.compareTo(markPos) > 0 ? caretPos : markPos;
         }
 
         @Override

@@ -73,4 +73,12 @@ public record Range(Pos from, Pos to) {
         return from.compareTo(to) > 0 ? from : to;
     }
 
+    /**
+     * Get whether this Range is width zero or not.
+     * @return {@code true}, if this Range is width zero
+     */
+    public boolean isMono() {
+        return from.compareTo(to) == 0;
+    }
+
 }
