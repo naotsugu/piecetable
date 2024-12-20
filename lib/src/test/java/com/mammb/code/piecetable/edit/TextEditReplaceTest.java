@@ -115,23 +115,25 @@ public class TextEditReplaceTest {
         assertEquals("1b3", te.getText(0, 1));
         assertEquals(Pos.of(0, 0), pos.getFirst().from());
         assertEquals(Pos.of(0, 1), pos.getFirst().to());
-        //assertEquals(Pos.of(0, 2), pos.get(1).from());
+        assertEquals(Pos.of(0, 2), pos.get(1).from());
         assertEquals(Pos.of(0, 3), pos.get(1).to());
 
     }
 
-//    @Test
-//    void testMultiCharReplace() {
-//        var te = TextEdit.of();
-//        te.insert(0, 0, "abc");
-//
-//        var pos = te.replace(List.of(
-//            Replace.of(Pos.of(0, 0), Pos.of(0, 1), "12"),
-//            Replace.of(Pos.of(0, 2), Pos.of(0, 3), "34")));
-//        assertEquals("12b34", te.getText(0, 1));
-//        assertEquals(Pos.of(0, 2), pos.getFirst());
-//        assertEquals(Pos.of(0, 5), pos.get(1));
-//
-//    }
+    @Test
+    void testMultiCharReplace() {
+        var te = TextEdit.of();
+        te.insert(0, 0, "abc");
+
+        var pos = te.replace(List.of(
+            Replace.of(Pos.of(0, 0), Pos.of(0, 1), "12"),
+            Replace.of(Pos.of(0, 2), Pos.of(0, 3), "34")));
+        assertEquals("12b34", te.getText(0, 1));
+        assertEquals(Pos.of(0, 0), pos.getFirst().from());
+        assertEquals(Pos.of(0, 2), pos.getFirst().to());
+        assertEquals(Pos.of(0, 3), pos.get(1).from());
+        assertEquals(Pos.of(0, 5), pos.get(1).to());
+
+    }
 
 }

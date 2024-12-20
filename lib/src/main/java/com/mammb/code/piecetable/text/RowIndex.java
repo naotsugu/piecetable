@@ -263,7 +263,7 @@ public class RowIndex {
      * @return the row-col position
      */
     public int[] pos(long serial) {
-        int result = Arrays.binarySearch(stCache, serial);
+        int result = Arrays.binarySearch(stCache, 0, cacheLength, serial);
         if (result >= 0) {
             return new int[] { result * cacheInterval, 0 };
         } else {

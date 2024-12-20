@@ -339,6 +339,7 @@ public class TextEditImpl implements TextEdit {
         if (unit.size() > 1) {
             flush();
         }
+
         for (int i = 1; i < ranges.size(); i++) {
             Range r = ranges.get(i);
             int diff = shifts.stream().limit(i).mapToInt(l -> l).sum();
