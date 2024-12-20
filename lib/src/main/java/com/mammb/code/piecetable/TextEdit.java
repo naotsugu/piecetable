@@ -113,34 +113,6 @@ public interface TextEdit {
     List<Range> replace(List<Replace> requests);
 
     /**
-     * @deprecated
-     * Replace the text in the specified range from this {@code TextEdit}.
-     * @param startRow the range start row
-     * @param startCol the range start col
-     * @param endRow the range end row
-     * @param endCol the range end col
-     * @param text the char sequence is to be inserted
-     * @return the new position
-     */
-    @Deprecated
-    default Pos replace(int startRow, int startCol, int endRow, int endCol, String text) {
-        return replace(new Pos(startRow, startCol), new Pos(endRow, endCol), text);
-    }
-
-    /**
-     * @deprecated
-     * Replace the text in the specified range from this {@code TextEdit}.
-     * @param start the start position
-     * @param end the end position
-     * @param text the char sequence is to be inserted
-     * @return the new position
-     */
-    @Deprecated
-    default Pos replace(Pos start, Pos end, String text) {
-        return replace(start, end, org -> text);
-    }
-
-    /**
      * Replace the text in the specified range from this {@code TextEdit}.
      * @param startRow the range start row
      * @param startCol the range start col

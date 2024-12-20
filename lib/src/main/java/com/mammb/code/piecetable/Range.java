@@ -23,15 +23,14 @@ import java.util.Objects;
  * If to represent a selection by caret, use the following,
  * <pre>
  *     | a | b | c |
- *     ----------->|
+ *     -----------&gt;|
  *   from         to(caret)
  * </pre>
  * <pre>
  *     | a | b | c |
- *     |<----------
+ *     |&lt;----------
  *  to(caret)     from
  * </pre>
- * </p>
  *
  * @param from the position of from
  * @param to   the position of to
