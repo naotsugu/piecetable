@@ -19,6 +19,20 @@ import java.util.Objects;
 
 /**
  * The range of points.
+ * <p>
+ * To represent a selection by caret, use the following,
+ * <pre>
+ *     | a | b | c |
+ *     ----------->|
+ *   from         to
+ * </pre>
+ * <pre>
+ *     | a | b | c |
+ *     |<----------
+ *    to         from
+ * </pre>
+ * </p>
+ *
  * @param from the position of from
  * @param to   the position of to
  * @author Naotsugu Kobayashi
