@@ -56,4 +56,25 @@ class RangeTest {
         assertEquals(Pos.of(rowMax, colMax), range.max());
     }
 
+    @ParameterizedTest
+    @CsvSource({
+    //   pos    contains
+        "0, 0,  false",
+        "0, 1,  false",
+        "1, 0,  false",
+        "1, 1,  false",
+        "1, 2,  true",
+        "1, 3,  true",
+        "2, 0,  true",
+        "2, 1,  true",
+        "3, 0,  true",
+        "3, 4,  true",
+        "3, 5,  false",
+        "4, 0,  false",
+    })
+    void contains(int row, int col, boolean contains) {
+        var range = Range.of(Pos.of(1, 2), Pos.of(3, 4));
+        assertEquals(contains, range.contains(Pos.of(row, col)));
+    }
+
 }

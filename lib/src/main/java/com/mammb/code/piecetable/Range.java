@@ -20,16 +20,16 @@ import java.util.Objects;
 /**
  * The range of points.
  * <p>
- * To represent a selection by caret, use the following,
+ * If to represent a selection by caret, use the following,
  * <pre>
  *     | a | b | c |
  *     ----------->|
- *   from         to
+ *   from         to(caret)
  * </pre>
  * <pre>
  *     | a | b | c |
  *     |<----------
- *    to         from
+ *  to(caret)     from
  * </pre>
  * </p>
  *
@@ -85,6 +85,16 @@ public record Range(Pos from, Pos to) {
      */
     public Pos max() {
         return from.compareTo(to) > 0 ? from : to;
+    }
+
+    /**
+     * Gets whether the specified position is included in this range or not.
+     * Boundary positions include
+     * @param pos the specified position
+     * @return {@code true}, if the specified position is included in this range
+     */
+    public boolean contains(Pos pos) {
+        return min().compareTo(pos) <= 0 && max().compareTo(pos) >= 0;
     }
 
     /**
