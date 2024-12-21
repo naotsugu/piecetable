@@ -286,8 +286,9 @@ public class TextEditImpl implements TextEdit {
     @Override
     public List<Range> replace(List<Replace> requests) {
 
+        flush();
         long occurredOn = System.currentTimeMillis();
-        List<Range> ranges = new ArrayList<>();
+        List<long[]> serials = new ArrayList<>();
         List<Edit.ConcreteEdit> unit = new ArrayList<>();
         List<Integer> shifts = new ArrayList<>();
 
@@ -306,9 +307,9 @@ public class TextEditImpl implements TextEdit {
                 var delText = join(textRightByte(row, col, src.length()));
                 Edit.Del del = deleteEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
-                unit.add(del);
-                unit.add(ins);
-                ranges.addFirst(Range.of(ins.to(), rep.caretPos()));
+                unit.addAll(List.of(del, ins));
+                long serial = doc.serial(rep.caretPos());
+                serials.addFirst(new long[] { serial + dst.length(), serial });
                 shifts.addFirst(dst.length() - delText.length());
             } else if (cp < 0) {
                 // backspace insert
@@ -317,19 +318,21 @@ public class TextEditImpl implements TextEdit {
                 var delText = join(textLeftByte(row, col, src.length()));
                 Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), dst, occurredOn);
-                unit.add(bs);
-                unit.add(ins);
-                ranges.addFirst(Range.of(rep.markPos(), ins.to()));
+                unit.addAll(List.of(bs, ins));
+                long serial = doc.serial(rep.markPos());
+                serials.addFirst(new long[] { serial, serial + dst.length() });
                 shifts.addFirst(dst.length() - delText.length());
             } else if (dst != null && !dst.isEmpty()) {
                 // insert only
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.add(ins);
-                ranges.addFirst(Range.of(ins.to(), ins.to()));
+                long serial = doc.serial(rep.caretPos()) + dst.length();
+                serials.addFirst(new long[] { serial });
                 shifts.addFirst(dst.length());
             } else {
                 // no operation
-                ranges.addFirst(Range.of(rep.caretPos(), rep.caretPos()));
+                long serial = doc.serial(rep.caretPos());
+                serials.addFirst(new long[] { serial });
                 shifts.addFirst(0);
             }
         }
@@ -340,17 +343,20 @@ public class TextEditImpl implements TextEdit {
             flush();
         }
 
-        for (int i = 1; i < ranges.size(); i++) {
-            Range r = ranges.get(i);
-            int diff = shifts.stream().limit(i).mapToInt(l -> l).sum();
-            if (r.isMono()) {
-                long serial = doc.serial(r.from().row(), r.from().col()) + diff;
-                Pos from = doc.pos(serial);
-                ranges.set(i, Range.of(from, from));
+        List<Range> ranges = new ArrayList<>();
+        for (int i = 0; i < serials.size(); i++) {
+            int diff = ranges.isEmpty()
+                ? 0
+                : shifts.stream().limit(i).mapToInt(l -> l).sum();
+            long[] serial = serials.get(i);
+            if (serial.length == 1) {
+                ranges.add(Range.of(
+                    doc.pos(serial[0] + diff),
+                    doc.pos(serial[0] + diff)));
             } else {
-                long serialFrom = doc.serial(r.from().row(), r.from().col()) + diff;
-                long serialTo   = doc.serial(r.to().row(), r.to().col()) + diff;
-                ranges.set(i, Range.of(doc.pos(serialFrom), doc.pos(serialTo)));
+                ranges.add(Range.of(
+                    doc.pos(serial[0] + diff),
+                    doc.pos(serial[1] + diff)));
             }
         }
 

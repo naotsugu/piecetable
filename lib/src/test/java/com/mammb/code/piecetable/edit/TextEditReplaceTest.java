@@ -136,4 +136,57 @@ public class TextEditReplaceTest {
 
     }
 
+    @Test
+    void testMultiLineReplace() {
+        var te = TextEdit.of();
+        te.insert(0, 0, """
+            abc
+            def""");
+
+        var pos = te.replace(List.of(
+            Replace.of(Pos.of(0, 1), Pos.of(1, 2), "1234\n567")));
+        assertEquals("""
+            a1234
+            567f""", te.getText(0, 2));
+        assertEquals(Pos.of(0, 1), pos.getFirst().from());
+        assertEquals(Pos.of(1, 3), pos.getFirst().to());
+
+    }
+
+
+    @Test
+    void testReplace() {
+        var te = TextEdit.of();
+        te.insert(0, 0, """
+        12345
+        6789a""");
+
+        // | 1 | 2 | 3 | 4 | 5 |        | 1 | x | x | x | 4 | y | y |
+        //     ------->|    ----            ----------->|    --------
+        // | 6 | 7 | 8 | 9 | a |        | y | y | y | 8 | z | z | a |
+        // ------->|   --->|            ----------->|   ------->|
+
+        var pos = te.replace(List.of(
+            Replace.of(Pos.of(0, 4), Pos.of(1, 2), "yy\nyyy"),
+            Replace.of(Pos.of(0, 1), Pos.of(0, 3), "xxx"),
+            Replace.of(Pos.of(1, 3), Pos.of(1, 4), "zz")));
+        assertEquals("""
+            1xxx4yy
+            yyy8zza""", te.getText(0, 2));
+
+        assertEquals(Pos.of(0, 5), pos.get(0).from());
+        assertEquals(Pos.of(1, 3), pos.get(0).to());
+
+        assertEquals(Pos.of(0, 1), pos.get(1).from());
+        assertEquals(Pos.of(0, 4), pos.get(1).to());
+
+        assertEquals(Pos.of(1, 4), pos.get(2).from());
+        assertEquals(Pos.of(1, 6), pos.get(2).to());
+    }
+    //                              | 1 | x | x | x | 4 | y | y |
+    // | 1 | 2 | 3 | 4 | 5 |        | 1 | 2 | 3 | 4 | y | y |
+    //     ------->|    ----                         --------
+    // | 6 | 7 | 8 | 9 | a |        | y | y | y | 8 | z | z | a |
+    // ------->|   --->|            ----------->|   ------->|
+
 }
