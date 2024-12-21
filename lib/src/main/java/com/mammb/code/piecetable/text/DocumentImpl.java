@@ -53,6 +53,9 @@ public class DocumentImpl implements Document {
     /** The row ending. */
     private final RowEnding rowEnding;
 
+    /** Readonly or not. */
+    private boolean readonly;
+
 
     /**
      * Constructor.
@@ -131,6 +134,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public void insert(int row, int col, CharSequence cs) {
+        if (readonly) return;
         col = getText(row).toString().substring(0, col).getBytes(charset).length;
         insert(row, col, cs.toString().getBytes(charset));
     }
@@ -138,6 +142,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public void delete(int row, int col, CharSequence cs) {
+        if (readonly) return;
         col = getText(row).toString().substring(0, col).getBytes(charset).length;
         delete(row, col, cs.toString().getBytes(charset).length);
     }
@@ -151,6 +156,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public void insert(int row, int rawCol, byte[] bytes) {
+        if (readonly) return;
         rawCol += (row == 0) ? bom.length : 0;
         pt.insert(index.serial(row, rawCol), bytes);
         index.insert(row, rawCol, bytes);
@@ -159,6 +165,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public void delete(int row, int rawCol, int rawLen) {
+        if (readonly) return;
         rawCol += (row == 0) ? bom.length : 0;
         pt.delete(index.serial(row, rawCol), rawLen);
         index.delete(row, rawCol, rawLen);
@@ -199,12 +206,15 @@ public class DocumentImpl implements Document {
         return search(cs, row, col, Short.MAX_VALUE).stream().findFirst();
     }
 
+    @Override
+    public void readonly(boolean readonly) {
+        this.readonly = readonly;
+    }
 
     @Override
     public int rows() {
         return index.rowSize();
     }
-
 
     @Override
     public long rawSize() {

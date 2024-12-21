@@ -114,6 +114,12 @@ public interface Document {
     Optional<Found> findNext(CharSequence cs, int row, int col);
 
     /**
+     * Set readonly.
+     * @param readonly readonly
+     */
+    void readonly(boolean readonly);
+
+    /**
      * Get the row size.
      * @return the row size
      */
@@ -128,6 +134,8 @@ public interface Document {
 
     /**
      * Get the serial position.
+     * Represents the byte position from the beginning of the file.
+     * This position does not include bom.
      * @param row the specified row
      * @param col the specified position in a row
      * @return the serial position
