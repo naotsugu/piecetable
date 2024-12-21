@@ -264,27 +264,35 @@ public class TextEditImpl implements TextEdit {
             return insert(row, col, text);
         }
         long occurredOn = System.currentTimeMillis();
-        Edit e;
-        Pos pos;
         if (len > 0) {
+            // delete insert
+            // | a | b | c |
+            // |<-----------
             var delText = join(textRightByte(row, col, len));
             Edit.Del del = deleteEdit(row, col, delText, occurredOn);
             Edit.Ins ins = insertEdit(row, col, text, occurredOn);
-            e = new Edit.Cmp(List.of(del, ins), occurredOn);
-            pos = ins.to();
+            Edit e = new Edit.Cmp(List.of(del, ins), occurredOn);
+            push(e);
+            return ins.to();
         } else {
+            // backspace insert
+            // | a | b | c |
+            // ----------->|
             var delText = join(textLeftByte(row, col, -len));
             Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
             Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), text, occurredOn);
-            e = new Edit.Cmp(List.of(bs, ins), occurredOn);
-            pos = ins.to();
+            Edit e = new Edit.Cmp(List.of(bs, ins), occurredOn);
+            push(e);
+            return ins.to();
         }
-        push(e);
-        return pos;
     }
 
     @Override
     public List<Range> replace(List<Replace> requests) {
+
+        if (requests.isEmpty()) {
+            return List.of();
+        }
 
         flush();
         long occurredOn = System.currentTimeMillis();
@@ -338,10 +346,7 @@ public class TextEditImpl implements TextEdit {
         }
 
         push(new Edit.Cmp(unit, occurredOn));
-
-        if (unit.size() > 1) {
-            flush();
-        }
+        flush();
 
         List<Range> ranges = new ArrayList<>();
         for (int i = 0; i < serials.size(); i++) {

@@ -96,7 +96,7 @@ public interface Content {
 
         @Override
         public Point replace(Point start, Point end, String text) {
-            var pos = edit.replace(start.row(), start.col(), end.row(), end.col(), text);
+            var pos = edit.replace(start.row(), start.col(), end.row(), end.col(), o -> text);
             return new PointRec(pos.row(), pos.col());
         }
 
@@ -107,7 +107,7 @@ public interface Content {
                     .map(range -> edit.replace(
                             range.min().row(), range.min().col(),
                             range.max().row(), range.max().col(),
-                            ""))
+                            o -> ""))
                     .map(pos -> new PointRec(pos.row(), pos.col()))
                     .map(Point.class::cast)
                     .toList();

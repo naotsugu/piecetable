@@ -142,6 +142,11 @@ public interface Document {
      */
     long serial(int row, int col);
 
+    /**
+     * Get the serial position.
+     * @param pos the specified pos
+     * @return the serial position
+     */
     default long serial(Pos pos) {
         return serial(pos.row(), pos.col());
     }
