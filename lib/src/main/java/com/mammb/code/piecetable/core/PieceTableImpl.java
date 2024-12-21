@@ -66,7 +66,6 @@ public class PieceTableImpl implements PieceTable {
         }
     }
 
-
     /**
      * Create a new {@code PieceTable}.
      * @return a new {@code PieceTable}
@@ -74,7 +73,6 @@ public class PieceTableImpl implements PieceTable {
     public static PieceTableImpl of() {
         return new PieceTableImpl(null, null);
     }
-
 
     /**
      * Create a new {@code PieceTable}.
@@ -85,7 +83,6 @@ public class PieceTableImpl implements PieceTable {
         var cb = ChannelBuffer.of(path);
         return new PieceTableImpl(path, new Piece(cb, 0, cb.length()));
     }
-
 
     @Override
     public void insert(long pos, byte[] bytes) {
@@ -125,7 +122,6 @@ public class PieceTableImpl implements PieceTable {
         length += bytes.length;
     }
 
-
     @Override
     public void delete(long pos, int len) {
 
@@ -160,7 +156,6 @@ public class PieceTableImpl implements PieceTable {
         length -= len;
     }
 
-
     @Override
     public byte[] get(long pos, int len) {
 
@@ -184,12 +179,10 @@ public class PieceTableImpl implements PieceTable {
         return ret;
     }
 
-
     @Override
     public long length() {
         return length;
     }
-
 
     @Override
     public void save(Path path) {
@@ -240,7 +233,6 @@ public class PieceTableImpl implements PieceTable {
 
     }
 
-
     /**
      * Get the all bytes.
      * @return the all bytes
@@ -252,7 +244,6 @@ public class PieceTableImpl implements PieceTable {
         }
         return bytes.get();
     }
-
 
     /**
      * Writes the contents of the PieceTable to the specified path.
@@ -276,7 +267,6 @@ public class PieceTableImpl implements PieceTable {
             throw new RuntimeException(e);
         }
     }
-
 
     private PiecePoint at(long pos) {
         // 0  |x|x|x|  length:3
@@ -338,7 +328,6 @@ public class PieceTableImpl implements PieceTable {
         indices.clear();
     }
 
-
     private PiecePoint fillToIndices(long pos, long piecePosition, int tableIndex) {
         for (int i = tableIndex; i < pieces.size(); i++) {
             var piece = pieces.get(i);
@@ -351,7 +340,6 @@ public class PieceTableImpl implements PieceTable {
         }
         return null;
     }
-
 
     record PiecePoint(Long position, int tableIndex, Piece piece) {
         // excludes

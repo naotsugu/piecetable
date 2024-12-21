@@ -187,18 +187,15 @@ public class DocumentImpl implements Document {
         return pt.get(col, len);
     }
 
-
     @Override
     public CharSequence getText(int row, int rawCol, int rawLen) {
         return new String(get(row, rawCol, rawLen), charset);
     }
 
-
     @Override
     public List<Found> findAll(CharSequence cs) {
         return search(cs, 0, 0, Short.MAX_VALUE);
     }
-
 
     @Override
     public Optional<Found> findNext(CharSequence cs, int row, int col) {
@@ -237,7 +234,6 @@ public class DocumentImpl implements Document {
         return charset;
     }
 
-
     @Override
     public RowEnding rowEnding() {
         return rowEnding;
@@ -253,12 +249,10 @@ public class DocumentImpl implements Document {
         return path;
     }
 
-
     @Override
     public void save(Path path) {
         pt.save(path);
     }
-
 
     private List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
 
