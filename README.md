@@ -5,6 +5,8 @@
 
 Piece table data structure in Java.
 
+Piece table is a data structure typically used to represent a text document.
+
 
 ## Operations
 
@@ -18,7 +20,7 @@ A piece table consists of three columns:
 
 In addition to the table, two buffers are used to handle edits:
 
-* `read-only` : A buffer to the original text document
+* `read-only` : A reference to the original text document
 * `append-only` : A buffer to a temporary file
 
 ![piecetable1](docs/images/piecetable1.png)

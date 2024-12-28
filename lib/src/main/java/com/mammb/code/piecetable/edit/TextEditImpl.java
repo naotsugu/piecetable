@@ -302,13 +302,13 @@ public class TextEditImpl implements TextEdit {
 
         for (Replace rep : requests.stream().sorted(Comparator.reverseOrder()).toList()) {
 
-            int cp = rep.markPos().compareTo(rep.caretPos());
+            int direction = rep.markPos().compareTo(rep.caretPos());
             String src = getText(rep.min(), rep.max());
             String dst = rep.convert().apply(src);
             int row = rep.caretPos().row();
             int col = rep.caretPos().col();
 
-            if (cp > 0) {
+            if (direction > 0) {
                 // delete insert
                 // | a | b | c |
                 // |<-----------
@@ -319,7 +319,7 @@ public class TextEditImpl implements TextEdit {
                 long serial = doc.serial(rep.caretPos());
                 serials.addFirst(new long[] { serial + dst.length(), serial });
                 shifts.addFirst(dst.length() - delText.length());
-            } else if (cp < 0) {
+            } else if (direction < 0) {
                 // backspace insert
                 // | a | b | c |
                 // ----------->|
