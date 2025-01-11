@@ -374,27 +374,19 @@ public class TextEditImpl implements TextEdit {
     @Override
     public List<Pos> undo() {
         flush();
-        final Optional<Edit> undo = undoEdit();
-        if (undo.isEmpty()) {
-            return List.of();
-        }
-        return switch (undo.get()) {
+        return undoEdit().map(edit -> switch (edit) {
             case Edit.ConcreteEdit e -> List.of(e.to());
             case Edit.Cmp e -> List.of(e.edits().getLast().to());
-        };
+        }).orElseGet(List::of);
     }
 
     @Override
     public List<Pos> redo() {
         flush();
-        final Optional<Edit> redo = redoEdit();
-        if (redo.isEmpty()) {
-            return List.of();
-        }
-        return switch (redo.get()) {
+        return redoEdit().map(edit -> switch (edit) {
             case Edit.ConcreteEdit e -> List.of(e.to());
             case Edit.Cmp e -> List.of(e.edits().getLast().to());
-        };
+        }).orElseGet(List::of);
     }
 
     @Override
@@ -789,6 +781,5 @@ public class TextEditImpl implements TextEdit {
         }
         return poss;
     }
-
 
 }
