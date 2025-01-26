@@ -253,7 +253,7 @@ public interface TextEdit {
     RowEnding rowEnding();
 
     /**
-     * Get the bom.
+     * Get the bom as byte array.
      * @return the bom, if there is no bom, an empty byte array
      */
     byte[] bom();

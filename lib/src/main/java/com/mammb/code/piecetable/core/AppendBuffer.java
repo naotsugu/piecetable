@@ -37,6 +37,7 @@ public interface AppendBuffer extends Buffer {
      * @return a new appendable buffer
      */
     static AppendBuffer of() {
+
         return new AppendBuffer() {
 
             private final ByteArray elements = ByteArray.of();

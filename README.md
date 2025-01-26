@@ -5,10 +5,10 @@
 
 Piece table data structure in Java.
 
-Piece table is a data structure typically used to represent a text document.
+Piece table is a data structure typically used to represent a text document editing.
 
 
-## Operations
+## Operations of piece table
 
 ### Initial state
 
