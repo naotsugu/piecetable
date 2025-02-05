@@ -38,9 +38,6 @@ public class DocumentImpl implements Document {
     /** The {@link PieceTable}. */
     private final PieceTable pt;
 
-    /** The {@link Path} of Document. */
-    private final Path path;
-
     /** The {@link Charset} of Document. */
     private final Charset charset;
 
@@ -52,6 +49,9 @@ public class DocumentImpl implements Document {
 
     /** The row ending. */
     private final RowEnding rowEnding;
+
+    /** The {@link Path} of Document. */
+    private Path path;
 
     /** Readonly or not. */
     private boolean readonly;
@@ -252,6 +252,7 @@ public class DocumentImpl implements Document {
     @Override
     public void save(Path path) {
         pt.save(path);
+        this.path = path;
     }
 
     private List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
