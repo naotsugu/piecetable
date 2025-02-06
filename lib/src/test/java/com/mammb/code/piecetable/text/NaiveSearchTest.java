@@ -37,13 +37,13 @@ class NaiveSearchTest {
         assertEquals(3, founds.size());
 
         assertEquals(0, founds.get(0).row());
-        assertEquals(0, founds.get(0).col());
+        assertEquals(0, founds.get(0).rawCol());
 
         assertEquals(1, founds.get(1).row());
-        assertEquals(5, founds.get(1).col());
+        assertEquals(5, founds.get(1).rawCol());
 
         assertEquals(2, founds.get(2).row());
-        assertEquals(8, founds.get(2).col());
+        assertEquals(8, founds.get(2).rawCol());
     }
 
     @Test
@@ -57,13 +57,13 @@ class NaiveSearchTest {
         assertEquals(3, founds.size());
 
         assertEquals(2, founds.get(0).row());
-        assertEquals(8, founds.get(0).col());
+        assertEquals(8, founds.get(0).rawCol());
 
         assertEquals(1, founds.get(1).row());
-        assertEquals(5, founds.get(1).col());
+        assertEquals(5, founds.get(1).rawCol());
 
         assertEquals(0, founds.get(2).row());
-        assertEquals(0, founds.get(2).col());
+        assertEquals(0, founds.get(2).rawCol());
 
     }
 

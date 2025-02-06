@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.mammb.code.piecetable.RowEnding;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +78,6 @@ public class DocumentImpl implements Document {
         }
     }
 
-
     /**
      * Create a new {@link Document}.
      * @return a new {@link Document}
@@ -87,7 +85,6 @@ public class DocumentImpl implements Document {
     public static DocumentImpl of() {
         return new DocumentImpl(PieceTable.of(), null, null);
     }
-
 
     /**
      * Create a new {@link Document}.
@@ -97,7 +94,6 @@ public class DocumentImpl implements Document {
     public static DocumentImpl of(Path path) {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path));
     }
-
 
     /**
      * Create a new {@link Document}.
@@ -109,7 +105,6 @@ public class DocumentImpl implements Document {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, progressListener));
     }
 
-
     /**
      * Create a new {@link Document}.
      * @param path the {@link Path} of the document
@@ -119,7 +114,6 @@ public class DocumentImpl implements Document {
     public static DocumentImpl of(Path path, Charset charset) {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, charset));
     }
-
 
     /**
      * Create a new {@link Document}.
@@ -131,14 +125,12 @@ public class DocumentImpl implements Document {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, -1, charsetMatches));
     }
 
-
     @Override
     public void insert(int row, int col, CharSequence cs) {
         if (readonly) return;
         col = getText(row).toString().substring(0, col).getBytes(charset).length;
         insert(row, col, cs.toString().getBytes(charset));
     }
-
 
     @Override
     public void delete(int row, int col, CharSequence cs) {
@@ -147,12 +139,10 @@ public class DocumentImpl implements Document {
         delete(row, col, cs.toString().getBytes(charset).length);
     }
 
-
     @Override
     public CharSequence getText(int row) {
         return new String(get(row), charset);
     }
-
 
     @Override
     public void insert(int row, int rawCol, byte[] bytes) {
@@ -162,7 +152,6 @@ public class DocumentImpl implements Document {
         index.insert(row, rawCol, bytes);
     }
 
-
     @Override
     public void delete(int row, int rawCol, int rawLen) {
         if (readonly) return;
@@ -171,13 +160,11 @@ public class DocumentImpl implements Document {
         index.delete(row, rawCol, rawLen);
     }
 
-
     @Override
     public byte[] get(int row, int rawCol, int rawLen) {
         rawCol += (row == 0) ? bom.length : 0;
         return pt.get(index.serial(row, rawCol), rawLen);
     }
-
 
     @Override
     public byte[] get(int row) {
@@ -194,15 +181,17 @@ public class DocumentImpl implements Document {
 
     @Override
     public List<Found> findAll(CharSequence cs) {
-        return new NaiveSearch(this).search(cs.toString().getBytes(charset), 0, 0, Short.MAX_VALUE);
+        byte[] pattern = cs.toString().getBytes(charset);
+        return new NaiveSearch(this).search(pattern, 0, 0, Short.MAX_VALUE).stream()
+            .map(f -> new Found(f.row(), getText(f.row(), f.rawCol(), f.rawLen()).length(), cs.length())).toList();
     }
 
     @Override
     public Optional<Found> findNext(CharSequence cs, int row, int col) {
+        byte[] pattern = cs.toString().getBytes(charset);
         col = getText(row).toString().substring(0, col).getBytes().length;
-        return new NaiveSearch(this)
-            .search(cs.toString().getBytes(charset), row, col, 1)
-            .stream().findFirst();
+        return new NaiveSearch(this).search(pattern, row, col, 1).stream().findFirst()
+            .map(f -> new Found(f.row(), getText(f.row(), f.rawCol(), f.rawLen()).length(), cs.length()));
     }
 
     @Override

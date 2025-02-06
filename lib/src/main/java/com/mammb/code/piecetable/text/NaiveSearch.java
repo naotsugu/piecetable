@@ -16,7 +16,6 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Found;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,9 +45,9 @@ public class NaiveSearch {
      * @param maxFound limit of found
      * @return the list of found
      */
-    List<Found> search(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
+    List<FoundByte> search(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
 
-        List<Found> founds = new ArrayList<>();
+        List<FoundByte> founds = new ArrayList<>();
         byte first = pattern[0];
         int rows = doc.rows();
 
@@ -68,7 +67,7 @@ public class NaiveSearch {
                     for (int k = 1; j < end && value[j] == pattern[k]; j++, k++) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new Found(row, col, pattern.length));
+                        founds.add(new FoundByte(row, col, pattern.length));
                         if (founds.size() >= maxFound) {
                             return founds;
                         }
@@ -89,9 +88,9 @@ public class NaiveSearch {
      * @param maxFound limit of found
      * @return the list of found
      */
-    List<Found> searchDesc(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
+    List<FoundByte> searchDesc(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
 
-        List<Found> founds = new ArrayList<>();
+        List<FoundByte> founds = new ArrayList<>();
         byte last = pattern[pattern.length - 1];
 
         for (int row = fromRow; row >= 0; row--) {
@@ -112,7 +111,7 @@ public class NaiveSearch {
                     for (int k = pattern.length - 2; j > end && value[j] == pattern[k]; j--, k--) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new Found(row, col - (pattern.length - 1), pattern.length));
+                        founds.add(new FoundByte(row, col - (pattern.length - 1), pattern.length));
                         if (founds.size() >= maxFound) {
                             return founds;
                         }
@@ -124,5 +123,13 @@ public class NaiveSearch {
         }
         return founds;
     }
+
+    /**
+     * Found byte
+     * @param row the number of row
+     * @param rawCol the byte position on the row
+     * @param rawLen the byte length
+     */
+    record FoundByte(int row, int rawCol, int rawLen) { }
 
 }
