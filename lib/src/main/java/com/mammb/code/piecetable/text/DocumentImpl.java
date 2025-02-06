@@ -194,13 +194,15 @@ public class DocumentImpl implements Document {
 
     @Override
     public List<Found> findAll(CharSequence cs) {
-        return search(cs, 0, 0, Short.MAX_VALUE);
+        return new NaiveSearch(this).search(cs.toString().getBytes(charset), 0, 0, Short.MAX_VALUE);
     }
 
     @Override
     public Optional<Found> findNext(CharSequence cs, int row, int col) {
         col = getText(row).toString().substring(0, col).getBytes().length;
-        return search(cs, row, col, Short.MAX_VALUE).stream().findFirst();
+        return new NaiveSearch(this)
+            .search(cs.toString().getBytes(charset), row, col, 1)
+            .stream().findFirst();
     }
 
     @Override
@@ -253,40 +255,6 @@ public class DocumentImpl implements Document {
     public void save(Path path) {
         pt.save(path);
         this.path = path;
-    }
-
-    private List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
-
-        List<Found> founds = new ArrayList<>();
-        byte[] str = cs.toString().getBytes(charset);
-        byte first = str[0];
-
-        for (int row = fromRow; row < rows(); row++) {
-            byte[] value = get(row);
-            int max = value.length - str.length;
-            int colOffset = (row == fromRow) ? fromCol : 0;
-            for (int col = colOffset; col <= max; col++) {
-                // look for first character
-                if (value[col] != first) {
-                    while (++col <= max && value[col] != first);
-                }
-                // found first character, now look at the rest of value
-                if (col <= max) {
-                    int j = col + 1;
-                    int end = j + str.length - 1;
-                    for (int k = 1; j < end && value[j] == str[k]; j++, k++);
-                    if (j == end) {
-                        // found whole charSequence
-                        founds.add(new Found(row, col, str.length));
-                        if (founds.size() >= maxFound) {
-                            return founds;
-                        }
-                        col += str.length;
-                    }
-                }
-            }
-        }
-        return founds;
     }
 
 }
