@@ -41,11 +41,11 @@ public class NaiveSearch {
      * Search pattern.
      * @param pattern the pattern
      * @param fromRow from row
-     * @param fromCol from col
+     * @param fromRawCol the byte position on the row
      * @param maxFound limit of found
      * @return the list of found
      */
-    List<Found> search(byte[] pattern, int fromRow, int fromCol, int maxFound) {
+    List<Found> search(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
 
         List<Found> founds = new ArrayList<>();
         byte first = pattern[0];
@@ -54,7 +54,7 @@ public class NaiveSearch {
         for (int row = fromRow; row < rows; row++) {
             byte[] value = doc.get(row);
             int max = value.length - pattern.length;
-            int colOffset = (row == fromRow) ? fromCol : 0;
+            int colOffset = (row == fromRow) ? fromRawCol : 0;
             for (int col = colOffset; col <= max; col++) {
                 // look for first character
                 if (value[col] != first) {
@@ -83,11 +83,11 @@ public class NaiveSearch {
      * Search pattern descending.
      * @param pattern the pattern
      * @param fromRow from row
-     * @param fromCol from col
+     * @param fromRawCol the byte position on the row
      * @param maxFound limit of found
      * @return the list of found
      */
-    List<Found> searchDesc(byte[] pattern, int fromRow, int fromCol, int maxFound) {
+    List<Found> searchDesc(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
 
         List<Found> founds = new ArrayList<>();
         byte last = pattern[pattern.length - 1];
@@ -96,7 +96,7 @@ public class NaiveSearch {
             byte[] value = doc.get(row);
             int min = pattern.length - 1;
             int colOffset = (row == fromRow)
-                ? fromCol - 1
+                ? fromRawCol - 1
                 : value.length - pattern.length;
             for (int col = colOffset; col >= 0; col--) {
                 // look for last character
