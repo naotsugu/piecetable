@@ -39,6 +39,7 @@ public class NaiveSearch {
 
     /**
      * Search pattern.
+     * Bypass String instantiation by comparing them as a byte array.
      * @param pattern the pattern
      * @param fromRow from row
      * @param fromRawCol the byte position on the row
@@ -81,6 +82,7 @@ public class NaiveSearch {
 
     /**
      * Search pattern descending.
+     * Bypass String instantiation by comparing them as a byte array.
      * @param pattern the pattern
      * @param fromRow from row
      * @param fromRawCol the byte position on the row
@@ -120,7 +122,6 @@ public class NaiveSearch {
                 }
             }
         }
-
         return founds;
     }
 
