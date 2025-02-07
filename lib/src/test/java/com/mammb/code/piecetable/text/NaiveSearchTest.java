@@ -16,7 +16,11 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Found;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,12 +32,14 @@ class NaiveSearchTest {
 
     @Test
     void search() {
+
         var doc = Document.of();
         doc.insert(0, 0, "abc12345678\n");
         doc.insert(1, 0, "12345abc678\n");
         doc.insert(2, 0, "abc45678abc\n");
 
-        var founds = new NaiveSearch(doc).search("abc", 0, 0, Integer.MAX_VALUE);
+        List<Found> founds = new ArrayList<>();
+        new NaiveSearch(doc).search("abc", 0, 0, founds::add);
         assertEquals(4, founds.size());
 
         assertEquals(0, founds.get(0).row());
@@ -51,12 +57,14 @@ class NaiveSearchTest {
 
     @Test
     void searchDesc() {
+
         var doc = Document.of();
         doc.insert(0, 0, "abc12345678\n");
         doc.insert(1, 0, "12345abc678\n");
         doc.insert(2, 0, "abc45678abc\n");
 
-        var founds = new NaiveSearch(doc).searchDesc("abc", 2, 12, Integer.MAX_VALUE);
+        List<Found> founds = new ArrayList<>();
+        new NaiveSearch(doc).searchDesc("abc", 2, 12, founds::add);
         assertEquals(4, founds.size());
 
         assertEquals(2, founds.get(0).row());

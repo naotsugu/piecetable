@@ -16,7 +16,11 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Found;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,7 +38,8 @@ class CaseSensitiveSearchTest {
         doc.insert(1, 0, "12345aBc678\n");
         doc.insert(2, 0, "aBc45678aBc\n");
 
-        var founds = new CaseSensitiveSearch(doc).search("AbC", 0, 0, Integer.MAX_VALUE);
+        List<Found> founds = new ArrayList<>();
+        new CaseSensitiveSearch(doc).search("AbC", 0, 0, founds::add);
         assertEquals(4, founds.size());
 
         assertEquals(0, founds.get(0).row());
@@ -59,7 +64,8 @@ class CaseSensitiveSearchTest {
         doc.insert(1, 0, "12345aBc678\n");
         doc.insert(2, 0, "aBc45678aBc\n");
 
-        var founds = new CaseSensitiveSearch(doc).searchDesc("AbC", 2, 12, Integer.MAX_VALUE);
+        List<Found> founds = new ArrayList<>();
+        new CaseSensitiveSearch(doc).searchDesc("AbC", 2, 12, founds::add);
         assertEquals(4, founds.size());
 
         assertEquals(2, founds.get(0).row());

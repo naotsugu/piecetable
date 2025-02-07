@@ -17,8 +17,6 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.Found;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The case-sensitive search.
@@ -38,9 +36,8 @@ public class CaseSensitiveSearch implements Search {
     }
 
     @Override
-    public List<Found> search(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
+    public void search(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
 
-        List<Found> founds = new ArrayList<>();
         char first = pattern.charAt(0);
 
         for (int row = fromRow; row < doc.rows(); row++) {
@@ -60,9 +57,9 @@ public class CaseSensitiveSearch implements Search {
                     for (int k = 1; j < end && eq(cs.charAt(j), pattern.charAt(k)); j++, k++) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new Found(row, col, pattern.length()));
-                        if (founds.size() >= maxFound) {
-                            return founds;
+                        var found = new Found(row, col, pattern.length());
+                        if (!listener.apply(found)) {
+                            return;
                         }
                         col += pattern.length();
                     }
@@ -70,13 +67,11 @@ public class CaseSensitiveSearch implements Search {
 
             }
         }
-        return founds;
     }
 
     @Override
-    public List<Found> searchDesc(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
+    public void searchDesc(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
 
-        List<Found> founds = new ArrayList<>();
         char last = pattern.charAt(pattern.length() - 1);
 
         for (int row = fromRow; row >= 0; row--) {
@@ -97,9 +92,9 @@ public class CaseSensitiveSearch implements Search {
                     for (int k = pattern.length() - 2; j > end && eq(cs.charAt(j), pattern.charAt(k)); j--, k--) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new Found(row, col - (pattern.length() - 1), pattern.length()));
-                        if (founds.size() >= maxFound) {
-                            return founds;
+                        var found = new Found(row, col - (pattern.length() - 1), pattern.length());
+                        if (!listener.apply(found)) {
+                            return;
                         }
                         col -= pattern.length();
                     }
@@ -107,7 +102,6 @@ public class CaseSensitiveSearch implements Search {
                 }
             }
         }
-        return founds;
     }
 
     private static boolean eq(char ch1, char ch2) {

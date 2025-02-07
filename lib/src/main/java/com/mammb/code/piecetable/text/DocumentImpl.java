@@ -24,6 +24,7 @@ import com.mammb.code.piecetable.RowEnding;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -181,12 +182,16 @@ public class DocumentImpl implements Document {
 
     @Override
     public List<Found> findAll(CharSequence cs) {
-        return new NaiveSearch(this).search(cs, 0, 0, Short.MAX_VALUE);
+        List<Found> founds = new ArrayList<>();
+        new NaiveSearch(this).search(cs, 0, 0, founds::add);
+        return founds;
     }
 
     @Override
     public Optional<Found> findNext(CharSequence cs, int row, int col) {
-        return new NaiveSearch(this).search(cs, row, col, 1).stream().findFirst();
+        List<Found> founds = new ArrayList<>();
+        new NaiveSearch(this).search(cs, row, col, f -> { founds.add(f); return false; });
+        return founds.stream().findFirst();
     }
 
     @Override

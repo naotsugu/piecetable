@@ -17,8 +17,6 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.Found;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The naive search.
@@ -39,12 +37,11 @@ public class NaiveSearch implements Search {
     }
 
     @Override
-    public List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
+    public void search(CharSequence cs, int fromRow, int fromCol, FoundListener listener) {
 
         byte[] pattern = cs.toString().getBytes(doc.charset());
         int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;
 
-        List<Found> founds = new ArrayList<>();
         byte first = pattern[0];
         int rows = doc.rows();
 
@@ -64,27 +61,23 @@ public class NaiveSearch implements Search {
                     for (int k = 1; j < end && value[j] == pattern[k]; j++, k++) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new Found(row,
-                            new String(value, 0, col, doc.charset()).length(),
-                            cs.length()));
-                        if (founds.size() >= maxFound) {
-                            return founds;
+                        var found = new Found(row, new String(value, 0, col, doc.charset()).length(), cs.length());
+                        if (!listener.apply(found)) {
+                            return;
                         }
                         col += pattern.length;
                     }
                 }
             }
         }
-        return founds;
     }
 
     @Override
-    public List<Found> searchDesc(CharSequence cs, int fromRow, int fromCol, int maxFound) {
+    public void searchDesc(CharSequence cs, int fromRow, int fromCol, FoundListener listener) {
 
         byte[] pattern = cs.toString().getBytes(doc.charset());
         int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;
 
-        List<Found> founds = new ArrayList<>();
         byte last = pattern[pattern.length - 1];
 
         for (int row = fromRow; row >= 0; row--) {
@@ -106,11 +99,9 @@ public class NaiveSearch implements Search {
                     if (j == end) {
                         // found whole charSequence
                         int c = col - (pattern.length - 1);
-                        founds.add(new Found(row,
-                            new String(value, 0, c, doc.charset()).length(),
-                            cs.length()));
-                        if (founds.size() >= maxFound) {
-                            return founds;
+                        var found = new Found(row, new String(value, 0, c, doc.charset()).length(), cs.length());
+                        if (!listener.apply(found)) {
+                            return;
                         }
                         col -= pattern.length;
                     }
@@ -118,7 +109,6 @@ public class NaiveSearch implements Search {
                 }
             }
         }
-        return founds;
     }
 
 }

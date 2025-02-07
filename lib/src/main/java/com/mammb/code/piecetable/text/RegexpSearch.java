@@ -40,10 +40,9 @@ public class RegexpSearch implements Search {
     }
 
     @Override
-    public List<Found> search(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
+    public void search(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
 
         Pattern p = Pattern.compile(pattern.toString());
-        List<Found> founds = new ArrayList<>();
 
         for (int row = fromRow; row < doc.rows(); row++) {
 
@@ -53,21 +52,18 @@ public class RegexpSearch implements Search {
                 if (row == fromRow && m.start() < fromCol) {
                     continue;
                 }
-                founds.add(new Found(row, m.start(), m.start() - m.end()));
-
-                if (founds.size() >= maxFound) {
-                    return founds;
+                var found = new Found(row, m.start(), m.start() - m.end());
+                if (!listener.apply(found)) {
+                    return;
                 }
             }
         }
-        return founds;
     }
 
     @Override
-    public List<Found> searchDesc(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
+    public void searchDesc(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
 
         Pattern p = Pattern.compile(pattern.toString());
-        List<Found> founds = new ArrayList<>();
 
         for (int row = fromRow; row >= 0; row--) {
 
@@ -82,13 +78,11 @@ public class RegexpSearch implements Search {
             }
 
             for (Found found : rowFounds) {
-                founds.add(found);
-                if (founds.size() >= maxFound) {
-                    return founds;
+                if (!listener.apply(found)) {
+                    return;
                 }
             }
         }
-        return founds;
     }
 
 }
