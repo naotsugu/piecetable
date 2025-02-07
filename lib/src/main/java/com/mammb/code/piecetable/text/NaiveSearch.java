@@ -16,14 +16,16 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Found;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The naive search.
+ * Bypass String instantiation by comparing them as a byte array.
  * @author Naotsugu Kobayashi
  */
-public class NaiveSearch {
+public class NaiveSearch implements Search {
 
     /** The source document. */
     private final Document doc;
@@ -36,18 +38,13 @@ public class NaiveSearch {
         this.doc = doc;
     }
 
-    /**
-     * Search pattern.
-     * Bypass String instantiation by comparing them as a byte array.
-     * @param pattern the pattern
-     * @param fromRow from row
-     * @param fromRawCol the byte position on the row
-     * @param maxFound limit of found
-     * @return the list of found
-     */
-    List<FoundByte> search(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
+    @Override
+    public List<Found> search(CharSequence cs, int fromRow, int fromCol, int maxFound) {
 
-        List<FoundByte> founds = new ArrayList<>();
+        byte[] pattern = cs.toString().getBytes(doc.charset());
+        int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;
+
+        List<Found> founds = new ArrayList<>();
         byte first = pattern[0];
         int rows = doc.rows();
 
@@ -67,7 +64,9 @@ public class NaiveSearch {
                     for (int k = 1; j < end && value[j] == pattern[k]; j++, k++) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new FoundByte(row, col, pattern.length));
+                        founds.add(new Found(row,
+                            new String(value, 0, col, doc.charset()).length(),
+                            cs.length()));
                         if (founds.size() >= maxFound) {
                             return founds;
                         }
@@ -79,18 +78,13 @@ public class NaiveSearch {
         return founds;
     }
 
-    /**
-     * Search pattern descending.
-     * Bypass String instantiation by comparing them as a byte array.
-     * @param pattern the pattern
-     * @param fromRow from row
-     * @param fromRawCol the byte position on the row
-     * @param maxFound limit of found
-     * @return the list of found
-     */
-    List<FoundByte> searchDesc(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
+    @Override
+    public List<Found> searchDesc(CharSequence cs, int fromRow, int fromCol, int maxFound) {
 
-        List<FoundByte> founds = new ArrayList<>();
+        byte[] pattern = cs.toString().getBytes(doc.charset());
+        int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;
+
+        List<Found> founds = new ArrayList<>();
         byte last = pattern[pattern.length - 1];
 
         for (int row = fromRow; row >= 0; row--) {
@@ -111,7 +105,10 @@ public class NaiveSearch {
                     for (int k = pattern.length - 2; j > end && value[j] == pattern[k]; j--, k--) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new FoundByte(row, col - (pattern.length - 1), pattern.length));
+                        int c = col - (pattern.length - 1);
+                        founds.add(new Found(row,
+                            new String(value, 0, c, doc.charset()).length(),
+                            cs.length()));
                         if (founds.size() >= maxFound) {
                             return founds;
                         }
@@ -123,13 +120,5 @@ public class NaiveSearch {
         }
         return founds;
     }
-
-    /**
-     * Found byte
-     * @param row the number of row
-     * @param rawCol the byte position on the row
-     * @param rawLen the byte length
-     */
-    record FoundByte(int row, int rawCol, int rawLen) { }
 
 }

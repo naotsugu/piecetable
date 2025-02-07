@@ -24,7 +24,7 @@ import java.util.List;
  * The case-sensitive search.
  * @author Naotsugu Kobayashi
  */
-public class CaseSensitiveSearch {
+public class CaseSensitiveSearch implements Search {
 
     /** The source document. */
     private final Document doc;
@@ -37,18 +37,10 @@ public class CaseSensitiveSearch {
         this.doc = doc;
     }
 
-    /**
-     * Search pattern.
-     * @param pattern the pattern
-     * @param fromRow from row
-     * @param fromCol from column
-     * @param maxFound limit of found
-     * @return the list of found
-     */
-    List<Found> search(String pattern, int fromRow, int fromCol, int maxFound) {
+    @Override
+    public List<Found> search(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
 
         List<Found> founds = new ArrayList<>();
-        pattern = pattern.toLowerCase();
         char first = pattern.charAt(0);
 
         for (int row = fromRow; row < doc.rows(); row++) {
@@ -58,14 +50,14 @@ public class CaseSensitiveSearch {
             int from = (row == fromRow) ? fromCol : 0;
             for (int col = from; col <= max; col++) {
                 // look for first character
-                if (Character.toLowerCase(cs.charAt(col)) != first) {
-                    while (++col <= max && Character.toLowerCase(cs.charAt(col)) != first) ;
+                if (!eq(cs.charAt(col), first)) {
+                    while (++col <= max && !eq(cs.charAt(col), first)) ;
                 }
                 // found first character, now look at the rest of value
                 if (col <= max) {
                     int j = col + 1;
                     int end = j + (pattern.length() - 1);
-                    for (int k = 1; j < end && Character.toLowerCase(cs.charAt(j)) == pattern.charAt(k); j++, k++) ;
+                    for (int k = 1; j < end && eq(cs.charAt(j), pattern.charAt(k)); j++, k++) ;
                     if (j == end) {
                         // found whole charSequence
                         founds.add(new Found(row, col, pattern.length()));
@@ -78,22 +70,13 @@ public class CaseSensitiveSearch {
 
             }
         }
-
         return founds;
     }
 
-    /**
-     * Search pattern descending.
-     * @param pattern the pattern
-     * @param fromRow from row
-     * @param fromCol from column
-     * @param maxFound limit of found
-     * @return the list of found
-     */
-    List<Found> searchDesc(String pattern, int fromRow, int fromCol, int maxFound) {
+    @Override
+    public List<Found> searchDesc(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
 
         List<Found> founds = new ArrayList<>();
-        pattern = pattern.toLowerCase();
         char last = pattern.charAt(pattern.length() - 1);
 
         for (int row = fromRow; row >= 0; row--) {
@@ -104,14 +87,14 @@ public class CaseSensitiveSearch {
                 : cs.length() - pattern.length();
             for (int col = from; col >= 0; col--) {
                 // look for last character
-                if (Character.toLowerCase(cs.charAt(col)) != last) {
-                    while (--col >= min && Character.toLowerCase(cs.charAt(col)) != last) ;
+                if (!eq(cs.charAt(col), last)) {
+                    while (--col >= min && !eq(cs.charAt(col), last)) ;
                 }
                 // found last character, now look at the rest of value
                 if (col >= min) {
                     int j = col - 1;
                     int end = j - (pattern.length() - 1);
-                    for (int k = pattern.length() - 2; j > end && Character.toLowerCase(cs.charAt(j)) == pattern.charAt(k); j--, k--) ;
+                    for (int k = pattern.length() - 2; j > end && eq(cs.charAt(j), pattern.charAt(k)); j--, k--) ;
                     if (j == end) {
                         // found whole charSequence
                         founds.add(new Found(row, col - (pattern.length() - 1), pattern.length()));
@@ -125,6 +108,10 @@ public class CaseSensitiveSearch {
             }
         }
         return founds;
+    }
+
+    private static boolean eq(char ch1, char ch2) {
+        return Character.toLowerCase(ch1) == Character.toLowerCase(ch2);
     }
 
 }

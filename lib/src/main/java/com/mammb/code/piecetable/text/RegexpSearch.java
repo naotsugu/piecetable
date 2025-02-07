@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * The regexp search.
  * @author Naotsugu Kobayashi
  */
-public class RegexpSearch {
+public class RegexpSearch implements Search {
 
     /** The source document. */
     private final Document doc;
@@ -39,17 +39,10 @@ public class RegexpSearch {
         this.doc = doc;
     }
 
-    /**
-     * Search pattern.
-     * @param pattern the pattern
-     * @param fromRow from row
-     * @param fromCol from column
-     * @param maxFound limit of found
-     * @return the list of found
-     */
-    List<Found> search(String pattern, int fromRow, int fromCol, int maxFound) {
+    @Override
+    public List<Found> search(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
 
-        Pattern p = Pattern.compile(pattern);
+        Pattern p = Pattern.compile(pattern.toString());
         List<Found> founds = new ArrayList<>();
 
         for (int row = fromRow; row < doc.rows(); row++) {
@@ -70,17 +63,10 @@ public class RegexpSearch {
         return founds;
     }
 
-    /**
-     * Search pattern descending.
-     * @param pattern the pattern
-     * @param fromRow from row
-     * @param fromCol from column
-     * @param maxFound limit of found
-     * @return the list of found
-     */
-    List<Found> searchDesc(String pattern, int fromRow, int fromCol, int maxFound) {
+    @Override
+    public List<Found> searchDesc(CharSequence pattern, int fromRow, int fromCol, int maxFound) {
 
-        Pattern p = Pattern.compile(pattern);
+        Pattern p = Pattern.compile(pattern.toString());
         List<Found> founds = new ArrayList<>();
 
         for (int row = fromRow; row >= 0; row--) {

@@ -181,17 +181,12 @@ public class DocumentImpl implements Document {
 
     @Override
     public List<Found> findAll(CharSequence cs) {
-        byte[] pattern = cs.toString().getBytes(charset);
-        return new NaiveSearch(this).search(pattern, 0, 0, Short.MAX_VALUE).stream()
-            .map(f -> new Found(f.row(), getText(f.row(), f.rawCol(), f.rawLen()).length(), cs.length())).toList();
+        return new NaiveSearch(this).search(cs, 0, 0, Short.MAX_VALUE);
     }
 
     @Override
     public Optional<Found> findNext(CharSequence cs, int row, int col) {
-        byte[] pattern = cs.toString().getBytes(charset);
-        col = getText(row).toString().substring(0, col).getBytes().length;
-        return new NaiveSearch(this).search(pattern, row, col, 1).stream().findFirst()
-            .map(f -> new Found(f.row(), getText(f.row(), f.rawCol(), f.rawLen()).length(), cs.length()));
+        return new NaiveSearch(this).search(cs, row, col, 1).stream().findFirst();
     }
 
     @Override
