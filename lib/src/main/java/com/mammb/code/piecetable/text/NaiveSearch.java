@@ -54,8 +54,8 @@ public class NaiveSearch {
         for (int row = fromRow; row < rows; row++) {
             byte[] value = doc.get(row);
             int max = value.length - pattern.length;
-            int colOffset = (row == fromRow) ? fromRawCol : 0;
-            for (int col = colOffset; col <= max; col++) {
+            int from = (row == fromRow) ? fromRawCol : 0;
+            for (int col = from; col <= max; col++) {
                 // look for first character
                 if (value[col] != first) {
                     while (++col <= max && value[col] != first) ;

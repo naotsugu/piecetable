@@ -21,55 +21,58 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test of {@link NaiveSearch}.
+ * Test of {@link RegexpSearch}.
  * @author Naotsugu Kobayashi
  */
-class NaiveSearchTest {
+class RegexpSearchTest {
 
     @Test
     void search() {
+
         var doc = Document.of();
         doc.insert(0, 0, "abc12345678\n");
         doc.insert(1, 0, "12345abc678\n");
         doc.insert(2, 0, "abc45678abc\n");
 
-        var founds = new NaiveSearch(doc).search("abc".getBytes(), 0, 0, Integer.MAX_VALUE);
+        var founds = new RegexpSearch(doc).search("a.c", 0, 0, Integer.MAX_VALUE);
         assertEquals(4, founds.size());
 
         assertEquals(0, founds.get(0).row());
-        assertEquals(0, founds.get(0).rawCol());
+        assertEquals(0, founds.get(0).col());
 
         assertEquals(1, founds.get(1).row());
-        assertEquals(5, founds.get(1).rawCol());
+        assertEquals(5, founds.get(1).col());
 
         assertEquals(2, founds.get(2).row());
-        assertEquals(0, founds.get(2).rawCol());
+        assertEquals(0, founds.get(2).col());
 
         assertEquals(2, founds.get(3).row());
-        assertEquals(8, founds.get(3).rawCol());
+        assertEquals(8, founds.get(3).col());
+
     }
 
     @Test
     void searchDesc() {
+
         var doc = Document.of();
         doc.insert(0, 0, "abc12345678\n");
         doc.insert(1, 0, "12345abc678\n");
         doc.insert(2, 0, "abc45678abc\n");
 
-        var founds = new NaiveSearch(doc).searchDesc("abc".getBytes(), 2, 12, Integer.MAX_VALUE);
+        var founds = new RegexpSearch(doc).searchDesc("a.c", 2, 12, Integer.MAX_VALUE);
         assertEquals(4, founds.size());
 
         assertEquals(2, founds.get(0).row());
-        assertEquals(8, founds.get(0).rawCol());
+        assertEquals(8, founds.get(0).col());
 
         assertEquals(2, founds.get(1).row());
-        assertEquals(0, founds.get(1).rawCol());
+        assertEquals(0, founds.get(1).col());
 
         assertEquals(1, founds.get(2).row());
-        assertEquals(5, founds.get(2).rawCol());
+        assertEquals(5, founds.get(2).col());
 
         assertEquals(0, founds.get(3).row());
-        assertEquals(0, founds.get(3).rawCol());
+        assertEquals(0, founds.get(3).col());
 
     }
 
