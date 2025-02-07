@@ -16,14 +16,15 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Found;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The naive search.
+ * The case-sensitive search.
  * @author Naotsugu Kobayashi
  */
-public class NaiveSearch {
+public class CaseSensitiveSearch {
 
     /** The source document. */
     private final Document doc;
@@ -32,90 +33,92 @@ public class NaiveSearch {
      * Constructor.
      * @param doc the source document
      */
-    public NaiveSearch(Document doc) {
+    public CaseSensitiveSearch(Document doc) {
         this.doc = doc;
     }
 
     /**
      * Search pattern.
-     * Bypass String instantiation by comparing them as a byte array.
      * @param pattern the pattern
      * @param fromRow from row
-     * @param fromRawCol the byte position on the row
+     * @param fromCol from column
      * @param maxFound limit of found
      * @return the list of found
      */
-    List<FoundByte> search(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
+    List<Found> search(String pattern, int fromRow, int fromCol, int maxFound) {
 
-        List<FoundByte> founds = new ArrayList<>();
-        byte first = pattern[0];
-        int rows = doc.rows();
+        List<Found> founds = new ArrayList<>();
+        pattern = pattern.toLowerCase();
+        char first = pattern.charAt(0);
 
-        for (int row = fromRow; row < rows; row++) {
-            byte[] value = doc.get(row);
-            int max = value.length - pattern.length;
-            int from = (row == fromRow) ? fromRawCol : 0;
+        for (int row = fromRow; row < doc.rows(); row++) {
+
+            CharSequence cs = doc.getText(row);
+            int max = cs.length() - pattern.length();
+            int from = (row == fromRow) ? fromCol : 0;
             for (int col = from; col <= max; col++) {
                 // look for first character
-                if (value[col] != first) {
-                    while (++col <= max && value[col] != first) ;
+                if (Character.toLowerCase(cs.charAt(col)) != first) {
+                    while (++col <= max && Character.toLowerCase(cs.charAt(col)) != first) ;
                 }
                 // found first character, now look at the rest of value
                 if (col <= max) {
                     int j = col + 1;
-                    int end = j + (pattern.length - 1);
-                    for (int k = 1; j < end && value[j] == pattern[k]; j++, k++) ;
+                    int end = j + (pattern.length() - 1);
+                    for (int k = 1; j < end && Character.toLowerCase(cs.charAt(j)) == pattern.charAt(k); j++, k++) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new FoundByte(row, col, pattern.length));
+                        founds.add(new Found(row, col, pattern.length()));
                         if (founds.size() >= maxFound) {
                             return founds;
                         }
-                        col += pattern.length;
+                        col += pattern.length();
                     }
                 }
+
             }
         }
+
         return founds;
     }
 
     /**
      * Search pattern descending.
-     * Bypass String instantiation by comparing them as a byte array.
      * @param pattern the pattern
      * @param fromRow from row
-     * @param fromRawCol the byte position on the row
+     * @param fromCol from column
      * @param maxFound limit of found
      * @return the list of found
      */
-    List<FoundByte> searchDesc(byte[] pattern, int fromRow, int fromRawCol, int maxFound) {
+    List<Found> searchDesc(String pattern, int fromRow, int fromCol, int maxFound) {
 
-        List<FoundByte> founds = new ArrayList<>();
-        byte last = pattern[pattern.length - 1];
+        List<Found> founds = new ArrayList<>();
+        pattern = pattern.toLowerCase();
+        char last = pattern.charAt(pattern.length() - 1);
 
         for (int row = fromRow; row >= 0; row--) {
-            byte[] value = doc.get(row);
-            int min = pattern.length - 1;
+            CharSequence cs = doc.getText(row);
+            int min = pattern.length() - 1;
             int from = (row == fromRow)
-                ? fromRawCol - 1
-                : value.length - pattern.length;
+                ? fromCol - 1
+                : cs.length() - pattern.length();
             for (int col = from; col >= 0; col--) {
                 // look for last character
-                if (value[col] != last) {
-                    while (--col >= min && value[col] != last) ;
+                if (Character.toLowerCase(cs.charAt(col)) != last) {
+                    while (--col >= min && Character.toLowerCase(cs.charAt(col)) != last) ;
                 }
                 // found last character, now look at the rest of value
                 if (col >= min) {
                     int j = col - 1;
-                    int end = j - (pattern.length - 1);
-                    for (int k = pattern.length - 2; j > end && value[j] == pattern[k]; j--, k--) ;
+                    int end = j - (pattern.length() - 1);
+                    for (int k = pattern.length() - 2; j > end && Character.toLowerCase(cs.charAt(j)) == pattern.charAt(k); j--, k--) ;
                     if (j == end) {
                         // found whole charSequence
-                        founds.add(new FoundByte(row, col - (pattern.length - 1), pattern.length));
+                        founds.add(new Found(row, col - (pattern.length() - 1), pattern.length()));
                         if (founds.size() >= maxFound) {
                             return founds;
                         }
-                        col -= pattern.length;
+                        col -= pattern.length();
                     }
 
                 }
@@ -123,13 +126,5 @@ public class NaiveSearch {
         }
         return founds;
     }
-
-    /**
-     * Found byte
-     * @param row the number of row
-     * @param rawCol the byte position on the row
-     * @param rawLen the byte length
-     */
-    record FoundByte(int row, int rawCol, int rawLen) { }
 
 }
