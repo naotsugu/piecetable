@@ -40,6 +40,8 @@ public class NaiveSearch implements Search {
     @Override
     public void search(CharSequence cs, int fromRow, int fromCol, FoundListener listener) {
 
+        if (cs == null || cs.isEmpty()) return;
+
         byte[] pattern = cs.toString().getBytes(doc.charset());
         int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;
 
@@ -75,6 +77,8 @@ public class NaiveSearch implements Search {
 
     @Override
     public void searchDesc(CharSequence cs, int fromRow, int fromCol, FoundListener listener) {
+
+        if (cs == null || cs.isEmpty()) return;
 
         byte[] pattern = cs.toString().getBytes(doc.charset());
         int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;

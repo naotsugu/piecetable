@@ -16,7 +16,6 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Findable;
 import com.mammb.code.piecetable.Findable.Found;
 import com.mammb.code.piecetable.Findable.FoundListener;
 
@@ -39,6 +38,8 @@ public class CaseSensitiveSearch implements Search {
 
     @Override
     public void search(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
+
+        if (pattern == null || pattern.isEmpty()) return;
 
         char first = pattern.charAt(0);
 
@@ -73,6 +74,8 @@ public class CaseSensitiveSearch implements Search {
 
     @Override
     public void searchDesc(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
+
+        if (pattern == null || pattern.isEmpty()) return;
 
         char last = pattern.charAt(pattern.length() - 1);
 

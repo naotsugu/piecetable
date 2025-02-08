@@ -43,6 +43,8 @@ public class RegexpSearch implements Search {
     @Override
     public void search(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
 
+        if (pattern == null || pattern.isEmpty()) return;
+
         Pattern p = Pattern.compile(pattern.toString());
 
         for (int row = fromRow; row < doc.rows(); row++) {
@@ -63,6 +65,8 @@ public class RegexpSearch implements Search {
 
     @Override
     public void searchDesc(CharSequence pattern, int fromRow, int fromCol, FoundListener listener) {
+
+        if (pattern == null || pattern.isEmpty()) return;
 
         Pattern p = Pattern.compile(pattern.toString());
 

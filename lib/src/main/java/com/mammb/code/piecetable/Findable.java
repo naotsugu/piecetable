@@ -17,7 +17,6 @@ package com.mammb.code.piecetable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * The findable.
