@@ -503,37 +503,37 @@ public class TextEditImpl implements TextEdit {
     @Override
     public List<Found> findAll(CharSequence cs, boolean caseSensitive) {
         flush();
-        return findAll(cs, caseSensitive);
+        return doc.findAll(cs, caseSensitive);
     }
 
     @Override
     public List<Found> findAll(CharSequence regex) {
         flush();
-        return findAll(regex);
+        return doc.findAll(regex);
     }
 
     @Override
     public Optional<Found> find(CharSequence cs, int row, int col, boolean forward, boolean caseSensitive) {
         flush();
-        return find(cs, row, col, forward, caseSensitive);
+        return doc.find(cs, row, col, forward, caseSensitive);
     }
 
     @Override
     public Optional<Found> find(CharSequence regex, int row, int col, boolean forward) {
         flush();
-        return find(regex, row, col, forward);
+        return doc.find(regex, row, col, forward);
     }
 
     @Override
     public void find(CharSequence cs, boolean caseSensitive, int row, int col, boolean forward, FoundListener listener) {
         flush();
-        find(cs, caseSensitive, row, col, forward, listener);
+        doc.find(cs, caseSensitive, row, col, forward, listener);
     }
 
     @Override
     public void find(CharSequence regex, int row, int col, boolean forward, FoundListener listener) {
         flush();
-        find(regex, row, col, forward, listener);
+        doc.find(regex, row, col, forward, listener);
     }
 
     Edit.Ins insertEdit(int row, int col, String text, long occurredOn) {
