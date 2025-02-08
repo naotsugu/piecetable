@@ -17,7 +17,6 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.RowEnding;
@@ -28,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 /**
  * The document implementation.
@@ -181,17 +182,43 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public List<Found> findAll(CharSequence cs) {
-        List<Found> founds = new ArrayList<>();
-        new NaiveSearch(this).search(cs, 0, 0, founds::add);
-        return founds;
+    public List<Found> findAll(CharSequence cs, boolean caseSensitive) {
+        return findAll(cs, caseSensitive ? Search.caseSensitiveOf(this) : Search.of(this));
     }
 
     @Override
-    public Optional<Found> findNext(CharSequence cs, int row, int col) {
-        List<Found> founds = new ArrayList<>();
-        new NaiveSearch(this).search(cs, row, col, f -> { founds.add(f); return false; });
-        return founds.stream().findFirst();
+    public List<Found> findAll(CharSequence regex) {
+        return findAll(regex, Search.regexpOf(this));
+    }
+
+    @Override
+    public Optional<Found> find(CharSequence cs, int row, int col, boolean forward, boolean caseSensitive) {
+        return find(cs, row, col, forward, caseSensitive ? Search.caseSensitiveOf(this) : Search.of(this));
+    }
+
+    @Override
+    public Optional<Found> find(CharSequence regex, int row, int col, boolean forward) {
+        return find(regex, row, col, forward, Search.regexpOf(this));
+    }
+
+    @Override
+    public void find(CharSequence cs, boolean caseSensitive, int row, int col, boolean forward, FoundListener listener) {
+        Search search = caseSensitive ? Search.caseSensitiveOf(this) : Search.of(this);
+        if (forward) {
+            search.search(cs, row, col, listener);
+        } else {
+            search.searchDesc(cs, row, col, listener);
+        }
+    }
+
+    @Override
+    public void find(CharSequence regex, int row, int col, boolean forward, FoundListener listener) {
+        Search search = Search.regexpOf(this);
+        if (forward) {
+            search.search(regex, row, col, listener);
+        } else {
+            search.searchDesc(regex, row, col, listener);
+        }
     }
 
     @Override
@@ -244,6 +271,24 @@ public class DocumentImpl implements Document {
     public void save(Path path) {
         pt.save(path);
         this.path = path;
+    }
+
+    // ------------------------------------------------------------------------
+
+    private List<Found> findAll(CharSequence pattern, Search search) {
+        List<Found> founds = new ArrayList<>();
+        search.search(pattern, 0, 0, founds::add);
+        return founds;
+    }
+
+    private Optional<Found> find(CharSequence pattern, int row, int col, boolean forward, Search search) {
+        AtomicReference<Found> found = new AtomicReference<>();
+        if (forward) {
+            search.search(pattern, row, col, f -> { found.set(f); return false; });
+        } else {
+            search.searchDesc(pattern, row, col, f -> { found.set(f); return false; });
+        }
+        return Optional.ofNullable(found.get());
     }
 
 }

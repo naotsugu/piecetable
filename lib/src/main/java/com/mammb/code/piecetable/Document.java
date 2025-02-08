@@ -18,8 +18,6 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * The document.
@@ -27,7 +25,7 @@ import java.util.Optional;
  * The document manipulation by line number and column number.
  * @author Naotsugu Kobayashi
  */
-public interface Document {
+public interface Document extends Findable {
 
     /**
      * Inserts the char sequence into this {@code Document}.
@@ -96,22 +94,6 @@ public interface Document {
      * @return the char sequence
      */
     CharSequence getText(int row, int rawCol, int rawLen);
-
-    /**
-     * Searches for the specified char sequence.
-     * @param cs the specified char sequence
-     * @return found list
-     */
-    List<Found> findAll(CharSequence cs);
-
-    /**
-     * Searches for the specified char sequence.
-     * @param cs the specified char sequence
-     * @param row the number of start row(zero origin)
-     * @param col the start byte position on the row
-     * @return found
-     */
-    Optional<Found> findNext(CharSequence cs, int row, int col);
 
     /**
      * Set readonly.

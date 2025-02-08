@@ -18,7 +18,6 @@ package com.mammb.code.piecetable.edit;
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.Range;
 import com.mammb.code.piecetable.RowEnding;
-import com.mammb.code.piecetable.Found;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.TextEdit;
 import java.nio.charset.Charset;
@@ -465,18 +464,6 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public List<Found> findAll(String text) {
-        flush();
-        return doc.findAll(text);
-    }
-
-    @Override
-    public Optional<Found> findNext(String text, int row, int col) {
-        flush();
-        return doc.findNext(text, row, col);
-    }
-
-    @Override
     public int rows() {
         return doc.rows();
     }
@@ -511,6 +498,42 @@ public class TextEditImpl implements TextEdit {
     public void save(Path path) {
         flush();
         doc.save(path);
+    }
+
+    @Override
+    public List<Found> findAll(CharSequence cs, boolean caseSensitive) {
+        flush();
+        return findAll(cs, caseSensitive);
+    }
+
+    @Override
+    public List<Found> findAll(CharSequence regex) {
+        flush();
+        return findAll(regex);
+    }
+
+    @Override
+    public Optional<Found> find(CharSequence cs, int row, int col, boolean forward, boolean caseSensitive) {
+        flush();
+        return find(cs, row, col, forward, caseSensitive);
+    }
+
+    @Override
+    public Optional<Found> find(CharSequence regex, int row, int col, boolean forward) {
+        flush();
+        return find(regex, row, col, forward);
+    }
+
+    @Override
+    public void find(CharSequence cs, boolean caseSensitive, int row, int col, boolean forward, FoundListener listener) {
+        flush();
+        find(cs, caseSensitive, row, col, forward, listener);
+    }
+
+    @Override
+    public void find(CharSequence regex, int row, int col, boolean forward, FoundListener listener) {
+        flush();
+        find(regex, row, col, forward, listener);
     }
 
     Edit.Ins insertEdit(int row, int col, String text, long occurredOn) {

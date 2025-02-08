@@ -28,7 +28,7 @@ import java.util.function.Function;
  * Provides an abstraction of text editing.
  * @author Naotsugu Kobayashi
  */
-public interface TextEdit {
+public interface TextEdit extends Findable {
 
     /**
      * Inserts the text into this {@code TextEdit}.
@@ -210,22 +210,6 @@ public interface TextEdit {
      * Clear undo/redo buffer.
      */
     void clear();
-
-    /**
-     * Searches for the specified char sequence.
-     * @param text the specified char sequence
-     * @return found list
-     */
-    List<Found> findAll(String text);
-
-    /**
-     * Searches for the specified char sequence.
-     * @param text the specified char sequence
-     * @param row the number of start row(zero origin)
-     * @param col the start byte position on the row
-     * @return found
-     */
-    Optional<Found> findNext(String text, int row, int col);
 
     /**
      * Get the row size.

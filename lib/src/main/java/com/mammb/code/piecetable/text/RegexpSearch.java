@@ -16,7 +16,8 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Found;
+import com.mammb.code.piecetable.Findable.Found;
+import com.mammb.code.piecetable.Findable.FoundListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

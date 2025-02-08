@@ -16,7 +16,7 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Found;
+import com.mammb.code.piecetable.Findable.Found;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

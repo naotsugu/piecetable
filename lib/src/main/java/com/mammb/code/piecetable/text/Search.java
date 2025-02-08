@@ -16,13 +16,13 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Found;
+import com.mammb.code.piecetable.Findable.FoundListener;
 
 /**
  * The search.
  * @author Naotsugu Kobayashi
  */
-public interface Search {
+interface Search {
 
     /**
      * Search pattern.
@@ -67,18 +67,6 @@ public interface Search {
      */
     static Search regexpOf(Document doc) {
         return new RegexpSearch(doc);
-    }
-
-    /**
-     * Found listener.
-     */
-    interface FoundListener {
-        /**
-         * Apply the found event.
-         * @param found the found
-         * @return {@code true}, if the current search can be continued
-         */
-        boolean apply(Found found);
     }
 
 }
