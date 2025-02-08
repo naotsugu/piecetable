@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 /**
  * The document implementation.
@@ -277,16 +276,24 @@ public class DocumentImpl implements Document {
 
     private List<Found> findAll(CharSequence pattern, Search search) {
         List<Found> founds = new ArrayList<>();
-        search.search(pattern, 0, 0, founds::add);
+        FoundListener listener = f -> {
+            founds.add(f);
+            return founds.size() < Short.MAX_VALUE;
+        };
+        search.search(pattern, 0, 0, listener);
         return founds;
     }
 
     private Optional<Found> find(CharSequence pattern, int row, int col, boolean forward, Search search) {
         AtomicReference<Found> found = new AtomicReference<>();
+        FoundListener listener = f -> {
+            found.set(f);
+            return false;
+        };
         if (forward) {
-            search.search(pattern, row, col, f -> { found.set(f); return false; });
+            search.search(pattern, row, col, listener);
         } else {
-            search.searchDesc(pattern, row, col, f -> { found.set(f); return false; });
+            search.searchDesc(pattern, row, col, listener);
         }
         return Optional.ofNullable(found.get());
     }
