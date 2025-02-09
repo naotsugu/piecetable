@@ -29,7 +29,7 @@ java {
     withJavadocJar()
 }
 
-version = "0.5.9"
+version = "0.5.10"
 group = "com.mammb"
 base.archivesName.set("piecetable")
 
