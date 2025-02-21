@@ -55,7 +55,7 @@ public class RegexpSearch implements Search {
                 if (row == fromRow && m.start() < fromCol) {
                     continue;
                 }
-                var found = new Found(row, m.start(), m.start() - m.end());
+                var found = new Found(row, m.start(), m.end() - m.start());
                 if (!listener.apply(found)) {
                     return;
                 }
@@ -79,7 +79,7 @@ public class RegexpSearch implements Search {
                 if (row == fromRow && m.start() >= fromCol) {
                     break;
                 }
-                rowFounds.addFirst(new Found(row, m.start(), m.start() - m.end()));
+                rowFounds.addFirst(new Found(row, m.start(), m.end() - m.start()));
             }
 
             for (Found found : rowFounds) {
