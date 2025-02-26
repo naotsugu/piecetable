@@ -31,7 +31,7 @@ import java.util.Arrays;
 public class ChannelBuffer implements Buffer, Closeable {
 
     /** The size of buffer. */
-    private static final short PREF_BUF_SIZE = 1024 * 8;
+    private static final short PREF_BUF_SIZE = Short.MAX_VALUE;
 
     /** The empty byte array. */
     private static final byte[] EMPTY = {};
