@@ -25,10 +25,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test of {@link CaseSensitiveSearch}.
+ * Test of {@link CaseInsensitiveSearch}.
  * @author Naotsugu Kobayashi
  */
-class CaseSensitiveSearchTest {
+class CaseInsensitiveSearchTest {
 
     @Test
     void search() {
@@ -39,7 +39,7 @@ class CaseSensitiveSearchTest {
         doc.insert(2, 0, "aBc45678aBc\n");
 
         List<Found> founds = new ArrayList<>();
-        new CaseSensitiveSearch(doc).search("AbC", 0, 0, founds::add);
+        new CaseInsensitiveSearch(doc).search("AbC", 0, 0, founds::add);
         assertEquals(4, founds.size());
 
         assertEquals(0, founds.get(0).row());
@@ -65,7 +65,7 @@ class CaseSensitiveSearchTest {
         doc.insert(2, 0, "aBc45678aBc\n");
 
         List<Found> founds = new ArrayList<>();
-        new CaseSensitiveSearch(doc).searchDesc("AbC", 2, 12, founds::add);
+        new CaseInsensitiveSearch(doc).searchDesc("AbC", 2, 12, founds::add);
         assertEquals(4, founds.size());
 
         assertEquals(2, founds.get(0).row());

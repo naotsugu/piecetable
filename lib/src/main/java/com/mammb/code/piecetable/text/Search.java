@@ -43,7 +43,7 @@ interface Search {
     void searchDesc(CharSequence pattern, int fromRow, int fromCol, FoundListener listener);
 
     /**
-     * Create a case-insensitive search.
+     * Create a case-sensitive search.
      * @param doc the document
      * @return the search
      */
@@ -52,12 +52,12 @@ interface Search {
     }
 
     /**
-     * Create a case-sensitive search.
+     * Create a case-insensitive search.
      * @param doc the document
      * @return the search
      */
-    static Search caseSensitiveOf(Document doc) {
-        return new CaseSensitiveSearch(doc);
+    static Search caseInsensitiveOf(Document doc) {
+        return new CaseInsensitiveSearch(doc);
     }
 
     /**

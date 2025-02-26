@@ -20,10 +20,10 @@ import com.mammb.code.piecetable.Findable.Found;
 import com.mammb.code.piecetable.Findable.FoundListener;
 
 /**
- * The case-sensitive search.
+ * The case-insensitive search.
  * @author Naotsugu Kobayashi
  */
-public class CaseSensitiveSearch implements Search {
+public class CaseInsensitiveSearch implements Search {
 
     /** The source document. */
     private final Document doc;
@@ -32,7 +32,7 @@ public class CaseSensitiveSearch implements Search {
      * Constructor.
      * @param doc the source document
      */
-    public CaseSensitiveSearch(Document doc) {
+    public CaseInsensitiveSearch(Document doc) {
         this.doc = doc;
     }
 

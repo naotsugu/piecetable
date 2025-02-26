@@ -182,7 +182,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public List<Found> findAll(CharSequence cs, boolean caseSensitive) {
-        return findAll(cs, caseSensitive ? Search.caseSensitiveOf(this) : Search.of(this));
+        return findAll(cs, caseSensitive ? Search.caseInsensitiveOf(this) : Search.of(this));
     }
 
     @Override
@@ -192,7 +192,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public Optional<Found> find(CharSequence cs, int row, int col, boolean forward, boolean caseSensitive) {
-        return find(cs, row, col, forward, caseSensitive ? Search.caseSensitiveOf(this) : Search.of(this));
+        return find(cs, row, col, forward, caseSensitive ? Search.caseInsensitiveOf(this) : Search.of(this));
     }
 
     @Override
@@ -202,7 +202,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public void find(CharSequence cs, boolean caseSensitive, int row, int col, boolean forward, FoundListener listener) {
-        Search search = caseSensitive ? Search.caseSensitiveOf(this) : Search.of(this);
+        Search search = caseSensitive ? Search.caseInsensitiveOf(this) : Search.of(this);
         if (forward) {
             search.search(cs, row, col, listener);
         } else {
