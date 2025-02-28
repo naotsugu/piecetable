@@ -304,6 +304,7 @@ public class TextEditImpl implements TextEdit {
             int direction = rep.markPos().compareTo(rep.caretPos());
             String src = getText(rep.min(), rep.max());
             String dst = rep.convert().apply(src);
+            int dstByteLen = dst.getBytes(doc.charset()).length;
             int row = rep.caretPos().row();
             int col = rep.caretPos().col();
 
@@ -316,8 +317,8 @@ public class TextEditImpl implements TextEdit {
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.addAll(List.of(del, ins));
                 long serial = doc.serial(rep.caretPos());
-                serials.addFirst(new long[] { serial + dst.length(), serial });
-                shifts.addFirst(dst.length() - delText.length());
+                serials.addFirst(new long[] { serial + dstByteLen, serial });
+                shifts.addFirst(dstByteLen - delText.getBytes(doc.charset()).length);
             } else if (direction < 0) {
                 // backspace insert
                 // | a | b | c |
@@ -327,15 +328,15 @@ public class TextEditImpl implements TextEdit {
                 Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), dst, occurredOn);
                 unit.addAll(List.of(bs, ins));
                 long serial = doc.serial(rep.markPos());
-                serials.addFirst(new long[] { serial, serial + dst.length() });
-                shifts.addFirst(dst.length() - delText.length());
+                serials.addFirst(new long[] { serial, serial + dstByteLen });
+                shifts.addFirst(dstByteLen - delText.getBytes(doc.charset()).length);
             } else if (dst != null && !dst.isEmpty()) {
                 // insert only
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.add(ins);
-                long serial = doc.serial(rep.caretPos()) + dst.length();
+                long serial = doc.serial(rep.caretPos()) + dstByteLen;
                 serials.addFirst(new long[] { serial });
-                shifts.addFirst(dst.length());
+                shifts.addFirst(dstByteLen);
             } else {
                 // no operation
                 long serial = doc.serial(rep.caretPos());

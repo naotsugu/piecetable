@@ -22,7 +22,9 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * ByteChannel buffer.
@@ -31,7 +33,7 @@ import java.util.Arrays;
 public class ChannelBuffer implements Buffer, Closeable {
 
     /** The size of buffer. */
-    private static final short PREF_BUF_SIZE = Short.MAX_VALUE;
+    private static final short PREF_BUF_SIZE = 1024 * 8;
 
     /** The empty byte array. */
     private static final byte[] EMPTY = {};
@@ -124,7 +126,6 @@ public class ChannelBuffer implements Buffer, Closeable {
     public void close() throws IOException {
         ch.close();
     }
-
 
     /**
      * Fill buffer.
