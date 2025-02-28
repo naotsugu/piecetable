@@ -92,4 +92,15 @@ public record Piece(Buffer target, long bufIndex, long length) {
         return target.write(channel, buf, bufIndex, length);
     }
 
+
+    /**
+     * Reads the contents into the specified byte buffer.
+     * @param offset the offset
+     * @param buffer the specified byte buffer
+     * @return the Next read offset position. {@code -1} if there are no bytes to read in this buffer
+     */
+    long read(long offset, ByteBuffer buffer) {
+        return target.read(offset, buffer);
+    }
+
 }

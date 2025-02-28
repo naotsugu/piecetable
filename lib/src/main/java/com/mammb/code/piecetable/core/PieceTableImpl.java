@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 /**
  * The PieceTable implementation.
@@ -233,11 +234,24 @@ public class PieceTableImpl implements PieceTable {
 
     }
 
+    @Override
+    public void read(Function<ByteBuffer, Boolean> traverseCallback) {
+        var bb = ByteBuffer.allocateDirect(1024 * 64);
+        for (Piece piece : pieces) {
+            for (long i = 0; i >= 0;) {
+                i = piece.read(i, bb);
+                if (!traverseCallback.apply(bb)) {
+                    return;
+                }
+            }
+        }
+    }
+
     /**
      * Get the all bytes.
      * @return the all bytes
      */
-    public byte[] bytes() {
+    byte[] bytes() {
         ByteArray bytes = ByteArray.of();
         for (Piece piece : pieces) {
             bytes.add(piece.bytes());

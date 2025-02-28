@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -56,4 +57,19 @@ class PieceTableTest {
         var bytes = pt.get(0, (int) pt.length());
         assertEquals("a span of text", new String(bytes));
     }
+
+    @Test
+    void read() {
+        var pt = PieceTable.of();
+        pt.insert(0, "0123456789".getBytes());
+
+        pt.read(bb -> {
+            bb.flip();
+            byte[] bytes = new byte[10];
+            bb.get(bytes);
+            assertArrayEquals("0123456789".getBytes(), bytes);
+            return true;
+        });
+    }
+
 }

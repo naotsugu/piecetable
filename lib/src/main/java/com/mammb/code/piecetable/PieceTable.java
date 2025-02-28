@@ -16,7 +16,9 @@
 package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.core.PieceTableImpl;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 /**
  * PieceTable.
@@ -85,6 +87,12 @@ public interface PieceTable {
      * @param path the path
      */
     void save(Path path);
+
+    /**
+     * Reads the contents into the specified byte buffer callback.
+     * @param traverseCallback the specified byte buffer callback
+     */
+    void read(Function<ByteBuffer, Boolean> traverseCallback);
 
     /**
      * Get the default implementation of the piece table.
