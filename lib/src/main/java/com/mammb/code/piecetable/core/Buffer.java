@@ -49,6 +49,13 @@ public interface Buffer {
      */
     long length();
 
+    /**
+     * Reads the contents of this buffer into the specified byte buffer.
+     * @param offset the offset
+     * @param buffer the specified byte buffer
+     * @return the Next read offset position. {@code -1} if there are no bytes to read in this buffer
+     */
+    long read(long offset, ByteBuffer buffer);
 
     /**
      * Get whether this buffer is empty.
@@ -57,7 +64,6 @@ public interface Buffer {
     default boolean isEmpty() {
         return this.length() == 0;
     }
-
 
     /**
      * Write this buffer values to the specified channel.
@@ -113,6 +119,21 @@ public interface Buffer {
             @Override
             public long length() {
                 return elements.length;
+            }
+
+            @Override
+            public long read(long offset, ByteBuffer buffer) {
+                int index = Math.toIntExact(offset);
+                if (index >= elements.length) {
+                    return -1;
+                }
+                if (buffer.remaining() >= elements.length - index) {
+                    buffer.put(elements, index, elements.length - index);
+                    return -1;
+                }
+                int length = buffer.remaining();
+                buffer.put(elements, index, length);
+                return index + length;
             }
         };
     }

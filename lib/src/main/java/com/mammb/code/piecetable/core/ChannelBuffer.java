@@ -127,6 +127,16 @@ public class ChannelBuffer implements Buffer, Closeable {
         ch.close();
     }
 
+    @Override
+    public long read(long offset, ByteBuffer buffer) {
+        try {
+            int read = ch.position(offset).read(buffer);
+            return (read < 0) ? read : offset + read;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Fill buffer.
      * @param from start position of channel

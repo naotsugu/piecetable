@@ -15,6 +15,8 @@
  */
 package com.mammb.code.piecetable.core;
 
+import java.nio.ByteBuffer;
+
 /**
  * Appendable buffer.
  * @author Naotsugu Kobayashi
@@ -65,6 +67,11 @@ public interface AppendBuffer extends Buffer {
             @Override
             public long length() {
                 return elements.length();
+            }
+
+            @Override
+            public long read(long offset, ByteBuffer buffer) {
+                return elements.read(Math.toIntExact(offset), buffer);
             }
 
         };

@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable.core;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -150,6 +151,26 @@ public class ByteArray implements Serializable {
      */
     public int capacity() {
         return bytes.length;
+    }
+
+
+    /**
+     * Reads the contents of this buffer into the specified byte buffer.
+     * @param offset the offset
+     * @param buffer the specified byte buffer
+     * @return the Next read offset position. {@code -1} if there are no bytes to read in this buffer
+     */
+    public int read(int offset, ByteBuffer buffer) {
+        if (offset >= bytes.length) {
+            return -1;
+        }
+        if (buffer.remaining() >= bytes.length - offset) {
+            buffer.put(bytes, offset, bytes.length - offset);
+            return -1;
+        }
+        int length = buffer.remaining();
+        buffer.put(bytes, offset, length);
+        return offset + length;
     }
 
 

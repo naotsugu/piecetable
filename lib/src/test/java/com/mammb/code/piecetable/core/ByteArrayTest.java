@@ -17,6 +17,8 @@ package com.mammb.code.piecetable.core;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.ByteBuffer;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Naotsugu Kobayashi
  */
 class ByteArrayTest {
+
     @Test
     void test() {
         var b = ByteArray.of();
@@ -56,6 +59,31 @@ class ByteArrayTest {
         assertEquals(0, b.capacity());
         assertArrayEquals(new byte[]{}, b.get());
 
+    }
+
+    @Test
+    void read() {
+        var b = ByteArray.of(new byte[] { 0, 1, 2, 3, 4 });
+        ByteBuffer bb = ByteBuffer.allocate(2);
+
+        int ret = b.read(0, bb);
+        assertEquals(2, ret);
+        bb.flip();
+        assertEquals(0, bb.get());
+        assertEquals(1, bb.get());
+        bb.compact();
+
+        ret = b.read(ret, bb);
+        assertEquals(4, ret);
+        bb.flip();
+        assertEquals(2, bb.get());
+        assertEquals(3, bb.get());
+        bb.compact();
+
+        ret = b.read(ret, bb);
+        assertEquals(-1, ret);
+        bb.flip();
+        assertEquals(4, bb.get());
     }
 
 }
