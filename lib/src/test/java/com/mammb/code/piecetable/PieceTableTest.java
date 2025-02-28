@@ -67,6 +67,7 @@ class PieceTableTest {
             bb.flip();
             byte[] bytes = new byte[10];
             bb.get(bytes);
+            bb.compact();
             assertArrayEquals("0123456789".getBytes(), bytes);
             return true;
         });

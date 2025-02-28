@@ -20,6 +20,7 @@ import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.RowEnding;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 /**
  * The document implementation.
@@ -233,6 +235,11 @@ public class DocumentImpl implements Document {
     @Override
     public long rawSize() {
         return pt.length() - bom.length;
+    }
+
+    @Override
+    public void read(Function<ByteBuffer, Boolean> traverseCallback) {
+        pt.read(traverseCallback);
     }
 
     @Override

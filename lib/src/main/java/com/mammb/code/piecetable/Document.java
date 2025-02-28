@@ -16,8 +16,10 @@
 package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.text.DocumentImpl;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 /**
  * The document.
@@ -113,6 +115,12 @@ public interface Document extends Findable {
      * @return the bytes length of this document holds
      */
     long rawSize();
+
+    /**
+     * Reads the contents into the specified byte buffer callback.
+     * @param traverseCallback the specified byte buffer callback
+     */
+    void read(Function<ByteBuffer, Boolean> traverseCallback);
 
     /**
      * Get the serial position.
