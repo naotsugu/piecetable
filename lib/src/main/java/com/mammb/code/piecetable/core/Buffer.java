@@ -52,10 +52,11 @@ public interface Buffer {
     /**
      * Reads the contents of this buffer into the specified byte buffer.
      * @param offset the offset
+     * @param length the length
      * @param buffer the specified byte buffer
      * @return the Next read offset position. {@code -1} if there are no bytes to read in this buffer
      */
-    long read(long offset, ByteBuffer buffer);
+    long read(long offset, long length, ByteBuffer buffer);
 
     /**
      * Get whether this buffer is empty.
@@ -122,18 +123,20 @@ public interface Buffer {
             }
 
             @Override
-            public long read(long offset, ByteBuffer buffer) {
-                int index = Math.toIntExact(offset);
-                if (index >= elements.length) {
+            public long read(long offset, long length, ByteBuffer buffer) {
+                int offsetInt = Math.toIntExact(offset);
+                int lengthInt = Math.toIntExact(length);
+                if (offsetInt + lengthInt >= elements.length) {
                     return -1;
                 }
-                if (buffer.remaining() >= elements.length - index) {
-                    buffer.put(elements, index, elements.length - index);
+                if (lengthInt == 0) return offsetInt;
+                int remaining = buffer.remaining();
+                if (remaining >= lengthInt) {
+                    buffer.put(elements, offsetInt, lengthInt);
                     return -1;
                 }
-                int length = buffer.remaining();
-                buffer.put(elements, index, length);
-                return index + length;
+                buffer.put(elements, offsetInt, remaining);
+                return offsetInt + lengthInt;
             }
         };
     }

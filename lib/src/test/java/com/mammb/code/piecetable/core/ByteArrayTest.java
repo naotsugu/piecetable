@@ -63,24 +63,24 @@ class ByteArrayTest {
 
     @Test
     void read() {
-        var b = ByteArray.of(new byte[] { 0, 1, 2, 3, 4 });
+        var ba = ByteArray.of(new byte[] { 0, 1, 2, 3, 4 });
         ByteBuffer bb = ByteBuffer.allocate(2);
 
-        int ret = b.read(0, bb);
+        int ret = ba.read(0, 5, bb);
         assertEquals(2, ret);
         bb.flip();
         assertEquals(0, bb.get());
         assertEquals(1, bb.get());
         bb.compact();
 
-        ret = b.read(ret, bb);
+        ret = ba.read(ret, 3, bb);
         assertEquals(4, ret);
         bb.flip();
         assertEquals(2, bb.get());
         assertEquals(3, bb.get());
         bb.compact();
 
-        ret = b.read(ret, bb);
+        ret = ba.read(ret, 1, bb);
         assertEquals(-1, ret);
         bb.flip();
         assertEquals(4, bb.get());

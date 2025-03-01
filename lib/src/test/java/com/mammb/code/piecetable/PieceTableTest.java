@@ -59,11 +59,11 @@ class PieceTableTest {
     }
 
     @Test
-    void read() {
+    void readAll() {
         var pt = PieceTable.of();
         pt.insert(0, "0123456789".getBytes());
 
-        pt.read(bb -> {
+        pt.read(0, bb -> {
             bb.flip();
             byte[] bytes = new byte[10];
             bb.get(bytes);
@@ -71,6 +71,38 @@ class PieceTableTest {
             assertArrayEquals("0123456789".getBytes(), bytes);
             return true;
         });
+    }
+
+    @Test
+    void readMiddle() {
+        var text = "012abc345";
+        var pt = PieceTable.of();
+        pt.insert(pt.length(), text.substring(0, 3).getBytes());
+        pt.insert(pt.length(), text.substring(3, 6).getBytes());
+        pt.insert(pt.length(), text.substring(6, 9).getBytes());
+        assertEquals(text, new String(pt.get(0, (int) pt.length())));
+
+        StringBuilder sb = new StringBuilder();
+        pt.read(0, bb -> {
+            bb.flip();
+            byte[] bytes = new byte[bb.remaining()];
+            bb.get(bytes);
+            sb.append(new String(bytes));
+            bb.compact();
+            return true;
+        });
+        assertEquals(text, sb.toString());
+
+        sb.setLength(0);
+        pt.read(2, bb -> {
+            bb.flip();
+            byte[] bytes = new byte[bb.remaining()];
+            bb.get(bytes);
+            sb.append(new String(bytes));
+            bb.compact();
+            return true;
+        });
+        assertEquals(text.substring(2), sb.toString());
     }
 
 }

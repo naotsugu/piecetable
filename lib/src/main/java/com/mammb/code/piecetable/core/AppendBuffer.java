@@ -70,8 +70,8 @@ public interface AppendBuffer extends Buffer {
             }
 
             @Override
-            public long read(long offset, ByteBuffer buffer) {
-                return elements.read(Math.toIntExact(offset), buffer);
+            public long read(long offset, long length, ByteBuffer buffer) {
+                return elements.read(Math.toIntExact(offset), Math.toIntExact(length), buffer);
             }
 
         };

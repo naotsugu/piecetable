@@ -118,9 +118,10 @@ public interface Document extends Findable {
 
     /**
      * Reads the contents into the specified byte buffer callback.
+     * @param offset the offset
      * @param traverseCallback the specified byte buffer callback
      */
-    void read(Function<ByteBuffer, Boolean> traverseCallback);
+    void read(long offset, Function<ByteBuffer, Boolean> traverseCallback);
 
     /**
      * Get the serial position.

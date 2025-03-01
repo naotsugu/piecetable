@@ -238,8 +238,8 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public void read(Function<ByteBuffer, Boolean> traverseCallback) {
-        pt.read(traverseCallback);
+    public void read(long offset, Function<ByteBuffer, Boolean> traverseCallback) {
+        pt.read(offset, traverseCallback);
     }
 
     @Override

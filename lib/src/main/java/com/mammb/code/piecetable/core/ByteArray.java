@@ -157,20 +157,22 @@ public class ByteArray implements Serializable {
     /**
      * Reads the contents of this buffer into the specified byte buffer.
      * @param offset the offset
+     * @param length the length
      * @param buffer the specified byte buffer
      * @return the Next read offset position. {@code -1} if there are no bytes to read in this buffer
      */
-    public int read(int offset, ByteBuffer buffer) {
-        if (offset >= bytes.length) {
+    public int read(int offset, int length, ByteBuffer buffer) {
+        if (offset + length > bytes.length) {
             return -1;
         }
-        if (buffer.remaining() >= bytes.length - offset) {
-            buffer.put(bytes, offset, bytes.length - offset);
+        if (length == 0) return offset;
+        int remaining = buffer.remaining();
+        if (remaining >= length) {
+            buffer.put(bytes, offset, length);
             return -1;
         }
-        int length = buffer.remaining();
-        buffer.put(bytes, offset, length);
-        return offset + length;
+        buffer.put(bytes, offset, remaining);
+        return offset + remaining;
     }
 
 

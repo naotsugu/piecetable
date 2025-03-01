@@ -173,8 +173,6 @@ class PieceTableImplTest {
         assertEquals("cde", new String(pt.get(2, 3)));
         assertEquals("def", new String(pt.get(3, 3)));
         assertEquals("abcde", new String(pt.get(0, 5)));
-
-
     }
 
 }
