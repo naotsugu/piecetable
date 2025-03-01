@@ -33,7 +33,7 @@ import java.util.List;
 public class ChannelBuffer implements Buffer, Closeable {
 
     /** The size of buffer. */
-    private static final short PREF_BUF_SIZE = 1024 * 8;
+    static final short PREF_BUF_SIZE = 1024 * 8;
 
     /** The empty byte array. */
     private static final byte[] EMPTY = {};
@@ -131,12 +131,12 @@ public class ChannelBuffer implements Buffer, Closeable {
     public long read(long offset, long length, ByteBuffer buffer) {
         try {
             int read = ch.position(offset).read(buffer);
-            long redundant = ch.position() - (offset + length);
-            if (redundant > 0) {
-                buffer.position(buffer.position() - Math.toIntExact(redundant));
+            if (read == length) return -1;
+            if (read > length) {
+                buffer.position(buffer.position() - Math.toIntExact(read - length));
                 return -1;
             }
-            return (read < 0) ? read : offset + read;
+            return offset + read;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

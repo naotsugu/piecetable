@@ -100,7 +100,10 @@ public record Piece(Buffer target, long bufIndex, long length) {
      * @return the Next read offset position. {@code -1} if there are no bytes to read in this buffer
      */
     long read(long offset, ByteBuffer buffer) {
-        return target.read(bufIndex + offset, length - offset, buffer);
+        long readLength = length - offset;
+        if (readLength < 0) throw new IndexOutOfBoundsException("offset:" + offset + " length:" + length);
+        if (readLength == 0) return -1;
+        return target.read(bufIndex + offset, readLength, buffer);
     }
 
 }

@@ -33,7 +33,6 @@ public interface Buffer {
      */
     byte get(long index);
 
-
     /**
      * Get the byte array at the specified index.
      * @param startIndex the start raw index of the byte value
@@ -41,7 +40,6 @@ public interface Buffer {
      * @return the byte array at the specified index
      */
     byte[] bytes(long startIndex, long endIndex);
-
 
     /**
      * Get the length of buffer.
@@ -93,7 +91,6 @@ public interface Buffer {
         return to - from;
     }
 
-
     /**
      * Create a new in-memory buffer.
      * @param bytes the source byte array
@@ -126,7 +123,7 @@ public interface Buffer {
             public long read(long offset, long length, ByteBuffer buffer) {
                 int offsetInt = Math.toIntExact(offset);
                 int lengthInt = Math.toIntExact(length);
-                if (offsetInt + lengthInt >= elements.length) {
+                if (offsetInt + lengthInt > elements.length) {
                     return -1;
                 }
                 if (lengthInt == 0) return offsetInt;
@@ -136,7 +133,7 @@ public interface Buffer {
                     return -1;
                 }
                 buffer.put(elements, offsetInt, remaining);
-                return offsetInt + lengthInt;
+                return offsetInt + remaining;
             }
         };
     }

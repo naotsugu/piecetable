@@ -66,24 +66,27 @@ class ByteArrayTest {
         var ba = ByteArray.of(new byte[] { 0, 1, 2, 3, 4 });
         ByteBuffer bb = ByteBuffer.allocate(2);
 
-        int ret = ba.read(0, 5, bb);
-        assertEquals(2, ret);
-        bb.flip();
-        assertEquals(0, bb.get());
+        assertEquals(-1, ba.read(0, 1, bb));
+        assertEquals(0, bb.flip().get());
+        bb.clear();
+
+        assertEquals(-1, ba.read(0, 2, bb));
+        assertEquals(0, bb.flip().get());
+        assertEquals(1, bb.get());
+        bb.clear();
+
+        assertEquals(2, ba.read(0, 5, bb));
+        assertEquals(0, bb.flip().get());
         assertEquals(1, bb.get());
         bb.compact();
-
-        ret = ba.read(ret, 3, bb);
-        assertEquals(4, ret);
-        bb.flip();
-        assertEquals(2, bb.get());
+        assertEquals(4, ba.read(2, 3, bb));
+        assertEquals(2, bb.flip().get());
         assertEquals(3, bb.get());
         bb.compact();
+        assertEquals(-1, ba.read(4, 1, bb));
+        assertEquals(4, bb.flip().get());
+        bb.compact();
 
-        ret = ba.read(ret, 1, bb);
-        assertEquals(-1, ret);
-        bb.flip();
-        assertEquals(4, bb.get());
     }
 
 }
