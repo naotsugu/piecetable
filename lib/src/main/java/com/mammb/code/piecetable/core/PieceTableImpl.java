@@ -188,7 +188,10 @@ public class PieceTableImpl implements PieceTable {
     @Override
     public void save(Path path) {
         try {
-            if (sourcePath != null && Objects.equals(sourcePath.toRealPath(), path.toRealPath())) {
+            if (sourcePath != null &&
+                Files.exists(path) &&
+                Objects.equals(sourcePath.toRealPath(), path.toRealPath())) {
+
                 Path tmp = Files.createTempFile(sourcePath.getParent(), sourcePath.getFileName().toString(), null);
                 write(tmp);
                 for (Piece piece : pieces) {
