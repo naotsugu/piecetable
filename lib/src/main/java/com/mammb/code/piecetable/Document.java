@@ -121,7 +121,7 @@ public interface Document extends Findable {
      * @param offset the offset
      * @param traverseCallback the specified byte buffer callback
      */
-    void read(long offset, Function<ByteBuffer, Boolean> traverseCallback);
+    void bufferRead(long offset, Function<ByteBuffer, Boolean> traverseCallback);
 
     /**
      * Get the serial position.
@@ -135,6 +135,8 @@ public interface Document extends Findable {
 
     /**
      * Get the serial position.
+     * Represents the byte position from the beginning of the file.
+     * This position does not include bom.
      * @param pos the specified pos
      * @return the serial position
      */
