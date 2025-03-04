@@ -45,6 +45,7 @@ class DocumentTest {
     @Test
     void bomText(@TempDir Path tempDir) throws IOException {
         var path = tempDir.resolve("test.txt");
+        // (UTF-8 BOM) a b LF c d
         Files.write(path, new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF, 0x61, 0x62, 0x0a, 0x63, 0x64});
 
         var doc = Document.of(path);

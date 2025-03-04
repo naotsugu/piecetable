@@ -148,33 +148,29 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public void insert(int row, int rawCol, byte[] bytes) {
+    public void insert(int row, int col, byte[] bytes) {
         if (readonly) return;
-        rawCol += (row == 0) ? bom.length : 0;
-        pt.insert(index.serial(row, rawCol), bytes);
-        index.insert(row, rawCol, bytes);
+        pt.insert(index.serial(row, col) + bom.length, bytes);
+        index.insert(row, col, bytes);
     }
 
     @Override
-    public void delete(int row, int rawCol, int rawLen) {
+    public void delete(int row, int col, int rawLen) {
         if (readonly) return;
-        rawCol += (row == 0) ? bom.length : 0;
-        pt.delete(index.serial(row, rawCol), rawLen);
-        index.delete(row, rawCol, rawLen);
+        pt.delete(index.serial(row, col) + bom.length, rawLen);
+        index.delete(row, col, rawLen);
     }
 
     @Override
-    public byte[] get(int row, int rawCol, int rawLen) {
-        rawCol += (row == 0) ? bom.length : 0;
-        return pt.get(index.serial(row, rawCol), rawLen);
+    public byte[] get(int row, int col, int rawLen) {
+        return pt.get(index.serial(row, col) + bom.length, rawLen);
     }
 
     @Override
     public byte[] get(int row) {
-        long col = index.get(row);
-        col += (row == 0) ? bom.length : 0;
-        int len = Math.toIntExact(index.get(row + 1) - col);
-        return pt.get(col, len);
+        long serial = index.get(row);
+        int len = Math.toIntExact(index.get(row + 1) - serial);
+        return pt.get(serial + bom.length, len);
     }
 
     @Override

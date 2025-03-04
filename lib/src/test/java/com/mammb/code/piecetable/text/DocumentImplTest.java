@@ -15,6 +15,7 @@
  */
 package com.mammb.code.piecetable.text;
 
+import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.PieceTable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -132,6 +133,30 @@ class DocumentImplTest {
 
         doc.insert(2, 0, "2");
         assertEquals("2def\n", doc.getText(2));
+    }
+
+
+    @Test
+    void bomTextSerial(@TempDir Path tempDir) throws IOException {
+
+        var path = tempDir.resolve("test.txt");
+        // (UTF-8 BOM) a b LF c d
+        Files.write(path, new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF, 0x61, 0x62, 0x0a, 0x63, 0x64 });
+
+        var doc = Document.of(path);
+        // (UTF-8 BOM) a b LF c d LF e f
+        doc.insert(1, 2, "\nef");
+
+        assertArrayEquals(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF }, doc.bom());
+        assertEquals(3, doc.rows());
+        assertEquals(8, doc.rawSize());
+
+        assertEquals(0, doc.serial(0, 0));
+        assertEquals(1, doc.serial(0, 1));
+        assertEquals(2, doc.serial(0, 2));
+        assertEquals(3, doc.serial(1, 0));
+        assertEquals(8, doc.serial(2, 2));
+
     }
 
 }

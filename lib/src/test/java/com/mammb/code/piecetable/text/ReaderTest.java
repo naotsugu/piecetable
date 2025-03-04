@@ -59,8 +59,8 @@ class ReaderTest {
         assertArrayEquals(new byte[] { (byte) 0xFE, (byte) 0xFF }, reader.bom());
 
         assertEquals(0, reader.index().get(0));
-        assertEquals(4 + 2, reader.index().get(1));
-        assertEquals(10 + 2, reader.index().get(2));
+        assertEquals(4, reader.index().get(1));
+        assertEquals(10, reader.index().get(2));
 
         assertEquals(StandardCharsets.UTF_16BE, reader.charset());
 

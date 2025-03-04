@@ -189,6 +189,10 @@ public class Reader implements DocumentStat {
 
                 if (length == 0) {
                     bom = checkBom(read);
+                    if (bom.length > 0) {
+                        // exclude BOM
+                        read = Arrays.copyOfRange(read, bom.length, read.length);
+                    }
                 }
                 if (charset == null) {
                     charset = checkCharset(read);

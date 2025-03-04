@@ -249,6 +249,7 @@ public class RowIndex {
 
     /**
      * Get the serial position.
+     * Length of BOM is excluded.
      * @param row the specified row
      * @param col the specified position in a row
      * @return the serial position
