@@ -320,7 +320,7 @@ public class RowIndex {
         int oldCapacity = rowLengths.length;
         if (oldCapacity > 0) {
             int newCapacity = Math.min(
-                Math.max(minCapacity, oldCapacity + oldCapacity >> 1),
+                Math.max(minCapacity, oldCapacity + (oldCapacity >> 1)),
                 Integer.MAX_VALUE - 8);
             return rowLengths = Arrays.copyOf(rowLengths, newCapacity);
         } else {
@@ -338,7 +338,7 @@ public class RowIndex {
         int oldCapacity = stCache.length;
         if (oldCapacity > 0) {
             int newCapacity = Math.min(
-                Math.max(minCapacity, oldCapacity + oldCapacity >> 2),
+                Math.max(minCapacity, oldCapacity + (oldCapacity >> 2)),
                 Integer.MAX_VALUE - 8);
             return stCache = Arrays.copyOf(stCache, newCapacity);
         } else {
