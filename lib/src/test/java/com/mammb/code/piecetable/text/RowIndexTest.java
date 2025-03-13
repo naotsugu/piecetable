@@ -67,7 +67,7 @@ class RowIndexTest {
 
     @Test
     void get() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.add("ab\n\ncde\nf\ng\nhi\njkl\nmn".getBytes());
         assertEquals(0, index.get(0));  // |a|b|$|    3    3
         assertEquals(3, index.get(1));  // |$|        1    4
@@ -85,7 +85,7 @@ class RowIndexTest {
 
     @Test
     void insert() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.add("ab\ncde\nfg\nhij\nk".getBytes());
         assertEquals(5, index.rowLengths().length);
         assertEquals(3, index.rowLengths()[0]);
@@ -114,7 +114,7 @@ class RowIndexTest {
 
     @Test
     void insertMono() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.insert(0, 0, "abc".getBytes());
         assertEquals(1, index.rowLengths().length);
         assertEquals(3, index.rowLengths()[0]);
@@ -122,7 +122,7 @@ class RowIndexTest {
 
     @Test
     void insertDelete() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.insert(0, 0, "abc".getBytes());
         index.delete(0, 0, 3);
         assertEquals(1, index.rowLengths().length);
@@ -135,7 +135,7 @@ class RowIndexTest {
 
     @Test
     void deleteEnd() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.add("12".getBytes());
         index.delete(0, 1, 1);
         assertEquals(1, index.rowLengths().length);
@@ -148,7 +148,7 @@ class RowIndexTest {
 
     @Test
     void deleteEnd2() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.add("abc\n12".getBytes());
         index.delete(1, 1, 1);
         assertEquals(2, index.rowLengths().length);
@@ -158,7 +158,7 @@ class RowIndexTest {
 
     @Test
     void deleteWithinSingleLine() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.add("abcd\n".getBytes());
         index.delete(0, 1, 2);
         // abcd$ -> ad$
@@ -173,7 +173,7 @@ class RowIndexTest {
 
     @Test
     void deleteAcrossMultipleLines() {
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         index.add("ab\ncd\nef\ngh\n".getBytes());
         index.delete(0, 1, 6);
         assertEquals(3, index.rowLengths().length);
@@ -185,7 +185,7 @@ class RowIndexTest {
     @Test
     void rowSizeWithInsertAndDelete() {
 
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         assertEquals(1, index.rowSize());
 
         index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
@@ -221,7 +221,7 @@ class RowIndexTest {
     @Test
     void rowSizeWithInsertAndDelete2() {
 
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         assertEquals(1, index.rowSize());
 
         index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
@@ -247,7 +247,7 @@ class RowIndexTest {
     @Test
     void rowSizeWithInsertAndDelete3() {
 
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         assertEquals(1, index.rowSize());
 
         index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
@@ -273,7 +273,7 @@ class RowIndexTest {
     @Test
     void rowSizeWithInsertAndDelete4() {
 
-        var index = RowIndex.of(5);
+        var index = RowIndex.of(5, 0);
         assertEquals(1, index.rowSize());
 
         index.insert(0, 0, "aaa\nbbb\nccc".getBytes(StandardCharsets.UTF_8));
@@ -337,7 +337,7 @@ class RowIndexTest {
 
     @Test
     void serial() {
-        var index = RowIndex.of(3);
+        var index = RowIndex.of(3, 0);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
 
         assertEquals(0L, index.serial(0, 0));
@@ -368,7 +368,7 @@ class RowIndexTest {
 
     @Test
     void pos1() {
-        var index = RowIndex.of(3);
+        var index = RowIndex.of(3, 0);
         index.insert(0, 0, "abc".getBytes(StandardCharsets.UTF_8));
         assertArrayEquals(new int[]{0, 0}, index.pos(0));
         assertArrayEquals(new int[]{0, 1}, index.pos(1));
@@ -378,7 +378,7 @@ class RowIndexTest {
 
     @Test
     void pos2() {
-        var index = RowIndex.of(3);
+        var index = RowIndex.of(3, 0);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
 
         assertArrayEquals(new int[]{0, 0}, index.pos(0));

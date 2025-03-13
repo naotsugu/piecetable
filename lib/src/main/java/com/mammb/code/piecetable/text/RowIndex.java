@@ -49,35 +49,43 @@ public class RowIndex {
     /**
      * Create a new {@code RowIndex}.
      * @param cacheInterval the sub-total cache interval
+     * @param prefRows the pref row size
      */
-    private RowIndex(int cacheInterval) {
-        rowLengths = new int[] { 0 };
+    private RowIndex(int cacheInterval, int prefRows) {
+        rowLengths = new int[Math.max(1, prefRows)];
         length = 1;
 
-        stCache = new long[] { 0 };
+        stCache = new long[Math.max(1, prefRows / cacheInterval)];
         cacheLength = 1;
         this.cacheInterval = cacheInterval;
     }
-
 
     /**
      * Create a new {@link RowIndex}.
      * @return a new {@link RowIndex}
      */
     public static RowIndex of() {
-        return new RowIndex(100);
+        return new RowIndex(100, 0);
     }
 
+    /**
+     * Create a new {@link RowIndex}.
+     * @param prefRows the pref row size
+     * @return a new {@link RowIndex}
+     */
+    public static RowIndex of(int prefRows) {
+        return new RowIndex(100, prefRows);
+    }
 
     /**
      * Create a new {@link RowIndex}.
      * @param cacheInterval the sub-total cache interval
+     * @param prefRows the pref row size
      * @return a new {@link RowIndex}
      */
-    static RowIndex of(int cacheInterval) {
-        return new RowIndex(cacheInterval);
+    static RowIndex of(int cacheInterval, int prefRows) {
+        return new RowIndex(cacheInterval, prefRows);
     }
-
 
     /**
      * Adds the specified byte array to the index.
@@ -109,7 +117,6 @@ public class RowIndex {
         }
 
     }
-
 
     /**
      * Gets the total byte length of the specified row from the head.
@@ -145,7 +152,6 @@ public class RowIndex {
         }
         return startPos;
     }
-
 
     /**
      * Insert the specified byte array to the index.
@@ -188,7 +194,6 @@ public class RowIndex {
 
         length += rows.length - 1;
     }
-
 
     /**
      * Delete the specified byte length of the index.
@@ -240,6 +245,18 @@ public class RowIndex {
     }
 
     /**
+     * Trim to size.
+     */
+    public void trimToSize() {
+        if (Math.max(1, length) < rowLengths.length) {
+            rowLengths = Arrays.copyOf(rowLengths, Math.max(1, length));
+        }
+        if (Math.max(1, cacheLength) < stCache.length) {
+            stCache = Arrays.copyOf(stCache, Math.max(1, cacheLength));
+        }
+    }
+
+    /**
      * Get the size of rows.
      * @return the size of rows
      */
@@ -283,7 +300,6 @@ public class RowIndex {
         }
     }
 
-
     /**
      * Converts the specified byte array to line-by-line byte length.
      * @param bytes the specified byte array
@@ -310,7 +326,6 @@ public class RowIndex {
         return intArray.get();
     }
 
-
     /**
      * Grow this lineLengths array.
      * @param minCapacity the growth capacity
@@ -327,7 +342,6 @@ public class RowIndex {
             return rowLengths = new int[Math.max(100, minCapacity)];
         }
     }
-
 
     /**
      * Grow this sub-total cache array.
@@ -346,7 +360,6 @@ public class RowIndex {
         }
     }
 
-
     /**
      * Gets the row lengths array.
      * @return the row lengths array
@@ -354,7 +367,6 @@ public class RowIndex {
     int[] rowLengths() {
         return Arrays.copyOf(rowLengths, length);
     }
-
 
     /**
      * Gets the sub-total cache array.

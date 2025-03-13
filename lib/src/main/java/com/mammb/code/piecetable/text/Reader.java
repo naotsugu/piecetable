@@ -70,7 +70,8 @@ public class Reader implements DocumentStat {
      * @param matches the CharsetMatches
      */
     private Reader(Path path, int rowLimit,
-                   ProgressListener<byte[]> progressListener, CharsetMatch... matches) {
+            ProgressListener<byte[]> progressListener,
+            CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
         if (path != null) {
