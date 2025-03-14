@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import java.util.List;
 public class Reader implements DocumentStat {
 
     /** The row index. */
-    private final RowIndex index = RowIndex.of();
+    private final RowIndex index;
     /** The byte order mark. */
     private byte[] bom = new byte[0];
     /** The charset read. */
@@ -74,8 +75,10 @@ public class Reader implements DocumentStat {
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
-        if (path != null) {
+        this.index = RowIndex.of();
+        if (path != null && Files.exists(path)) {
             read(path, rowLimit);
+            index.trimToSize();
         }
     }
 
@@ -199,11 +202,12 @@ public class Reader implements DocumentStat {
                     charset = checkCharset(read);
                 }
                 length += read.length;
-                index.add(read);
                 for (byte b : read) {
                     if (b == '\r') crCount++;
                     else if (b == '\n') lfCount++;
                 }
+
+                index.add(read);
 
                 if (listener != null) {
                     boolean continuation = listener.accept(read);
@@ -273,7 +277,6 @@ public class Reader implements DocumentStat {
         }
         return new byte[0];
     }
-
 
     private Charset checkCharset(byte[] bytes) {
         return matches.stream().map(m -> m.put(bytes))
