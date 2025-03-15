@@ -192,8 +192,9 @@ public class Reader implements DocumentStat {
                 byte[] read = asBytes(buf, n, bytes);
 
                 if (length == 0) {
-                    bom = checkBom(read);
+                    bom = Bom.extract(read);
                     if (bom.length > 0) {
+                        charset = Bom.toCharset(bom);
                         // exclude BOM
                         read = Arrays.copyOfRange(read, bom.length, read.length);
                     }
@@ -238,44 +239,6 @@ public class Reader implements DocumentStat {
         } else {
             return Arrays.copyOf(buf.array(), buf.limit());
         }
-    }
-
-
-    private byte[] checkBom(byte[] bytes) {
-        if (bytes == null) {
-            return new byte[0];
-        } else if (bytes.length >= 3 &&
-            (bytes[0] & 0xFF) == 0xef &&
-            (bytes[1] & 0xFF) == 0xbb &&
-            (bytes[2] & 0xFF) == 0xbf) {
-            charset = StandardCharsets.UTF_8;
-            return new byte[] { bytes[0], bytes[1], bytes[2] };
-        } else if (bytes.length >= 2 &&
-            (bytes[0] & 0xFF) == 0xfe &&
-            (bytes[1] & 0xFF) == 0xff) {
-            charset = StandardCharsets.UTF_16BE;
-            return new byte[] { bytes[0], bytes[1] };
-        } else if (bytes.length >= 4 &&
-            (bytes[0] & 0xFF) == 0xff &&
-            (bytes[1] & 0xFF) == 0xfe &&
-            (bytes[2] & 0xFF) == 0x00 &&
-            (bytes[3] & 0xFF) == 0x00) {
-            charset = Charset.forName("UTF_32LE");
-            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] };
-        } else if (bytes.length >= 2 &&
-            (bytes[0] & 0xFF) == 0xff &&
-            (bytes[1] & 0xFF) == 0xfe) {
-            charset = StandardCharsets.UTF_16LE;
-            return new byte[] { bytes[0], bytes[1] };
-        } else if (bytes.length >= 4 &&
-            (bytes[0] & 0xFF) == 0x00 &&
-            (bytes[1] & 0xFF) == 0x00 &&
-            (bytes[2] & 0xFF) == 0xfe &&
-            (bytes[3] & 0xFF) == 0xff) {
-            charset = Charset.forName("UTF_32BE");
-            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] };
-        }
-        return new byte[0];
     }
 
     private Charset checkCharset(byte[] bytes) {
