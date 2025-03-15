@@ -115,7 +115,21 @@ public class RowIndex {
                 length++;
             }
         }
+    }
 
+    /**
+     * Build sub-total cache.
+     */
+    public void buildStCache() {
+        long st = 0;
+        cacheLength = 0;
+        stCache = new long[1 + (length / cacheInterval)];
+        for (int i = 0; i < length; i ++) {
+            if (i % cacheInterval == 0) {
+                stCache[cacheLength++] = st;
+            }
+            st += rowLengths[i];
+        }
     }
 
     /**

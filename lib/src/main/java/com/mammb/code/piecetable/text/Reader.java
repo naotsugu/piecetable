@@ -220,6 +220,8 @@ public class Reader implements DocumentStat {
                 }
             }
 
+            index.buildStCache();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
