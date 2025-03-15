@@ -21,5 +21,5 @@ package com.mammb.code.piecetable;
  */
 public interface Version {
     /** The version value. */
-    String val = "0.5.10";
+    String val = "0.5.11";
 }
