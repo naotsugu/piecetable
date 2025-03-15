@@ -154,7 +154,7 @@ public class RowIndex {
         }
 
         for (int i = startRow; i < length && i < row; i++) {
-            if (i % cacheInterval == 0) {
+            if (i % cacheInterval == 0 && cacheIndex >= cacheLength) {
                 if (cacheLength + 1 > stCache.length) {
                     stCache = growCache(cacheLength + 1);
                 }
