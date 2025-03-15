@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * The test of {@link MappedBuffer}.
  * @author Naotsugu Kobayashi
  */
-class MapBufferTest {
+class MappedBufferTest {
 
     @Test
     void get(@TempDir Path tempDir) throws Exception {

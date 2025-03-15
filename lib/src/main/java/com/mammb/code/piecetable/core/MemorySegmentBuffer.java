@@ -18,51 +18,50 @@ package com.mammb.code.piecetable.core;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
 
 /**
- * Memory mapped buffer.
+ * Memory segment buffer.
  * @author Naotsugu Kobayashi
  */
-public class MappedBuffer implements Buffer, Closeable {
+public class MemorySegmentBuffer implements Buffer, Closeable {
 
-    /** The chunk size. */
-    private final int chunkSize = 1_073_741_824;
-    /** The mapped byte buffers. */
-    private MappedByteBuffer[] maps;
+    /** The arena. */
+    private final Arena arena;
+    /** The memory segment. */
+    private MemorySegment ms;
     /** The current size of entity to which this channel is connected. */
     private long length;
 
     /**
-     * Create a new {@link MappedBuffer}.
+     * Create a new {@link MemorySegmentBuffer}.
      * @param file the source file
      */
-    private MappedBuffer(RandomAccessFile file) {
+    public MemorySegmentBuffer(RandomAccessFile file) {
         try (FileChannel fc = file.getChannel(); FileLock lock = fc.tryLock()) {
             if (lock == null) throw new RuntimeException("locked:" + file);
             length = fc.size();
-            maps = new MappedByteBuffer[1 + (int) (length / chunkSize)];
-            for (int i = 0; i < maps.length; i++) {
-                long s = (long) chunkSize * i;
-                maps[i] = fc.map(FileChannel.MapMode.READ_ONLY, s, Math.min(chunkSize, length - s));
-            }
+            arena = Arena.ofConfined();
+            ms = fc.map(FileChannel.MapMode.READ_ONLY, 0, length, arena);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Create a new {@code MappedBuffer} from the given {@code Path}.
+     * Create a new {@code MsBuffer} from the given {@code Path}.
      * @param path the given {@code Path}
-     * @return a new {@code MappedBuffer}
+     * @return a new {@code MsBuffer}
      */
-    public static MappedBuffer of(Path path) {
+    public static MemorySegmentBuffer of(Path path) {
         try (var file = new RandomAccessFile(path.toFile(), "rw")) {
-            return new MappedBuffer(file);
+            return new MemorySegmentBuffer(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -74,7 +73,7 @@ public class MappedBuffer implements Buffer, Closeable {
             throw new IndexOutOfBoundsException(
                 "index[%d], length[%d]".formatted(index, length));
         }
-        return maps[Math.toIntExact(index / chunkSize)].get(Math.toIntExact(index % chunkSize));
+        return ms.get(ValueLayout.JAVA_BYTE, index);
     }
 
     @Override
@@ -83,11 +82,7 @@ public class MappedBuffer implements Buffer, Closeable {
             throw new IndexOutOfBoundsException(
                 "from[%d], to[%d], length[%d]".formatted(startIndex, endIndex, length));
         }
-        byte[] bytes = new byte[Math.toIntExact(endIndex - startIndex)];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = get(startIndex + i);
-        }
-        return bytes;
+        return ms.asSlice(startIndex, endIndex - startIndex).toArray(ValueLayout.JAVA_BYTE);
     }
 
     @Override
@@ -108,9 +103,6 @@ public class MappedBuffer implements Buffer, Closeable {
 
     @Override
     public void close() {
-        maps = null;
-        length = 0;
-        System.gc();
+        arena.close();
     }
-
 }
