@@ -26,7 +26,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * The test of {@link MapBuffer}.
+ * The test of {@link MappedBuffer}.
  * @author Naotsugu Kobayashi
  */
 class MapBufferTest {
@@ -37,7 +37,7 @@ class MapBufferTest {
         var path = tempDir.resolve("test_get.txt");
         Files.write(path, List.of("a", "b"));
 
-        try (var cb = MapBuffer.of(path)) {
+        try (var cb = MappedBuffer.of(path)) {
             assertEquals(4, cb.length());
             assertEquals('a', cb.get(0));
             assertEquals('\n', cb.get(1));
@@ -53,7 +53,7 @@ class MapBufferTest {
         Files.write(path, List.of(
             "a".repeat(100), "b"));
 
-        try (var cb = MapBuffer.of(path)) {
+        try (var cb = MappedBuffer.of(path)) {
             long i = 100;
             assertEquals(i + 3, cb.length());
             assertEquals('a', cb.bytes(i - 1, i)[0]);
@@ -70,7 +70,7 @@ class MapBufferTest {
         Files.write(path, List.of("0123"));
         var bb = ByteBuffer.allocate(2);
 
-        try (var cb = MapBuffer.of(path)) {
+        try (var cb = MappedBuffer.of(path)) {
 
             assertEquals(-1, cb.read(0, 1, bb));
             assertEquals('0', bb.flip().get());
