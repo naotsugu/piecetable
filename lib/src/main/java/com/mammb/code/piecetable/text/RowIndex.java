@@ -91,9 +91,16 @@ public class RowIndex {
      * Adds the specified byte array to the index.
      * @param bytes the specified byte array to be added
      */
-    public void add(byte[] bytes) {
-
+    void add(byte[] bytes) {
         int[] rows = rows(bytes);
+        add(rows);
+    }
+
+    /**
+     * Adds the specified length array to the index.
+     * @param rows the specified length array
+     */
+    void add(int[] rows) {
         if (rows.length == 0) {
             return;
         }
