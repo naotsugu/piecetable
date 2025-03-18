@@ -63,7 +63,7 @@ public class DocumentImpl implements Document {
      * Constructor.
      * @param pt the {@link PieceTable}
      * @param path the {@link Path} of document
-     * @param reader the {@link Reader}
+     * @param reader the {@link SeqReader}
      */
     DocumentImpl(PieceTable pt, Path path, Reader reader) {
         this.pt = pt;

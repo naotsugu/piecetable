@@ -16,79 +16,42 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
-import com.mammb.code.piecetable.Document.ProgressListener;
+import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.DocumentStat;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 
 /**
- * Reader.
+ * The reader.
  * @author Naotsugu Kobayashi
  */
-public class Reader implements DocumentStat {
-
-    /** The row index. */
-    private final RowIndex index;
-    /** The byte order mark. */
-    private byte[] bom = new byte[0];
-    /** The charset read. */
-    private Charset charset;
-    /** The byte length read. */
-    private long length = 0;
-    /** The CharsetMatches. */
-    private final List<CharsetMatch> matches = new ArrayList<>();
-    /** The count of carriage return. */
-    private int crCount = 0;
-    /** The count of line feed. */
-    private int lfCount = 0;
-    /** The read callback. */
-    private final ProgressListener<byte[]> progressListener;
+public interface Reader extends DocumentStat {
 
     /**
-     * Constructor.
-     * @param path the path to be read
-     * @param matches the CharsetMatches
+     * Get the {@link RowIndex}.
+     * @return the {@link RowIndex}
      */
-    private Reader(Path path, CharsetMatch... matches) {
-        this(path, -1, null, matches);
-    }
+    RowIndex index();
 
-    /**
-     * Constructor.
-     * @param path the path to be read
-     * @param rowLimit the limit of row
-     * @param progressListener the read callback
-     * @param matches the CharsetMatches
-     */
-    private Reader(Path path, int rowLimit,
-            ProgressListener<byte[]> progressListener,
-            CharsetMatch... matches) {
-        this.progressListener = progressListener;
-        this.matches.addAll(Arrays.asList(matches));
-        this.index = RowIndex.of();
-        if (path != null && Files.exists(path)) {
-            read(path, rowLimit);
-            index.trimToSize();
-        }
-    }
+    @Override
+    Charset charset();
+
+    @Override
+    int crCount();
+
+    @Override
+    int lfCount();
+
+    @Override
+    byte[] bom();
 
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
      * @return a new {@link Reader}.
      */
-    public static Reader of(Path path) {
-        return new Reader(path, CharsetMatches.utf8(), CharsetMatches.ms932());
+    static Reader of(Path path) {
+        return new SeqReader(path, -1, null, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
 
     /**
@@ -97,8 +60,8 @@ public class Reader implements DocumentStat {
      * @param progressListener the traverse callback of the document
      * @return a new {@link Reader}.
      */
-    public static Reader of(Path path, ProgressListener<byte[]> progressListener) {
-        return new Reader(path, -1, progressListener, CharsetMatches.utf8(), CharsetMatches.ms932());
+    static Reader of(Path path, Document.ProgressListener<byte[]> progressListener) {
+        return new SeqReader(path, -1, progressListener, CharsetMatches.utf8(), CharsetMatches.ms932());
     }
 
     /**
@@ -107,8 +70,8 @@ public class Reader implements DocumentStat {
      * @param charset the character set of the file to be read
      * @return a new {@link Reader}.
      */
-    public static Reader of(Path path, Charset charset) {
-        return new Reader(path, CharsetMatch.of(charset));
+    static Reader of(Path path, Charset charset) {
+        return new SeqReader(path, -1, null, CharsetMatch.of(charset));
     }
 
     /**
@@ -118,137 +81,8 @@ public class Reader implements DocumentStat {
      * @param matches the {@link CharsetMatch} used in reading the target file
      * @return a new {@link Reader}.
      */
-    public static Reader of(Path path, int rowLimit, CharsetMatch... matches) {
-        return new Reader(path, rowLimit, null, matches);
-    }
-
-    /**
-     * Get the {@link RowIndex}.
-     * @return the {@link RowIndex}
-     */
-    public RowIndex index() {
-        return index;
-    }
-
-    @Override
-    public Charset charset() {
-        return (charset == null) ? StandardCharsets.UTF_8 : charset;
-    }
-
-    @Override
-    public int crCount() {
-        return crCount;
-    }
-
-    @Override
-    public int lfCount() {
-        return lfCount;
-    }
-
-    @Override
-    public byte[] bom() {
-        return bom;
-    }
-
-    /**
-     * Gets the row lengths array.
-     * @return the row lengths array
-     */
-    public int[] rowLengths() {
-        return index.rowLengths();
-    }
-
-    /**
-     * Read the file at the specified path.
-     * @param path the path of file to be reade
-     * @param rowLimit the limit on the number of rows to read from the file,
-     *                 if -1 is specified, there is no limit
-     */
-    private void read(Path path, int rowLimit) {
-
-        var listener = progressListener;
-
-        try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
-
-            long size = channel.size();
-            if (size <= 0) {
-                return;
-            }
-
-            int cap = 1024 * 64;
-            ByteBuffer buf = (size < cap)
-                ? ByteBuffer.allocate((int) size)
-                : ByteBuffer.allocateDirect(cap);
-
-            byte[] bytes = new byte[buf.capacity()];
-
-            for (;;) {
-                buf.clear();
-                int n = channel.read(buf);
-                if (n < 0) {
-                    break;
-                }
-                buf.flip();
-                byte[] read = asBytes(buf, n, bytes);
-
-                if (length == 0) {
-                    bom = Bom.extract(read);
-                    if (bom.length > 0) {
-                        charset = Bom.toCharset(bom);
-                        // exclude BOM
-                        read = Arrays.copyOfRange(read, bom.length, read.length);
-                    }
-                }
-                if (charset == null) {
-                    charset = checkCharset(read);
-                }
-                length += read.length;
-                for (byte b : read) {
-                    if (b == '\r') crCount++;
-                    else if (b == '\n') lfCount++;
-                }
-
-                index.add(read);
-
-                if (listener != null) {
-                    boolean continuation = listener.accept(read);
-                    if (!continuation) break;
-                }
-
-                if (rowLimit >= 0 && (rowLimit < crCount || rowLimit < lfCount)) {
-                    break;
-                }
-            }
-
-            index.buildStCache();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private byte[] asBytes(ByteBuffer buf, int nRead, byte[] bytes) {
-        if (buf.isDirect()) {
-            if (nRead != bytes.length) {
-                byte[] rest = new byte[nRead];
-                buf.get(rest);
-                return rest;
-            } else {
-                buf.get(bytes);
-                return bytes;
-            }
-        } else {
-            return Arrays.copyOf(buf.array(), buf.limit());
-        }
-    }
-
-    private Charset checkCharset(byte[] bytes) {
-        return matches.stream().map(m -> m.put(bytes))
-            .max(Comparator.naturalOrder())
-            .filter(r -> r.confidence() >= 100)
-            .map(CharsetMatch.Result::charset)
-            .orElse(null);
+    static Reader of(Path path, int rowLimit, CharsetMatch... matches) {
+        return new SeqReader(path, rowLimit, null, matches);
     }
 
 }
