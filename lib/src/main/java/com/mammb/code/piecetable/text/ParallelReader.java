@@ -56,6 +56,8 @@ public class ParallelReader implements Reader {
     /** The read callback. */
     private final Document.ProgressListener<byte[]> progressListener;
 
+    private final byte[] chunk = new byte[1024 * 128];
+
     /**
      * Constructor.
      * @param path the path to be read
@@ -103,29 +105,29 @@ public class ParallelReader implements Reader {
     }
 
     private void read(Path path) {
-        var listener = progressListener;
-        int chunkSize = 1024 * 64 * 64;
+        int chunkSize = chunk.length;
         try (var arena = Arena.ofShared(); // parallel needs ofShared arena
              var channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             length = channel.size();
             MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, length, arena);
 
-            RowIndex index = RowIndex.of();
             IntStream.rangeClosed(0, Math.toIntExact(length / chunkSize)).parallel()
                 .mapToObj(i -> chunkReadOf(i, chunkSize, seg))
-                .forEachOrdered(cr -> {
-                    index.add(cr.rows);
-                    crCount += cr.crCount;
-                    lfCount += cr.lfCount;
-                    if (listener != null) {
-                        boolean continuation = listener.accept(cr.bytes);
-                        if (!continuation) Thread.currentThread().interrupt(); // TODO
-                    }
-                });
+                .forEachOrdered(this::aggregate);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void aggregate(ChunkRead chunkRead) {
+        index.add(chunkRead.rows);
+        crCount += chunkRead.crCount;
+        lfCount += chunkRead.lfCount;
+        if (progressListener != null) {
+            boolean continuation = progressListener.accept(chunk);
+            if (!continuation) Thread.currentThread().interrupt(); // TODO
         }
     }
 
@@ -153,6 +155,7 @@ public class ParallelReader implements Reader {
                 count = 0;
             }
         }
+        rows.add(count);
         return new ChunkRead(bytes, rows.get(), crCount, lfCount);
     }
 
