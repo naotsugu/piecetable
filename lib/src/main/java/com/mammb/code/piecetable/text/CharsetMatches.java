@@ -29,9 +29,14 @@ import static java.lang.System.Logger.Level.INFO;
  */
 public abstract class CharsetMatches {
 
+    /** logger. */
     private static final System.Logger log = System.getLogger(CharsetMatches.class.getName());
 
     private CharsetMatches() {
+    }
+
+    static CharsetMatch[] defaults() {
+        return new CharsetMatch[] { utf8(), ms932() };
     }
 
     /**

@@ -104,7 +104,7 @@ public class DocumentImpl implements Document {
      * @param progressListener the traverse callback of the document
      * @return a new {@link Document}
      */
-    public static DocumentImpl of(Path path, ProgressListener<byte[]> progressListener) {
+    public static DocumentImpl of(Path path, ProgressListener<Long> progressListener) {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, progressListener));
     }
 

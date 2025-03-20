@@ -273,21 +273,21 @@ public interface TextEdit extends Findable {
 
     /**
      * Create a new {@link TextEdit}.
-     * @param path the path of the file to read
-     * @param progressListener the document traverse callback
-     * @return a new {@link TextEdit}
-     */
-    static TextEdit of(Path path, ProgressListener<byte[]> progressListener) {
-        return new TextEditImpl(Document.of(path, progressListener));
-    }
-
-    /**
-     * Create a new {@link TextEdit}.
      * @param document the Document
      * @return a new {@link TextEdit}
      */
     static TextEdit of(Document document) {
         return new TextEditImpl(document);
+    }
+
+    /**
+     * Create a new {@link TextEdit}.
+     * @param path the path of the file to read
+     * @param progressListener the document traverse callback
+     * @return a new {@link TextEdit}
+     */
+    static TextEdit of(Path path, ProgressListener<Long> progressListener) {
+        return new TextEditImpl(Document.of(path, progressListener));
     }
 
     /**

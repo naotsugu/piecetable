@@ -51,7 +51,7 @@ public class SeqReader implements Reader {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private final ProgressListener<byte[]> progressListener;
+    private final ProgressListener<Long> progressListener;
 
     /**
      * Constructor.
@@ -61,7 +61,7 @@ public class SeqReader implements Reader {
      * @param matches the CharsetMatches
      */
     SeqReader(Path path, int rowLimit,
-            ProgressListener<byte[]> progressListener,
+            ProgressListener<Long> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
@@ -160,7 +160,7 @@ public class SeqReader implements Reader {
                 index.add(read);
 
                 if (listener != null) {
-                    boolean continuation = listener.accept(read);
+                    boolean continuation = listener.accept((long) read.length);
                     if (!continuation) break;
                 }
 

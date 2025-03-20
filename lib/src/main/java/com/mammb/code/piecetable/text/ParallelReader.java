@@ -39,6 +39,9 @@ import java.util.stream.IntStream;
  */
 public class ParallelReader implements Reader {
 
+    /** The chunk size. */
+    static final int CHUNK_SIZE = 1024 * 256;
+
     /** The row index. */
     private final RowIndex index;
     /** The byte order mark. */
@@ -54,9 +57,7 @@ public class ParallelReader implements Reader {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private final Document.ProgressListener<byte[]> progressListener;
-
-    private final byte[] chunk = new byte[1024 * 128];
+    private final Document.ProgressListener<Long> progressListener;
 
     /**
      * Constructor.
@@ -65,7 +66,7 @@ public class ParallelReader implements Reader {
      * @param matches the CharsetMatches
      */
     ParallelReader(Path path,
-            Document.ProgressListener<byte[]> progressListener,
+            Document.ProgressListener<Long> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
@@ -105,15 +106,14 @@ public class ParallelReader implements Reader {
     }
 
     private void read(Path path) {
-        int chunkSize = chunk.length;
         try (var arena = Arena.ofShared(); // parallel needs ofShared arena
              var channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             length = channel.size();
             MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, length, arena);
 
-            IntStream.rangeClosed(0, Math.toIntExact(length / chunkSize)).parallel()
-                .mapToObj(i -> chunkReadOf(i, chunkSize, seg))
+            IntStream.rangeClosed(0, Math.toIntExact(length / CHUNK_SIZE)).parallel()
+                .mapToObj(i -> chunkReadOf(i, CHUNK_SIZE, seg))
                 .forEachOrdered(this::aggregate);
 
         } catch (IOException e) {
@@ -126,8 +126,8 @@ public class ParallelReader implements Reader {
         crCount += chunkRead.crCount;
         lfCount += chunkRead.lfCount;
         if (progressListener != null) {
-            boolean continuation = progressListener.accept(chunk);
-            if (!continuation) Thread.currentThread().interrupt(); // TODO
+            boolean continuation = progressListener.accept(chunkRead.byteSize);
+            if (!continuation) throw new RuntimeException("interrupted.");
         }
     }
 
@@ -156,7 +156,7 @@ public class ParallelReader implements Reader {
             }
         }
         rows.add(count);
-        return new ChunkRead(bytes, rows.get(), crCount, lfCount);
+        return new ChunkRead(bytes.length, rows.get(), crCount, lfCount);
     }
 
     private byte[] handleHeadChunk(byte[] bytes) {
@@ -170,7 +170,7 @@ public class ParallelReader implements Reader {
         return bytes;
     }
 
-    record ChunkRead(byte[] bytes, int[] rows, int crCount, int lfCount) {}
+    record ChunkRead(long byteSize, int[] rows, int crCount, int lfCount) {}
 
     private Charset checkCharset(byte[] bytes) {
         return matches.stream().map(m -> m.put(bytes))
