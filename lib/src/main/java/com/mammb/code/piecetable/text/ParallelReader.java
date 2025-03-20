@@ -116,6 +116,8 @@ public class ParallelReader implements Reader {
                 .mapToObj(i -> chunkReadOf(i, CHUNK_SIZE, seg))
                 .forEachOrdered(this::aggregate);
 
+            index.buildStCache();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
