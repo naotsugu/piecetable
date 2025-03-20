@@ -56,9 +56,13 @@ public class ParallelReader implements Reader {
     /** The read callback. */
     private final Document.ProgressListener<byte[]> progressListener;
 
-
-    ParallelReader(
-            Path path,
+    /**
+     * Constructor.
+     * @param path the path to be read
+     * @param progressListener the read callback
+     * @param matches the CharsetMatches
+     */
+    ParallelReader(Path path,
             Document.ProgressListener<byte[]> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
@@ -99,6 +103,7 @@ public class ParallelReader implements Reader {
     }
 
     private void read(Path path) {
+        var listener = progressListener;
         int chunkSize = 1024 * 64 * 64;
         try (var arena = Arena.ofShared(); // parallel needs ofShared arena
              var channel = FileChannel.open(path, StandardOpenOption.READ)) {
@@ -113,6 +118,10 @@ public class ParallelReader implements Reader {
                     index.add(cr.rows);
                     crCount += cr.crCount;
                     lfCount += cr.lfCount;
+                    if (listener != null) {
+                        boolean continuation = listener.accept(cr.bytes);
+                        if (!continuation) Thread.currentThread().interrupt(); // TODO
+                    }
                 });
 
         } catch (IOException e) {
@@ -144,7 +153,7 @@ public class ParallelReader implements Reader {
                 count = 0;
             }
         }
-        return new ChunkRead(rows.get(), crCount, lfCount);
+        return new ChunkRead(bytes, rows.get(), crCount, lfCount);
     }
 
     private byte[] handleHeadChunk(byte[] bytes) {
@@ -158,7 +167,7 @@ public class ParallelReader implements Reader {
         return bytes;
     }
 
-    record ChunkRead(int[] rows, int crCount, int lfCount) {}
+    record ChunkRead(byte[] bytes, int[] rows, int crCount, int lfCount) {}
 
     private Charset checkCharset(byte[] bytes) {
         return matches.stream().map(m -> m.put(bytes))
