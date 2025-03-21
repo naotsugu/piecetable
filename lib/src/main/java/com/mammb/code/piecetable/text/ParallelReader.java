@@ -117,6 +117,7 @@ public class ParallelReader implements Reader {
                 .forEachOrdered(this::aggregate);
 
             index.buildStCache();
+            index.trimToSize();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
