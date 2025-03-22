@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.text;
+package com.mammb.code.piecetable.search;
 
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.Findable.FoundListener;
@@ -22,7 +22,7 @@ import com.mammb.code.piecetable.Findable.FoundListener;
  * The search.
  * @author Naotsugu Kobayashi
  */
-interface Search {
+public interface Search {
 
     /**
      * Search pattern.
