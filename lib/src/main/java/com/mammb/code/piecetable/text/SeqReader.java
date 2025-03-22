@@ -56,18 +56,18 @@ public class SeqReader implements Reader {
     /**
      * Constructor.
      * @param path the path to be read
-     * @param rowLimit the limit of row
+     * @param rowPrefLimit the limit of row
      * @param progressListener the read callback
      * @param matches the CharsetMatches
      */
-    SeqReader(Path path, int rowLimit,
+    SeqReader(Path path, int rowPrefLimit,
             ProgressListener<Long> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
         this.index = RowIndex.of();
         if (path != null && Files.exists(path)) {
-            read(path, rowLimit);
+            read(path, rowPrefLimit);
         }
     }
 
@@ -110,10 +110,10 @@ public class SeqReader implements Reader {
     /**
      * Read the file at the specified path.
      * @param path the path of file to be reade
-     * @param rowLimit the limit on the number of rows to read from the file,
-     *                 if -1 is specified, there is no limit
+     * @param rowPrefLimit the limit on the number of rows to read from the file,
+     * if -1 is specified, there is no limit.
      */
-    private void read(Path path, int rowLimit) {
+    private void read(Path path, int rowPrefLimit) {
 
         var listener = progressListener;
 
@@ -164,7 +164,7 @@ public class SeqReader implements Reader {
                     if (!continuation) break;
                 }
 
-                if (rowLimit >= 0 && (rowLimit < crCount || rowLimit < lfCount)) {
+                if (rowPrefLimit >= 0 && (rowPrefLimit < crCount || rowPrefLimit < lfCount)) {
                     break;
                 }
             }
