@@ -86,7 +86,7 @@ public class NaiveSearch {
     }
 
     private List<Chunk> buildChunk(int fromRow, int fromCol) {
-        int chunkRowSize = 10_000;
+        int chunkRowSize = doc.rows() / Runtime.getRuntime().availableProcessors() + 1;
         List<Chunk> list = new ArrayList<>();
         long serialPrev = doc.serial(fromRow, fromCol);
         for (int i = fromRow + chunkRowSize; i < doc.rows(); i+= chunkRowSize) {
