@@ -63,7 +63,7 @@ class PieceTableTest {
         var pt = PieceTable.of();
         pt.insert(0, "0123456789".getBytes());
 
-        pt.read(0, bb -> {
+        pt.read(0, -1, bb -> {
             bb.flip();
             byte[] bytes = new byte[10];
             bb.get(bytes);
@@ -83,7 +83,7 @@ class PieceTableTest {
         assertEquals(text, new String(pt.get(0, (int) pt.length())));
 
         StringBuilder sb = new StringBuilder();
-        pt.read(0, bb -> {
+        pt.read(0, -1, bb -> {
             bb.flip();
             byte[] bytes = new byte[bb.remaining()];
             bb.get(bytes);
@@ -94,7 +94,7 @@ class PieceTableTest {
         assertEquals(text, sb.toString());
 
         sb.setLength(0);
-        pt.read(2, bb -> {
+        pt.read(2, -1, bb -> {
             bb.flip();
             byte[] bytes = new byte[bb.remaining()];
             bb.get(bytes);

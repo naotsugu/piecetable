@@ -235,8 +235,8 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public void bufferRead(long offset, Function<ByteBuffer, Boolean> traverseCallback) {
-        pt.read(offset, traverseCallback);
+    public void bufferRead(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback) {
+        pt.read(offset, limitLength, traverseCallback);
     }
 
     @Override

@@ -238,7 +238,7 @@ public class PieceTableImpl implements PieceTable {
     }
 
     @Override
-    public void read(long offset, Function<ByteBuffer, Boolean> traverseCallback) {
+    public void read(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback) {
         var bb = ByteBuffer.allocate(1024 * 64);
         long len = 0;
         for (Piece piece : pieces) {
@@ -248,7 +248,9 @@ public class PieceTableImpl implements PieceTable {
                 start = offset - len;
             }
             for (long i = start; i >= 0;) {
-                i = piece.read(i, bb);
+                int before = bb.remaining();
+                i = piece.read(i, limitLength, bb);
+                limitLength -= (before - bb.remaining());
                 if (!traverseCallback.apply(bb)) {
                     return;
                 }

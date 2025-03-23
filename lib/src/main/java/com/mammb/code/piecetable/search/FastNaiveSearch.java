@@ -72,7 +72,7 @@ public class FastNaiveSearch implements Search {
             return true;
         };
 
-        doc.bufferRead(serial, traverse);
+        doc.bufferRead(serial, -1, traverse);
     }
 
     @Override

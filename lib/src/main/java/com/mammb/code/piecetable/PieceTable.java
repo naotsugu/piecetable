@@ -92,7 +92,7 @@ public interface PieceTable {
      * Reads the contents into the specified byte buffer callback.
      * Provides access to content in an efficient manner via byte buffers.
      * {@snippet :
-     * pieceTable.read(0, byteBuffer -> {
+     * pieceTable.read(0, -1, byteBuffer -> {
      *     byteBuffer.flip();
      *     var b = byteBuffer.get();
      *     // ...
@@ -101,9 +101,10 @@ public interface PieceTable {
      * });
      * }
      * @param offset the offset
+     * @param limitLength the limit length({@code -1} are no limit)
      * @param traverseCallback the specified byte buffer callback
      */
-    void read(long offset, Function<ByteBuffer, Boolean> traverseCallback);
+    void read(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback);
 
     /**
      * Get the default implementation of the piece table.
