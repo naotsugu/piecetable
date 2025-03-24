@@ -86,11 +86,10 @@ public class NaiveSearch {
     }
 
     private List<Chunk> buildChunk(int fromRow, int fromCol) {
-        int chunkRowSize = doc.rows() / Runtime.getRuntime().availableProcessors() + 1;
-        chunkRowSize = Math.max(10_000, chunkRowSize);
+        int chunkRowSize = chunkRowSize();
         List<Chunk> list = new ArrayList<>();
         long serialPrev = doc.serial(fromRow, fromCol);
-        for (int i = fromRow + chunkRowSize; i < doc.rows(); i+= chunkRowSize) {
+        for (int i = fromRow + chunkRowSize; i < doc.rows(); i += chunkRowSize) {
             long serial = doc.serial(i, 0);
             list.add(new Chunk(serialPrev, serial));
             serialPrev = serial;
@@ -99,6 +98,27 @@ public class NaiveSearch {
             list.add(new Chunk(serialPrev, doc.rawSize()));
         }
         return list;
+    }
+
+    private List<Chunk> buildBackwardChunk(int fromRow, int fromCol) {
+        int chunkRowSize = chunkRowSize();
+        List<Chunk> list = new ArrayList<>();
+        long serialPrev = doc.serial(fromRow, fromCol);
+        for (int i = fromRow - chunkRowSize; i > 0; i -= chunkRowSize) {
+            long serial = doc.serial(i, 0);
+            list.add(new Chunk(serial, serialPrev));
+            serialPrev = serial;
+        }
+        if (serialPrev > 0) {
+            list.add(new Chunk(0, serialPrev));
+        }
+        return list;
+    }
+
+    private int chunkRowSize() {
+        int chunkRowSize = (int) Math.ceil(
+            (double) doc.rows() / Runtime.getRuntime().availableProcessors());
+        return Math.max(10_000, chunkRowSize);
     }
 
     private record Chunk(long from, long to) {
