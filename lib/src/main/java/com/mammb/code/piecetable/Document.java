@@ -104,6 +104,12 @@ public interface Document extends Findable {
     void readonly(boolean readonly);
 
     /**
+     * Get readonly.
+     * @return readonly
+     */
+    boolean readonly();
+
+    /**
      * Get the row size.
      * @return the row size
      */

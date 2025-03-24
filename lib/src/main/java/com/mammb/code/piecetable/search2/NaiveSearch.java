@@ -45,8 +45,10 @@ public class NaiveSearch {
             Progress.Listener<List<Findable.Found>> listener) {
 
         if (cs == null || cs.isEmpty()) return;
+        boolean readonly = doc.readonly();
+
         try {
-            doc.readonly(true);
+            if (!readonly) doc.readonly(true);
             buildChunk(fromRow, fromCol).stream().parallel()
                 .map(c -> search(c, cs))
                 .forEachOrdered(p -> {
@@ -54,7 +56,7 @@ public class NaiveSearch {
                     if (!continuation) throw new RuntimeException("interrupted.");
                 });
         } finally {
-            doc.readonly(false);
+            if (!readonly) doc.readonly(false);
         }
     }
 
