@@ -45,6 +45,7 @@ public class NaiveSearch {
             Progress.Listener<List<Findable.Found>> listener) {
 
         if (cs == null || cs.isEmpty()) return;
+
         boolean readonly = doc.readonly();
 
         try {
