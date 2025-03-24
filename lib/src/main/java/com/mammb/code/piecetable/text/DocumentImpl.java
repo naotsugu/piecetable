@@ -225,6 +225,11 @@ public class DocumentImpl implements Document {
     }
 
     @Override
+    public boolean readonly() {
+        return readonly;
+    }
+
+    @Override
     public int rows() {
         return index.rowSize();
     }
