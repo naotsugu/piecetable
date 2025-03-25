@@ -297,6 +297,27 @@ public class RowIndex {
     }
 
     /**
+     * Get the raw floor serial position.
+     * @param serial the base serial
+     * @return the raw floor serial position
+     */
+    public long rawFloorSerial(long serial) {
+        int result = Arrays.binarySearch(stCache, 0, cacheLength, serial);
+        if (result >= 0) {
+            return stCache[result];
+        } else {
+            int point = Math.max(~result - 1, 0);
+            long st = stCache[point];
+            for (int i = point * cacheInterval; i < length; i++) {
+                int len = rowLengths[i];
+                if (st + len > serial) return st;
+                st += len;
+            }
+            return st;
+        }
+    }
+
+    /**
      * Get the row-col position.
      * @param serial the serial position
      * @return the row-col position

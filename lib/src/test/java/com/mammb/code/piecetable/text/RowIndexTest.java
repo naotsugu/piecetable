@@ -367,6 +367,37 @@ class RowIndexTest {
     }
 
     @Test
+    void rawFloorSerial() {
+        var index = RowIndex.of(3, 0);
+        index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals(0L, index.rawFloorSerial(0L));
+        assertEquals(0L, index.rawFloorSerial(1L));
+
+        assertEquals(2L, index.rawFloorSerial(2L));
+        assertEquals(2L, index.rawFloorSerial(3L));
+        assertEquals(2L, index.rawFloorSerial(4L));
+
+        assertEquals(5L, index.rawFloorSerial(5L));
+        assertEquals(5L, index.rawFloorSerial(6L));
+        assertEquals(5L, index.rawFloorSerial(7L));
+        assertEquals(5L, index.rawFloorSerial(8L));
+
+        assertEquals(9L, index.rawFloorSerial(9L));
+        assertEquals(9L, index.rawFloorSerial(10L));
+        assertEquals(9L, index.rawFloorSerial(11L));
+        assertEquals(9L, index.rawFloorSerial(12L));
+        assertEquals(9L, index.rawFloorSerial(13L));
+
+        assertEquals(14L, index.rawFloorSerial(14L));
+        assertEquals(14L, index.rawFloorSerial(15L));
+        assertEquals(14L, index.rawFloorSerial(16L));
+        assertEquals(14L, index.rawFloorSerial(17L));
+        assertEquals(14L, index.rawFloorSerial(18L));
+        assertEquals(19L, index.rawFloorSerial(19L));
+    }
+
+    @Test
     void pos1() {
         var index = RowIndex.of(3, 0);
         index.insert(0, 0, "abc".getBytes(StandardCharsets.UTF_8));
