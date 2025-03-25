@@ -15,12 +15,10 @@
  */
 package com.mammb.code.piecetable;
 
-import com.mammb.code.piecetable.Document.ProgressListener;
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -286,7 +284,7 @@ public interface TextEdit extends Findable {
      * @param progressListener the document traverse callback
      * @return a new {@link TextEdit}
      */
-    static TextEdit of(Path path, ProgressListener<Long> progressListener) {
+    static TextEdit of(Path path, Progress.Listener<Void> progressListener) {
         return new TextEditImpl(Document.of(path, progressListener));
     }
 

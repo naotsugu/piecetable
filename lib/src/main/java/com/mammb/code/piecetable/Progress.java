@@ -44,19 +44,13 @@ public interface Progress<T> {
     T partial();
 
     /**
-     * The message.
-     * @return the message
-     */
-    String message();
-
-    /**
      * Create a next workDone progress.
-     * @param workDone the up to max value
+     * @param workDelta the work delta
      * @param partial the partial result
      * @return a new {@link Progress}
      */
-    default Progress<T> workDone(double workDone, T partial) {
-        return of(workDone, max(), partial, "");
+    default Progress<T> workDone(double workDelta, T partial) {
+        return of(workDone() + workDelta, max(), partial);
     }
 
     /**
@@ -64,12 +58,21 @@ public interface Progress<T> {
      * @param workDone the up to max value
      * @param max the max value
      * @param partial the partial result
-     * @param message the message
      * @return a new {@link Progress}
      */
-    static <T> Progress<T> of(double workDone, double max, T partial, String message) {
-        record ProgressRecord<T>(double workDone, double max, T partial, String message) implements Progress<T> { }
-        return new ProgressRecord<>(workDone, max, partial, message);
+    static <T> Progress<T> of(double workDone, double max, T partial) {
+        record ProgressRecord<T>(double workDone, double max, T partial) implements Progress<T> { }
+        return new ProgressRecord<>(workDone, max, partial);
+    }
+
+    /**
+     * Create a new {@link Progress}.
+     * @param workDone the up to max value
+     * @param max the max value
+     * @return a new {@link Progress}
+     */
+    static Progress<Void> of(double workDone, double max) {
+        return of(workDone, max, null);
     }
 
     /**

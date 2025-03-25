@@ -221,7 +221,7 @@ public interface Document extends Findable {
      * @param progressListener the traverse callback of the document
      * @return a new {@link Document}
      */
-    static Document of(Path path, ProgressListener<Long> progressListener) {
+    static Document of(Path path, Progress.Listener<Void> progressListener) {
         return DocumentImpl.of(path, progressListener);
     }
 

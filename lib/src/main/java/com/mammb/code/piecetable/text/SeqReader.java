@@ -16,7 +16,7 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
-import com.mammb.code.piecetable.Document.ProgressListener;
+import com.mammb.code.piecetable.Progress;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -51,7 +51,7 @@ public class SeqReader implements Reader {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private final ProgressListener<Long> progressListener;
+    private final Progress.Listener<Void> progressListener;
 
     /**
      * Constructor.
@@ -61,7 +61,7 @@ public class SeqReader implements Reader {
      * @param matches the CharsetMatches
      */
     SeqReader(Path path, int rowPrefLimit,
-            ProgressListener<Long> progressListener,
+            Progress.Listener<Void> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
@@ -130,6 +130,7 @@ public class SeqReader implements Reader {
                 : ByteBuffer.allocateDirect(cap);
 
             byte[] bytes = new byte[buf.capacity()];
+            long nRead = 0;
 
             for (;;) {
                 buf.clear();
@@ -139,6 +140,7 @@ public class SeqReader implements Reader {
                 }
                 buf.flip();
                 byte[] read = asBytes(buf, n, bytes);
+                nRead += read.length;
 
                 if (length == 0) {
                     bom = Bom.extract(read);
@@ -160,7 +162,8 @@ public class SeqReader implements Reader {
                 index.add(read);
 
                 if (listener != null) {
-                    boolean continuation = listener.accept((long) read.length);
+                    var progress = Progress.of(nRead, length);
+                    boolean continuation = listener.accept(progress);
                     if (!continuation) break;
                 }
 

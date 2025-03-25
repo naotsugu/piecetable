@@ -19,6 +19,7 @@ import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.Pos;
+import com.mammb.code.piecetable.Progress;
 import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.search.Search;
 import java.nio.ByteBuffer;
@@ -105,7 +106,7 @@ public class DocumentImpl implements Document {
      * @param progressListener the traverse callback of the document
      * @return a new {@link Document}
      */
-    public static DocumentImpl of(Path path, ProgressListener<Long> progressListener) {
+    public static DocumentImpl of(Path path, Progress.Listener<Void> progressListener) {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, progressListener));
     }
 

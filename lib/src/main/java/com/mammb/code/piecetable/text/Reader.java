@@ -16,8 +16,8 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
-import com.mammb.code.piecetable.Document;
 import com.mammb.code.piecetable.DocumentStat;
+import com.mammb.code.piecetable.Progress;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -62,7 +62,7 @@ public interface Reader extends DocumentStat {
      * @param progressListener the traverse callback of the document
      * @return a new {@link Reader}.
      */
-    static Reader of(Path path, Document.ProgressListener<Long> progressListener) {
+    static Reader of(Path path, Progress.Listener<Void> progressListener) {
         try {
             return Files.size(path) >= ParallelReader.CHUNK_SIZE
                 ? new ParallelReader(path, progressListener, CharsetMatches.defaults())

@@ -85,7 +85,7 @@ public class NaiveSearch {
             bb.compact();
             return true;
         });
-        return Progress.of(chunk.length(), doc.rawSize(), founds, "");
+        return Progress.of(chunk.to(), doc.rawSize(), founds);
     }
 
     private List<Chunk> buildChunk(int fromRow, int fromCol) {

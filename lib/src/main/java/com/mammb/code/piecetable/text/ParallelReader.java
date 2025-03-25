@@ -16,7 +16,7 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
-import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Progress;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -57,7 +57,7 @@ public class ParallelReader implements Reader {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private final Document.ProgressListener<Long> progressListener;
+    private final Progress.Listener<Void> progressListener;
 
     /**
      * Constructor.
@@ -66,7 +66,7 @@ public class ParallelReader implements Reader {
      * @param matches the CharsetMatches
      */
     ParallelReader(Path path,
-            Document.ProgressListener<Long> progressListener,
+            Progress.Listener<Void> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
@@ -129,7 +129,8 @@ public class ParallelReader implements Reader {
         crCount += chunkRead.crCount;
         lfCount += chunkRead.lfCount;
         if (progressListener != null) {
-            boolean continuation = progressListener.accept(chunkRead.byteSize);
+            var progress = Progress.of((long) chunkRead.chunkNo * CHUNK_SIZE + chunkRead.byteSize, length);
+            boolean continuation = progressListener.accept(progress);
             if (!continuation) throw new RuntimeException("interrupted.");
         }
     }
@@ -159,7 +160,7 @@ public class ParallelReader implements Reader {
             }
         }
         rows.add(count);
-        return new ChunkRead(bytes.length, rows.get(), crCount, lfCount);
+        return new ChunkRead(chunkNo, bytes.length, rows.get(), crCount, lfCount);
     }
 
     private byte[] handleHeadChunk(byte[] bytes) {
@@ -173,7 +174,7 @@ public class ParallelReader implements Reader {
         return bytes;
     }
 
-    record ChunkRead(long byteSize, int[] rows, int crCount, int lfCount) {}
+    record ChunkRead(int chunkNo, long byteSize, int[] rows, int crCount, int lfCount) {}
 
     private Charset checkCharset(byte[] bytes) {
         return matches.stream().map(m -> m.put(bytes))
