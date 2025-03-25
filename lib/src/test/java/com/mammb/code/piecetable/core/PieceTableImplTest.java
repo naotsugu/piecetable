@@ -17,10 +17,12 @@ package com.mammb.code.piecetable.core;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.ByteBuffer;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * The test of {@link PieceTableImplTest}.
+ * The test of {@link PieceTableImpl}.
  * @author Naotsugu Kobayashi
  */
 class PieceTableImplTest {
