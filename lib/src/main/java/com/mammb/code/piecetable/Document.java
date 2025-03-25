@@ -131,6 +131,15 @@ public interface Document extends Findable {
     void bufferRead(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback);
 
     /**
+     * Reads the contents into the specified byte buffer.
+     * @param offset the offset
+     * @param length the length
+     * @param bb byte buffer
+     * @return the read length
+     */
+    long bufferRead(long offset, long length, ByteBuffer bb);
+
+    /**
      * Get the serial position.
      * Represents the byte position from the beginning of the file.
      * This position does not include bom.

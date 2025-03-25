@@ -107,6 +107,15 @@ public interface PieceTable {
     void read(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback);
 
     /**
+     * Reads the contents into the specified byte buffer.
+     * @param offset the offset
+     * @param length the length
+     * @param bb byte buffer
+     * @return the read length
+     */
+    long read(long offset, long length, ByteBuffer bb);
+
+    /**
      * Get the default implementation of the piece table.
      * @return the piece table
      */

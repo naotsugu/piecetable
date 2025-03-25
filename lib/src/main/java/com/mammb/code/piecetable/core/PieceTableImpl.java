@@ -259,6 +259,25 @@ public class PieceTableImpl implements PieceTable {
         }
     }
 
+    @Override
+    public long read(long offset, long length, ByteBuffer bb) {
+        long limit = length;
+        long len = 0;
+        for (Piece piece : pieces) {
+            if ((len + piece.length()) < offset) continue;
+            long start = 0;
+            if (len < offset && offset <= len + piece.length()) {
+                start = offset - len;
+            }
+            int before = bb.remaining();
+            piece.read(start, limit, bb);
+            limit -= (before - bb.remaining());
+            if (limit <= 0 || !bb.hasRemaining()) break;
+            len += piece.length();
+        }
+        return length - limit;
+    }
+
     /**
      * Get the all bytes.
      * @return the all bytes

@@ -246,6 +246,11 @@ public class DocumentImpl implements Document {
     }
 
     @Override
+    public long bufferRead(long offset, long length, ByteBuffer bb) {
+        return pt.read(offset, length, bb);
+    }
+
+    @Override
     public long serial(int row, int col) {
         return index.serial(row, col);
     }
