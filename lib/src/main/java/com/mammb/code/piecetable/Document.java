@@ -150,6 +150,13 @@ public interface Document extends Findable {
     long serial(int row, int col);
 
     /**
+     * Get the raw floor serial position.
+     * @param serial the base serial
+     * @return the raw floor serial position
+     */
+    long rawFloorSerial(long serial);
+
+    /**
      * Get the serial position.
      * Represents the byte position from the beginning of the file.
      * This position does not include bom.

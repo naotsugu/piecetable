@@ -256,6 +256,11 @@ public class DocumentImpl implements Document {
     }
 
     @Override
+    public long rawFloorSerial(long serial) {
+        return index.rawFloorSerial(serial);
+    }
+
+    @Override
     public Pos pos(long serial) {
         int[] ret = index.pos(serial);
         return new Pos(ret[0], ret[1]);
