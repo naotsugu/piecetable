@@ -297,11 +297,11 @@ public class RowIndex {
     }
 
     /**
-     * Get the raw floor serial position.
+     * Get the row floor serial position.
      * @param serial the base serial
-     * @return the raw floor serial position
+     * @return the row floor serial position
      */
-    public long rawFloorSerial(long serial) {
+    public long rowFloorSerial(long serial) {
         int result = Arrays.binarySearch(stCache, 0, cacheLength, serial);
         if (result >= 0) {
             return stCache[result];
@@ -312,6 +312,27 @@ public class RowIndex {
                 int len = rowLengths[i];
                 if (st + len > serial) return st;
                 st += len;
+            }
+            return st;
+        }
+    }
+
+    /**
+     * Get the row ceil serial position.
+     * @param serial the base serial
+     * @return the row floor serial position
+     */
+    public long rowCeilSerial(long serial) {
+        int result = Arrays.binarySearch(stCache, 0, cacheLength, serial);
+        if (result >= 0) {
+            return stCache[result];
+        } else {
+            int point = Math.max(~result - 1, 0);
+            long st = stCache[point];
+            for (int i = point * cacheInterval; i < length; i++) {
+                int len = rowLengths[i];
+                st += len;
+                if (st > serial) return st;
             }
             return st;
         }

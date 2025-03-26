@@ -150,11 +150,18 @@ public interface Document extends Findable {
     long serial(int row, int col);
 
     /**
-     * Get the raw floor serial position.
+     * Get the row floor serial position.
      * @param serial the base serial
-     * @return the raw floor serial position
+     * @return the row floor serial position
      */
-    long rawFloorSerial(long serial);
+    long rowFloorSerial(long serial);
+
+    /**
+     * Get the row ceil serial position.
+     * @param serial the base serial
+     * @return the row floor serial position
+     */
+    long rowCeilSerial(long serial);
 
     /**
      * Get the serial position.

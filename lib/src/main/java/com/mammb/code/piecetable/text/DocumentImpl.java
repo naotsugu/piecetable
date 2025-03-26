@@ -256,8 +256,13 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public long rawFloorSerial(long serial) {
-        return index.rawFloorSerial(serial);
+    public long rowFloorSerial(long serial) {
+        return index.rowFloorSerial(serial);
+    }
+
+    @Override
+    public long rowCeilSerial(long serial) {
+        return index.rowCeilSerial(serial);
     }
 
     @Override
