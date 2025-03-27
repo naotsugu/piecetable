@@ -402,25 +402,26 @@ class RowIndexTest {
         var index = RowIndex.of(3, 0);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
 
-        assertEquals(2L, index.rowCeilSerial(0L));
-        assertEquals(2L, index.rowCeilSerial(1L));
+        assertEquals(0L, index.rowCeilSerial(0L));
 
-        assertEquals(5L, index.rowCeilSerial(2L));
+        assertEquals(2L, index.rowCeilSerial(1L));
+        assertEquals(2L, index.rowCeilSerial(2L));
+
         assertEquals(5L, index.rowCeilSerial(3L));
         assertEquals(5L, index.rowCeilSerial(4L));
+        assertEquals(5L, index.rowCeilSerial(5L));
 
-        assertEquals(9L, index.rowCeilSerial(5L));
         assertEquals(9L, index.rowCeilSerial(6L));
         assertEquals(9L, index.rowCeilSerial(7L));
         assertEquals(9L, index.rowCeilSerial(8L));
+        assertEquals(9L, index.rowCeilSerial(9L));
 
-        assertEquals(14L, index.rowCeilSerial(9L));
         assertEquals(14L, index.rowCeilSerial(10L));
         assertEquals(14L, index.rowCeilSerial(11L));
         assertEquals(14L, index.rowCeilSerial(12L));
         assertEquals(14L, index.rowCeilSerial(13L));
+        assertEquals(14L, index.rowCeilSerial(14L));
 
-        assertEquals(19L, index.rowCeilSerial(14L));
         assertEquals(19L, index.rowCeilSerial(15L));
         assertEquals(19L, index.rowCeilSerial(16L));
         assertEquals(19L, index.rowCeilSerial(17L));

@@ -90,12 +90,26 @@ class SeqReaderTest {
     }
 
     @Test
-    void charsetUTF16() throws IOException {
+    void charsetUTF16BE() throws IOException {
         Path path = dir.resolve("utf16BE" + ".txt");
         Charset cs = StandardCharsets.UTF_16BE;
 
         ByteArrayOutputStream os = new ByteArrayOutputStream( );
         os.write(Bom.UTF_16BE);
+        os.write("abcあいう".getBytes(cs));
+
+        Files.write(path, os.toByteArray());
+        var target = new SeqReader(path, -1, null, CharsetMatches.defaults());
+        assertEquals(cs, target.charset());
+    }
+
+    @Test
+    void charsetUTF16LE() throws IOException {
+        Path path = dir.resolve("utf16BE" + ".txt");
+        Charset cs = StandardCharsets.UTF_16LE;
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream( );
+        os.write(Bom.UTF_16LE);
         os.write("abcあいう".getBytes(cs));
 
         Files.write(path, os.toByteArray());
