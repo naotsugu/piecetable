@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.text;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -84,6 +85,20 @@ class SeqReaderTest {
         Path path = dir.resolve("utf8" + ".txt");
         Charset cs = StandardCharsets.UTF_8;
         Files.write(path, "abcあいう".getBytes(cs));
+        var target = new SeqReader(path, -1, null, CharsetMatches.defaults());
+        assertEquals(cs, target.charset());
+    }
+
+    @Test
+    void charsetUTF16() throws IOException {
+        Path path = dir.resolve("utf16BE" + ".txt");
+        Charset cs = StandardCharsets.UTF_16BE;
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream( );
+        os.write(Bom.UTF_16BE);
+        os.write("abcあいう".getBytes(cs));
+
+        Files.write(path, os.toByteArray());
         var target = new SeqReader(path, -1, null, CharsetMatches.defaults());
         assertEquals(cs, target.charset());
     }

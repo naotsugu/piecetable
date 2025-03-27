@@ -25,11 +25,11 @@ import java.util.Arrays;
  */
 class Bom {
 
-    private static final byte[] UTF_8    = new byte[] { (byte) 0xef, (byte) 0xbb, (byte) 0xbf };
-    private static final byte[] UTF_16BE = new byte[] { (byte) 0xfe, (byte) 0xff };
-    private static final byte[] UTF_16LE = new byte[] { (byte) 0xff, (byte) 0xfe };
-    private static final byte[] UTF_32BE = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff };
-    private static final byte[] UTF_32LE = new byte[] { (byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00 };
+    static final byte[] UTF_8    = new byte[] { (byte) 0xef, (byte) 0xbb, (byte) 0xbf };
+    static final byte[] UTF_16BE = new byte[] { (byte) 0xfe, (byte) 0xff };
+    static final byte[] UTF_16LE = new byte[] { (byte) 0xff, (byte) 0xfe };
+    static final byte[] UTF_32BE = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff };
+    static final byte[] UTF_32LE = new byte[] { (byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00 };
 
     /**
      * Extracts the bom from the specified byte array.
