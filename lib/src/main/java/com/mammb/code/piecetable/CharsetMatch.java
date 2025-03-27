@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable;
 
 import java.nio.charset.Charset;
+import java.util.Comparator;
 
 /**
  * The CharsetMatch.
@@ -38,7 +39,7 @@ public interface CharsetMatch {
      * @return a new {@link CharsetMatch}
      */
     static CharsetMatch of(Charset charset) {
-        return bytes -> new Result(charset, 100);
+        return bytes -> new Result(charset, 100, 0);
     }
 
 
@@ -46,11 +47,14 @@ public interface CharsetMatch {
      * The {@link CharsetMatch} result.
      * @param charset the charset
      * @param confidence the confidence
+     * @param miss the miss
      */
-    record Result(Charset charset, int confidence) implements Comparable<Result> {
+    record Result(Charset charset, int confidence, int miss) implements Comparable<Result> {
         @Override
         public int compareTo(Result o) {
-            return Integer.compare(confidence, o.confidence);
+            return Comparator.comparingInt(Result::miss)
+                .thenComparing(Result::confidence)
+                .compare(o, this);
         }
     }
 

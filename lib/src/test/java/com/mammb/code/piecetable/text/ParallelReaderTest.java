@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.text;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,6 +69,23 @@ class ParallelReaderTest {
         assertEquals(2, target.index().rowLengths()[1]);
     }
 
+    @Test
+    void charsetWindows31j() throws IOException {
+        Path path = dir.resolve("ms932" + ".txt");
+        Charset cs = Charset.forName("windows-31j");
+        Files.write(path, "abcあいう".getBytes(cs));
+        var target = new ParallelReader(path, null, CharsetMatches.defaults());
+        assertEquals(cs, target.charset());
+    }
+
+    @Test
+    void charsetUTF8() throws IOException {
+        Path path = dir.resolve("utf8" + ".txt");
+        Charset cs = StandardCharsets.UTF_8;
+        Files.write(path, "abcあいう".getBytes(cs));
+        var target = new ParallelReader(path, null, CharsetMatches.defaults());
+        assertEquals(cs, target.charset());
+    }
 
     private Path textFile(String text) {
         Path path = dir.resolve(UUID.randomUUID() + ".txt");

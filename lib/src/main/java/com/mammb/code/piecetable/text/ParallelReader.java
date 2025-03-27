@@ -179,7 +179,6 @@ public class ParallelReader implements Reader {
     private Charset checkCharset(byte[] bytes) {
         return matches.stream().map(m -> m.put(bytes))
             .max(Comparator.naturalOrder())
-            .filter(r -> r.confidence() >= 100)
             .map(CharsetMatch.Result::charset)
             .orElse(null);
     }

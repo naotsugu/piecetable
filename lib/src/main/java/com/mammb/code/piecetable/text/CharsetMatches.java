@@ -99,7 +99,7 @@ public abstract class CharsetMatches {
                     }
                 }
             }
-            return new Result(StandardCharsets.UTF_8, clamp(confidence - miss));
+            return new Result(StandardCharsets.UTF_8, clamp(confidence), miss);
         }
 
         private int trail(byte b) {
@@ -152,12 +152,12 @@ public abstract class CharsetMatches {
                     trail = 0;
                 }
             }
-            return new Result(Charset.forName("windows-31j"), clamp(confidence - miss));
+            return new Result(Charset.forName("windows-31j"), clamp(confidence), miss);
         }
     }
 
     private static int clamp(int value) {
-        return Math.min(100, Math.max(value, 0));
+        return Math.clamp(value, 0, 100);
     }
 
 }
