@@ -30,6 +30,7 @@ class Bom {
     static final byte[] UTF_16LE = new byte[] { (byte) 0xff, (byte) 0xfe };
     static final byte[] UTF_32BE = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff };
     static final byte[] UTF_32LE = new byte[] { (byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00 };
+    static final byte[] GB18030  = new byte[] { (byte) 0x84, (byte) 0x31, (byte) 0x95, (byte) 0x33 };
 
     /**
      * Extracts the bom from the specified byte array.
@@ -43,27 +44,44 @@ class Bom {
             (bytes[0] & 0xFF) == 0xef &&
             (bytes[1] & 0xFF) == 0xbb &&
             (bytes[2] & 0xFF) == 0xbf) {
-            return new byte[] { bytes[0], bytes[1], bytes[2] };
+            return new byte[] { bytes[0], bytes[1], bytes[2] }; // UTF_8
         } else if (bytes.length >= 2 &&
             (bytes[0] & 0xFF) == 0xfe &&
             (bytes[1] & 0xFF) == 0xff) {
-            return new byte[] { bytes[0], bytes[1] };
+            return new byte[] { bytes[0], bytes[1] }; // UTF_16BE
         } else if (bytes.length >= 4 &&
             (bytes[0] & 0xFF) == 0xff &&
             (bytes[1] & 0xFF) == 0xfe &&
             (bytes[2] & 0xFF) == 0x00 &&
             (bytes[3] & 0xFF) == 0x00) {
-            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] };
+            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] }; // UTF_32LE
         } else if (bytes.length >= 2 &&
             (bytes[0] & 0xFF) == 0xff &&
             (bytes[1] & 0xFF) == 0xfe) {
-            return new byte[] { bytes[0], bytes[1] };
+            return new byte[] { bytes[0], bytes[1] }; // UTF_16LE
         } else if (bytes.length >= 4 &&
             (bytes[0] & 0xFF) == 0x00 &&
             (bytes[1] & 0xFF) == 0x00 &&
             (bytes[2] & 0xFF) == 0xfe &&
             (bytes[3] & 0xFF) == 0xff) {
-            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] };
+            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] }; // UTF_32BE
+        } else if (bytes.length >= 4 &&
+            (bytes[0] & 0xFF) == 0x84 &&
+            (bytes[1] & 0xFF) == 0x31 &&
+            (bytes[2] & 0xFF) == 0x95 &&
+            (bytes[3] & 0xFF) == 0x33) {
+            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] }; // GB18030
+        } else if (bytes.length >= 3 &&
+            (bytes[0] & 0xFF) == 0xf7 &&
+            (bytes[1] & 0xFF) == 0x64 &&
+            (bytes[2] & 0xFF) == 0x4c) {
+            return new byte[] { bytes[0], bytes[1], bytes[2] }; // UTF-1
+        } else if (bytes.length >= 4 &&
+            (bytes[0] & 0xFF) == 0xdd &&
+            (bytes[1] & 0xFF) == 0x73 &&
+            (bytes[2] & 0xFF) == 0x66 &&
+            (bytes[3] & 0xFF) == 0x73) {
+            return new byte[] { bytes[0], bytes[1], bytes[2], bytes[3] }; //UTF-EBCDIC
         }
         return new byte[0];
     }
@@ -84,6 +102,8 @@ class Bom {
             return StandardCharsets.UTF_16LE;
         } else if (Arrays.equals(bom, UTF_32BE)) {
             return Charset.forName("UTF_32BE");
+        } else if (Arrays.equals(bom, GB18030)) {
+            return Charset.forName("GB18030");
         } else {
             return null;
         }
