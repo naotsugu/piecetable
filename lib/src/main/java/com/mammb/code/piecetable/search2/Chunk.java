@@ -19,9 +19,10 @@ package com.mammb.code.piecetable.search2;
  * The chunk.
  * @param from the from position
  * @param to the to position
+ * @param total the total size
  * @author Naotsugu Kobayashi
  */
-public record Chunk(long from, long to) {
+public record Chunk(long from, long to, long total) {
 
     /**
      * Get the length.

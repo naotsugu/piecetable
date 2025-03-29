@@ -16,48 +16,61 @@
 package com.mammb.code.piecetable.search2;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.Findable;
+import com.mammb.code.piecetable.Progress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * The AbstractSearch.
+ * The search utilities.
  * @author Naotsugu Kobayashi
  */
-public abstract class AbstractSearch {
+final class Searches {
 
-    /** The source document. */
-    private final Document doc;
-
-    /**
-     * Constructor.
-     * @param doc the source document
-     */
-    AbstractSearch(Document doc) {
-        this.doc = doc;
-    }
-
-    List<Chunk> buildChunk(int fromRow, int fromCol, int size) {
+    static List<Chunk> chunks(Document doc, int fromRow, int fromCol, int size) {
         List<Chunk> chunks = new ArrayList<>();
         long from = doc.serial(fromRow, fromCol);
         while (true) {
             long to = doc.rowFloorSerial(from + size);
-            chunks.add(new Chunk(from, to));
+            chunks.add(new Chunk(from, to, doc.rawSize() - from));
             if (to >= doc.rawSize()) break;
             from = to;
         }
         return chunks;
     }
 
-    List<Chunk> buildBackwardChunk(int fromRow, int fromCol, int size) {
+    static List<Chunk> backwardChunks(Document doc, int fromRow, int fromCol, int size) {
         List<Chunk> chunks = new ArrayList<>();
         long from = doc.serial(fromRow, fromCol);
+        long total = from;
         while (true) {
             long to = doc.rowCeilSerial(from - size);
-            chunks.add(new Chunk(from, to));
+            chunks.add(new Chunk(from, to, total));
             if (to == 0) break;
             from = to;
         }
         return chunks;
+    }
+
+    static void withLock(Document doc, Runnable r) {
+        final boolean ro = doc.readonly();
+        try {
+            if (!ro) doc.readonly(true);
+            r.run();
+        } finally {
+            if (!ro) doc.readonly(false);
+        }
+    }
+
+    static void notifyProgress(Progress progress, Progress.Listener<List<Findable.Found>> listener) {
+        boolean continuation = listener.accept(progress);
+        if (!continuation) throw new RuntimeException("interrupted.");
+    }
+
+    static List<Findable.Found> reverse(List<Findable.Found> founds) {
+        Collections.reverse(founds);
+        return founds;
     }
 
 }

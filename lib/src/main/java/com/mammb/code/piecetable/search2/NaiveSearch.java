@@ -50,7 +50,7 @@ public class NaiveSearch {
 
         try {
             if (!readonly) doc.readonly(true);
-            buildChunk(fromRow, fromCol).stream().parallel()
+            buildChunks(fromRow, fromCol).stream().parallel()
                 .map(c -> search(c, cs))
                 .forEachOrdered(p -> {
                     boolean continuation = listener.accept(p);
@@ -88,7 +88,7 @@ public class NaiveSearch {
         return Progress.of(chunk.to(), doc.rawSize(), founds);
     }
 
-    private List<Chunk> buildChunk(int fromRow, int fromCol) {
+    private List<Chunk> buildChunks(int fromRow, int fromCol) {
         int chunkRowSize = chunkRowSize();
         List<Chunk> list = new ArrayList<>();
         long serialPrev = doc.serial(fromRow, fromCol);
@@ -103,7 +103,7 @@ public class NaiveSearch {
         return list;
     }
 
-    private List<Chunk> buildBackwardChunk(int fromRow, int fromCol) {
+    private List<Chunk> buildBackwardChunks(int fromRow, int fromCol) {
         int chunkRowSize = chunkRowSize();
         List<Chunk> list = new ArrayList<>();
         long serialPrev = doc.serial(fromRow, fromCol);
