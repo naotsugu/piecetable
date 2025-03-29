@@ -53,26 +53,32 @@ public abstract class PatternSearch {
 
     void search(CharSequence cs, int matchFlags, int fromRow, int fromCol,
             Progress.Listener<List<Findable.Found>> listener) {
+
         if (cs == null || cs.isEmpty()) return;
+
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+
         Searches.withLock(doc, () ->
             Searches.chunks(doc, fromRow, fromCol, CHUNK_SIZE).stream()
                 .parallel()
                 .map(c -> search(c, pattern))
-                .map(m -> Progress.of(m.chunk.to(), m.chunk.total(), m.founds))
+                .map(m -> Progress.of(m.chunk.distance(), m.chunk.parentLength(), m.founds))
                 .forEachOrdered(m -> Searches.notifyProgress(m, listener))
         );
     }
 
     void searchBackward(CharSequence cs, int matchFlags, int fromRow, int fromCol,
             Progress.Listener<List<Findable.Found>> listener) {
+
         if (cs == null || cs.isEmpty()) return;
+
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+
         Searches.withLock(doc, () ->
             Searches.backwardChunks(doc, fromRow, fromCol, CHUNK_SIZE).stream()
                 .parallel()
                 .map(c -> search(c, pattern))
-                .map(m -> Progress.of(m.chunk.total() - m.chunk.from(), m.chunk.total(), Searches.reverse(m.founds)))
+                .map(m -> Progress.of(m.chunk.reverseDistance(), m.chunk.parentLength(), Searches.reverse(m.founds)))
                 .forEachOrdered(m -> Searches.notifyProgress(m, listener))
         );
     }

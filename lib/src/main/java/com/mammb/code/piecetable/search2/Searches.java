@@ -31,10 +31,12 @@ final class Searches {
     static List<Chunk> chunks(Document doc, int fromRow, int fromCol, int size) {
         List<Chunk> chunks = new ArrayList<>();
         long from = doc.serial(fromRow, fromCol);
+        long parentFrom = from;
+        long parentTo = doc.rawSize();
         while (true) {
             long to = doc.rowFloorSerial(from + size);
-            chunks.add(new Chunk(from, to, doc.rawSize() - from));
-            if (to >= doc.rawSize()) break;
+            chunks.add(new Chunk(from, to, parentFrom, parentTo));
+            if (to >= parentTo) break;
             from = to;
         }
         return chunks;
@@ -43,10 +45,10 @@ final class Searches {
     static List<Chunk> backwardChunks(Document doc, int fromRow, int fromCol, int size) {
         List<Chunk> chunks = new ArrayList<>();
         long from = doc.serial(fromRow, fromCol);
-        long total = from;
+        long parentFrom = from;
         while (true) {
             long to = doc.rowCeilSerial(from - size);
-            chunks.add(new Chunk(from, to, total));
+            chunks.add(new Chunk(to, from, 0, parentFrom));
             if (to == 0) break;
             from = to;
         }
@@ -63,7 +65,8 @@ final class Searches {
         }
     }
 
-    static void notifyProgress(Progress progress, Progress.Listener<List<Findable.Found>> listener) {
+    static void notifyProgress(Progress<List<Findable.Found>> progress,
+            Progress.Listener<List<Findable.Found>> listener) {
         boolean continuation = listener.accept(progress);
         if (!continuation) throw new RuntimeException("interrupted.");
     }

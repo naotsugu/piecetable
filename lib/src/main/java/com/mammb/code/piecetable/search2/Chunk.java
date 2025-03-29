@@ -19,10 +19,11 @@ package com.mammb.code.piecetable.search2;
  * The chunk.
  * @param from the from position
  * @param to the to position
- * @param total the total size
+ * @param parentFrom the parent from
+ * @param parentTo the parent to
  * @author Naotsugu Kobayashi
  */
-public record Chunk(long from, long to, long total) {
+public record Chunk(long from, long to, long parentFrom, long parentTo) {
 
     /**
      * Get the length.
@@ -30,6 +31,49 @@ public record Chunk(long from, long to, long total) {
      */
     long length() {
         return to - from;
+    }
+
+    /**
+     * Get the parent length.
+     * @return the parent length
+     */
+    long parentLength() {
+        return parentTo - parentFrom;
+    }
+
+    /**
+     * <pre>
+     * 0 ---------------------------- ┬
+     *                                │
+     * parentFrom -- from ─┐          ┼
+     *                     │          │
+     *                 to ─┘ ─┐ from  │ to - parentFrom
+     *                        │       │
+     *                       ─┘ to    ┴
+     *
+     * parentTo ----
+     * </pre>
+     * @return the distance
+     */
+    long distance() {
+        return to - parentFrom;
+    }
+
+    /**
+     * <pre>
+     * parentFrom 0 ----------------- ┬
+     *                                │
+     *                       ─┐ from  ┼
+     *                        │       │
+     *               from ─┐ ─┘ to    │ parentTo - from
+     *                     │          │
+     * parentTo ----   to ─┘          ┴
+     *
+     * </pre>
+     * @return the reverse distance
+     */
+    long reverseDistance() {
+        return parentTo - from;
     }
 
 }

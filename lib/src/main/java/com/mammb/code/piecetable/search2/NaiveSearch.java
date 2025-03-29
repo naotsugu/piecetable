@@ -46,19 +46,11 @@ public class NaiveSearch {
 
         if (cs == null || cs.isEmpty()) return;
 
-        boolean readonly = doc.readonly();
-
-        try {
-            if (!readonly) doc.readonly(true);
+        Searches.withLock(doc, () ->
             buildChunks(fromRow, fromCol).stream().parallel()
                 .map(c -> search(c, cs))
-                .forEachOrdered(p -> {
-                    boolean continuation = listener.accept(p);
-                    if (!continuation) throw new RuntimeException("interrupted.");
-                });
-        } finally {
-            if (!readonly) doc.readonly(false);
-        }
+                .forEachOrdered(p -> Searches.notifyProgress(p, listener))
+        );
     }
 
     private Progress<List<Findable.Found>> search(Chunk chunk, CharSequence cs) {
@@ -66,7 +58,7 @@ public class NaiveSearch {
         byte first = pattern[0];
         AtomicInteger n = new AtomicInteger(0);
         List<Findable.Found> founds = new ArrayList<>();
-        doc.bufferRead(chunk.from, chunk.length(), bb -> {
+        doc.bufferRead(chunk.from(), chunk.length(), bb -> {
             bb.flip();
             while (bb.remaining() >= pattern.length) {
                 int matchLen;
@@ -77,7 +69,7 @@ public class NaiveSearch {
                     if (pattern[matchLen] != bb.get()) break;
                 }
                 if (matchLen == pattern.length) {
-                    Pos pos = doc.pos(chunk.from + n.get() - matchLen);
+                    Pos pos = doc.pos(chunk.from() + n.get() - matchLen);
                     var found = new Findable.Found(pos.row(), pos.col(), cs.length());
                     founds.add(found);
                 }
@@ -92,13 +84,15 @@ public class NaiveSearch {
         int chunkRowSize = chunkRowSize();
         List<Chunk> list = new ArrayList<>();
         long serialPrev = doc.serial(fromRow, fromCol);
+        long parentFrom = serialPrev;
+        long parentTo = doc.rawSize();
         for (int i = fromRow + chunkRowSize; i < doc.rows(); i += chunkRowSize) {
             long serial = doc.serial(i, 0);
-            list.add(new Chunk(serialPrev, serial));
+            list.add(new Chunk(serialPrev, serial, parentFrom, parentTo));
             serialPrev = serial;
         }
         if (serialPrev < doc.rawSize()) {
-            list.add(new Chunk(serialPrev, doc.rawSize()));
+            list.add(new Chunk(serialPrev, doc.rawSize(), parentFrom, parentTo));
         }
         return list;
     }
@@ -107,13 +101,14 @@ public class NaiveSearch {
         int chunkRowSize = chunkRowSize();
         List<Chunk> list = new ArrayList<>();
         long serialPrev = doc.serial(fromRow, fromCol);
+        long parentFrom = serialPrev;
         for (int i = fromRow - chunkRowSize; i > 0; i -= chunkRowSize) {
             long serial = doc.serial(i, 0);
-            list.add(new Chunk(serial, serialPrev));
+            list.add(new Chunk(serial, serialPrev, 0, parentFrom));
             serialPrev = serial;
         }
         if (serialPrev > 0) {
-            list.add(new Chunk(0, serialPrev));
+            list.add(new Chunk(0, serialPrev, 0, parentFrom));
         }
         return list;
     }
@@ -122,12 +117,6 @@ public class NaiveSearch {
         int chunkRowSize = (int) Math.ceil(
             (double) doc.rows() / Runtime.getRuntime().availableProcessors());
         return Math.max(10_000, chunkRowSize);
-    }
-
-    private record Chunk(long from, long to) {
-        long length() {
-            return to - from;
-        }
     }
 
 }
