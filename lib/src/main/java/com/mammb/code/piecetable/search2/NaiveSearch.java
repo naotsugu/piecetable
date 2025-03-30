@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.mammb.code.piecetable.search2.Searches.*;
+
 /**
  * The naive search.
  * Bypass String instantiation by comparing them as a byte array.
@@ -46,8 +48,9 @@ public class NaiveSearch {
 
         if (cs == null || cs.isEmpty()) return;
 
-        Searches.withLock(doc, () ->
-            buildChunks(fromRow, fromCol).stream().parallel()
+        int size = chunkSize();
+        withLock(doc, () ->
+            chunks(doc, fromRow, fromCol, size).stream().parallel()
                 .map(c -> search(c, cs))
                 .forEachOrdered(p -> Searches.notifyProgress(p, listener))
         );
@@ -80,43 +83,10 @@ public class NaiveSearch {
         return Progress.of(chunk.to(), doc.rawSize(), founds);
     }
 
-    private List<Chunk> buildChunks(int fromRow, int fromCol) {
-        int chunkRowSize = chunkRowSize();
-        List<Chunk> list = new ArrayList<>();
-        long serialPrev = doc.serial(fromRow, fromCol);
-        long parentFrom = serialPrev;
-        long parentTo = doc.rawSize();
-        for (int i = fromRow + chunkRowSize; i < doc.rows(); i += chunkRowSize) {
-            long serial = doc.serial(i, 0);
-            list.add(new Chunk(serialPrev, serial, parentFrom, parentTo));
-            serialPrev = serial;
-        }
-        if (serialPrev < doc.rawSize()) {
-            list.add(new Chunk(serialPrev, doc.rawSize(), parentFrom, parentTo));
-        }
-        return list;
-    }
-
-    private List<Chunk> buildBackwardChunks(int fromRow, int fromCol) {
-        int chunkRowSize = chunkRowSize();
-        List<Chunk> list = new ArrayList<>();
-        long serialPrev = doc.serial(fromRow, fromCol);
-        long parentFrom = serialPrev;
-        for (int i = fromRow - chunkRowSize; i > 0; i -= chunkRowSize) {
-            long serial = doc.serial(i, 0);
-            list.add(new Chunk(serial, serialPrev, 0, parentFrom));
-            serialPrev = serial;
-        }
-        if (serialPrev > 0) {
-            list.add(new Chunk(0, serialPrev, 0, parentFrom));
-        }
-        return list;
-    }
-
-    private int chunkRowSize() {
-        int chunkRowSize = (int) Math.ceil(
-            (double) doc.rows() / Runtime.getRuntime().availableProcessors());
-        return Math.max(10_000, chunkRowSize);
+    private int chunkSize() {
+        int chunkSize = (int) Math.ceil(
+            (double) doc.rawSize() / Runtime.getRuntime().availableProcessors());
+        return Math.max(DEFAULT_CHUNK_SIZE, chunkSize);
     }
 
 }

@@ -28,7 +28,11 @@ import java.util.List;
  */
 final class Searches {
 
+    /** The default chunk size. */
+    static final int DEFAULT_CHUNK_SIZE = 1024 * 256;
+
     static List<Chunk> chunks(Document doc, int fromRow, int fromCol, int size) {
+
         List<Chunk> chunks = new ArrayList<>();
         long from = doc.serial(fromRow, fromCol);
         long parentFrom = from;

@@ -22,11 +22,12 @@ import com.mammb.code.piecetable.Progress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.mammb.code.piecetable.search2.Searches.*;
 
 /**
  * The pattern search.
@@ -36,9 +37,6 @@ public abstract class PatternSearch {
 
     /** The source document. */
     private final Document doc;
-
-    /** The chunk size. */
-    private final int CHUNK_SIZE = 1024 * 256;
 
     /** The ByteBuffer pool. */
     private final ConcurrentLinkedQueue<ByteBuffer> pool = new ConcurrentLinkedQueue<>();
@@ -58,12 +56,12 @@ public abstract class PatternSearch {
 
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
-        Searches.withLock(doc, () ->
-            Searches.chunks(doc, fromRow, fromCol, CHUNK_SIZE).stream()
+        withLock(doc, () ->
+            chunks(doc, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
                 .parallel()
                 .map(c -> search(c, pattern))
                 .map(m -> Progress.of(m.chunk.distance(), m.chunk.parentLength(), m.founds))
-                .forEachOrdered(m -> Searches.notifyProgress(m, listener))
+                .forEachOrdered(m -> notifyProgress(m, listener))
         );
     }
 
@@ -74,12 +72,12 @@ public abstract class PatternSearch {
 
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
-        Searches.withLock(doc, () ->
-            Searches.backwardChunks(doc, fromRow, fromCol, CHUNK_SIZE).stream()
+        withLock(doc, () ->
+            backwardChunks(doc, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
                 .parallel()
                 .map(c -> search(c, pattern))
-                .map(m -> Progress.of(m.chunk.reverseDistance(), m.chunk.parentLength(), Searches.reverse(m.founds)))
-                .forEachOrdered(m -> Searches.notifyProgress(m, listener))
+                .map(m -> Progress.of(m.chunk.reverseDistance(), m.chunk.parentLength(), reverse(m.founds)))
+                .forEachOrdered(m -> notifyProgress(m, listener))
         );
     }
 
@@ -89,7 +87,7 @@ public abstract class PatternSearch {
 
         ByteBuffer bb = pool.poll();
         if (bb == null) {
-            bb = ByteBuffer.allocateDirect(CHUNK_SIZE);
+            bb = ByteBuffer.allocateDirect(DEFAULT_CHUNK_SIZE);
         }
 
         doc.bufferRead(chunk.from(), chunk.length(), bb);
