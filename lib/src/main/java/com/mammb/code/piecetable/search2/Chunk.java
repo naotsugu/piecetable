@@ -23,7 +23,21 @@ package com.mammb.code.piecetable.search2;
  * @param parentTo the parent to
  * @author Naotsugu Kobayashi
  */
-public record Chunk(long from, long to, long parentFrom, long parentTo) {
+record Chunk(long from, long to, long parentFrom, long parentTo) {
+
+    /**
+     * Canonical constructor.
+     * @param from the from position
+     * @param to the to position
+     * @param parentFrom the parent from
+     * @param parentTo the parent to
+     */
+    Chunk {
+        if (from > to)
+            throw new IllegalArgumentException(String.format("(%d, %d)", from, to));
+        if (parentFrom > parentTo)
+            throw new IllegalArgumentException(String.format("(%d, %d)", parentFrom, parentTo));
+    }
 
     /**
      * Get the length.
