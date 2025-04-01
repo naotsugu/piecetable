@@ -33,8 +33,8 @@ public class PatternSearch implements Search {
     /** The default chunk size. */
     static final int DEFAULT_CHUNK_SIZE = 1024 * 256;
 
-    /** The source document. */
-    private final SearchSource source;
+    /** The serial document. */
+    private final SerialSource source;
 
     /** The match flags. */
     private final int matchFlags;
@@ -46,7 +46,7 @@ public class PatternSearch implements Search {
      * Constructor.
      * @param source the source
      */
-    PatternSearch(SearchSource source, int matchFlags) {
+    PatternSearch(SerialSource source, int matchFlags) {
         this.source = source;
         this.matchFlags = matchFlags;
     }

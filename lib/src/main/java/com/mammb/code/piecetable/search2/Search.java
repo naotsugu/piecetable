@@ -49,7 +49,7 @@ public interface Search {
      * @param source the search source
      * @return the search
      */
-    static Search of(SearchSource source) {
+    static Search of(SerialSource source) {
         return new PatternSearch(source, Pattern.LITERAL);
     }
 
@@ -58,7 +58,7 @@ public interface Search {
      * @param source the search source
      * @return the search
      */
-    static Search caseInsensitiveOf(SearchSource source) {
+    static Search caseInsensitiveOf(SerialSource source) {
         return new PatternSearch(source, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
     }
 
@@ -67,7 +67,7 @@ public interface Search {
      * @param source the search source
      * @return the search
      */
-    static Search regexOf(SearchSource source) {
+    static Search regexOf(SerialSource source) {
         return new PatternSearch(source, 0);
     }
 }

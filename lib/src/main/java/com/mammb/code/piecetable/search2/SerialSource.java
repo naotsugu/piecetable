@@ -20,10 +20,10 @@ import java.nio.charset.Charset;
 import java.util.function.Function;
 
 /**
- * The search source.
+ * The serial source.
  * @author Naotsugu Kobayashi
  */
-public interface SearchSource {
+public interface SerialSource {
 
     /**
      * Get the charset.

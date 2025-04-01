@@ -27,14 +27,14 @@ import java.util.function.Function;
  */
 public class NaiveSearch implements Search {
 
-    /** The source document. */
-    private final SearchSource source;
+    /** The serial document. */
+    private final SerialSource source;
 
     /**
      * Constructor.
      * @param source the source
      */
-    public NaiveSearch(SearchSource source) {
+    public NaiveSearch(SerialSource source) {
         this.source = source;
     }
 
