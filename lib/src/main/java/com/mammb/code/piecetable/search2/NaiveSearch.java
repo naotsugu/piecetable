@@ -15,53 +15,54 @@
  */
 package com.mammb.code.piecetable.search2;
 
-import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Findable;
-import com.mammb.code.piecetable.Pos;
-import com.mammb.code.piecetable.Progress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.mammb.code.piecetable.search2.Searches.*;
+import java.util.function.Function;
 
 /**
  * The naive search.
  * Bypass String instantiation by comparing them as a byte array.
  * @author Naotsugu Kobayashi
  */
-public class NaiveSearch {
+public class NaiveSearch implements Search {
 
     /** The source document. */
-    private final Document doc;
+    private final SearchSource source;
 
     /**
      * Constructor.
-     * @param doc the source document
+     * @param source the source
      */
-    public NaiveSearch(Document doc) {
-        this.doc = doc;
+    public NaiveSearch(SearchSource source) {
+        this.source = source;
     }
 
-    public void search(CharSequence cs, int fromRow, int fromCol,
-            Progress.Listener<List<Findable.Found>> listener) {
-
+    @Override
+    public void search(CharSequence cs, int fromRow, int fromCol, Function<FoundsInChunk, Boolean> listener) {
         if (cs == null || cs.isEmpty()) return;
-
         int size = chunkSize();
-        withLock(doc, () ->
-            chunks(doc, fromRow, fromCol, size).stream().parallel()
-                .map(c -> search(c, cs))
-                .forEachOrdered(p -> Searches.notifyProgress(p, listener))
-        );
+        Chunk.of(source, fromRow, fromCol, size).stream().parallel()
+            .map(c -> search(c, cs))
+            .forEachOrdered(fic -> notifyProgress(fic, listener));
     }
 
-    private Progress<List<Findable.Found>> search(Chunk chunk, CharSequence cs) {
-        byte[] pattern = cs.toString().getBytes(doc.charset());
+    @Override
+    public void searchBackward(CharSequence cs, int fromRow, int fromCol, Function<FoundsInChunk, Boolean> listener) {
+        if (cs == null || cs.isEmpty()) return;
+        int size = chunkSize();
+        Chunk.backwardOf(source, fromRow, fromCol, size).stream().parallel()
+            .map(c -> search(c, cs))
+            .map(FoundsInChunk::reverse)
+            .forEachOrdered(fic -> notifyProgress(fic, listener));
+    }
+
+    private FoundsInChunk search(Chunk chunk, CharSequence cs) {
+        byte[] pattern = cs.toString().getBytes(source.charset());
         byte first = pattern[0];
         AtomicInteger n = new AtomicInteger(0);
-        List<Findable.Found> founds = new ArrayList<>();
-        doc.bufferRead(chunk.from(), chunk.length(), bb -> {
+        List<Found> founds = new ArrayList<>();
+        source.bufferRead(chunk.from(), chunk.length(), bb -> {
             bb.flip();
             while (bb.remaining() >= pattern.length) {
                 int matchLen;
@@ -72,21 +73,27 @@ public class NaiveSearch {
                     if (pattern[matchLen] != bb.get()) break;
                 }
                 if (matchLen == pattern.length) {
-                    Pos pos = doc.pos(chunk.from() + n.get() - matchLen);
-                    var found = new Findable.Found(pos.row(), pos.col(), cs.length());
+                    var found = new Found(n.get(), cs.length());
                     founds.add(found);
                 }
             }
             bb.compact();
             return true;
         });
-        return Progress.of(chunk.to(), doc.rawSize(), founds);
+        return new FoundsInChunk(founds, chunk);
     }
+
 
     private int chunkSize() {
         int chunkSize = (int) Math.ceil(
-            (double) doc.rawSize() / Runtime.getRuntime().availableProcessors());
-        return Math.max(DEFAULT_CHUNK_SIZE, chunkSize);
+            (double) source.rawSize() / Runtime.getRuntime().availableProcessors());
+        return Math.max(1024 * 256, chunkSize);
+    }
+
+    void notifyProgress(FoundsInChunk foundsInChunk,
+            Function<FoundsInChunk, Boolean> listener) {
+        boolean continuation = listener.apply(foundsInChunk);
+        if (!continuation) throw new RuntimeException("interrupted.");
     }
 
 }

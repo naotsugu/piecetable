@@ -15,97 +15,104 @@
  */
 package com.mammb.code.piecetable.search2;
 
-import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Findable;
-import com.mammb.code.piecetable.Pos;
-import com.mammb.code.piecetable.Progress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.mammb.code.piecetable.search2.Searches.*;
 
 /**
  * The pattern search.
  * @author Naotsugu Kobayashi
  */
-public abstract class PatternSearch {
+public class PatternSearch implements Search {
+
+    /** The default chunk size. */
+    static final int DEFAULT_CHUNK_SIZE = 1024 * 256;
 
     /** The source document. */
-    private final Document doc;
+    private final SearchSource source;
+
+    /** The match flags. */
+    private final int matchFlags;
 
     /** The ByteBuffer pool. */
     private final ConcurrentLinkedQueue<ByteBuffer> pool = new ConcurrentLinkedQueue<>();
 
     /**
      * Constructor.
-     * @param doc the source document
+     * @param source the source
      */
-    PatternSearch(Document doc) {
-        this.doc = doc;
+    PatternSearch(SearchSource source, int matchFlags) {
+        this.source = source;
+        this.matchFlags = matchFlags;
     }
 
-    void search(CharSequence cs, int matchFlags, int fromRow, int fromCol,
-            Progress.Listener<List<Findable.Found>> listener) {
+    @Override
+    public void search(CharSequence cs, int fromRow, int fromCol,
+            Function<FoundsInChunk, Boolean> listener) {
 
         if (cs == null || cs.isEmpty()) return;
 
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
-        withLock(doc, () ->
-            chunks(doc, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
-                .parallel()
-                .map(c -> search(c, pattern))
-                .map(m -> Progress.of(m.chunk.distance(), m.chunk.parentLength(), m.founds))
-                .forEachOrdered(m -> notifyProgress(m, listener))
-        );
+        Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
+            .parallel()
+            .map(c -> search(c, pattern))
+            .forEachOrdered(fic -> notifyProgress(fic, listener));
     }
 
-    void searchBackward(CharSequence cs, int matchFlags, int fromRow, int fromCol,
-            Progress.Listener<List<Findable.Found>> listener) {
+    @Override
+    public void searchBackward(CharSequence cs, int fromRow, int fromCol,
+            Function<FoundsInChunk, Boolean> listener) {
 
         if (cs == null || cs.isEmpty()) return;
 
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
-        withLock(doc, () ->
-            backwardChunks(doc, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
-                .parallel()
-                .map(c -> search(c, pattern))
-                .map(m -> Progress.of(m.chunk.reverseDistance(), m.chunk.parentLength(), reverse(m.founds)))
-                .forEachOrdered(m -> notifyProgress(m, listener))
-        );
+        Chunk.backwardOf(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
+            .parallel()
+            .map(c -> search(c, pattern))
+            .map(FoundsInChunk::reverse)
+            .forEachOrdered(fic -> notifyProgress(fic, listener));
+
     }
 
-    private Match search(Chunk chunk, Pattern pattern) {
+    private FoundsInChunk search(Chunk chunk, Pattern pattern) {
 
-        List<Findable.Found> founds = new ArrayList<>();
+        List<Found> founds = new ArrayList<>();
 
         ByteBuffer bb = pool.poll();
         if (bb == null) {
             bb = ByteBuffer.allocateDirect(DEFAULT_CHUNK_SIZE);
         }
 
-        doc.bufferRead(chunk.from(), chunk.length(), bb);
+        source.bufferRead(chunk.from(), chunk.length(), bb);
         bb.flip();
-        CharBuffer cb = doc.charset().decode(bb);
+        CharBuffer cb = source.charset().decode(bb);
         bb.clear();
         pool.offer(bb);
 
+        int n = 0;
+        int pos = 0;
         Matcher matcher = pattern.matcher(cb);
         while (matcher.find()) {
-            Pos pos = doc.pos(chunk.from() + matcher.start());
-            var found = new Findable.Found(pos.row(), pos.col(), matcher.end() - matcher.start());
+            pos += source.charset().encode(cb.slice(n, matcher.start())).position();
+            n = matcher.start();
+            var found = new Found(pos, matcher.end() - matcher.start());
             founds.add(found);
         }
 
-        return new Match(chunk, founds);
+        return new FoundsInChunk(founds, chunk);
     }
 
-    private record Match(Chunk chunk, List<Findable.Found> founds) { }
+    void notifyProgress(FoundsInChunk foundsInChunk,
+            Function<FoundsInChunk, Boolean> listener) {
+        boolean continuation = listener.apply(foundsInChunk);
+        if (!continuation) throw new RuntimeException("interrupted.");
+    }
 
 }

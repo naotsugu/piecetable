@@ -15,6 +15,9 @@
  */
 package com.mammb.code.piecetable.search2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The chunk.
  * @param from the from position
@@ -23,7 +26,7 @@ package com.mammb.code.piecetable.search2;
  * @param parentTo the parent to
  * @author Naotsugu Kobayashi
  */
-record Chunk(long from, long to, long parentFrom, long parentTo) {
+public record Chunk(long from, long to, long parentFrom, long parentTo) {
 
     /**
      * Canonical constructor.
@@ -32,7 +35,7 @@ record Chunk(long from, long to, long parentFrom, long parentTo) {
      * @param parentFrom the parent from
      * @param parentTo the parent to
      */
-    Chunk {
+    public Chunk {
         if (from > to)
             throw new IllegalArgumentException(String.format("(%d, %d)", from, to));
         if (parentFrom > parentTo)
@@ -43,7 +46,7 @@ record Chunk(long from, long to, long parentFrom, long parentTo) {
      * Get the length.
      * @return the length
      */
-    long length() {
+    public long length() {
         return to - from;
     }
 
@@ -51,7 +54,7 @@ record Chunk(long from, long to, long parentFrom, long parentTo) {
      * Get the parent length.
      * @return the parent length
      */
-    long parentLength() {
+    public long parentLength() {
         return parentTo - parentFrom;
     }
 
@@ -69,7 +72,7 @@ record Chunk(long from, long to, long parentFrom, long parentTo) {
      * </pre>
      * @return the distance
      */
-    long distance() {
+    public long distance() {
         return to - parentFrom;
     }
 
@@ -86,8 +89,36 @@ record Chunk(long from, long to, long parentFrom, long parentTo) {
      * </pre>
      * @return the reverse distance
      */
-    long reverseDistance() {
+    public long reverseDistance() {
         return parentTo - from;
+    }
+
+
+    static List<Chunk> of(SearchSource source, int fromRow, int fromCol, int size) {
+        List<Chunk> chunks = new ArrayList<>();
+        long from = source.serial(fromRow, fromCol);
+        long parentFrom = from;
+        long parentTo = source.rawSize();
+        while (true) {
+            long to = source.rowFloorSerial(from + size);
+            chunks.add(new Chunk(from, to, parentFrom, parentTo));
+            if (to >= parentTo) break;
+            from = to;
+        }
+        return chunks;
+    }
+
+    static List<Chunk> backwardOf(SearchSource source, int fromRow, int fromCol, int size) {
+        List<Chunk> chunks = new ArrayList<>();
+        long from = source.serial(fromRow, fromCol);
+        long parentFrom = from;
+        while (true) {
+            long to = source.rowCeilSerial(from - size);
+            chunks.add(new Chunk(to, from, 0, parentFrom));
+            if (to == 0) break;
+            from = to;
+        }
+        return chunks;
     }
 
 }
