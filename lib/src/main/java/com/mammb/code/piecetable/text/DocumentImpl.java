@@ -241,28 +241,8 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public void bufferRead(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback) {
-        pt.read(offset, limitLength, traverseCallback);
-    }
-
-    @Override
-    public long bufferRead(long offset, long length, ByteBuffer bb) {
-        return pt.read(offset, length, bb);
-    }
-
-    @Override
     public long serial(int row, int col) {
         return index.serial(row, col);
-    }
-
-    @Override
-    public long rowFloorSerial(long serial) {
-        return index.rowFloorSerial(serial);
-    }
-
-    @Override
-    public long rowCeilSerial(long serial) {
-        return index.rowCeilSerial(serial);
     }
 
     @Override

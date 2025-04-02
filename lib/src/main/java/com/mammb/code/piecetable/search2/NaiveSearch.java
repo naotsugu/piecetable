@@ -86,7 +86,7 @@ public class NaiveSearch implements Search {
 
     private int chunkSize() {
         int chunkSize = (int) Math.ceil(
-            (double) source.rawSize() / Runtime.getRuntime().availableProcessors());
+            (double) source.length() / Runtime.getRuntime().availableProcessors());
         return Math.max(1024 * 256, chunkSize);
     }
 

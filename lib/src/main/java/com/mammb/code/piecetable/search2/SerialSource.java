@@ -36,7 +36,7 @@ public interface SerialSource {
      * Not the javas UTF-16 encoded memory size.
      * @return the bytes length of this document holds
      */
-    long rawSize();
+    long length();
 
     /**
      * Get the serial position.

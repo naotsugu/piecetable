@@ -123,23 +123,6 @@ public interface Document extends Findable {
     long rawSize();
 
     /**
-     * Reads the contents into the specified byte buffer callback.
-     * @param offset the offset
-     * @param limitLength the limit length({@code -1} are no limit)
-     * @param traverseCallback the specified byte buffer callback
-     */
-    void bufferRead(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback);
-
-    /**
-     * Reads the contents into the specified byte buffer.
-     * @param offset the offset
-     * @param length the length
-     * @param bb byte buffer
-     * @return the read length
-     */
-    long bufferRead(long offset, long length, ByteBuffer bb);
-
-    /**
      * Get the serial position.
      * Represents the byte position from the beginning of the file.
      * This position does not include bom.
@@ -148,20 +131,6 @@ public interface Document extends Findable {
      * @return the serial position
      */
     long serial(int row, int col);
-
-    /**
-     * Get the row floor serial position.
-     * @param serial the base serial
-     * @return the row floor serial position
-     */
-    long rowFloorSerial(long serial);
-
-    /**
-     * Get the row ceil serial position.
-     * @param serial the base serial
-     * @return the row floor serial position
-     */
-    long rowCeilSerial(long serial);
 
     /**
      * Get the serial position.

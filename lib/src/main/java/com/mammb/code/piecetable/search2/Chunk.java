@@ -98,7 +98,7 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
         List<Chunk> chunks = new ArrayList<>();
         long from = source.serial(fromRow, fromCol);
         long parentFrom = from;
-        long parentTo = source.rawSize();
+        long parentTo = source.length();
         while (true) {
             long to = source.rowFloorSerial(from + size);
             chunks.add(new Chunk(from, to, parentFrom, parentTo));
