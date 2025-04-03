@@ -100,7 +100,7 @@ public class PatternSearch implements Search {
         int pos = 0;
         Matcher matcher = pattern.matcher(cb);
         while (matcher.find()) {
-            pos += source.charset().encode(cb.slice(n, matcher.start())).position();
+            pos += source.charset().encode(cb.slice(n, matcher.start())).limit();
             n = matcher.start();
             var found = new Found(pos, matcher.end() - matcher.start());
             founds.add(found);

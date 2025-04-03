@@ -29,20 +29,17 @@ public class SerialSourceImpl implements SerialSource {
 
     /** The {@link PieceTable}. */
     private final PieceTable pt;
-
-    /** The {@link Charset} of Document. */
-    private final Charset charset;
-
     /** The {@link RowIndex}. */
     private final RowIndex index;
-
+    /** The {@link Charset} of Document. */
+    private final Charset charset;
     /** The byte order mark length. */
     private final int bom;
 
-    SerialSourceImpl(PieceTable pt, Charset charset, RowIndex index, int bom) {
+    SerialSourceImpl(PieceTable pt, RowIndex index, Charset charset, int bom) {
         this.pt = pt;
-        this.charset = charset;
         this.index = index;
+        this.charset = charset;
         this.bom = bom;
     }
 
