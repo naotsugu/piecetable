@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.search2;
+package com.mammb.code.piecetable.search;
 
 import com.mammb.code.piecetable.PieceTable;
-import com.mammb.code.piecetable.text.DocumentImpl;
 import com.mammb.code.piecetable.text.Reader;
-import com.mammb.code.piecetable.text.RowIndex;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -84,13 +81,16 @@ class SearchTest {
                 return pt.length();
             }
             @Override public long serial(int row, int col) {
-                return index.serial(row, col);
+                return index.offset(row, col);
             }
-            @Override public long rowFloorSerial(long serial) {
-                return index.rowFloorSerial(serial);
+            @Override public int[] pos(long serial) {
+                return index.pos(serial);
             }
-            @Override public long rowCeilSerial(long serial) {
-                return index.rowCeilSerial(serial);
+            @Override public long rowFloorOffset(long serial) {
+                return index.rowFloorOffset(serial);
+            }
+            @Override public long rowCeilOffset(long serial) {
+                return index.rowCeilOffset(serial);
             }
             @Override public long bufferRead(long offset, long length, ByteBuffer bb) {
                 return pt.read(offset, length, bb);

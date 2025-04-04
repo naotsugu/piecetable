@@ -17,21 +17,15 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.Progress;
 import com.mammb.code.piecetable.RowEnding;
-import com.mammb.code.piecetable.search.Search;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 /**
  * The document implementation.
@@ -152,20 +146,20 @@ public class DocumentImpl implements Document {
     @Override
     public void insert(int row, int col, byte[] bytes) {
         if (readonly) return;
-        pt.insert(index.serial(row, col) + bom.length, bytes);
+        pt.insert(index.offset(row, col) + bom.length, bytes);
         index.insert(row, col, bytes);
     }
 
     @Override
     public void delete(int row, int col, int rawLen) {
         if (readonly) return;
-        pt.delete(index.serial(row, col) + bom.length, rawLen);
+        pt.delete(index.offset(row, col) + bom.length, rawLen);
         index.delete(row, col, rawLen);
     }
 
     @Override
     public byte[] get(int row, int col, int rawLen) {
-        return pt.get(index.serial(row, col) + bom.length, rawLen);
+        return pt.get(index.offset(row, col) + bom.length, rawLen);
     }
 
     @Override
@@ -178,46 +172,6 @@ public class DocumentImpl implements Document {
     @Override
     public CharSequence getText(int row, int rawCol, int rawLen) {
         return new String(get(row, rawCol, rawLen), charset);
-    }
-
-    @Override
-    public List<Found> findAll(CharSequence cs, boolean caseSensitive) {
-        return findAll(cs, caseSensitive ? Search.caseInsensitiveOf(this) : Search.of(this));
-    }
-
-    @Override
-    public List<Found> findAll(CharSequence regex) {
-        return findAll(regex, Search.regexpOf(this));
-    }
-
-    @Override
-    public Optional<Found> find(CharSequence cs, int row, int col, boolean forward, boolean caseSensitive) {
-        return find(cs, row, col, forward, caseSensitive ? Search.caseInsensitiveOf(this) : Search.of(this));
-    }
-
-    @Override
-    public Optional<Found> find(CharSequence regex, int row, int col, boolean forward) {
-        return find(regex, row, col, forward, Search.regexpOf(this));
-    }
-
-    @Override
-    public void find(CharSequence cs, boolean caseSensitive, int row, int col, boolean forward, FoundListener listener) {
-        Search search = caseSensitive ? Search.caseInsensitiveOf(this) : Search.of(this);
-        if (forward) {
-            search.search(cs, row, col, listener);
-        } else {
-            search.searchDesc(cs, row, col, listener);
-        }
-    }
-
-    @Override
-    public void find(CharSequence regex, int row, int col, boolean forward, FoundListener listener) {
-        Search search = Search.regexpOf(this);
-        if (forward) {
-            search.search(regex, row, col, listener);
-        } else {
-            search.searchDesc(regex, row, col, listener);
-        }
     }
 
     @Override
@@ -242,7 +196,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public long serial(int row, int col) {
-        return index.serial(row, col);
+        return index.offset(row, col);
     }
 
     @Override
@@ -277,30 +231,17 @@ public class DocumentImpl implements Document {
         this.path = path;
     }
 
-    // ------------------------------------------------------------------------
-
-    private List<Found> findAll(CharSequence pattern, Search search) {
-        List<Found> founds = new ArrayList<>();
-        FoundListener listener = f -> {
-            founds.add(f);
-            return founds.size() < Short.MAX_VALUE;
-        };
-        search.search(pattern, 0, 0, listener);
-        return founds;
+    @Override
+    public DocumentSearch search() {
+        var source = new SerialSourceImpl(pt, index, charset, bom.length);
+        return new DocumentSearchImpl(source, r -> {
+            final boolean ro = readonly();
+            try {
+                if (!ro) readonly(true);
+                r.run();
+            } finally {
+                if (!ro) readonly(false);
+            }
+        });
     }
-
-    private Optional<Found> find(CharSequence pattern, int row, int col, boolean forward, Search search) {
-        AtomicReference<Found> found = new AtomicReference<>();
-        FoundListener listener = f -> {
-            found.set(f);
-            return false;
-        };
-        if (forward) {
-            search.search(pattern, row, col, listener);
-        } else {
-            search.searchDesc(pattern, row, col, listener);
-        }
-        return Optional.ofNullable(found.get());
-    }
-
 }

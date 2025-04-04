@@ -16,7 +16,7 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.PieceTable;
-import com.mammb.code.piecetable.search2.SerialSource;
+import com.mammb.code.piecetable.search.SerialSource;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -55,17 +55,22 @@ public class SerialSourceImpl implements SerialSource {
 
     @Override
     public long serial(int row, int col) {
-        return index.serial(row, col);
+        return index.offset(row, col);
     }
 
     @Override
-    public long rowFloorSerial(long serial) {
-        return index.rowFloorSerial(serial);
+    public int[] pos(long offset) {
+        return index.pos(offset);
     }
 
     @Override
-    public long rowCeilSerial(long serial) {
-        return index.rowCeilSerial(serial);
+    public long rowFloorOffset(long offset) {
+        return index.rowFloorOffset(offset);
+    }
+
+    @Override
+    public long rowCeilOffset(long serial) {
+        return index.rowCeilOffset(serial);
     }
 
     @Override

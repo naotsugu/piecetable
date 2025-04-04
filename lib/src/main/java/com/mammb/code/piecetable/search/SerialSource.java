@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.search2;
+package com.mammb.code.piecetable.search;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -49,18 +49,25 @@ public interface SerialSource {
     long serial(int row, int col);
 
     /**
+     * Get the row-col position.
+     * @param serial the serial position
+     * @return the row-col position
+     */
+    int[] pos(long serial);
+
+    /**
      * Get the row floor serial position.
      * @param serial the base serial
      * @return the row floor serial position
      */
-    long rowFloorSerial(long serial);
+    long rowFloorOffset(long serial);
 
     /**
      * Get the row ceil serial position.
      * @param serial the base serial
      * @return the row floor serial position
      */
-    long rowCeilSerial(long serial);
+    long rowCeilOffset(long serial);
 
     /**
      * Reads the contents into the specified byte buffer.

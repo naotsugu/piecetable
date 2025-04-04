@@ -26,7 +26,7 @@ import java.util.function.Function;
  * Provides an abstraction of text editing.
  * @author Naotsugu Kobayashi
  */
-public interface TextEdit extends Findable {
+public interface TextEdit {
 
     /**
      * Inserts the text into this {@code TextEdit}.
@@ -251,6 +251,12 @@ public interface TextEdit extends Findable {
      * @param path the path
      */
     void save(Path path);
+
+    /**
+     * Get the {@link DocumentSearch}.
+     * @return the {@link DocumentSearch}
+     */
+    DocumentSearch search();
 
     /**
      * Create a new {@link TextEdit}.

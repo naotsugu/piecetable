@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable.edit;
 
 import com.mammb.code.piecetable.Document;
+import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.Range;
 import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.Pos;
@@ -502,39 +503,9 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public List<Found> findAll(CharSequence cs, boolean caseSensitive) {
+    public DocumentSearch search() {
         flush();
-        return doc.findAll(cs, caseSensitive);
-    }
-
-    @Override
-    public List<Found> findAll(CharSequence regex) {
-        flush();
-        return doc.findAll(regex);
-    }
-
-    @Override
-    public Optional<Found> find(CharSequence cs, int row, int col, boolean forward, boolean caseSensitive) {
-        flush();
-        return doc.find(cs, row, col, forward, caseSensitive);
-    }
-
-    @Override
-    public Optional<Found> find(CharSequence regex, int row, int col, boolean forward) {
-        flush();
-        return doc.find(regex, row, col, forward);
-    }
-
-    @Override
-    public void find(CharSequence cs, boolean caseSensitive, int row, int col, boolean forward, FoundListener listener) {
-        flush();
-        doc.find(cs, caseSensitive, row, col, forward, listener);
-    }
-
-    @Override
-    public void find(CharSequence regex, int row, int col, boolean forward, FoundListener listener) {
-        flush();
-        doc.find(regex, row, col, forward, listener);
+        return doc.search();
     }
 
     Edit.Ins insertEdit(int row, int col, String text, long occurredOn) {

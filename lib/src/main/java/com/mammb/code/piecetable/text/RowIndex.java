@@ -292,17 +292,17 @@ public class RowIndex {
      * @param col the specified position in a row
      * @return the serial position
      */
-    public long serial(int row, int col) {
+    public long offset(int row, int col) {
         return get(row) + Math.min(rowLengths[row], col);
     }
 
     /**
-     * Get the row floor serial position.
-     * @param serial the base serial
-     * @return the row floor serial position
+     * Get the row floor offset position.
+     * @param offset the base offset
+     * @return the row floor offset position
      */
-    public long rowFloorSerial(long serial) {
-        int result = Arrays.binarySearch(stCache, 0, cacheLength, serial);
+    public long rowFloorOffset(long offset) {
+        int result = Arrays.binarySearch(stCache, 0, cacheLength, offset);
         if (result >= 0) {
             return stCache[result];
         } else {
@@ -310,7 +310,7 @@ public class RowIndex {
             long st = stCache[point];
             for (int i = point * cacheInterval; i < length; i++) {
                 int len = rowLengths[i];
-                if (st + len > serial) return st;
+                if (st + len > offset) return st;
                 st += len;
             }
             return st;
@@ -318,13 +318,13 @@ public class RowIndex {
     }
 
     /**
-     * Get the row ceil serial position.
-     * @param serial the base serial
-     * @return the row floor serial position
+     * Get the row ceil offset position.
+     * @param offset the base offset
+     * @return the row floor offset position
      */
-    public long rowCeilSerial(long serial) {
-        if (serial <= 0) return 0;
-        int result = Arrays.binarySearch(stCache, 0, cacheLength, serial);
+    public long rowCeilOffset(long offset) {
+        if (offset <= 0) return 0;
+        int result = Arrays.binarySearch(stCache, 0, cacheLength, offset);
         if (result >= 0) {
             return stCache[result];
         } else {
@@ -333,7 +333,7 @@ public class RowIndex {
             for (int i = point * cacheInterval; i < length; i++) {
                 int len = rowLengths[i];
                 st += len;
-                if (st >= serial) return st;
+                if (st >= offset) return st;
             }
             return st;
         }
@@ -341,11 +341,11 @@ public class RowIndex {
 
     /**
      * Get the row-col position.
-     * @param serial the serial position
+     * @param offset the offset position
      * @return the row-col position
      */
-    public int[] pos(long serial) {
-        int result = Arrays.binarySearch(stCache, 0, cacheLength, serial);
+    public int[] pos(long offset) {
+        int result = Arrays.binarySearch(stCache, 0, cacheLength, offset);
         if (result >= 0) {
             return new int[] { result * cacheInterval, 0 };
         } else {
@@ -353,8 +353,8 @@ public class RowIndex {
             long st = stCache[point];
             for (int i = point * cacheInterval; i < length; i++) {
                 int len = rowLengths[i];
-                if (st + len > serial) {
-                    int col = (int) (serial - st);
+                if (st + len > offset) {
+                    int col = (int) (offset - st);
                     return new int[] { i, col };
                 } else {
                     st += len;

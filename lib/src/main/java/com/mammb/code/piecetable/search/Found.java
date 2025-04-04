@@ -1,4 +1,4 @@
-package com.mammb.code.piecetable.search2;
+package com.mammb.code.piecetable.search;
 
 /**
  * The found.

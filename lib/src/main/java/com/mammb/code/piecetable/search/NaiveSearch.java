@@ -15,9 +15,10 @@
  */
 package com.mammb.code.piecetable.search;
 
-import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Findable.Found;
-import com.mammb.code.piecetable.Findable.FoundListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * The naive search.
@@ -26,94 +27,73 @@ import com.mammb.code.piecetable.Findable.FoundListener;
  */
 public class NaiveSearch implements Search {
 
-    /** The source document. */
-    private final Document doc;
+    /** The serial document. */
+    private final SerialSource source;
 
     /**
      * Constructor.
-     * @param doc the source document
+     * @param source the source
      */
-    public NaiveSearch(Document doc) {
-        this.doc = doc;
+    public NaiveSearch(SerialSource source) {
+        this.source = source;
     }
 
     @Override
-    public void search(CharSequence cs, int fromRow, int fromCol, FoundListener listener) {
-
+    public void search(CharSequence cs, int fromRow, int fromCol, Function<FoundsInChunk, Boolean> listener) {
         if (cs == null || cs.isEmpty()) return;
+        int size = chunkSize();
+        Chunk.of(source, fromRow, fromCol, size).stream().parallel()
+            .map(c -> search(c, cs))
+            .forEachOrdered(fic -> notifyProgress(fic, listener));
+    }
 
-        byte[] pattern = cs.toString().getBytes(doc.charset());
-        int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;
+    @Override
+    public void searchBackward(CharSequence cs, int fromRow, int fromCol, Function<FoundsInChunk, Boolean> listener) {
+        if (cs == null || cs.isEmpty()) return;
+        int size = chunkSize();
+        Chunk.backwardOf(source, fromRow, fromCol, size).stream().parallel()
+            .map(c -> search(c, cs))
+            .map(FoundsInChunk::reverse)
+            .forEachOrdered(fic -> notifyProgress(fic, listener));
+    }
 
+    private FoundsInChunk search(Chunk chunk, CharSequence cs) {
+        byte[] pattern = cs.toString().getBytes(source.charset());
         byte first = pattern[0];
-        int rows = doc.rows();
-
-        for (int row = fromRow; row < rows; row++) {
-            byte[] value = doc.get(row);
-            int max = value.length - pattern.length;
-            int from = (row == fromRow) ? fromRawCol : 0;
-            for (int col = from; col <= max; col++) {
-                // look for first character
-                if (value[col] != first) {
-                    while (++col <= max && value[col] != first) ;
+        AtomicInteger n = new AtomicInteger(0);
+        List<Found> founds = new ArrayList<>();
+        source.bufferRead(chunk.from(), chunk.length(), bb -> {
+            bb.flip();
+            while (bb.remaining() >= pattern.length) {
+                int matchLen;
+                n.getAndIncrement();
+                if (first != bb.get()) continue;
+                for (matchLen = 1; matchLen < pattern.length; matchLen++) {
+                    n.getAndIncrement();
+                    if (pattern[matchLen] != bb.get()) break;
                 }
-                // found first character, now look at the rest of value
-                if (col <= max) {
-                    int j = col + 1;
-                    int end = j + (pattern.length - 1);
-                    for (int k = 1; j < end && value[j] == pattern[k]; j++, k++) ;
-                    if (j == end) {
-                        // found whole charSequence
-                        var found = new Found(row, new String(value, 0, col, doc.charset()).length(), cs.length());
-                        if (!listener.apply(found)) {
-                            return;
-                        }
-                        col += pattern.length;
-                    }
+                if (matchLen == pattern.length) {
+                    var found = new Found(n.get(), cs.length());
+                    founds.add(found);
                 }
             }
-        }
+            bb.compact();
+            return true;
+        });
+        return new FoundsInChunk(founds, chunk);
     }
 
-    @Override
-    public void searchDesc(CharSequence cs, int fromRow, int fromCol, FoundListener listener) {
 
-        if (cs == null || cs.isEmpty()) return;
+    private int chunkSize() {
+        int chunkSize = (int) Math.ceil(
+            (double) source.length() / Runtime.getRuntime().availableProcessors());
+        return Math.max(1024 * 256, chunkSize);
+    }
 
-        byte[] pattern = cs.toString().getBytes(doc.charset());
-        int fromRawCol =  doc.getText(fromRow).toString().substring(0, fromCol).getBytes().length;
-
-        byte last = pattern[pattern.length - 1];
-
-        for (int row = fromRow; row >= 0; row--) {
-            byte[] value = doc.get(row);
-            int min = pattern.length - 1;
-            int from = (row == fromRow)
-                ? fromRawCol - 1
-                : value.length - pattern.length;
-            for (int col = from; col >= 0; col--) {
-                // look for last character
-                if (value[col] != last) {
-                    while (--col >= min && value[col] != last) ;
-                }
-                // found last character, now look at the rest of value
-                if (col >= min) {
-                    int j = col - 1;
-                    int end = j - (pattern.length - 1);
-                    for (int k = pattern.length - 2; j > end && value[j] == pattern[k]; j--, k--) ;
-                    if (j == end) {
-                        // found whole charSequence
-                        int c = col - (pattern.length - 1);
-                        var found = new Found(row, new String(value, 0, c, doc.charset()).length(), cs.length());
-                        if (!listener.apply(found)) {
-                            return;
-                        }
-                        col -= pattern.length;
-                    }
-
-                }
-            }
-        }
+    void notifyProgress(FoundsInChunk foundsInChunk,
+            Function<FoundsInChunk, Boolean> listener) {
+        boolean continuation = listener.apply(foundsInChunk);
+        if (!continuation) throw new RuntimeException("interrupted.");
     }
 
 }

@@ -336,97 +336,97 @@ class RowIndexTest {
     }
 
     @Test
-    void serial() {
+    void offset() {
         var index = RowIndex.of(3, 0);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
 
-        assertEquals(0L, index.serial(0, 0));
-        assertEquals(1L, index.serial(0, 1));
+        assertEquals(0L, index.offset(0, 0));
+        assertEquals(1L, index.offset(0, 1));
 
-        assertEquals(2L, index.serial(1, 0));
-        assertEquals(3L, index.serial(1, 1));
-        assertEquals(4L, index.serial(1, 2));
+        assertEquals(2L, index.offset(1, 0));
+        assertEquals(3L, index.offset(1, 1));
+        assertEquals(4L, index.offset(1, 2));
 
-        assertEquals(5L, index.serial(2, 0));
-        assertEquals(6L, index.serial(2, 1));
-        assertEquals(7L, index.serial(2, 2));
-        assertEquals(8L, index.serial(2, 3));
+        assertEquals(5L, index.offset(2, 0));
+        assertEquals(6L, index.offset(2, 1));
+        assertEquals(7L, index.offset(2, 2));
+        assertEquals(8L, index.offset(2, 3));
 
-        assertEquals(9L, index.serial(3, 0));
-        assertEquals(10L, index.serial(3, 1));
-        assertEquals(11L, index.serial(3, 2));
-        assertEquals(12L, index.serial(3, 3));
-        assertEquals(13L, index.serial(3, 4));
+        assertEquals(9L, index.offset(3, 0));
+        assertEquals(10L, index.offset(3, 1));
+        assertEquals(11L, index.offset(3, 2));
+        assertEquals(12L, index.offset(3, 3));
+        assertEquals(13L, index.offset(3, 4));
 
-        assertEquals(14L, index.serial(4, 0));
-        assertEquals(15L, index.serial(4, 1));
-        assertEquals(16L, index.serial(4, 2));
-        assertEquals(17L, index.serial(4, 3));
-        assertEquals(18L, index.serial(4, 4));
-        assertEquals(19L, index.serial(4, 5));
+        assertEquals(14L, index.offset(4, 0));
+        assertEquals(15L, index.offset(4, 1));
+        assertEquals(16L, index.offset(4, 2));
+        assertEquals(17L, index.offset(4, 3));
+        assertEquals(18L, index.offset(4, 4));
+        assertEquals(19L, index.offset(4, 5));
     }
 
     @Test
-    void rowFloorSerial() {
+    void rowFloorOffset() {
         var index = RowIndex.of(3, 0);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
 
-        assertEquals(0L, index.rowFloorSerial(0L));
-        assertEquals(0L, index.rowFloorSerial(1L));
+        assertEquals(0L, index.rowFloorOffset(0L));
+        assertEquals(0L, index.rowFloorOffset(1L));
 
-        assertEquals(2L, index.rowFloorSerial(2L));
-        assertEquals(2L, index.rowFloorSerial(3L));
-        assertEquals(2L, index.rowFloorSerial(4L));
+        assertEquals(2L, index.rowFloorOffset(2L));
+        assertEquals(2L, index.rowFloorOffset(3L));
+        assertEquals(2L, index.rowFloorOffset(4L));
 
-        assertEquals(5L, index.rowFloorSerial(5L));
-        assertEquals(5L, index.rowFloorSerial(6L));
-        assertEquals(5L, index.rowFloorSerial(7L));
-        assertEquals(5L, index.rowFloorSerial(8L));
+        assertEquals(5L, index.rowFloorOffset(5L));
+        assertEquals(5L, index.rowFloorOffset(6L));
+        assertEquals(5L, index.rowFloorOffset(7L));
+        assertEquals(5L, index.rowFloorOffset(8L));
 
-        assertEquals(9L, index.rowFloorSerial(9L));
-        assertEquals(9L, index.rowFloorSerial(10L));
-        assertEquals(9L, index.rowFloorSerial(11L));
-        assertEquals(9L, index.rowFloorSerial(12L));
-        assertEquals(9L, index.rowFloorSerial(13L));
+        assertEquals(9L, index.rowFloorOffset(9L));
+        assertEquals(9L, index.rowFloorOffset(10L));
+        assertEquals(9L, index.rowFloorOffset(11L));
+        assertEquals(9L, index.rowFloorOffset(12L));
+        assertEquals(9L, index.rowFloorOffset(13L));
 
-        assertEquals(14L, index.rowFloorSerial(14L));
-        assertEquals(14L, index.rowFloorSerial(15L));
-        assertEquals(14L, index.rowFloorSerial(16L));
-        assertEquals(14L, index.rowFloorSerial(17L));
-        assertEquals(14L, index.rowFloorSerial(18L));
-        assertEquals(19L, index.rowFloorSerial(19L));
+        assertEquals(14L, index.rowFloorOffset(14L));
+        assertEquals(14L, index.rowFloorOffset(15L));
+        assertEquals(14L, index.rowFloorOffset(16L));
+        assertEquals(14L, index.rowFloorOffset(17L));
+        assertEquals(14L, index.rowFloorOffset(18L));
+        assertEquals(19L, index.rowFloorOffset(19L));
     }
 
     @Test
-    void rowCeilSerial() {
+    void rowCeilOffset() {
         var index = RowIndex.of(3, 0);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
 
-        assertEquals(0L, index.rowCeilSerial(0L));
+        assertEquals(0L, index.rowCeilOffset(0L));
 
-        assertEquals(2L, index.rowCeilSerial(1L));
-        assertEquals(2L, index.rowCeilSerial(2L));
+        assertEquals(2L, index.rowCeilOffset(1L));
+        assertEquals(2L, index.rowCeilOffset(2L));
 
-        assertEquals(5L, index.rowCeilSerial(3L));
-        assertEquals(5L, index.rowCeilSerial(4L));
-        assertEquals(5L, index.rowCeilSerial(5L));
+        assertEquals(5L, index.rowCeilOffset(3L));
+        assertEquals(5L, index.rowCeilOffset(4L));
+        assertEquals(5L, index.rowCeilOffset(5L));
 
-        assertEquals(9L, index.rowCeilSerial(6L));
-        assertEquals(9L, index.rowCeilSerial(7L));
-        assertEquals(9L, index.rowCeilSerial(8L));
-        assertEquals(9L, index.rowCeilSerial(9L));
+        assertEquals(9L, index.rowCeilOffset(6L));
+        assertEquals(9L, index.rowCeilOffset(7L));
+        assertEquals(9L, index.rowCeilOffset(8L));
+        assertEquals(9L, index.rowCeilOffset(9L));
 
-        assertEquals(14L, index.rowCeilSerial(10L));
-        assertEquals(14L, index.rowCeilSerial(11L));
-        assertEquals(14L, index.rowCeilSerial(12L));
-        assertEquals(14L, index.rowCeilSerial(13L));
-        assertEquals(14L, index.rowCeilSerial(14L));
+        assertEquals(14L, index.rowCeilOffset(10L));
+        assertEquals(14L, index.rowCeilOffset(11L));
+        assertEquals(14L, index.rowCeilOffset(12L));
+        assertEquals(14L, index.rowCeilOffset(13L));
+        assertEquals(14L, index.rowCeilOffset(14L));
 
-        assertEquals(19L, index.rowCeilSerial(15L));
-        assertEquals(19L, index.rowCeilSerial(16L));
-        assertEquals(19L, index.rowCeilSerial(17L));
-        assertEquals(19L, index.rowCeilSerial(18L));
-        assertEquals(19L, index.rowCeilSerial(19L));
+        assertEquals(19L, index.rowCeilOffset(15L));
+        assertEquals(19L, index.rowCeilOffset(16L));
+        assertEquals(19L, index.rowCeilOffset(17L));
+        assertEquals(19L, index.rowCeilOffset(18L));
+        assertEquals(19L, index.rowCeilOffset(19L));
     }
 
     @Test

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.search2;
+package com.mammb.code.piecetable.search;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +100,7 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
         long parentFrom = from;
         long parentTo = source.length();
         while (true) {
-            long to = source.rowFloorSerial(from + size);
+            long to = source.rowFloorOffset(from + size);
             chunks.add(new Chunk(from, to, parentFrom, parentTo));
             if (to >= parentTo) break;
             from = to;
@@ -113,7 +113,7 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
         long from = source.serial(fromRow, fromCol);
         long parentFrom = from;
         while (true) {
-            long to = source.rowCeilSerial(from - size);
+            long to = source.rowCeilOffset(from - size);
             chunks.add(new Chunk(to, from, 0, parentFrom));
             if (to == 0) break;
             from = to;

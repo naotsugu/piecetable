@@ -16,10 +16,8 @@
 package com.mammb.code.piecetable;
 
 import com.mammb.code.piecetable.text.DocumentImpl;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.function.Function;
 
 /**
  * The document.
@@ -27,7 +25,7 @@ import java.util.function.Function;
  * The document manipulation by line number and column number.
  * @author Naotsugu Kobayashi
  */
-public interface Document extends Findable {
+public interface Document {
 
     /**
      * Inserts the char sequence into this {@code Document}.
@@ -181,6 +179,12 @@ public interface Document extends Findable {
     void save(Path path);
 
     /**
+     * Get the {@link DocumentSearch}.
+     * @return the {@link DocumentSearch}
+     */
+    DocumentSearch search();
+
+    /**
      * Create a new {@link Document}.
      * @return a new {@link Document}
      */
@@ -225,19 +229,6 @@ public interface Document extends Findable {
      */
     static Document of(Path path, CharsetMatch... charsetMatches) {
         return DocumentImpl.of(path, charsetMatches);
-    }
-
-    /**
-     * Progress listener.
-     * @param <T> the type of progress value
-     */
-    interface ProgressListener<T> {
-        /**
-         * Accepts the progress.
-         * @param value the progress value
-         * @return {@code true} to continue progress
-         */
-        boolean accept(T value);
     }
 
 }

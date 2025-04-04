@@ -15,8 +15,8 @@
  */
 package com.mammb.code.piecetable.search;
 
-import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.Findable.FoundListener;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * The search.
@@ -31,42 +31,43 @@ public interface Search {
      * @param fromCol from column
      * @param listener the found listener
      */
-    void search(CharSequence pattern, int fromRow, int fromCol, FoundListener listener);
+    void search(CharSequence pattern, int fromRow, int fromCol,
+            Function<FoundsInChunk, Boolean> listener);
 
     /**
-     * Search pattern descending.
+     * Search pattern backward.
      * @param pattern the pattern
      * @param fromRow from row
      * @param fromCol from column
      * @param listener the found listener
      */
-    void searchDesc(CharSequence pattern, int fromRow, int fromCol, FoundListener listener);
+    void searchBackward(CharSequence pattern, int fromRow, int fromCol,
+            Function<FoundsInChunk, Boolean> listener);
 
     /**
      * Create a case-sensitive search.
-     * @param doc the document
+     * @param source the search source
      * @return the search
      */
-    static Search of(Document doc) {
-        return new NaiveSearch(doc);
+    static Search of(SerialSource source) {
+        return new PatternSearch(source, Pattern.LITERAL);
     }
 
     /**
      * Create a case-insensitive search.
-     * @param doc the document
+     * @param source the search source
      * @return the search
      */
-    static Search caseInsensitiveOf(Document doc) {
-        return new CaseInsensitiveSearch(doc);
+    static Search caseInsensitiveOf(SerialSource source) {
+        return new PatternSearch(source, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
     }
 
     /**
      * Create a regexp search.
-     * @param doc the document
+     * @param source the search source
      * @return the search
      */
-    static Search regexpOf(Document doc) {
-        return new RegexpSearch(doc);
+    static Search regexOf(SerialSource source) {
+        return new PatternSearch(source, 0);
     }
-
 }

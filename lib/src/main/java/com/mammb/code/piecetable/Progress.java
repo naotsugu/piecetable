@@ -59,6 +59,7 @@ public interface Progress<T> {
      * @param max the max value
      * @param partial the partial result
      * @return a new {@link Progress}
+     * @param <T> the type of partial results
      */
     static <T> Progress<T> of(double workDone, double max, T partial) {
         record ProgressRecord<T>(double workDone, double max, T partial) implements Progress<T> { }
