@@ -27,7 +27,7 @@ public interface DocumentSearch {
     enum PatternCase {
         /** literal. */
         LITERAL,
-        /** case insentitive. */
+        /** case insensitive. */
         CASE_INSENSITIVE,
         /** regex. */
         REGEX
