@@ -45,19 +45,19 @@ public class DocumentSearchImpl implements DocumentSearch {
             final Search search = search(source, spec.patternCase());
             switch (spec.direction()) {
                 case FORWARD ->
-                    search.search(spec.pattern(), pos.row(), pos.col(), foundsInChunk -> {
-                        return listener.accept(Progress.of(
+                    search.search(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
+                        listener.accept(Progress.of(
                             foundsInChunk.chunk().distance(),
                             foundsInChunk.chunk().parentLength(),
-                            toPosLen(foundsInChunk)));
-                    });
+                            toPosLen(foundsInChunk)))
+                    );
                 case BACKWARD ->
-                    search.searchBackward(spec.pattern(), pos.row(), pos.col(), foundsInChunk -> {
-                        return listener.accept(Progress.of(
+                    search.searchBackward(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
+                        listener.accept(Progress.of(
                             foundsInChunk.chunk().reverseDistance(),
                             foundsInChunk.chunk().parentLength(),
-                            toPosLen(foundsInChunk)));
-                    });
+                            toPosLen(foundsInChunk)))
+                    );
             }
         });
     }
@@ -65,7 +65,7 @@ public class DocumentSearchImpl implements DocumentSearch {
     private List<PosLen> toPosLen(FoundsInChunk foundsInChunk) {
         return foundsInChunk.founds().stream()
             .map(f -> {
-                var p = source.pos(foundsInChunk.chunk().from() + f.offset());
+                var p = source.pos(f.offset());
                 return new PosLen(p[0], p[1], f.len());
             }).toList();
     }

@@ -102,7 +102,7 @@ public class PatternSearch implements Search {
         while (matcher.find()) {
             pos += source.charset().encode(cb.slice(n, matcher.start() - n)).limit();
             n = matcher.start();
-            var found = new Found(pos, matcher.end() - matcher.start());
+            var found = new Found(chunk.from() + pos, matcher.end() - matcher.start());
             founds.add(found);
         }
 

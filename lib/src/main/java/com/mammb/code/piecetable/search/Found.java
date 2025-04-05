@@ -6,5 +6,5 @@ package com.mammb.code.piecetable.search;
  * @param len the byte length on UTF-16
  * @author Naotsugu Kobayashi
  */
-public record Found(int offset, int len) {
+public record Found(long offset, int len) {
 }
