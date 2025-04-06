@@ -20,10 +20,10 @@ import java.nio.charset.Charset;
 import java.util.function.Function;
 
 /**
- * The serial source.
+ * The search source.
  * @author Naotsugu Kobayashi
  */
-public interface SerialSource {
+public interface SearchSource {
 
     /**
      * Get the charset.
@@ -46,28 +46,28 @@ public interface SerialSource {
      * @param col the specified position in a row
      * @return the serial position
      */
-    long serial(int row, int col);
+    long offset(int row, int col);
 
     /**
      * Get the row-col position.
-     * @param serial the serial position
+     * @param offset the serial position
      * @return the row-col position
      */
-    int[] pos(long serial);
+    int[] pos(long offset);
 
     /**
      * Get the row floor serial position.
-     * @param serial the base serial
+     * @param offset the base serial
      * @return the row floor serial position
      */
-    long rowFloorOffset(long serial);
+    long rowFloorOffset(long offset);
 
     /**
      * Get the row ceil serial position.
-     * @param serial the base serial
+     * @param offset the base serial
      * @return the row floor serial position
      */
-    long rowCeilOffset(long serial);
+    long rowCeilOffset(long offset);
 
     /**
      * Reads the contents into the specified byte buffer.

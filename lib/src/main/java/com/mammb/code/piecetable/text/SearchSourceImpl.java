@@ -16,7 +16,7 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.PieceTable;
-import com.mammb.code.piecetable.search.SerialSource;
+import com.mammb.code.piecetable.search.SearchSource;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -25,7 +25,7 @@ import java.util.function.Function;
  * The serial source implementation.
  * @author Naotsugu Kobayashi
  */
-public class SerialSourceImpl implements SerialSource {
+public class SearchSourceImpl implements SearchSource {
 
     /** The {@link PieceTable}. */
     private final PieceTable pt;
@@ -36,7 +36,7 @@ public class SerialSourceImpl implements SerialSource {
     /** The byte order mark length. */
     private final int bom;
 
-    SerialSourceImpl(PieceTable pt, RowIndex index, Charset charset, int bom) {
+    SearchSourceImpl(PieceTable pt, RowIndex index, Charset charset, int bom) {
         this.pt = pt;
         this.index = index;
         this.charset = charset;
@@ -54,7 +54,7 @@ public class SerialSourceImpl implements SerialSource {
     }
 
     @Override
-    public long serial(int row, int col) {
+    public long offset(int row, int col) {
         return index.offset(row, col);
     }
 
@@ -69,8 +69,8 @@ public class SerialSourceImpl implements SerialSource {
     }
 
     @Override
-    public long rowCeilOffset(long serial) {
-        return index.rowCeilOffset(serial);
+    public long rowCeilOffset(long offset) {
+        return index.rowCeilOffset(offset);
     }
 
     @Override

@@ -21,7 +21,7 @@ import com.mammb.code.piecetable.PosLen;
 import com.mammb.code.piecetable.Progress;
 import com.mammb.code.piecetable.search.FoundsInChunk;
 import com.mammb.code.piecetable.search.Search;
-import com.mammb.code.piecetable.search.SerialSource;
+import com.mammb.code.piecetable.search.SearchSource;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -31,10 +31,10 @@ import java.util.function.Consumer;
  */
 public class DocumentSearchImpl implements DocumentSearch {
 
-    private final SerialSource source;
+    private final SearchSource source;
     private final Consumer<Runnable> around;
 
-    DocumentSearchImpl(SerialSource source, Consumer<Runnable> around) {
+    DocumentSearchImpl(SearchSource source, Consumer<Runnable> around) {
         this.source = source;
         this.around = around;
     }
@@ -70,7 +70,7 @@ public class DocumentSearchImpl implements DocumentSearch {
             }).toList();
     }
 
-    private Search search(SerialSource source, PatternCase patternCase) {
+    private Search search(SearchSource source, PatternCase patternCase) {
         return switch (patternCase) {
             case LITERAL -> Search.of(source);
             case CASE_INSENSITIVE -> Search.caseInsensitiveOf(source);

@@ -233,7 +233,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public DocumentSearch search() {
-        var source = new SerialSourceImpl(pt, index, charset, bom.length);
+        var source = new SearchSourceImpl(pt, index, charset, bom.length);
         return new DocumentSearchImpl(source, r -> {
             final boolean ro = readonly();
             try {

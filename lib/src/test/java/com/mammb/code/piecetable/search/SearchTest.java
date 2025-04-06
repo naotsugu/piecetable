@@ -70,27 +70,27 @@ class SearchTest {
 
     }
 
-    private SerialSource source(Path path) {
+    private SearchSource source(Path path) {
         var pt = PieceTable.of(path);
         var index = Reader.of(path).index();
-        return new SerialSource() {
+        return new SearchSource() {
             @Override public Charset charset() {
                 return StandardCharsets.UTF_8;
             }
             @Override public long length() {
                 return pt.length();
             }
-            @Override public long serial(int row, int col) {
+            @Override public long offset(int row, int col) {
                 return index.offset(row, col);
             }
-            @Override public int[] pos(long serial) {
-                return index.pos(serial);
+            @Override public int[] pos(long offset) {
+                return index.pos(offset);
             }
-            @Override public long rowFloorOffset(long serial) {
-                return index.rowFloorOffset(serial);
+            @Override public long rowFloorOffset(long offset) {
+                return index.rowFloorOffset(offset);
             }
-            @Override public long rowCeilOffset(long serial) {
-                return index.rowCeilOffset(serial);
+            @Override public long rowCeilOffset(long offset) {
+                return index.rowCeilOffset(offset);
             }
             @Override public long bufferRead(long offset, long length, ByteBuffer bb) {
                 return pt.read(offset, length, bb);
