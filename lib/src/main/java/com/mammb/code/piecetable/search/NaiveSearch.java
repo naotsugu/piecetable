@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.search;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -29,6 +30,8 @@ public class NaiveSearch implements Search {
 
     /** The serial document. */
     private final SearchSource source;
+    /** cancel?. */
+    private volatile boolean cancel = false;
 
     /**
      * Constructor.
@@ -39,22 +42,30 @@ public class NaiveSearch implements Search {
     }
 
     @Override
-    public void search(CharSequence cs, int fromRow, int fromCol, Function<FoundsInChunk, Boolean> listener) {
+    public void search(CharSequence cs, int fromRow, int fromCol,
+            Consumer<FoundsInChunk> listener) {
         if (cs == null || cs.isEmpty()) return;
         int size = chunkSize();
         Chunk.of(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
-            .forEachOrdered(fic -> notifyProgress(fic, listener));
+            .forEachOrdered(listener);
     }
 
     @Override
-    public void searchBackward(CharSequence cs, int fromRow, int fromCol, Function<FoundsInChunk, Boolean> listener) {
+    public void searchBackward(CharSequence cs, int fromRow, int fromCol,
+            Consumer<FoundsInChunk> listener) {
+
         if (cs == null || cs.isEmpty()) return;
         int size = chunkSize();
         Chunk.backwardOf(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
             .map(FoundsInChunk::reverse)
-            .forEachOrdered(fic -> notifyProgress(fic, listener));
+            .forEachOrdered(listener);
+    }
+
+    @Override
+    public void cancel() {
+        cancel = true;
     }
 
     private FoundsInChunk search(Chunk chunk, CharSequence cs) {
@@ -88,12 +99,6 @@ public class NaiveSearch implements Search {
         int chunkSize = (int) Math.ceil(
             (double) source.length() / Runtime.getRuntime().availableProcessors());
         return Math.max(1024 * 256, chunkSize);
-    }
-
-    void notifyProgress(FoundsInChunk foundsInChunk,
-            Function<FoundsInChunk, Boolean> listener) {
-        boolean continuation = listener.apply(foundsInChunk);
-        if (!continuation) throw new RuntimeException("interrupted.");
     }
 
 }

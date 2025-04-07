@@ -49,7 +49,6 @@ class SearchTest {
             assertEquals(1, founds.size());
             assertEquals(10, founds.getFirst().offset());
             assertEquals(3, founds.getFirst().len());
-            return true;
         });
 
         Search.caseInsensitiveOf(source).search("BCD", 0, 0, fic -> {
@@ -57,7 +56,6 @@ class SearchTest {
             assertEquals(1, founds.size());
             assertEquals(10, founds.getFirst().offset());
             assertEquals(3, founds.getFirst().len());
-            return true;
         });
 
         Search.regexOf(source).search("b.?d", 0, 0, fic -> {
@@ -65,7 +63,6 @@ class SearchTest {
             assertEquals(1, founds.size());
             assertEquals(10, founds.getFirst().offset());
             assertEquals(3, founds.getFirst().len());
-            return true;
         });
 
     }

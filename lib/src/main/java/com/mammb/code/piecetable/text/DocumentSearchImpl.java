@@ -31,8 +31,12 @@ import java.util.function.Consumer;
  */
 public class DocumentSearchImpl implements DocumentSearch {
 
+    /** The search source. */
     private final SearchSource source;
+    /** The around runnable. */
     private final Consumer<Runnable> around;
+    /** The search. */
+    private Search search;
 
     DocumentSearchImpl(SearchSource source, Consumer<Runnable> around) {
         this.source = source;
@@ -41,8 +45,8 @@ public class DocumentSearchImpl implements DocumentSearch {
 
     @Override
     public void run(Spec spec, Pos pos, Progress.Listener<List<PosLen>> listener) {
+        search = build(source, spec.patternCase());
         around.accept(() -> {
-            final Search search = search(source, spec.patternCase());
             switch (spec.direction()) {
                 case FORWARD ->
                     search.search(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
@@ -62,6 +66,12 @@ public class DocumentSearchImpl implements DocumentSearch {
         });
     }
 
+    @Override
+    public void cancel() {
+        Search s = search;
+        if (s != null) s.cancel();
+    }
+
     private List<PosLen> toPosLen(FoundsInChunk foundsInChunk) {
         return foundsInChunk.founds().stream()
             .map(f -> {
@@ -70,7 +80,7 @@ public class DocumentSearchImpl implements DocumentSearch {
             }).toList();
     }
 
-    private Search search(SearchSource source, PatternCase patternCase) {
+    private Search build(SearchSource source, PatternCase patternCase) {
         return switch (patternCase) {
             case LITERAL -> Search.of(source);
             case CASE_INSENSITIVE -> Search.caseInsensitiveOf(source);

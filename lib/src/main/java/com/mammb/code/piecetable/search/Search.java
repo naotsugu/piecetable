@@ -15,7 +15,7 @@
  */
 package com.mammb.code.piecetable.search;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
@@ -32,7 +32,7 @@ public interface Search {
      * @param listener the found listener
      */
     void search(CharSequence pattern, int fromRow, int fromCol,
-            Function<FoundsInChunk, Boolean> listener);
+           Consumer<FoundsInChunk> listener);
 
     /**
      * Search pattern backward.
@@ -42,7 +42,12 @@ public interface Search {
      * @param listener the found listener
      */
     void searchBackward(CharSequence pattern, int fromRow, int fromCol,
-            Function<FoundsInChunk, Boolean> listener);
+            Consumer<FoundsInChunk> listener);
+
+    /**
+     * Attempts to cancel execution of this task.
+     */
+    void cancel();
 
     /**
      * Create a case-sensitive search.

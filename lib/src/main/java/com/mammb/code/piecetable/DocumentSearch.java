@@ -57,4 +57,9 @@ public interface DocumentSearch {
      */
     void run(Spec spec, Pos pos, Progress.Listener<List<PosLen>> listener);
 
+    /**
+     * Cancel search.
+     */
+    void cancel();
+
 }

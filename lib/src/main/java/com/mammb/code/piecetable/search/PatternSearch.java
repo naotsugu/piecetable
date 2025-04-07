@@ -20,6 +20,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +43,9 @@ public class PatternSearch implements Search {
     /** The ByteBuffer pool. */
     private final ConcurrentLinkedQueue<ByteBuffer> pool = new ConcurrentLinkedQueue<>();
 
+    /** cancel?. */
+    private volatile boolean cancel = false;
+
     /**
      * Constructor.
      * @param source the source
@@ -53,7 +57,7 @@ public class PatternSearch implements Search {
 
     @Override
     public void search(CharSequence cs, int fromRow, int fromCol,
-            Function<FoundsInChunk, Boolean> listener) {
+            Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
 
@@ -62,12 +66,12 @@ public class PatternSearch implements Search {
         Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
             .parallel()
             .map(c -> search(c, pattern))
-            .forEachOrdered(fic -> notifyProgress(fic, listener));
+            .forEachOrdered(listener);
     }
 
     @Override
     public void searchBackward(CharSequence cs, int fromRow, int fromCol,
-            Function<FoundsInChunk, Boolean> listener) {
+            Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
 
@@ -77,8 +81,13 @@ public class PatternSearch implements Search {
             .parallel()
             .map(c -> search(c, pattern))
             .map(FoundsInChunk::reverse)
-            .forEachOrdered(fic -> notifyProgress(fic, listener));
+            .forEachOrdered(listener);
 
+    }
+
+    @Override
+    public void cancel() {
+        cancel = true;
     }
 
     private FoundsInChunk search(Chunk chunk, Pattern pattern) {
@@ -107,12 +116,6 @@ public class PatternSearch implements Search {
         }
 
         return new FoundsInChunk(founds, chunk);
-    }
-
-    void notifyProgress(FoundsInChunk foundsInChunk,
-            Function<FoundsInChunk, Boolean> listener) {
-        boolean continuation = listener.apply(foundsInChunk);
-        if (!continuation) throw new RuntimeException("interrupted.");
     }
 
 }
