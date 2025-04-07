@@ -55,7 +55,7 @@ public interface DocumentSearch {
      * @param pos the base position
      * @param listener the found listener
      */
-    void run(Spec spec, Pos pos, Progress.Listener<List<PosLen>> listener);
+    void run(Spec spec, Pos pos, Progress.Consumer<List<PosLen>> listener);
 
     /**
      * Cancel search.

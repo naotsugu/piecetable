@@ -15,6 +15,8 @@
  */
 package com.mammb.code.piecetable;
 
+import java.util.function.Consumer;
+
 /**
  * The progress.
  * @param <T> The type of partial result
@@ -87,6 +89,18 @@ public interface Progress<T> {
          * @return {@code true} to continue progress
          */
         boolean accept(Progress<T> progress);
+    }
+
+    /**
+     * Progress consumer.
+     * @param <T> the type of partial result
+     */
+    interface Consumer<T> {
+        /**
+         * Accepts the progress.
+         * @param progress the progress value
+         */
+        void accept(Progress<T> progress);
     }
 
 }

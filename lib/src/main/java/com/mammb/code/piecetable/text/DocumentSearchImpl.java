@@ -44,7 +44,7 @@ public class DocumentSearchImpl implements DocumentSearch {
     }
 
     @Override
-    public void run(Spec spec, Pos pos, Progress.Listener<List<PosLen>> listener) {
+    public void run(Spec spec, Pos pos, Progress.Consumer<List<PosLen>> listener) {
         search = build(source, spec.patternCase());
         around.accept(() -> {
             switch (spec.direction()) {

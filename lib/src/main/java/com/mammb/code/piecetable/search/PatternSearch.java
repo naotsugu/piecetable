@@ -66,7 +66,9 @@ public class PatternSearch implements Search {
         Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
             .parallel()
             .map(c -> search(c, pattern))
-            .forEachOrdered(listener);
+            .forEachOrdered(c -> {
+                if (!cancel) listener.accept(c);
+            });
     }
 
     @Override
@@ -81,7 +83,9 @@ public class PatternSearch implements Search {
             .parallel()
             .map(c -> search(c, pattern))
             .map(FoundsInChunk::reverse)
-            .forEachOrdered(listener);
+            .forEachOrdered(c -> {
+                if (!cancel) listener.accept(c);
+            });
 
     }
 
@@ -109,6 +113,7 @@ public class PatternSearch implements Search {
         int pos = 0;
         Matcher matcher = pattern.matcher(cb);
         while (matcher.find()) {
+            if (cancel) return new FoundsInChunk(List.of(), chunk);
             pos += source.charset().encode(cb.slice(n, matcher.start() - n)).limit();
             n = matcher.start();
             var found = new Found(chunk.from() + pos, matcher.end() - matcher.start());

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * The naive search.
@@ -48,7 +47,9 @@ public class NaiveSearch implements Search {
         int size = chunkSize();
         Chunk.of(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
-            .forEachOrdered(listener);
+            .forEachOrdered(c -> {
+                if (!cancel) listener.accept(c);
+            });
     }
 
     @Override
@@ -60,7 +61,9 @@ public class NaiveSearch implements Search {
         Chunk.backwardOf(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
             .map(FoundsInChunk::reverse)
-            .forEachOrdered(listener);
+            .forEachOrdered(c -> {
+                if (!cancel) listener.accept(c);
+            });
     }
 
     @Override
@@ -81,7 +84,7 @@ public class NaiveSearch implements Search {
                 if (first != bb.get()) continue;
                 for (matchLen = 1; matchLen < pattern.length; matchLen++) {
                     n.getAndIncrement();
-                    if (pattern[matchLen] != bb.get()) break;
+                    if (pattern[matchLen] != bb.get() || cancel) break;
                 }
                 if (matchLen == pattern.length) {
                     var found = new Found(n.get(), cs.length());
@@ -89,7 +92,7 @@ public class NaiveSearch implements Search {
                 }
             }
             bb.compact();
-            return true;
+            return !cancel;
         });
         return new FoundsInChunk(founds, chunk);
     }
