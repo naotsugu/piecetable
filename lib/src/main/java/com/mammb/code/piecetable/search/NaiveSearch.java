@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 /**
  * The naive search.
@@ -38,6 +39,14 @@ public class NaiveSearch implements Search {
      */
     public NaiveSearch(SearchSource source) {
         this.source = source;
+    }
+
+    @Override
+    public List<Found> search(CharSequence pattern, int fromRow, int fromCol, int toRow, int toCol) {
+        return search(
+            Chunk.of(source, fromRow, fromCol, toRow, toCol),
+            pattern
+        ).founds();
     }
 
     @Override

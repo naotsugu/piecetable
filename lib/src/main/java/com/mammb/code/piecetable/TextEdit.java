@@ -323,7 +323,7 @@ public interface TextEdit {
          * @return a new replace request
          */
         public static Replace of(Pos markPos, Pos caretPos, String text) {
-            return new Replace(markPos, caretPos, o -> text);
+            return new Replace(markPos, caretPos, _ -> text);
         }
 
         /**

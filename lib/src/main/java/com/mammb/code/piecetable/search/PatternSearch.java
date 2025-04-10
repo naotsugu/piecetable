@@ -56,6 +56,14 @@ public class PatternSearch implements Search {
     }
 
     @Override
+    public List<Found> search(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
+        return search(
+            Chunk.of(source, fromRow, fromCol, toRow, toCol),
+            Pattern.compile(cs.toString(), matchFlags)
+        ).founds();
+    }
+
+    @Override
     public void search(CharSequence cs, int fromRow, int fromCol,
             Consumer<FoundsInChunk> listener) {
 

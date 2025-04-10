@@ -15,6 +15,7 @@
  */
 package com.mammb.code.piecetable.search;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,17 @@ import java.util.regex.Pattern;
  * @author Naotsugu Kobayashi
  */
 public interface Search {
+
+    /**
+     * Pattern search for specified range.
+     * @param pattern the pattern
+     * @param fromRow from row
+     * @param fromCol from column
+     * @param toRow to row
+     * @param toCol to column
+     * @return the found list
+     */
+    List<Found> search(CharSequence pattern, int fromRow, int fromCol, int toRow, int toCol);
 
     /**
      * Search pattern.
