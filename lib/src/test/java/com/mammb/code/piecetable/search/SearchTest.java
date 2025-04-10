@@ -67,6 +67,19 @@ class SearchTest {
 
     }
 
+    @Test
+    void searchRange() {
+        var source = source(content(
+            "a".repeat(10) + "bcd" + "e".repeat(10) + "\n" +
+            "f".repeat(10) + "bcd"));
+        var founds = Search.of(source).search("bc", 0, 0, 1, 13);
+        assertEquals(2, founds.size());
+        assertEquals(10, founds.getFirst().offset());
+        assertEquals(2, founds.getFirst().len());
+        assertEquals(34, founds.get(1).offset());
+        assertEquals(2, founds.get(1).len());
+    }
+
     private SearchSource source(Path path) {
         var pt = PieceTable.of(path);
         var index = Reader.of(path).index();
