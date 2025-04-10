@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 /**
  * The naive search.
@@ -42,18 +41,28 @@ public class NaiveSearch implements Search {
     }
 
     @Override
-    public List<Found> search(CharSequence pattern, int fromRow, int fromCol, int toRow, int toCol) {
-        return search(
-            Chunk.of(source, fromRow, fromCol, toRow, toCol),
-            pattern
-        ).founds();
+    public List<Found> search(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
+        if (cs == null || cs.isEmpty()) return List.of();
+
+        long from = source.offset(fromRow, fromCol);
+        long to = source.offset(toRow, toCol);
+        int size = Math.toIntExact(to - from);
+        List<Found> founds = new ArrayList<>();
+        Chunk.of(source, from, to, size).stream().parallel()
+            .map(c -> search(c, cs))
+            .forEachOrdered(c -> {
+                if (!cancel) founds.addAll(c.founds());
+            });
+        return founds;
     }
 
     @Override
     public void search(CharSequence cs, int fromRow, int fromCol,
             Consumer<FoundsInChunk> listener) {
+
         if (cs == null || cs.isEmpty()) return;
-        int size = chunkSize();
+        int size = chunkSize(source.length());
+
         Chunk.of(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
             .forEachOrdered(c -> {
@@ -66,7 +75,8 @@ public class NaiveSearch implements Search {
             Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
-        int size = chunkSize();
+        int size = chunkSize(source.length());
+
         Chunk.backwardOf(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
             .map(FoundsInChunk::reverse)
@@ -107,9 +117,9 @@ public class NaiveSearch implements Search {
     }
 
 
-    private int chunkSize() {
+    private int chunkSize(long length) {
         int chunkSize = (int) Math.ceil(
-            (double) source.length() / Runtime.getRuntime().availableProcessors());
+            (double) length / Runtime.getRuntime().availableProcessors());
         return Math.max(1024 * 256, chunkSize);
     }
 

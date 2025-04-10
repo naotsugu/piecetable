@@ -57,10 +57,16 @@ public class PatternSearch implements Search {
 
     @Override
     public List<Found> search(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
-        return search(
-            Chunk.of(source, fromRow, fromCol, toRow, toCol),
-            Pattern.compile(cs.toString(), matchFlags)
-        ).founds();
+        if (cs == null || cs.isEmpty()) return List.of();
+        Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+        List<Found> founds = new ArrayList<>();
+        Chunk.of(source, fromRow, fromCol, toRow, toCol, DEFAULT_CHUNK_SIZE).stream()
+            .parallel()
+            .map(c -> search(c, pattern))
+            .forEachOrdered(c -> {
+                if (!cancel) founds.addAll(c.founds());
+            });
+        return founds;
     }
 
     @Override
@@ -68,7 +74,6 @@ public class PatternSearch implements Search {
             Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
-
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
         Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
