@@ -15,6 +15,7 @@
  */
 package com.mammb.code.piecetable.text;
 
+import com.mammb.code.piecetable.charset.CharsetMatches;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;

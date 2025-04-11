@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.text;
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.DocumentStat;
 import com.mammb.code.piecetable.Progress;
+import com.mammb.code.piecetable.charset.CharsetMatches;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;

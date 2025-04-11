@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.text;
+package com.mammb.code.piecetable.charset;
 
 import org.junit.jupiter.api.Test;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * The test of {@link CharsetMatches}.
@@ -40,4 +39,5 @@ class CharsetMatchesTest {
         var ret = ms932.put("あいうえお".getBytes(Charset.forName("windows-31j")));
         assertEquals(55, ret.confidence());
     }
+
 }
