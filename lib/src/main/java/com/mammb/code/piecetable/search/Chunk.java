@@ -94,15 +94,16 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
     }
 
     static List<Chunk> of(SearchSource source, int fromRow, int fromCol, int toRow, int toCol, int size) {
-        return of(source, source.offset(fromRow, fromCol), source.offset(toRow, toCol), size);
+        return of(source.offset(fromRow, fromCol), source.offset(toRow, toCol), size);
     }
 
-    static List<Chunk> of(SearchSource source, long from, long to, int size) {
+    static List<Chunk> of(final long from, final long to, int size) {
+        long offset = from;
         List<Chunk> chunks = new ArrayList<>();
         while (true) {
-            chunks.add(new Chunk(from, Math.min(from + size, to), 0, source.length()));
-            from += size;
-            if (from >= to) break;
+            chunks.add(new Chunk(offset, Math.min(offset + size, to), from, to));
+            offset += size;
+            if (offset >= to) break;
         }
         return chunks;
     }

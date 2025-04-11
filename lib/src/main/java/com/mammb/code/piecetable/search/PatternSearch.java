@@ -18,10 +18,10 @@ package com.mammb.code.piecetable.search;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,14 +59,11 @@ public class PatternSearch implements Search {
     public List<Found> search(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
         if (cs == null || cs.isEmpty()) return List.of();
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
-        List<Found> founds = new ArrayList<>();
-        Chunk.of(source, fromRow, fromCol, toRow, toCol, DEFAULT_CHUNK_SIZE).stream()
-            .parallel()
+        return Chunk.of(source, fromRow, fromCol, toRow, toCol, DEFAULT_CHUNK_SIZE).stream()
             .map(c -> search(c, pattern))
-            .forEachOrdered(c -> {
-                if (!cancel) founds.addAll(c.founds());
-            });
-        return founds;
+            .map(FoundsInChunk::founds)
+            .flatMap(Collection::stream)
+            .toList();
     }
 
     @Override
