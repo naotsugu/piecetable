@@ -15,8 +15,6 @@
  */
 package com.mammb.code.piecetable;
 
-import java.util.function.Consumer;
-
 /**
  * The progress.
  * @param <T> The type of partial result

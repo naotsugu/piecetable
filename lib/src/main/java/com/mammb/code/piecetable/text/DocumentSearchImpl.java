@@ -34,19 +34,24 @@ public class DocumentSearchImpl implements DocumentSearch {
     /** The search source. */
     private final SearchSource source;
     /** The around runnable. */
-    private final Consumer<Runnable> around;
+    private final Consumer<Runnable> aroundRun;
     /** The search. */
     private Search search;
 
-    DocumentSearchImpl(SearchSource source, Consumer<Runnable> around) {
+    /**
+     * Constructor.
+     * @param source the search source
+     * @param aroundRun the around runnable
+     */
+    DocumentSearchImpl(SearchSource source, Consumer<Runnable> aroundRun) {
         this.source = source;
-        this.around = around;
+        this.aroundRun = aroundRun;
     }
 
     @Override
     public void run(Spec spec, Pos pos, Progress.Consumer<List<PosLen>> listener) {
         search = build(source, spec.patternCase());
-        around.accept(() -> {
+        aroundRun.accept(() -> {
             switch (spec.direction()) {
                 case FORWARD ->
                     search.search(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
