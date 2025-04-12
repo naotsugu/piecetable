@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  * Bypass String instantiation by comparing them as a byte array.
  * @author Naotsugu Kobayashi
  */
-public class NaiveSearch implements Search {
+class NaiveSearch implements Search {
 
     /** The serial document. */
     private final SearchSource source;

@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * The pattern search.
  * @author Naotsugu Kobayashi
  */
-public class PatternSearch implements Search {
+class PatternSearch implements Search {
 
     /** The default chunk size. */
     static final int DEFAULT_CHUNK_SIZE = 1024 * 256;
