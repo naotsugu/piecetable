@@ -56,6 +56,6 @@ public interface DocumentSearch {
      * @param pos the base position
      * @param listener the found listener
      */
-    void run(Spec spec, Pos pos, Consumer<Segment.Valued<List<PosLen>>> listener);
+    void all(Spec spec, Pos pos, Consumer<Segment.Valued<List<PosLen>>> listener);
 
 }

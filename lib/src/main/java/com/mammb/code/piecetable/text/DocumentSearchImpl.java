@@ -49,7 +49,7 @@ public class DocumentSearchImpl implements DocumentSearch {
     }
 
     @Override
-    public void run(Spec spec, Pos pos, Consumer<Segment.Valued<List<PosLen>>> listener) {
+    public void all(Spec spec, Pos pos, Consumer<Segment.Valued<List<PosLen>>> listener) {
         search = build(source, spec.patternCase());
         aroundRun.accept(() -> {
             switch (spec.direction()) {
