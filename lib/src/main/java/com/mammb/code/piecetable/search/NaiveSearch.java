@@ -30,8 +30,6 @@ public class NaiveSearch implements Search {
 
     /** The serial document. */
     private final SearchSource source;
-    /** cancel?. */
-    private volatile boolean cancel = false;
 
     /**
      * Constructor.
@@ -63,9 +61,7 @@ public class NaiveSearch implements Search {
 
         Chunk.of(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
-            .forEachOrdered(c -> {
-                if (!cancel) listener.accept(c);
-            });
+            .forEachOrdered(listener);
     }
 
     @Override
@@ -78,14 +74,7 @@ public class NaiveSearch implements Search {
         Chunk.backwardOf(source, fromRow, fromCol, size).stream().parallel()
             .map(c -> search(c, cs))
             .map(FoundsInChunk::reverse)
-            .forEachOrdered(c -> {
-                if (!cancel) listener.accept(c);
-            });
-    }
-
-    @Override
-    public void cancel() {
-        cancel = true;
+            .forEachOrdered(listener);
     }
 
     private FoundsInChunk search(Chunk chunk, CharSequence cs) {
@@ -96,12 +85,13 @@ public class NaiveSearch implements Search {
         source.bufferRead(chunk.from(), chunk.length(), bb -> {
             bb.flip();
             while (bb.remaining() >= pattern.length) {
+                if (Thread.interrupted()) throw new RuntimeException("interrupted");
                 int matchLen;
                 n.getAndIncrement();
                 if (first != bb.get()) continue;
                 for (matchLen = 1; matchLen < pattern.length; matchLen++) {
                     n.getAndIncrement();
-                    if (pattern[matchLen] != bb.get() || cancel) break;
+                    if (pattern[matchLen] != bb.get()) break;
                 }
                 if (matchLen == pattern.length) {
                     var found = new Found(n.get(), cs.length());
@@ -109,7 +99,7 @@ public class NaiveSearch implements Search {
                 }
             }
             bb.compact();
-            return !cancel;
+            return true;
         });
         return new FoundsInChunk(founds, chunk);
     }

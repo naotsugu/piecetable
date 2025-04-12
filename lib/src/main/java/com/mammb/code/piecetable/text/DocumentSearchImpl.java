@@ -18,7 +18,7 @@ package com.mammb.code.piecetable.text;
 import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.PosLen;
-import com.mammb.code.piecetable.Progress;
+import com.mammb.code.piecetable.Segment;
 import com.mammb.code.piecetable.search.FoundsInChunk;
 import com.mammb.code.piecetable.search.Search;
 import com.mammb.code.piecetable.search.SearchSource;
@@ -49,32 +49,26 @@ public class DocumentSearchImpl implements DocumentSearch {
     }
 
     @Override
-    public void run(Spec spec, Pos pos, Progress.Consumer<List<PosLen>> listener) {
+    public void run(Spec spec, Pos pos, Consumer<Segment.Valued<List<PosLen>>> listener) {
         search = build(source, spec.patternCase());
         aroundRun.accept(() -> {
             switch (spec.direction()) {
                 case FORWARD ->
                     search.search(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
-                        listener.accept(Progress.of(
-                            foundsInChunk.chunk().distance(),
+                        listener.accept(Segment.valuedOf(
+                            foundsInChunk.chunk().length(),
                             foundsInChunk.chunk().parentLength(),
                             toPosLen(foundsInChunk)))
                     );
                 case BACKWARD ->
                     search.searchBackward(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
-                        listener.accept(Progress.of(
-                            foundsInChunk.chunk().reverseDistance(),
+                        listener.accept(Segment.valuedOf(
+                            foundsInChunk.chunk().length(),
                             foundsInChunk.chunk().parentLength(),
                             toPosLen(foundsInChunk)))
                     );
             }
         });
-    }
-
-    @Override
-    public void cancel() {
-        Search s = search;
-        if (s != null) s.cancel();
     }
 
     private List<PosLen> toPosLen(FoundsInChunk foundsInChunk) {

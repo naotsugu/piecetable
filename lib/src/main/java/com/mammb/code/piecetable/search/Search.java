@@ -57,11 +57,6 @@ public interface Search {
             Consumer<FoundsInChunk> listener);
 
     /**
-     * Attempts to cancel execution of this task.
-     */
-    void cancel();
-
-    /**
      * Create a case-sensitive search.
      * @param source the search source
      * @return the search

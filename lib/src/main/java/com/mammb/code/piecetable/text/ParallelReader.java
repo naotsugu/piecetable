@@ -16,7 +16,6 @@
 package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
-import com.mammb.code.piecetable.Progress;
 import com.mammb.code.piecetable.Segment;
 import java.io.IOException;
 import java.lang.foreign.Arena;

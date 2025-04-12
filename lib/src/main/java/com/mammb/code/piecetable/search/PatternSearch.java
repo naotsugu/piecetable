@@ -43,9 +43,6 @@ public class PatternSearch implements Search {
     /** The ByteBuffer pool. */
     private final ConcurrentLinkedQueue<ByteBuffer> pool = new ConcurrentLinkedQueue<>();
 
-    /** cancel?. */
-    private volatile boolean cancel = false;
-
     /**
      * Constructor.
      * @param source the source
@@ -76,9 +73,7 @@ public class PatternSearch implements Search {
         Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
             .parallel()
             .map(c -> search(c, pattern))
-            .forEachOrdered(c -> {
-                if (!cancel) listener.accept(c);
-            });
+            .forEachOrdered(listener);
     }
 
     @Override
@@ -93,18 +88,13 @@ public class PatternSearch implements Search {
             .parallel()
             .map(c -> search(c, pattern))
             .map(FoundsInChunk::reverse)
-            .forEachOrdered(c -> {
-                if (!cancel) listener.accept(c);
-            });
+            .forEachOrdered(listener);
 
-    }
-
-    @Override
-    public void cancel() {
-        cancel = true;
     }
 
     private FoundsInChunk search(Chunk chunk, Pattern pattern) {
+
+        if (Thread.interrupted()) throw new RuntimeException("interrupted");
 
         List<Found> founds = new ArrayList<>();
 
@@ -123,7 +113,7 @@ public class PatternSearch implements Search {
         int pos = 0;
         Matcher matcher = pattern.matcher(cb);
         while (matcher.find()) {
-            if (cancel) return new FoundsInChunk(List.of(), chunk);
+            if (Thread.interrupted()) throw new RuntimeException("interrupted");
             pos += source.charset().encode(cb.slice(n, matcher.start() - n)).limit();
             n = matcher.start();
             var found = new Found(chunk.from() + pos, matcher.end() - matcher.start());

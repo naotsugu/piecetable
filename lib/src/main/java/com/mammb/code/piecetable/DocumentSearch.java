@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The document search.
@@ -55,11 +56,6 @@ public interface DocumentSearch {
      * @param pos the base position
      * @param listener the found listener
      */
-    void run(Spec spec, Pos pos, Progress.Consumer<List<PosLen>> listener);
-
-    /**
-     * Cancel search.
-     */
-    void cancel();
+    void run(Spec spec, Pos pos, Consumer<Segment.Valued<List<PosLen>>> listener);
 
 }
