@@ -71,10 +71,7 @@ public class ParallelReader implements Reader {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
         this.index = RowIndex.of();
-        if (path != null && Files.exists(path)) {
-            read(path);
-            index.trimToSize();
-        }
+        read(path);
     }
 
     /**
@@ -106,6 +103,9 @@ public class ParallelReader implements Reader {
     }
 
     private void read(Path path) {
+
+        if (path == null || !Files.exists(path)) return;
+
         try (var arena = Arena.ofShared(); // parallel needs ofShared arena
              var channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
@@ -125,9 +125,14 @@ public class ParallelReader implements Reader {
     }
 
     private void aggregate(ChunkRead chunkRead) {
+
+        if (Thread.interrupted())
+            throw new RuntimeException("interrupted");
+
         index.add(chunkRead.rows);
         crCount += chunkRead.crCount;
         lfCount += chunkRead.lfCount;
+
         if (progressListener != null) {
             var progress = Progress.of((long) chunkRead.chunkNo * CHUNK_SIZE + chunkRead.byteSize, length);
             boolean continuation = progressListener.accept(progress);
@@ -136,6 +141,9 @@ public class ParallelReader implements Reader {
     }
 
     private ChunkRead chunkReadOf(int chunkNo, int chunkSize, MemorySegment seg) {
+
+        if (Thread.interrupted())
+            throw new RuntimeException("interrupted");
 
         long offset = (long) chunkNo * chunkSize;
         long sliceSize = Math.min(chunkSize, seg.byteSize() - offset);

@@ -23,6 +23,10 @@ import com.mammb.code.piecetable.CharsetMatch;
  */
 public interface CharsetMatches {
 
+    /**
+     * Create a new default {@link CharsetMatch}.
+     * @return a new default {@link CharsetMatch}
+     */
     static CharsetMatch[] defaults() {
         return new CharsetMatch[] { utf8(), ms932() };
     }

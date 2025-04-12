@@ -66,9 +66,7 @@ public class SeqReader implements Reader {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
         this.index = RowIndex.of();
-        if (path != null && Files.exists(path)) {
-            read(path, rowPrefLimit);
-        }
+        read(path, rowPrefLimit);
     }
 
     /**
@@ -113,7 +111,9 @@ public class SeqReader implements Reader {
      * @param rowPrefLimit the limit on the number of rows to read from the file,
      * if -1 is specified, there is no limit.
      */
-    private void read(Path path, int rowPrefLimit) {
+    void read(Path path, int rowPrefLimit) {
+
+        if (path == null || !Files.exists(path)) return;
 
         var listener = progressListener;
 
@@ -133,6 +133,10 @@ public class SeqReader implements Reader {
             long nRead = 0;
 
             for (;;) {
+
+                if (Thread.interrupted())
+                    throw new RuntimeException("interrupted");
+
                 buf.clear();
                 int n = channel.read(buf);
                 if (n < 0) {
