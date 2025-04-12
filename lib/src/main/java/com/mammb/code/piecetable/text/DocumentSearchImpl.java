@@ -19,10 +19,13 @@ import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.PosLen;
 import com.mammb.code.piecetable.Segment;
+import com.mammb.code.piecetable.search.Found;
 import com.mammb.code.piecetable.search.FoundsInChunk;
 import com.mammb.code.piecetable.search.Search;
 import com.mammb.code.piecetable.search.SearchSource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -54,29 +57,45 @@ public class DocumentSearchImpl implements DocumentSearch {
         aroundRun.accept(() -> {
             switch (spec.direction()) {
                 case FORWARD ->
-                    search.search(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
-                        listener.accept(Segment.valuedOf(
-                            foundsInChunk.chunk().length(),
-                            foundsInChunk.chunk().parentLength(),
-                            toPosLen(foundsInChunk)))
-                    );
+                    search.forward(spec.pattern(), pos.row(), pos.col(),
+                        foundsInChunk -> listener.accept(toSegment(foundsInChunk)));
                 case BACKWARD ->
-                    search.searchBackward(spec.pattern(), pos.row(), pos.col(), foundsInChunk ->
-                        listener.accept(Segment.valuedOf(
-                            foundsInChunk.chunk().length(),
-                            foundsInChunk.chunk().parentLength(),
-                            toPosLen(foundsInChunk)))
-                    );
+                    search.backward(spec.pattern(), pos.row(), pos.col(),
+                        foundsInChunk -> listener.accept(toSegment(foundsInChunk)));
             }
         });
     }
 
+    @Override
+    public Optional<PosLen> next(Spec spec, Pos pos) {
+        search = build(source, spec.patternCase());
+        List<PosLen> list = new ArrayList<>();
+        aroundRun.accept(() -> {
+            Optional<Found> found = switch (spec.direction()) {
+                case FORWARD -> search.nextOne(spec.pattern(), pos.row(), pos.col());
+                case BACKWARD -> search.previousOne(spec.pattern(), pos.row(), pos.col());
+            };
+            found.map(this::toPosLen).ifPresent(list::add);
+        });
+        return list.stream().findFirst();
+    }
+
+    private Segment.Valued<List<PosLen>> toSegment(FoundsInChunk foundsInChunk) {
+        return Segment.valuedOf(
+            foundsInChunk.chunk().length(),
+            foundsInChunk.chunk().parentLength(),
+            toPosLen(foundsInChunk));
+    }
+
     private List<PosLen> toPosLen(FoundsInChunk foundsInChunk) {
         return foundsInChunk.founds().stream()
-            .map(f -> {
-                var p = source.pos(f.offset());
-                return new PosLen(p[0], p[1], f.len());
-            }).toList();
+            .map(this::toPosLen)
+            .toList();
+    }
+
+    private PosLen toPosLen(Found found) {
+        var p = source.pos(found.offset());
+        return new PosLen(p[0], p[1], found.len());
     }
 
     private Search build(SearchSource source, PatternCase patternCase) {

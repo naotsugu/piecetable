@@ -31,4 +31,8 @@ public record FoundsInChunk(List<Found> founds, Chunk chunk) {
         return this;
     }
 
+    boolean hasFounds() {
+        return !founds.isEmpty();
+    }
+
 }

@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -51,11 +52,19 @@ public interface DocumentSearch {
     record Spec(CharSequence pattern, PatternCase patternCase, Direction direction) { }
 
     /**
-     * Run search.
+     * Search all.
      * @param spec the search specification
      * @param pos the base position
      * @param listener the found listener
      */
     void all(Spec spec, Pos pos, Consumer<Segment.Valued<List<PosLen>>> listener);
+
+    /**
+     * Search next.
+     * @param spec the search specification
+     * @param pos the base position
+     * @return the founded position
+     */
+    Optional<PosLen> next(Spec spec, Pos pos);
 
 }

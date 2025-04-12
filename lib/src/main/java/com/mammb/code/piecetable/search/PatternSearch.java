@@ -20,6 +20,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -53,7 +54,7 @@ public class PatternSearch implements Search {
     }
 
     @Override
-    public List<Found> search(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
+    public List<Found> all(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
         if (cs == null || cs.isEmpty()) return List.of();
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
         return Chunk.of(source, fromRow, fromCol, toRow, toCol, DEFAULT_CHUNK_SIZE).stream()
@@ -64,8 +65,33 @@ public class PatternSearch implements Search {
     }
 
     @Override
-    public void search(CharSequence cs, int fromRow, int fromCol,
-            Consumer<FoundsInChunk> listener) {
+    public Optional<Found> nextOne(CharSequence cs, int fromRow, int fromCol) {
+        if (cs == null || cs.isEmpty()) return Optional.empty();
+        Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+        return Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
+            .parallel()
+            .map(c -> search(c, pattern))
+            .filter(FoundsInChunk::hasFounds)
+            .findFirst()
+            .map(FoundsInChunk::founds)
+            .map(List::getFirst);
+    }
+
+    @Override
+    public Optional<Found> previousOne(CharSequence cs, int fromRow, int fromCol) {
+        if (cs == null || cs.isEmpty()) return Optional.empty();
+        Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+        return Chunk.backwardOf(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
+            .parallel()
+            .map(c -> search(c, pattern))
+            .filter(FoundsInChunk::hasFounds)
+            .findFirst()
+            .map(FoundsInChunk::founds)
+            .map(List::getLast);
+    }
+
+    @Override
+    public void forward(CharSequence cs, int fromRow, int fromCol, Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
@@ -77,8 +103,7 @@ public class PatternSearch implements Search {
     }
 
     @Override
-    public void searchBackward(CharSequence cs, int fromRow, int fromCol,
-            Consumer<FoundsInChunk> listener) {
+    public void backward(CharSequence cs, int fromRow, int fromCol, Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
 

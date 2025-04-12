@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.search;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -40,7 +41,7 @@ public class NaiveSearch implements Search {
     }
 
     @Override
-    public List<Found> search(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
+    public List<Found> all(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
         if (cs == null || cs.isEmpty()) return List.of();
         long from = source.offset(fromRow, fromCol);
         long to = source.offset(toRow, toCol);
@@ -53,7 +54,31 @@ public class NaiveSearch implements Search {
     }
 
     @Override
-    public void search(CharSequence cs, int fromRow, int fromCol,
+    public Optional<Found> nextOne(CharSequence cs, int fromRow, int fromCol) {
+        if (cs == null || cs.isEmpty()) return Optional.empty();
+        int size = chunkSize(source.length());
+        return Chunk.of(source, fromRow, fromCol, size).stream().parallel()
+            .map(c -> search(c, cs))
+            .filter(FoundsInChunk::hasFounds)
+            .findFirst()
+            .map(FoundsInChunk::founds)
+            .map(List::getFirst);
+    }
+
+    @Override
+    public Optional<Found> previousOne(CharSequence cs, int fromRow, int fromCol) {
+        if (cs == null || cs.isEmpty()) return Optional.empty();
+        int size = chunkSize(source.length());
+        return Chunk.backwardOf(source, fromRow, fromCol, size).stream().parallel()
+            .map(c -> search(c, cs))
+            .filter(FoundsInChunk::hasFounds)
+            .findFirst()
+            .map(FoundsInChunk::founds)
+            .map(List::getLast);
+    }
+
+    @Override
+    public void forward(CharSequence cs, int fromRow, int fromCol,
             Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
@@ -65,8 +90,8 @@ public class NaiveSearch implements Search {
     }
 
     @Override
-    public void searchBackward(CharSequence cs, int fromRow, int fromCol,
-            Consumer<FoundsInChunk> listener) {
+    public void backward(CharSequence cs, int fromRow, int fromCol,
+             Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
         int size = chunkSize(source.length());

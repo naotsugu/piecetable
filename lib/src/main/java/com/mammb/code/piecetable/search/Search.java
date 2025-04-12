@@ -16,6 +16,7 @@
 package com.mammb.code.piecetable.search;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -34,7 +35,25 @@ public interface Search {
      * @param toCol to column
      * @return the found list
      */
-    List<Found> search(CharSequence pattern, int fromRow, int fromCol, int toRow, int toCol);
+    List<Found> all(CharSequence pattern, int fromRow, int fromCol, int toRow, int toCol);
+
+    /**
+     * Search pattern.
+     * @param pattern the pattern
+     * @param fromRow from row
+     * @param fromCol from column
+     * @return the found
+     */
+    Optional<Found> nextOne(CharSequence pattern, int fromRow, int fromCol);
+
+    /**
+     * Search pattern.
+     * @param pattern the pattern
+     * @param fromRow from row
+     * @param fromCol from column
+     * @return the found
+     */
+    Optional<Found> previousOne(CharSequence pattern, int fromRow, int fromCol);
 
     /**
      * Search pattern.
@@ -43,8 +62,8 @@ public interface Search {
      * @param fromCol from column
      * @param listener the found listener
      */
-    void search(CharSequence pattern, int fromRow, int fromCol,
-           Consumer<FoundsInChunk> listener);
+    void forward(CharSequence pattern, int fromRow, int fromCol,
+             Consumer<FoundsInChunk> listener);
 
     /**
      * Search pattern backward.
@@ -53,7 +72,7 @@ public interface Search {
      * @param fromCol from column
      * @param listener the found listener
      */
-    void searchBackward(CharSequence pattern, int fromRow, int fromCol,
+    void backward(CharSequence pattern, int fromRow, int fromCol,
             Consumer<FoundsInChunk> listener);
 
     /**

@@ -44,21 +44,21 @@ class SearchTest {
 
         var source = source(content("a".repeat(10) + "bcd" + "e".repeat(10)));
 
-        Search.of(source).search("bcd", 0, 0, fic -> {
+        Search.of(source).forward("bcd", 0, 0, fic -> {
             var founds = fic.founds();
             assertEquals(1, founds.size());
             assertEquals(10, founds.getFirst().offset());
             assertEquals(3, founds.getFirst().len());
         });
 
-        Search.caseInsensitiveOf(source).search("BCD", 0, 0, fic -> {
+        Search.caseInsensitiveOf(source).forward("BCD", 0, 0, fic -> {
             var founds = fic.founds();
             assertEquals(1, founds.size());
             assertEquals(10, founds.getFirst().offset());
             assertEquals(3, founds.getFirst().len());
         });
 
-        Search.regexOf(source).search("b.?d", 0, 0, fic -> {
+        Search.regexOf(source).forward("b.?d", 0, 0, fic -> {
             var founds = fic.founds();
             assertEquals(1, founds.size());
             assertEquals(10, founds.getFirst().offset());
@@ -72,7 +72,7 @@ class SearchTest {
         var source = source(content(
             "a".repeat(10) + "bcd" + "e".repeat(10) + "\n" +
             "f".repeat(10) + "bcd"));
-        var founds = Search.of(source).search("bc", 0, 0, 1, 13);
+        var founds = Search.of(source).all("bc", 0, 0, 1, 13);
         assertEquals(2, founds.size());
         assertEquals(10, founds.getFirst().offset());
         assertEquals(2, founds.getFirst().len());
