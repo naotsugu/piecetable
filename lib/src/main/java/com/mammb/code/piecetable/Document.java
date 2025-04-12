@@ -18,6 +18,7 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 /**
  * The document.
@@ -214,11 +215,11 @@ public interface Document {
     /**
      * Create a new {@link Document}.
      * @param path the {@link Path} of the document
-     * @param progressListener the traverse callback of the document
+     * @param listener the progress listener
      * @return a new {@link Document}
      */
-    static Document of(Path path, Progress.Listener<Void> progressListener) {
-        return DocumentImpl.of(path, progressListener);
+    static Document of(Path path, Consumer<Segment> listener) {
+        return DocumentImpl.of(path, listener);
     }
 
     /**

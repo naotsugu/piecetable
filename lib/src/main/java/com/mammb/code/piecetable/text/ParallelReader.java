@@ -17,6 +17,7 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Progress;
+import com.mammb.code.piecetable.Segment;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 /**
@@ -57,7 +59,7 @@ public class ParallelReader implements Reader {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private final Progress.Listener<Void> progressListener;
+    private final Consumer<Segment> progressListener;
 
     /**
      * Constructor.
@@ -66,7 +68,7 @@ public class ParallelReader implements Reader {
      * @param matches the CharsetMatches
      */
     ParallelReader(Path path,
-            Progress.Listener<Void> progressListener,
+            Consumer<Segment> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
@@ -134,9 +136,7 @@ public class ParallelReader implements Reader {
         lfCount += chunkRead.lfCount;
 
         if (progressListener != null) {
-            var progress = Progress.of((long) chunkRead.chunkNo * CHUNK_SIZE + chunkRead.byteSize, length);
-            boolean continuation = progressListener.accept(progress);
-            if (!continuation) throw new RuntimeException("interrupted.");
+            progressListener.accept(Segment.of(chunkRead.byteSize, length));
         }
     }
 

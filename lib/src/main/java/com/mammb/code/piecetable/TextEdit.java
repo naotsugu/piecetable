@@ -19,6 +19,7 @@ import com.mammb.code.piecetable.edit.TextEditImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -287,11 +288,11 @@ public interface TextEdit {
     /**
      * Create a new {@link TextEdit}.
      * @param path the path of the file to read
-     * @param progressListener the document traverse callback
+     * @param listener the progress listener
      * @return a new {@link TextEdit}
      */
-    static TextEdit of(Path path, Progress.Listener<Void> progressListener) {
-        return new TextEditImpl(Document.of(path, progressListener));
+    static TextEdit of(Path path, Consumer<Segment> listener) {
+        return new TextEditImpl(Document.of(path, listener));
     }
 
     /**

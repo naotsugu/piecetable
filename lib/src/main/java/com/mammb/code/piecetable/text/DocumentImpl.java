@@ -22,10 +22,12 @@ import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.Progress;
 import com.mammb.code.piecetable.RowEnding;
+import com.mammb.code.piecetable.Segment;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 /**
  * The document implementation.
@@ -97,10 +99,10 @@ public class DocumentImpl implements Document {
     /**
      * Create a new {@link Document}.
      * @param path the {@link Path} of the document
-     * @param progressListener the traverse callback of the document
+     * @param progressListener the progress listener
      * @return a new {@link Document}
      */
-    public static DocumentImpl of(Path path, Progress.Listener<Void> progressListener) {
+    public static DocumentImpl of(Path path, Consumer<Segment> progressListener) {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, progressListener));
     }
 

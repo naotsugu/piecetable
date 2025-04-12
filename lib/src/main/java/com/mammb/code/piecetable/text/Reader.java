@@ -18,11 +18,13 @@ package com.mammb.code.piecetable.text;
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.DocumentStat;
 import com.mammb.code.piecetable.Progress;
+import com.mammb.code.piecetable.Segment;
 import com.mammb.code.piecetable.charset.CharsetMatches;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 /**
  * The reader.
@@ -60,14 +62,14 @@ public interface Reader extends DocumentStat {
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
-     * @param progressListener the traverse callback of the document
+     * @param listener the progress listener
      * @return a new {@link Reader}.
      */
-    static Reader of(Path path, Progress.Listener<Void> progressListener) {
+    static Reader of(Path path, Consumer<Segment> listener) {
         try {
             return Files.size(path) >= ParallelReader.CHUNK_SIZE
-                ? new ParallelReader(path, progressListener, CharsetMatches.defaults())
-                : new SeqReader(path, -1, progressListener, CharsetMatches.defaults());
+                ? new ParallelReader(path, listener, CharsetMatches.defaults())
+                : new SeqReader(path, -1, listener, CharsetMatches.defaults());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

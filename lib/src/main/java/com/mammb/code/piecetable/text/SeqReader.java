@@ -17,6 +17,7 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Progress;
+import com.mammb.code.piecetable.Segment;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Reader.
@@ -51,7 +53,7 @@ public class SeqReader implements Reader {
     /** The count of line feed. */
     private int lfCount = 0;
     /** The read callback. */
-    private final Progress.Listener<Void> progressListener;
+    private final Consumer<Segment> progressListener;
 
     /**
      * Constructor.
@@ -61,7 +63,7 @@ public class SeqReader implements Reader {
      * @param matches the CharsetMatches
      */
     SeqReader(Path path, int rowPrefLimit,
-            Progress.Listener<Void> progressListener,
+            Consumer<Segment> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
@@ -115,8 +117,6 @@ public class SeqReader implements Reader {
 
         if (path == null || !Files.exists(path)) return;
 
-        var listener = progressListener;
-
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             long size = channel.size();
@@ -130,7 +130,6 @@ public class SeqReader implements Reader {
                 : ByteBuffer.allocateDirect(cap);
 
             byte[] bytes = new byte[buf.capacity()];
-            long nRead = 0;
 
             for (;;) {
 
@@ -144,7 +143,6 @@ public class SeqReader implements Reader {
                 }
                 buf.flip();
                 byte[] read = asBytes(buf, n, bytes);
-                nRead += read.length;
 
                 if (length == 0) {
                     bom = Bom.extract(read);
@@ -165,10 +163,8 @@ public class SeqReader implements Reader {
 
                 index.add(read);
 
-                if (listener != null) {
-                    var progress = Progress.of(nRead, length);
-                    boolean continuation = listener.accept(progress);
-                    if (!continuation) break;
+                if (progressListener != null) {
+                    progressListener.accept(Segment.of(read.length + bom.length, length));
                 }
 
                 if (rowPrefLimit >= 0 && (rowPrefLimit < crCount || rowPrefLimit < lfCount)) {
@@ -182,7 +178,6 @@ public class SeqReader implements Reader {
             throw new RuntimeException(e);
         }
     }
-
 
     private byte[] asBytes(ByteBuffer buf, int nRead, byte[] bytes) {
         if (buf.isDirect()) {
