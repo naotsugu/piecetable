@@ -34,13 +34,15 @@ public interface Segment {
     long whole();
 
     /**
-     * The values {@link Segment}.
-     * @param fraction the fraction amount
-     * @param whole the whole amount
-     * @param value the value
+     * The valued {@link Segment}.
      * @param <T> the type of value
      */
-    record Valued<T>(long fraction, long whole, T value) implements Segment {
+    interface Valued<T> extends Segment {
+        /**
+         * Get the value.
+         * @return the value
+         */
+        T value();
     }
 
     /**
@@ -63,7 +65,8 @@ public interface Segment {
      * @param <T> the type of value
      */
     static <T> Valued<T> valuedOf(long fraction, long whole, T value) {
-        return new Valued<>(fraction, whole, value);
+        record ValuedRecord<T>(long fraction, long whole, T value) implements Valued<T> { }
+        return new ValuedRecord<>(fraction, whole, value);
     }
 
 }
