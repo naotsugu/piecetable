@@ -119,7 +119,7 @@ class NaiveSearch implements Search {
                     if (pattern[matchLen] != bb.get()) break;
                 }
                 if (matchLen == pattern.length) {
-                    var found = new Found(n.get(), cs.length());
+                    var found = new Found(n.get(), cs.length(), pattern.length);
                     founds.add(found);
                 }
             }

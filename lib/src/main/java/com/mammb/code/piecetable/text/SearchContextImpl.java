@@ -15,7 +15,6 @@
  */
 package com.mammb.code.piecetable.text;
 
-import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.PosLen;
 import com.mammb.code.piecetable.SearchContext;
@@ -26,9 +25,10 @@ import com.mammb.code.piecetable.search.Search;
 import com.mammb.code.piecetable.search.SearchSource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import static java.util.function.Predicate.not;
 
 /**
  * The search context implementation.
@@ -47,28 +47,39 @@ public class SearchContextImpl implements SearchContext {
     private List<Found> founds = new ArrayList<>();
 
 
-    public SearchContextImpl(SearchSource source, Consumer<Runnable> aroundRun) {
+    SearchContextImpl(SearchSource source, Consumer<Runnable> aroundRun) {
         this.source = source;
         this.aroundRun = aroundRun;
     }
 
+    @Override
     public void findAll(Spec spec, Consumer<Segment.Valued<List<PosLen>>> consumer) {
         Search s = build(source, spec.patternCase());
         aroundRun.accept(() -> s.forward(spec.pattern(), 0, 0, accept(consumer)));
         currentSpec = spec;
     }
 
+    @Override
     public Optional<PosLen> findNext(Pos pos) {
+        if (founds.isEmpty()) return Optional.empty();
         long offset = source.offset(pos.row(), pos.col());
-        return founds.stream().filter(f -> f.offset() >= offset).findFirst().map(this::toPosLen);
+        return founds.stream()
+            .filter(not(Found::isEmpty))
+            .filter(f -> f.offset() >= offset)
+            .findFirst().map(this::toPosLen);
     }
 
+    @Override
     public Optional<PosLen> findPrevious(Pos pos) {
+        if (founds.isEmpty()) return Optional.empty();
         long offset = source.offset(pos.row(), pos.col());
-        // TODO f.offset() + f.len()
-        return founds.stream().filter(f -> f.offset() + f.len() < offset).reduce((_, s) -> s).map(this::toPosLen);
+        return founds.stream()
+            .filter(not(Found::isEmpty))
+            .filter(f -> f.offset() + f.rawLen() < offset)
+            .reduce((_, s) -> s).map(this::toPosLen);
     }
 
+    @Override
     public Optional<PosLen> findNext(Spec spec, Pos pos) {
         Search s = build(source, spec.patternCase());
         List<PosLen> list = new ArrayList<>();
@@ -82,39 +93,43 @@ public class SearchContextImpl implements SearchContext {
         return list.stream().findFirst();
     }
 
+    @Override
     public void clear() {
         currentSpec = null;
         founds.clear();
     }
 
-    void insert(int row, int col, int rawLen) {
-        long offset = source.offset(row, col);
+    @Override
+    public List<PosLen> currentFounds() {
+        return founds.stream().map(this::toPosLen).toList();
+    }
+
+    void insert(long offset, int rawLen) {
+        if (rawLen <= 0) return;
         for (int i = 0; i < founds.size(); i++) {
             Found f = founds.get(i);
-            // TODO f.offset() + f.len()
-            if (f.offset() + f.len() <= offset) {
+            if (f.offset() + f.rawLen() <= offset) {
                 continue;
             }
-            if (f.offset() <= offset && offset < f.offset() + f.len()) {
-                founds.remove(i);
+            if (f.offset() <= offset && offset < f.offset() + f.rawLen()) {
+                founds.set(i, new Found(f.offset(), 0, 0));
             } else {
-                founds.set(i, new Found(f.offset() + rawLen, f.len()));
+                founds.set(i, new Found(f.offset() + rawLen, f.len(), f.rawLen()));
             }
         }
     }
 
-    void delete(int row, int col, int rawLen) {
-        long offset = source.offset(row, col);
+    void delete(long offset, int rawLen) {
+        if (rawLen <= 0) return;
         for (int i = 0; i < founds.size(); i++) {
             Found f = founds.get(i);
-            // TODO f.offset() + f.len()
-            if (f.offset() + f.len() <= offset) {
+            if (f.offset() + f.rawLen() <= offset) {
                 continue;
             }
             if (f.offset() <= offset && offset < f.offset() + f.len()) {
-                founds.remove(i);
+                founds.set(i, new Found(f.offset(), 0, 0));
             } else {
-                founds.set(i, new Found(f.offset() - rawLen, f.len()));
+                founds.set(i, new Found(f.offset() - rawLen, f.len(), f.rawLen()));
             }
         }
     }

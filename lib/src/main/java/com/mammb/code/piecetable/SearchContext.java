@@ -15,6 +15,10 @@
  */
 package com.mammb.code.piecetable;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 /**
  * The search context.
  * @author Naotsugu Kobayashi
@@ -47,5 +51,16 @@ public interface SearchContext {
      */
     record Spec(CharSequence pattern, PatternCase patternCase, Direction direction) { }
 
+    void findAll(Spec spec, Consumer<Segment.Valued<List<PosLen>>> consumer);
+
+    Optional<PosLen> findNext(Pos pos);
+
+    Optional<PosLen> findPrevious(Pos pos);
+
+    Optional<PosLen> findNext(Spec spec, Pos pos);
+
+    void clear();
+
+    List<PosLen> currentFounds();
 
 }

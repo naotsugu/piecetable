@@ -141,7 +141,8 @@ class PatternSearch implements Search {
             if (Thread.interrupted()) throw new RuntimeException("interrupted");
             pos += source.charset().encode(cb.slice(n, matcher.start() - n)).limit();
             n = matcher.start();
-            var found = new Found(chunk.from() + pos, matcher.end() - matcher.start());
+            var str = matcher.group();
+            var found = new Found(chunk.from() + pos, str.length(), str.getBytes(source.charset()).length);
             founds.add(found);
         }
 
