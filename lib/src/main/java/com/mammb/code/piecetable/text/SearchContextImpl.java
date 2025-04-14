@@ -34,7 +34,7 @@ import static java.util.function.Predicate.not;
  * The search context implementation.
  * @author Naotsugu Kobayashi
  */
-public class SearchContextImpl implements SearchContext {
+public class SearchContextImpl implements SearchContext, OffsetSync {
 
     /** The search source. */
     private final SearchSource source;
@@ -104,7 +104,8 @@ public class SearchContextImpl implements SearchContext {
         return founds.stream().map(this::toPosLen).toList();
     }
 
-    void insert(long offset, int rawLen) {
+    @Override
+    public void insert(long offset, int rawLen) {
         if (rawLen <= 0) return;
         for (int i = 0; i < founds.size(); i++) {
             Found f = founds.get(i);
@@ -119,7 +120,8 @@ public class SearchContextImpl implements SearchContext {
         }
     }
 
-    void delete(long offset, int rawLen) {
+    @Override
+    public void delete(long offset, int rawLen) {
         if (rawLen <= 0) return;
         for (int i = 0; i < founds.size(); i++) {
             Found f = founds.get(i);
