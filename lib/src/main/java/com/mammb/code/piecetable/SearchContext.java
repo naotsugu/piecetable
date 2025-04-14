@@ -51,16 +51,44 @@ public interface SearchContext {
      */
     record Spec(CharSequence pattern, PatternCase patternCase, Direction direction) { }
 
+    /**
+     * Search all.
+     * @param spec the search specification
+     * @param consumer the found consumer
+     */
     void findAll(Spec spec, Consumer<Segment.Valued<List<PosLen>>> consumer);
 
+    /**
+     * Search next on current context.
+     * @param pos the base position
+     * @return the found
+     */
     Optional<PosLen> findNext(Pos pos);
 
+    /**
+     * Search previous on current context.
+     * @param pos the base position
+     * @return the found
+     */
     Optional<PosLen> findPrevious(Pos pos);
 
+    /**
+     * Search next.
+     * @param spec the search specification
+     * @param pos the base position
+     * @return the found
+     */
     Optional<PosLen> findNext(Spec spec, Pos pos);
 
+    /**
+     * Clear context.
+     */
     void clear();
 
+    /**
+     * Get the current founds.
+     * @return the current founds
+     */
     List<PosLen> currentFounds();
 
 }
