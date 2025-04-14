@@ -16,7 +16,6 @@
 package com.mammb.code.piecetable.edit;
 
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.Range;
 import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.Pos;

@@ -180,8 +180,8 @@ public interface Document {
     void save(Path path);
 
     /**
-     * Get the {@link DocumentSearch}.
-     * @return the {@link DocumentSearch}
+     * Get the {@link SearchContext}.
+     * @return the {@link SearchContext}
      */
     SearchContext search();
 
