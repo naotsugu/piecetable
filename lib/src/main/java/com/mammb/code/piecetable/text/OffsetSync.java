@@ -34,4 +34,5 @@ interface OffsetSync {
      * @param rawLen the raw bytes length
      */
     void delete(long offset, int rawLen);
+
 }

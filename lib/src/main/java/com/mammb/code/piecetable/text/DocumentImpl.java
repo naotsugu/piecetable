@@ -17,10 +17,10 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Document;
-import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.RowEnding;
+import com.mammb.code.piecetable.SearchContext;
 import com.mammb.code.piecetable.Segment;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +48,9 @@ public class DocumentImpl implements Document {
 
     /** The row ending. */
     private final RowEnding rowEnding;
+
+    /** The offset sync. */
+    private OffsetSync offsetSync;
 
     /** The {@link Path} of Document. */
     private Path path;
@@ -147,15 +150,19 @@ public class DocumentImpl implements Document {
     @Override
     public void insert(int row, int col, byte[] bytes) {
         if (readonly) return;
-        pt.insert(index.offset(row, col) + bom.length, bytes);
+        long offset = index.offset(row, col);
+        pt.insert(offset + bom.length, bytes);
         index.insert(row, col, bytes);
+        if (offsetSync != null) offsetSync.insert(offset, bytes.length);
     }
 
     @Override
     public void delete(int row, int col, int rawLen) {
         if (readonly) return;
-        pt.delete(index.offset(row, col) + bom.length, rawLen);
+        long offset = index.offset(row, col);
+        pt.delete(offset + bom.length, rawLen);
         index.delete(row, col, rawLen);
+        if (offsetSync != null) offsetSync.delete(offset, rawLen);
     }
 
     @Override
@@ -233,9 +240,9 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public DocumentSearch search() {
+    public SearchContext search() {
         var source = new SearchSourceImpl(pt, index, charset, bom.length);
-        return new DocumentSearchImpl(source, r -> {
+        var search = new SearchContextImpl(source, r -> {
             final boolean ro = readonly();
             try {
                 if (!ro) readonly(true);
@@ -244,5 +251,8 @@ public class DocumentImpl implements Document {
                 if (!ro) readonly(false);
             }
         });
+        offsetSync = search;
+        return search;
     }
+
 }

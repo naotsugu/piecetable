@@ -20,6 +20,7 @@ import com.mammb.code.piecetable.DocumentSearch;
 import com.mammb.code.piecetable.Range;
 import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.Pos;
+import com.mammb.code.piecetable.SearchContext;
 import com.mammb.code.piecetable.TextEdit;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -503,7 +504,7 @@ public class TextEditImpl implements TextEdit {
     }
 
     @Override
-    public DocumentSearch search() {
+    public SearchContext search() {
         flush();
         return doc.search();
     }

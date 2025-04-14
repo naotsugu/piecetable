@@ -254,10 +254,10 @@ public interface TextEdit {
     void save(Path path);
 
     /**
-     * Get the {@link DocumentSearch}.
-     * @return the {@link DocumentSearch}
+     * Get the {@link SearchContext}.
+     * @return the {@link SearchContext}
      */
-    DocumentSearch search();
+    SearchContext search();
 
     /**
      * Create a new {@link TextEdit}.

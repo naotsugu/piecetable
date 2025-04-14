@@ -183,7 +183,7 @@ public interface Document {
      * Get the {@link DocumentSearch}.
      * @return the {@link DocumentSearch}
      */
-    DocumentSearch search();
+    SearchContext search();
 
     /**
      * Create a new {@link Document}.
