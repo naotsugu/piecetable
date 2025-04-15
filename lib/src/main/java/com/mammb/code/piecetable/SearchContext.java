@@ -63,22 +63,14 @@ public interface SearchContext {
      * @param pos the base position
      * @return the found
      */
-    Optional<PosLen> findNext(Pos pos);
+    Optional<PosLen> next(Pos pos);
 
     /**
      * Search previous on current context.
      * @param pos the base position
      * @return the found
      */
-    Optional<PosLen> findPrevious(Pos pos);
-
-    /**
-     * Search next.
-     * @param spec the search specification
-     * @param pos the base position
-     * @return the found
-     */
-    Optional<PosLen> findNext(Spec spec, Pos pos);
+    Optional<PosLen> previous(Pos pos);
 
     /**
      * Clear context.
@@ -89,6 +81,14 @@ public interface SearchContext {
      * Get the current founds.
      * @return the current founds
      */
-    List<PosLen> currentFounds();
+    List<PosLen> founds();
+
+    /**
+     * Search next one.
+     * @param spec the search specification
+     * @param pos the base position
+     * @return the found
+     */
+    Optional<PosLen> findOne(Spec spec, Pos pos);
 
 }

@@ -41,8 +41,6 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     /** The around runnable. */
     private final Consumer<Runnable> aroundRun;
 
-    /** The current find spec. */
-    private Spec currentSpec;
     /** The founds. */
     private List<Found> founds = new ArrayList<>();
 
@@ -56,11 +54,10 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     public void findAll(Spec spec, Consumer<Segment.Valued<List<PosLen>>> consumer) {
         Search s = build(source, spec.patternCase());
         aroundRun.accept(() -> s.forward(spec.pattern(), 0, 0, accept(consumer)));
-        currentSpec = spec;
     }
 
     @Override
-    public Optional<PosLen> findNext(Pos pos) {
+    public Optional<PosLen> next(Pos pos) {
         if (founds.isEmpty()) return Optional.empty();
         long offset = source.offset(pos.row(), pos.col());
         return founds.stream()
@@ -70,7 +67,7 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     }
 
     @Override
-    public Optional<PosLen> findPrevious(Pos pos) {
+    public Optional<PosLen> previous(Pos pos) {
         if (founds.isEmpty()) return Optional.empty();
         long offset = source.offset(pos.row(), pos.col());
         return founds.stream()
@@ -80,7 +77,7 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     }
 
     @Override
-    public Optional<PosLen> findNext(Spec spec, Pos pos) {
+    public Optional<PosLen> findOne(Spec spec, Pos pos) {
         Search s = build(source, spec.patternCase());
         List<PosLen> list = new ArrayList<>();
         aroundRun.accept(() -> {
@@ -95,12 +92,11 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
 
     @Override
     public void clear() {
-        currentSpec = null;
         founds.clear();
     }
 
     @Override
-    public List<PosLen> currentFounds() {
+    public List<PosLen> founds() {
         return founds.stream().map(this::toPosLen).toList();
     }
 
