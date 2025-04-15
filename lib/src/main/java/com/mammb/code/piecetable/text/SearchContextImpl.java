@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static java.util.function.Predicate.not;
 
@@ -57,31 +58,26 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     }
 
     @Override
-    public Optional<PosLen> next(Pos pos) {
+    public Optional<PosLen> next(Pos pos, Direction direction) {
         if (founds.isEmpty()) return Optional.empty();
         long offset = source.offset(pos.row(), pos.col());
-        return founds.stream()
-            .filter(not(Found::isEmpty))
-            .filter(f -> f.offset() >= offset)
-            .findFirst().map(this::toPosLen);
+        Stream<Found> stream = founds.stream().filter(not(Found::isEmpty));
+        return switch (direction) {
+            case FORWARD -> stream
+                .filter(f -> f.offset() >= offset)
+                .findFirst().map(this::toPosLen);
+            case BACKWARD -> stream
+                .filter(f -> f.offset() + f.rawLen() < offset)
+                .reduce((_, s) -> s).map(this::toPosLen);
+        };
     }
 
     @Override
-    public Optional<PosLen> previous(Pos pos) {
-        if (founds.isEmpty()) return Optional.empty();
-        long offset = source.offset(pos.row(), pos.col());
-        return founds.stream()
-            .filter(not(Found::isEmpty))
-            .filter(f -> f.offset() + f.rawLen() < offset)
-            .reduce((_, s) -> s).map(this::toPosLen);
-    }
-
-    @Override
-    public Optional<PosLen> findOne(Spec spec, Pos pos) {
+    public Optional<PosLen> findOne(Spec spec, Pos pos, Direction direction) {
         Search s = build(source, spec.patternCase());
         List<PosLen> list = new ArrayList<>();
         aroundRun.accept(() -> {
-            Optional<Found> found = switch (spec.direction()) {
+            Optional<Found> found = switch (direction) {
                 case FORWARD -> s.nextOne(spec.pattern(), pos.row(), pos.col());
                 case BACKWARD -> s.previousOne(spec.pattern(), pos.row(), pos.col());
             };

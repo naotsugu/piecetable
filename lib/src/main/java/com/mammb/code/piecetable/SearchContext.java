@@ -47,9 +47,8 @@ public interface SearchContext {
      * Search specification.
      * @param pattern the pattern sequence
      * @param patternCase the pattern case
-     * @param direction the direction
      */
-    record Spec(CharSequence pattern, PatternCase patternCase, Direction direction) { }
+    record Spec(CharSequence pattern, PatternCase patternCase) { }
 
     /**
      * Search all.
@@ -61,16 +60,10 @@ public interface SearchContext {
     /**
      * Search next on current context.
      * @param pos the base position
+     * @param direction the direction
      * @return the found
      */
-    Optional<PosLen> next(Pos pos);
-
-    /**
-     * Search previous on current context.
-     * @param pos the base position
-     * @return the found
-     */
-    Optional<PosLen> previous(Pos pos);
+    Optional<PosLen> next(Pos pos, Direction direction);
 
     /**
      * Clear context.
@@ -87,8 +80,9 @@ public interface SearchContext {
      * Search next one.
      * @param spec the search specification
      * @param pos the base position
+     * @param direction the direction
      * @return the found
      */
-    Optional<PosLen> findOne(Spec spec, Pos pos);
+    Optional<PosLen> findOne(Spec spec, Pos pos, Direction direction);
 
 }
