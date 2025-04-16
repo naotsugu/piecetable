@@ -41,11 +41,14 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     private final SearchSource source;
     /** The around runnable. */
     private final Consumer<Runnable> aroundRun;
-
     /** The founds. */
     private List<Found> founds = new ArrayList<>();
 
-
+    /**
+     * Constructor.
+     * @param source the search source
+     * @param aroundRun the around runnable
+     */
     SearchContextImpl(SearchSource source, Consumer<Runnable> aroundRun) {
         this.source = source;
         this.aroundRun = aroundRun;
