@@ -41,7 +41,7 @@ import static com.mammb.code.piecetable.edit.Texts.splitRowBreak;
  * The {@link TextEdit} implementation.
  * @author Naotsugu Kobayashi
  */
-public class TextEditImpl implements TextEdit {
+public class TextEditImpl implements TextEdit, Flushable {
 
     /** The edit queue. */
     private final Deque<Edit> deque = new ArrayDeque<>();
@@ -504,8 +504,7 @@ public class TextEditImpl implements TextEdit {
 
     @Override
     public SearchContext search() {
-        flush();
-        return doc.search();
+        return new FlushSearchContext(doc.search(), this);
     }
 
     Edit.Ins insertEdit(int row, int col, String text, long occurredOn) {
