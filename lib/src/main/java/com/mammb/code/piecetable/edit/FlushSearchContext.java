@@ -54,8 +54,14 @@ public class FlushSearchContext implements SearchContext {
 
     @Override
     public List<PosLen> founds() {
+        if (!sc.hasFounds()) return List.of();
         flushable.flush();
         return sc.founds();
+    }
+
+    @Override
+    public boolean hasFounds() {
+        return sc.hasFounds();
     }
 
     @Override

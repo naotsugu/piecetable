@@ -77,6 +77,12 @@ public interface SearchContext {
     List<PosLen> founds();
 
     /**
+     * Gets whether founds are present.
+      * @return {@code true}, if founds are present
+     */
+    boolean hasFounds();
+
+    /**
      * Search next one.
      * @param spec the search specification
      * @param pos the base position

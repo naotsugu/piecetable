@@ -100,6 +100,11 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     }
 
     @Override
+    public boolean hasFounds() {
+        return !founds.isEmpty();
+    }
+
+    @Override
     public void insert(long offset, int rawLen) {
         if (rawLen <= 0) return;
         for (int i = 0; i < founds.size(); i++) {
