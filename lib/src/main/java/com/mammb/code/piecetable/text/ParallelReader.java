@@ -48,7 +48,7 @@ public class ParallelReader implements Reader {
     /** The byte order mark. */
     private byte[] bom = new byte[0];
     /** The charset read. */
-    private Charset charset;
+    private volatile Charset charset;
     /** The byte length read. */
     private long length = 0;
     /** The CharsetMatches. */
@@ -59,6 +59,7 @@ public class ParallelReader implements Reader {
     private int lfCount = 0;
     /** The read callback. */
     private final Consumer<Segment> progressListener;
+    /** The lock object. */
     private final Object lock = new Object();
 
     /**
