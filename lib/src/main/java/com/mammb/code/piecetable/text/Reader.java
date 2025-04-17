@@ -92,7 +92,7 @@ public interface Reader extends DocumentStat {
      * @return a new {@link Reader}.
      */
     static Reader of(Path path, int rowLimit, CharsetMatch... matches) {
-        return new SeqReader(path, rowLimit, null, matches);
+        return new SeqReader(path, rowLimit, null, matches.length == 0 ? CharsetMatches.defaults() : matches);
     }
 
 }

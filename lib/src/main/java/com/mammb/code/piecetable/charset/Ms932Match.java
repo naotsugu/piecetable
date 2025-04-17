@@ -18,11 +18,16 @@ package com.mammb.code.piecetable.charset;
 import com.mammb.code.piecetable.CharsetMatch;
 import java.nio.charset.Charset;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * The ms932 {@link CharsetMatch}.
  * @author Naotsugu Kobayashi
  */
 class Ms932Match implements CharsetMatch {
+
+    /** logger. */
+    private static final System.Logger log = System.getLogger(Ms932Match.class.getName());
 
     private int confidence = 50;
     private int trail = 0;
@@ -55,6 +60,7 @@ class Ms932Match implements CharsetMatch {
                 trail = 0;
             }
         }
+        log.log(DEBUG, "windows-31j confidence:{0}, miss:{1}", confidence, miss);
         return new Result(Charset.forName("windows-31j"), Math.clamp(confidence, 0, 100), miss);
     }
 
