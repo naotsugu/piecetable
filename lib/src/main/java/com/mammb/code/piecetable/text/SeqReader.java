@@ -194,10 +194,10 @@ public class SeqReader implements Reader {
     }
 
     private Charset checkCharset(byte[] bytes) {
-        return matches.stream().map(m -> m.put(bytes))
-            .max(Comparator.naturalOrder())
-            .map(CharsetMatch.Result::charset)
-            .orElse(null);
+        var result = matches.stream().map(m -> m.put(bytes))
+            .max(Comparator.naturalOrder());
+        if (result.isEmpty() || result.get().isVague()) return null;
+        return result.map(CharsetMatch.Result::charset).orElse(null);
     }
 
 }

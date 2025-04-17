@@ -68,7 +68,7 @@ class Utf8Match implements CharsetMatch {
                 }
             }
         }
-        log.log(DEBUG, "UTF_8       confidence:{0}, miss:{1}", confidence, miss);
+        log.log(DEBUG, "UTF_8 confidence:{0}, miss:{1}", confidence, miss);
         return new Result(StandardCharsets.UTF_8, Math.clamp(confidence, 0, 100), miss);
     }
 

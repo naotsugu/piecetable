@@ -50,6 +50,15 @@ public interface CharsetMatch {
      * @param miss the miss
      */
     record Result(Charset charset, int confidence, int miss) implements Comparable<Result> {
+
+        /**
+         * Get if this result is vague.
+         * @return {@code true} if this result is vague
+         */
+        public boolean isVague() {
+            return confidence <= 50 && miss == 0;
+        }
+
         @Override
         public int compareTo(Result o) {
             return Comparator.comparingInt(Result::miss)

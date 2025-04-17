@@ -59,6 +59,7 @@ public class ParallelReader implements Reader {
     private int lfCount = 0;
     /** The read callback. */
     private final Consumer<Segment> progressListener;
+    private final Object lock = new Object();
 
     /**
      * Constructor.
@@ -151,6 +152,13 @@ public class ParallelReader implements Reader {
         if (chunkNo == 0) {
             bytes = handleHeadChunk(bytes);
         }
+        if (charset == null) {
+            synchronized (lock) {
+                if (charset == null) {
+                    charset = checkCharset(bytes);
+                }
+            }
+        }
 
         IntArray rows = IntArray.of();
         int crCount = 0;
@@ -177,17 +185,16 @@ public class ParallelReader implements Reader {
             // exclude BOM
             bytes = Arrays.copyOfRange(bytes, bom.length, bytes.length);
         }
-        charset = checkCharset(bytes);
         return bytes;
     }
 
     record ChunkRead(int chunkNo, long byteSize, int[] rows, int crCount, int lfCount) {}
 
     private Charset checkCharset(byte[] bytes) {
-        return matches.stream().map(m -> m.put(bytes))
-            .max(Comparator.naturalOrder())
-            .map(CharsetMatch.Result::charset)
-            .orElse(null);
+        var result = matches.stream().map(m -> m.put(bytes))
+            .max(Comparator.naturalOrder());
+        if (result.isEmpty() || result.get().isVague()) return null;
+        return result.map(CharsetMatch.Result::charset).orElse(null);
     }
 
 }
