@@ -28,7 +28,7 @@ public interface CharsetMatches {
      * @return a new default {@link CharsetMatch}
      */
     static CharsetMatch[] defaults() {
-        return new CharsetMatch[] { utf8(), ms932() };
+        return new CharsetMatch[] { utf8(), ms932(), new Utf16BEMatch(), new Utf16LEMatch() };
     }
 
     /**

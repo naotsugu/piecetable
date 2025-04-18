@@ -194,6 +194,7 @@ public class ParallelReader implements Reader {
     private Charset checkCharset(byte[] bytes) {
         var result = matches.stream().map(m -> m.put(bytes))
             .max(Comparator.naturalOrder());
+        System.out.println(result);
         if (result.isEmpty() || result.get().isVague()) return null;
         return result.map(CharsetMatch.Result::charset).orElse(null);
     }

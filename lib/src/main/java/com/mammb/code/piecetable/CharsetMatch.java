@@ -19,7 +19,7 @@ import java.nio.charset.Charset;
 import java.util.Comparator;
 
 /**
- * The CharsetMatch.
+ * The charset match.
  * Estimates the character set from a given byte array.
  * @author Naotsugu Kobayashi
  */
@@ -66,6 +66,14 @@ public interface CharsetMatch {
         int miss();
 
         /**
+         * Get the miss rank.
+         * @return the miss rank
+         */
+        default int missRank() {
+            return -1 * miss();
+        }
+
+        /**
          * Get if this result is vague.
          * @return {@code true} if this result is vague
          */
@@ -75,9 +83,9 @@ public interface CharsetMatch {
 
         @Override
         default int compareTo(Result o) {
-            return Comparator.comparingInt(Result::miss)
+            return Comparator.comparingInt(Result::missRank)
                 .thenComparing(Result::confidence)
-                .compare(o, this);
+                .compare(this, o);
         }
 
         /**

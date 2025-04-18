@@ -42,6 +42,10 @@ public class CharsetMatchResult implements CharsetMatch.Result {
         miss++;
     }
 
+    void exact() {
+        confidence = 100;
+    }
+
     @Override
     public Charset charset() {
         return charset;
