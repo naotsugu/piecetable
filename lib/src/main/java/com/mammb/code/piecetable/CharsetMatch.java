@@ -39,31 +39,58 @@ public interface CharsetMatch {
      * @return a new {@link CharsetMatch}
      */
     static CharsetMatch of(Charset charset) {
-        return bytes -> new Result(charset, 100, 0);
+        return _ -> Result.fixedOf(charset);
     }
-
 
     /**
      * The {@link CharsetMatch} result.
-     * @param charset the charset
-     * @param confidence the confidence
-     * @param miss the miss
      */
-    record Result(Charset charset, int confidence, int miss) implements Comparable<Result> {
+    interface Result extends Comparable<Result> {
+
+        /**
+         * Get the charset.
+         * @return the charset
+         */
+        Charset charset();
+
+        /**
+         * Get the confidence.
+         * @return the confidence
+         */
+        int confidence();
+
+        /**
+         * Get the miss.
+         * @return the miss
+         */
+        int miss();
 
         /**
          * Get if this result is vague.
          * @return {@code true} if this result is vague
          */
-        public boolean isVague() {
-            return confidence <= 50 && miss == 0;
+        default boolean isVague() {
+            return confidence() <= 50 && miss() == 0;
         }
 
         @Override
-        public int compareTo(Result o) {
+        default int compareTo(Result o) {
             return Comparator.comparingInt(Result::miss)
                 .thenComparing(Result::confidence)
                 .compare(o, this);
+        }
+
+        /**
+         * Create a new Fixed {@link Result}.
+         * @param charset the charset
+         * @return a new Fixed {@link Result}
+         */
+        static Result fixedOf(Charset charset) {
+            record Fixed(Charset charset) implements Result {
+                @Override public int confidence() { return 100; }
+                @Override public int miss() { return 0; }
+            }
+            return new Fixed(charset);
         }
     }
 

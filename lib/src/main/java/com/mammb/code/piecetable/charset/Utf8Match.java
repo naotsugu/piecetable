@@ -26,26 +26,23 @@ import static java.lang.System.Logger.Level.DEBUG;
  */
 class Utf8Match implements CharsetMatch {
 
-    /** logger. */
+    /** The logger. */
     private static final System.Logger log = System.getLogger(Utf8Match.class.getName());
+    /** The result. */
+    private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_8);
 
-    private int confidence = 50;
-    private int trail = 0;
-    private int miss = 0;
+    private int trail;
 
     @Override
     public Result put(byte[] bytes) {
 
         for (int i = 0; i < bytes.length; i++) {
 
-            if (confidence <= 0 || confidence >= 100) break;
-
             if (trail == 0) {
                 byte b = bytes[i];
                 trail = trail(b);
                 if (trail == -1) {
-                    confidence = Math.clamp(--confidence, 0, 100);
-                    miss++;
+                    result.decrement();
                 }
                 if (trail <= 0) continue;
             }
@@ -57,19 +54,18 @@ class Utf8Match implements CharsetMatch {
                 }
                 byte b = bytes[i];
                 if ((b & 0xc0) != 0x80) {
-                    confidence = Math.clamp(--confidence, 0, 100);
-                    miss++;
+                    result.decrement();
                     trail = 0;
                     break;
                 }
                 if (--trail == 0) {
-                    confidence = Math.clamp(++confidence, 0, 100);
+                    result.increment();
                     break;
                 }
             }
         }
-        log.log(DEBUG, "UTF_8 confidence:{0}, miss:{1}", confidence, miss);
-        return new Result(StandardCharsets.UTF_8, Math.clamp(confidence, 0, 100), miss);
+        log.log(DEBUG, result);
+        return result;
     }
 
     private int trail(byte b) {

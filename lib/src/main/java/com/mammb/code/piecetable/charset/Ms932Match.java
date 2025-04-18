@@ -26,12 +26,10 @@ import static java.lang.System.Logger.Level.DEBUG;
  */
 class Ms932Match implements CharsetMatch {
 
-    /** logger. */
+    /** The logger. */
     private static final System.Logger log = System.getLogger(Ms932Match.class.getName());
-
-    private int confidence = 50;
-    private int trail = 0;
-    private int miss = 0;
+    /** The result. */
+    private final CharsetMatchResult result = new CharsetMatchResult(Charset.forName("windows-31j"));
 
     @Override
     public Result put(byte[] bytes) {
@@ -39,29 +37,25 @@ class Ms932Match implements CharsetMatch {
             int b = Byte.toUnsignedInt(bytes[i]);
             if (b == 0x80 || b == 0xa0 || b >= 0xfd) {
                 // unused
-                confidence = Math.clamp(--confidence, 0, 100);
-                miss++;
+                result.decrement();
                 continue;
             }
             if ((0x81 <= b && b <= 0x9f) || b >= 0xe0) {
                 // double width
-                trail = 1;
                 if (i + 1 >= bytes.length) {
                     break;
                 }
 
                 int s = Byte.toUnsignedInt(bytes[++i]);
                 if ((0x40 <= s && s <= 0x7e) || (0x80 <= s && s <= 0xfc)) {
-                    confidence = Math.clamp(++confidence, 0, 100);
+                    result.increment();
                 } else {
-                    confidence = Math.clamp(--confidence, 0, 100);
-                    miss++;
+                    result.decrement();
                 }
-                trail = 0;
             }
         }
-        log.log(DEBUG, "windows-31j confidence:{0}, miss:{1}", confidence, miss);
-        return new Result(Charset.forName("windows-31j"), Math.clamp(confidence, 0, 100), miss);
+        log.log(DEBUG, result);
+        return result;
     }
 
 }
