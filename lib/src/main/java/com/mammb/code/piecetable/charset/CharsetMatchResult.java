@@ -28,6 +28,7 @@ public class CharsetMatchResult implements CharsetMatch.Result {
     private final Charset charset;
     private int confidence = 50;
     private int miss = 0;
+    private boolean vague = true;
 
     CharsetMatchResult(Charset charset) {
         this.charset = Objects.requireNonNull(charset);
@@ -35,15 +36,18 @@ public class CharsetMatchResult implements CharsetMatch.Result {
 
     void increment() {
         if (confidence < 100) confidence++;
+        vague = false;
     }
 
     void decrement() {
         if (confidence > 0) confidence--;
         miss++;
+        vague = false;
     }
 
     void exact() {
         confidence = 100;
+        vague = false;
     }
 
     @Override
@@ -62,8 +66,13 @@ public class CharsetMatchResult implements CharsetMatch.Result {
     }
 
     @Override
+    public boolean isVague() {
+        return vague;
+    }
+
+    @Override
     public String toString() {
-        return "%s confidence:%d, miss:%d".formatted(charset, confidence, miss);
+        return "%s confidence:%d, miss:%d vague:%s".formatted(charset, confidence, miss, vague);
     }
 
 }

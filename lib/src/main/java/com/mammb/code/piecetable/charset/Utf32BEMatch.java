@@ -31,6 +31,12 @@ public class Utf32BEMatch implements CharsetMatch {
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_32BE);
 
+    /**
+     * Constructor.
+     */
+    public Utf32BEMatch() {
+    }
+
     @Override
     public Result put(byte[] input) {
 

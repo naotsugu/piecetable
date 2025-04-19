@@ -66,19 +66,17 @@ public interface CharsetMatch {
         int miss();
 
         /**
+         * Get if this result is vague.
+         * @return {@code true} if this result is vague
+         */
+        boolean isVague();
+
+        /**
          * Get the miss rank.
          * @return the miss rank
          */
         default int missRank() {
             return -1 * miss();
-        }
-
-        /**
-         * Get if this result is vague.
-         * @return {@code true} if this result is vague
-         */
-        default boolean isVague() {
-            return confidence() <= 50 && miss() == 0;
         }
 
         @Override
@@ -97,6 +95,7 @@ public interface CharsetMatch {
             record Fixed(Charset charset) implements Result {
                 @Override public int confidence() { return 100; }
                 @Override public int miss() { return 0; }
+                @Override public boolean isVague() { return false; }
             }
             return new Fixed(charset);
         }

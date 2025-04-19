@@ -17,6 +17,8 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Segment;
+import com.mammb.code.piecetable.charset.Bom;
+import com.mammb.code.piecetable.charset.CharsetMatches;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -152,7 +154,7 @@ public class SeqReader implements Reader {
                     }
                 }
                 if (charset == null) {
-                    charset = checkCharset(read);
+                    charset = CharsetMatches.estimate(read, matches).orElse(null);
                 }
                 length += read.length;
                 for (byte b : read) {
@@ -191,13 +193,6 @@ public class SeqReader implements Reader {
         } else {
             return Arrays.copyOf(buf.array(), buf.limit());
         }
-    }
-
-    private Charset checkCharset(byte[] bytes) {
-        var result = matches.stream().map(m -> m.put(bytes))
-            .max(Comparator.naturalOrder());
-        if (result.isEmpty() || result.get().isVague()) return null;
-        return result.map(CharsetMatch.Result::charset).orElse(null);
     }
 
 }

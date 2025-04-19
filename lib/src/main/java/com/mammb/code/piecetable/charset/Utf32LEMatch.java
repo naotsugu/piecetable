@@ -31,6 +31,12 @@ public class Utf32LEMatch implements CharsetMatch {
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_32LE);
 
+    /**
+     * Constructor.
+     */
+    public Utf32LEMatch() {
+    }
+
     @Override
     public Result put(byte[] bytes) {
 

@@ -16,6 +16,11 @@
 package com.mammb.code.piecetable.charset;
 
 import com.mammb.code.piecetable.CharsetMatch;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The CharsetMatch simple implementation collections.
@@ -28,7 +33,18 @@ public interface CharsetMatches {
      * @return a new default {@link CharsetMatch}
      */
     static CharsetMatch[] defaults() {
-        return new CharsetMatch[] { utf8(), ms932(), new Utf16BEMatch(), new Utf16LEMatch() };
+        return new CharsetMatch[] { utf8(), ms932(),
+            new Utf16BEMatch(), new Utf16LEMatch() };
+    }
+
+    /**
+     * Create the {@link CharsetMatch}.
+     * @return the {@link CharsetMatch}
+     */
+    static CharsetMatch[] all() {
+        return new CharsetMatch[] { utf8(), ms932(),
+            new Utf16BEMatch(), new Utf16LEMatch(),
+            new Utf32BEMatch(), new Utf32LEMatch() };
     }
 
     /**
@@ -45,6 +61,21 @@ public interface CharsetMatches {
      */
     static CharsetMatch ms932() {
         return new Ms932Match();
+    }
+
+    /**
+     * Get the estimated {@link Charset}.
+     * @param bytes the specified bytes
+     * @param matches the list of {@link CharsetMatch}
+     * @return the estimated {@link Charset}
+     */
+    static Optional<Charset> estimate(byte[] bytes, List<CharsetMatch> matches) {
+        var result = matches.stream()
+            .map(m -> m.put(bytes))
+            .max(Comparator.naturalOrder());
+        return (result.isEmpty() || result.get().isVague())
+            ? Optional.empty()
+            : result.map(CharsetMatch.Result::charset);
     }
 
 }

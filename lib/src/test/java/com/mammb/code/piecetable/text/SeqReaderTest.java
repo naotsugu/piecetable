@@ -15,6 +15,7 @@
  */
 package com.mammb.code.piecetable.text;
 
+import com.mammb.code.piecetable.charset.Bom;
 import com.mammb.code.piecetable.charset.CharsetMatches;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -25,6 +26,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.text;
+package com.mammb.code.piecetable.charset;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -23,14 +23,20 @@ import java.util.Arrays;
  * Bom utility.
  * @author Naotsugu Kobayashi
  */
-class Bom {
+public interface Bom {
 
-    static final byte[] UTF_8    = new byte[] { (byte) 0xef, (byte) 0xbb, (byte) 0xbf };
-    static final byte[] UTF_16BE = new byte[] { (byte) 0xfe, (byte) 0xff };
-    static final byte[] UTF_16LE = new byte[] { (byte) 0xff, (byte) 0xfe };
-    static final byte[] UTF_32BE = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff };
-    static final byte[] UTF_32LE = new byte[] { (byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00 };
-    static final byte[] GB18030  = new byte[] { (byte) 0x84, (byte) 0x31, (byte) 0x95, (byte) 0x33 };
+    /** utf-8 bom. */
+    byte[] UTF_8    = new byte[] { (byte) 0xef, (byte) 0xbb, (byte) 0xbf };
+    /** utf-16BE bom. */
+    byte[] UTF_16BE = new byte[] { (byte) 0xfe, (byte) 0xff };
+    /** utf-16LE bom. */
+    byte[] UTF_16LE = new byte[] { (byte) 0xff, (byte) 0xfe };
+    /** utf-32BE bom. */
+    byte[] UTF_32BE = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff };
+    /** utf-32LE bom. */
+    byte[] UTF_32LE = new byte[] { (byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00 };
+    /** GB18030 bom. */
+    byte[] GB18030  = new byte[] { (byte) 0x84, (byte) 0x31, (byte) 0x95, (byte) 0x33 };
 
     /**
      * Extracts the bom from the specified byte array.

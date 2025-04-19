@@ -17,6 +17,8 @@ package com.mammb.code.piecetable.text;
 
 import com.mammb.code.piecetable.CharsetMatch;
 import com.mammb.code.piecetable.Segment;
+import com.mammb.code.piecetable.charset.Bom;
+import com.mammb.code.piecetable.charset.CharsetMatches;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -156,7 +158,7 @@ public class ParallelReader implements Reader {
         if (charset == null) {
             synchronized (lock) {
                 if (charset == null) {
-                    charset = checkCharset(bytes);
+                    charset = CharsetMatches.estimate(bytes, matches).orElse(null);
                 }
             }
         }
@@ -190,13 +192,5 @@ public class ParallelReader implements Reader {
     }
 
     record ChunkRead(int chunkNo, long byteSize, int[] rows, int crCount, int lfCount) {}
-
-    private Charset checkCharset(byte[] bytes) {
-        var result = matches.stream().map(m -> m.put(bytes))
-            .max(Comparator.naturalOrder());
-        System.out.println(result);
-        if (result.isEmpty() || result.get().isVague()) return null;
-        return result.map(CharsetMatch.Result::charset).orElse(null);
-    }
 
 }
