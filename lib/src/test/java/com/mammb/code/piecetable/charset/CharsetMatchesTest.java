@@ -18,6 +18,7 @@ package com.mammb.code.piecetable.charset;
 import org.junit.jupiter.api.Test;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,6 +40,29 @@ class CharsetMatchesTest {
         var ms932 = CharsetMatches.ms932();
         var ret = ms932.put("あいうえお".getBytes(Charset.forName("windows-31j")));
         assertEquals(55, ret.confidence());
+    }
+
+    @Test
+    void estimate() {
+
+        var cs = StandardCharsets.UTF_8;
+        assertEquals(cs, CharsetMatches.estimate("あいうえお\n".getBytes(cs), CharsetMatches.all()).get());
+
+        cs = Charset.forName("windows-31j");
+        assertEquals(cs, CharsetMatches.estimate("あいうえお\n".getBytes(cs), CharsetMatches.all()).get());
+
+        cs = StandardCharsets.UTF_16BE;
+        assertEquals(cs, CharsetMatches.estimate("あいうえお\n".getBytes(cs), CharsetMatches.all()).get());
+
+        cs = StandardCharsets.UTF_16LE;
+        assertEquals(cs, CharsetMatches.estimate("あいうえお\n".getBytes(cs), CharsetMatches.all()).get());
+
+        cs = StandardCharsets.UTF_32BE;
+        assertEquals(cs, CharsetMatches.estimate("あいうえお\n".getBytes(cs), CharsetMatches.all()).get());
+
+        cs = StandardCharsets.UTF_32LE;
+        assertEquals(cs, CharsetMatches.estimate("あいうえお\n".getBytes(cs), CharsetMatches.all()).get());
+
     }
 
 }

@@ -78,4 +78,14 @@ public interface CharsetMatches {
             : result.map(CharsetMatch.Result::charset);
     }
 
+    /**
+     * Get the estimated {@link Charset}.
+     * @param bytes the specified bytes
+     * @param matches the array of {@link CharsetMatch}
+     * @return the estimated {@link Charset}
+     */
+    static Optional<Charset> estimate(byte[] bytes, CharsetMatch... matches) {
+        return estimate(bytes, List.of(matches));
+    }
+
 }
