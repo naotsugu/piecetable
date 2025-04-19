@@ -30,23 +30,26 @@ class Utf16LEMatch implements CharsetMatch {
     private static final System.Logger log = System.getLogger(Utf16LEMatch.class.getName());
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_16LE);
+    /** The sum length. */
+    private long sumLength;
 
     @Override
     public Result put(byte[] bytes) {
 
         for (int i = 0; i < bytes.length - 1; i += 2) {
             int codeUnit = ((bytes[i + 1] & 0xff) << 8) | (bytes[i] & 0xff);
-            if (i == 0 && codeUnit == 0xFEFF) {
+            if (i == 0 && sumLength == 0 && codeUnit == 0xFEFF) {
                 result.exact();
                 break;
             }
             if (codeUnit == 0) {
-                result.decrement();
+                result.decreasesConfidence();
             } else if ((codeUnit >= 0x20 && codeUnit <= 0xff) || codeUnit == 0x0a) {
-                result.increment();
+                result.increasesConfidence();
             }
             if (result.confidence() == 100) break;
         }
+        sumLength += bytes.length;
         log.log(DEBUG, result);
         return result;
     }

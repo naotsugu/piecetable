@@ -30,6 +30,8 @@ public class Utf32BEMatch implements CharsetMatch {
     private static final System.Logger log = System.getLogger(Utf32BEMatch.class.getName());
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_32BE);
+    /** The sum length. */
+    private long sumLength;
 
     /**
      * Constructor.
@@ -38,34 +40,34 @@ public class Utf32BEMatch implements CharsetMatch {
     }
 
     @Override
-    public Result put(byte[] input) {
+    public Result put(byte[] bytes) {
 
-        int limit = (input.length / 4) * 4;
+        int limit = (bytes.length / 4) * 4;
 
         if (limit == 0) {
             return result;
         }
 
-        if (getChar(input, 0) == 0x0000FEFF) {
+        if (sumLength == 0 && getChar(bytes, 0) == 0x0000FEFF) {
             result.exact();
             return result;
         }
 
         for (int i = 0; i < limit; i += 4) {
-            int ch = getChar(input, i);
+            int ch = getChar(bytes, i);
             if (ch < 0 || ch >= 0x10FFFF || (ch >= 0xD800 && ch <= 0xDFFF)) {
-                result.decrement();
+                result.decreasesConfidence();
             } else {
-                result.increment();
+                result.increasesConfidence();
             }
         }
-
+        sumLength += bytes.length;
         log.log(DEBUG, result);
         return result;
     }
 
     private static int getChar(byte[] bytes, int index) {
         return (bytes[index] & 0xFF) << 24 | (bytes[index + 1] & 0xFF) << 16 |
-            (bytes[index + 2] & 0xFF) <<  8 | (bytes[index + 3] & 0xFF);
+               (bytes[index + 2] & 0xFF) <<  8 | (bytes[index + 3] & 0xFF);
     }
 }

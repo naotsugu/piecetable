@@ -34,13 +34,26 @@ public class CharsetMatchResult implements CharsetMatch.Result {
         this.charset = Objects.requireNonNull(charset);
     }
 
-    void increment() {
+    void increasesConfidence() {
         if (confidence < 100) confidence++;
         vague = false;
     }
 
-    void decrement() {
+    void decreasesConfidence() {
         if (confidence > 0) confidence--;
+        miss++;
+        vague = false;
+    }
+
+    void increasesConfidence(int n) {
+        confidence += n;
+        confidence = Math.clamp(confidence, 0, 100);
+        vague = false;
+    }
+
+    void decreasesConfidence(int n) {
+        confidence -= n;
+        confidence = Math.clamp(confidence, 0, 100);
         miss++;
         vague = false;
     }

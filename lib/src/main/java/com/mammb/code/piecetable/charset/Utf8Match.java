@@ -30,7 +30,7 @@ class Utf8Match implements CharsetMatch {
     private static final System.Logger log = System.getLogger(Utf8Match.class.getName());
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_8);
-
+    /** trail flag. */
     private int trail;
 
     @Override
@@ -42,7 +42,7 @@ class Utf8Match implements CharsetMatch {
                 byte b = bytes[i];
                 trail = trail(b);
                 if (trail == -1) {
-                    result.decrement();
+                    result.decreasesConfidence();
                 }
                 if (trail <= 0) continue;
             }
@@ -54,12 +54,12 @@ class Utf8Match implements CharsetMatch {
                 }
                 byte b = bytes[i];
                 if ((b & 0xc0) != 0x80) {
-                    result.decrement();
+                    result.decreasesConfidence();
                     trail = 0;
                     break;
                 }
                 if (--trail == 0) {
-                    result.increment();
+                    result.increasesConfidence();
                     break;
                 }
             }

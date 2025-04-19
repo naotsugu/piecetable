@@ -37,7 +37,7 @@ class Ms932Match implements CharsetMatch {
             int b = Byte.toUnsignedInt(bytes[i]);
             if (b == 0x80 || b == 0xa0 || b >= 0xfd) {
                 // unused
-                result.decrement();
+                result.decreasesConfidence();
                 continue;
             }
             if ((0x81 <= b && b <= 0x9f) || 0xe0 <= b && b <= 0xfc) {
@@ -49,12 +49,12 @@ class Ms932Match implements CharsetMatch {
                 int s = Byte.toUnsignedInt(bytes[++i]);
                 if ((0x40 <= s && s <= 0x7e) || (0x80 <= s && s <= 0xfc)) {
                     if (miss(b, s)) {
-                        result.decrement();
+                        result.decreasesConfidence();
                     } else {
-                        result.increment();
+                        result.increasesConfidence();
                     }
                 } else {
-                    result.decrement();
+                    result.decreasesConfidence();
                 }
             }
         }

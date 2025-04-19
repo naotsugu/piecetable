@@ -30,6 +30,8 @@ public class Utf32LEMatch implements CharsetMatch {
     private static final System.Logger log = System.getLogger(Utf32LEMatch.class.getName());
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_32LE);
+    /** The sum length. */
+    private long sumLength;
 
     /**
      * Constructor.
@@ -46,7 +48,7 @@ public class Utf32LEMatch implements CharsetMatch {
             return result;
         }
 
-        if (getChar(bytes, 0) == 0x0000FEFF) {
+        if (sumLength == 0 && getChar(bytes, 0) == 0x0000FEFF) {
             result.exact();
             return result;
         }
@@ -54,12 +56,12 @@ public class Utf32LEMatch implements CharsetMatch {
         for (int i = 0; i < limit; i += 4) {
             int ch = getChar(bytes, i);
             if (ch < 0 || ch >= 0x10FFFF || (ch >= 0xD800 && ch <= 0xDFFF)) {
-                result.decrement();
+                result.decreasesConfidence();
             } else {
-                result.increment();
+                result.increasesConfidence();
             }
         }
-
+        sumLength += bytes.length;
         log.log(DEBUG, result);
         return result;
 
