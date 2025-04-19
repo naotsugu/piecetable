@@ -19,7 +19,6 @@ import com.mammb.code.piecetable.CharsetMatch;
 import java.nio.charset.StandardCharsets;
 
 import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.INFO;
 
 /**
  * The utf-8 {@link CharsetMatch}.
@@ -65,7 +64,7 @@ class Utf8Match implements CharsetMatch {
                 }
             }
         }
-        log.log(INFO, result);
+        log.log(DEBUG, result);
         return result;
     }
 

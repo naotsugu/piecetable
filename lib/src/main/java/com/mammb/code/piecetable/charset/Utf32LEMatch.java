@@ -21,33 +21,47 @@ import java.nio.charset.StandardCharsets;
 import static java.lang.System.Logger.Level.DEBUG;
 
 /**
- * The utf-16BE {@link CharsetMatch}.
+ * The utf-32LE {@link CharsetMatch}.
  * @author Naotsugu Kobayashi
  */
-class Utf16BEMatch implements CharsetMatch {
+public class Utf32LEMatch implements CharsetMatch {
 
     /** The logger. */
-    private static final System.Logger log = System.getLogger(Utf16BEMatch.class.getName());
+    private static final System.Logger log = System.getLogger(Utf32LEMatch.class.getName());
     /** The result. */
-    private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_16BE);
+    private final CharsetMatchResult result = new CharsetMatchResult(StandardCharsets.UTF_32LE);
 
     @Override
     public Result put(byte[] bytes) {
-        for (int i = 0; i < bytes.length - 1; i += 2) {
-            int codeUnit = ((bytes[i] & 0xff) << 8) | (bytes[i + 1] & 0xff);
-            if (i == 0 && codeUnit == 0xFEFF) {
-                result.exact();
-                break;
-            }
-            if (codeUnit == 0) {
+
+        int limit = (bytes.length / 4) * 4;
+
+        if (limit == 0) {
+            return result;
+        }
+
+        if (getChar(bytes, 0) == 0x0000FEFF) {
+            result.exact();
+            return result;
+        }
+
+        for (int i = 0; i < limit; i += 4) {
+            int ch = getChar(bytes, i);
+            if (ch < 0 || ch >= 0x10FFFF || (ch >= 0xD800 && ch <= 0xDFFF)) {
                 result.decrement();
-            } else if ((codeUnit >= 0x20 && codeUnit <= 0xff) || codeUnit == 0x0a) {
+            } else {
                 result.increment();
             }
-            if (result.confidence() == 100) break;
         }
+
         log.log(DEBUG, result);
         return result;
+
+    }
+
+    private static int getChar(byte[] bytes, int index) {
+        return (bytes[index + 3] & 0xFF) << 24 | (bytes[index + 2] & 0xFF) << 16 |
+            (bytes[index + 1] & 0xFF) <<  8 | (bytes[index] & 0xFF);
     }
 
 }

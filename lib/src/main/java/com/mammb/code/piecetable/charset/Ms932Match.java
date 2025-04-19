@@ -19,7 +19,6 @@ import com.mammb.code.piecetable.CharsetMatch;
 import java.nio.charset.Charset;
 
 import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.INFO;
 
 /**
  * The ms932 {@link CharsetMatch}.
@@ -59,7 +58,7 @@ class Ms932Match implements CharsetMatch {
                 }
             }
         }
-        log.log(INFO, result);
+        log.log(DEBUG, result);
         return result;
     }
 
