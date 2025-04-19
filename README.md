@@ -52,7 +52,7 @@ Add dependencies.
 
 ```kotlin
 dependencies {
-    implementation("com.mammb:piecetable:0.5.11")
+    implementation("com.mammb:piecetable:0.5.12")
 }
 ```
 
