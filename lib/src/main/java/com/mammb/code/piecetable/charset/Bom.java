@@ -25,15 +25,15 @@ import java.util.Arrays;
  */
 public interface Bom {
 
-    /** utf-8 bom. */
+    /** UTF-8 bom. */
     byte[] UTF_8    = new byte[] { (byte) 0xef, (byte) 0xbb, (byte) 0xbf };
-    /** utf-16BE bom. */
+    /** UTF-16BE bom. */
     byte[] UTF_16BE = new byte[] { (byte) 0xfe, (byte) 0xff };
-    /** utf-16LE bom. */
+    /** UTF-16LE bom. */
     byte[] UTF_16LE = new byte[] { (byte) 0xff, (byte) 0xfe };
-    /** utf-32BE bom. */
+    /** UTF-32BE bom. */
     byte[] UTF_32BE = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff };
-    /** utf-32LE bom. */
+    /** UTF-32LE bom. */
     byte[] UTF_32LE = new byte[] { (byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00 };
     /** GB18030 bom. */
     byte[] GB18030  = new byte[] { (byte) 0x84, (byte) 0x31, (byte) 0x95, (byte) 0x33 };

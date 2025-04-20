@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The CharsetMatch simple implementation collections.
+ * The {@link CharsetMatch} utilities.
  * @author Naotsugu Kobayashi
  */
 public interface CharsetMatches {
