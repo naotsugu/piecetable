@@ -41,7 +41,7 @@ public interface Bom {
     /**
      * Extracts the bom from the specified byte array.
      * @param bytes the specified byte array
-     * @return the bom
+     * @return the bom, if the bom does not exist, an empty array
      */
     static byte[] extract(byte[] bytes) {
         if (bytes == null) {

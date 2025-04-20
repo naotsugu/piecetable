@@ -48,7 +48,7 @@ class Ms932Match implements CharsetMatch {
 
                 int s = Byte.toUnsignedInt(bytes[++i]);
                 if ((0x40 <= s && s <= 0x7e) || (0x80 <= s && s <= 0xfc)) {
-                    if (miss(b, s)) {
+                    if (isInvalid(b, s)) {
                         result.decreasesConfidence();
                     } else {
                         result.increasesConfidence();
@@ -62,7 +62,7 @@ class Ms932Match implements CharsetMatch {
         return result;
     }
 
-    boolean miss(int hi, int lo) {
+    boolean isInvalid(int hi, int lo) {
         if (hi == 0x81) {
             return 0xad <= lo && lo <= 0xb7 || 0xc0 <= lo && lo <= 0xc7
                 || 0xcf <= lo && lo <= 0xd9 || 0xe9 <= lo && lo <= 0xef

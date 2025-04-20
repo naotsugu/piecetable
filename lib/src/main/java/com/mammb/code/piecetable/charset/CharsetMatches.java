@@ -28,8 +28,8 @@ import java.util.Optional;
 public interface CharsetMatches {
 
     /**
-     * Create a new default {@link CharsetMatch}.
-     * @return a new default {@link CharsetMatch}
+     * Create a new default {@link CharsetMatch} array.
+     * @return a new default {@link CharsetMatch} array
      */
     static CharsetMatch[] defaults() {
         return new CharsetMatch[] { utf8(), ms932(),
@@ -37,8 +37,8 @@ public interface CharsetMatches {
     }
 
     /**
-     * Create the {@link CharsetMatch}.
-     * @return the {@link CharsetMatch}
+     * Create the {@link CharsetMatch} array.
+     * @return the {@link CharsetMatch} array
      */
     static CharsetMatch[] all() {
         return new CharsetMatch[] { utf8(), ms932(),
