@@ -22,7 +22,7 @@ package com.mammb.code.piecetable.search;
  * @param rawLen the raw byte length
  * @author Naotsugu Kobayashi
  */
-public record Found(long offset, int len, int rawLen) {
+public record Found(long offset, int len, int rawLen) implements Comparable<Found> {
 
     /**
      * Gets whether this found is empty or not.
@@ -38,6 +38,12 @@ public record Found(long offset, int len, int rawLen) {
      */
     public long offsetEnd() {
         return offset + rawLen;
+    }
+
+    @Override
+    public int compareTo(Found that) {
+        int c = Long.compare(this.offset, that.offset);
+        return c == 0 ? Integer.compare(this.len, that.len) : c;
     }
 
 }

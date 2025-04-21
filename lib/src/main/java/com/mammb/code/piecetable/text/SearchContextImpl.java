@@ -63,6 +63,7 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     @Override
     public Optional<PosLen> next(Pos pos, Direction direction) {
         if (founds.isEmpty()) return Optional.empty();
+
         long offset = source.offset(pos.row(), pos.col());
         Stream<Found> stream = founds.stream().filter(not(Found::isEmpty));
         return switch (direction) {
