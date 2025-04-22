@@ -69,7 +69,7 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
         int index = Collections.binarySearch(founds, new Found(offset, 0, 0));
         index = (index >= 0) ? index : ~index;
         return switch (direction) {
-            case FORWARD -> Optional.of(toPosLen(founds.get(index)));
+            case FORWARD -> (index < founds.size()) ? Optional.of(toPosLen(founds.get(index))) : Optional.empty();
             case BACKWARD -> (index > 0) ? Optional.of(toPosLen(founds.get(index - 1))) : Optional.empty();
         };
     }
@@ -106,33 +106,32 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     @Override
     public void insert(long offset, int rawLen) {
         if (rawLen <= 0) return;
-        for (int i = 0; i < founds.size(); i++) {
-            Found f = founds.get(i);
-            if (f.offset() + f.rawLen() <= offset) {
-                continue;
-            }
-            if (f.offset() <= offset && offset < f.offset() + f.rawLen()) {
-                founds.set(i, new Found(f.offset(), 0, 0));
-            } else {
-                founds.set(i, new Found(f.offset() + rawLen, f.len(), f.rawLen()));
-            }
-        }
+        shift(offset, rawLen);
     }
 
     @Override
     public void delete(long offset, int rawLen) {
         if (rawLen <= 0) return;
-        for (int i = 0; i < founds.size(); i++) {
-            Found f = founds.get(i);
-            if (f.offset() + f.rawLen() <= offset) {
-                continue;
-            }
-            if (f.offset() <= offset && offset < f.offset() + f.len()) {
-                founds.set(i, new Found(f.offset(), 0, 0));
-            } else {
-                founds.set(i, new Found(f.offset() - rawLen, f.len(), f.rawLen()));
+        shift(offset, -rawLen);
+    }
+
+    private void shift(long offset, int len) {
+        int index = Collections.binarySearch(founds, new Found(offset, 0, 0));
+        index = (index >= 0) ? index : ~index;
+        if (index >= founds.size()) return;
+
+        List<Found> sub = founds.subList(index, founds.size());
+        List<Found> shifted = sub.stream()
+            .map(f -> new Found(f.offset() + len, f.len(), f.rawLen()))
+            .toList();
+        sub.clear();
+        if (!founds.isEmpty()) {
+            Found f = founds.getLast();
+            if (f.offset() < offset && offset < f.offset() + f.rawLen()) {
+                founds.removeLast();
             }
         }
+        founds.addAll(shifted);
     }
 
     private Search build(SearchSource source, PatternCase patternCase) {
