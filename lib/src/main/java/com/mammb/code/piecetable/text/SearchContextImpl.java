@@ -24,12 +24,10 @@ import com.mammb.code.piecetable.search.FoundsInChunk;
 import com.mammb.code.piecetable.search.Search;
 import com.mammb.code.piecetable.search.SearchSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import static java.util.function.Predicate.not;
 
 /**
  * The search context implementation.
@@ -58,21 +56,21 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     public void findAll(Spec spec, Consumer<Segment.Valued<List<PosLen>>> consumer) {
         Search s = build(source, spec.patternCase());
         aroundRun.accept(() -> s.forward(spec.pattern(), 0, 0, accept(consumer)));
+        Collections.sort(founds);
     }
 
     @Override
     public Optional<PosLen> next(Pos pos, Direction direction) {
-        if (founds.isEmpty()) return Optional.empty();
+
+        if (founds.isEmpty())
+            return Optional.empty();
 
         long offset = source.offset(pos.row(), pos.col());
-        Stream<Found> stream = founds.stream().filter(not(Found::isEmpty));
+        int index = Collections.binarySearch(founds, new Found(offset, 0, 0));
+        index = (index >= 0) ? index : ~index;
         return switch (direction) {
-            case FORWARD -> stream
-                .filter(f -> f.offset() >= offset)
-                .findFirst().map(this::toPosLen);
-            case BACKWARD -> stream
-                .filter(f -> f.offset() + f.rawLen() < offset)
-                .reduce((_, s) -> s).map(this::toPosLen);
+            case FORWARD -> Optional.of(toPosLen(founds.get(index)));
+            case BACKWARD -> (index > 0) ? Optional.of(toPosLen(founds.get(index - 1))) : Optional.empty();
         };
     }
 
