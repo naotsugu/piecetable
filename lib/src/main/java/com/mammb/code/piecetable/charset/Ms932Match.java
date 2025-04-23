@@ -96,7 +96,7 @@ class Ms932Match implements CharsetMatch {
         } else if (hi == 0xef) {
             return true;
         } else {
-            return true;
+            return false;
         }
     }
 
