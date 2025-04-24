@@ -116,22 +116,22 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     }
 
     private void shift(long offset, int len) {
+
         int index = Collections.binarySearch(founds, new Found(offset, 0, 0));
         index = (index >= 0) ? index : ~index;
         if (index >= founds.size()) return;
 
+        long end = offset + Math.abs(len);
+
         List<Found> sub = founds.subList(index, founds.size());
         List<Found> shifted = sub.stream()
+            .filter(f -> offset >= f.offsetEnd() || f.offset() >= end)
             .map(f -> new Found(f.offset() + len, f.len(), f.rawLen()))
             .toList();
         sub.clear();
-        if (!founds.isEmpty()) {
-            Found f = founds.getLast();
-            if (f.offset() < offset && offset < f.offset() + f.rawLen()) {
-                founds.removeLast();
-            }
-        }
+
         founds.addAll(shifted);
+
     }
 
     private Search build(SearchSource source, PatternCase patternCase) {
