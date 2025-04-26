@@ -48,7 +48,36 @@ public interface SearchContext {
      * @param pattern the pattern sequence
      * @param patternCase the pattern case
      */
-    record Spec(CharSequence pattern, PatternCase patternCase) { }
+    record Spec(CharSequence pattern, PatternCase patternCase) {
+
+        /**
+         * Create a new literal {@link Spec}.
+         * @param pattern the pattern sequence
+         * @return a new literal {@link Spec}
+         */
+        public Spec literalOf(CharSequence pattern) {
+            return new Spec(pattern, PatternCase.LITERAL);
+        }
+
+        /**
+         * Create a new case-insensitive {@link Spec}.
+         * @param pattern the pattern sequence
+         * @return a new case-insensitive {@link Spec}
+         */
+        public Spec caseInsensitiveOf(CharSequence pattern) {
+            return new Spec(pattern, PatternCase.CASE_INSENSITIVE);
+        }
+
+        /**
+         * Create a new regex {@link Spec}.
+         * @param pattern the pattern sequence
+         * @return a new regex {@link Spec}
+         */
+        public Spec regexOf(CharSequence pattern) {
+            return new Spec(pattern, PatternCase.REGEX);
+        }
+
+    }
 
     /**
      * Search all.

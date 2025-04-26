@@ -74,7 +74,7 @@ class ParallelReaderTest {
     void charsetWindows31j() throws IOException {
         Path path = dir.resolve("ms932" + ".txt");
         Charset cs = Charset.forName("windows-31j");
-        Files.write(path, "abcあいう".getBytes(cs));
+        Files.write(path, "abcあいうえお".getBytes(cs));
         var target = new ParallelReader(path, null, CharsetMatches.defaults());
         assertEquals(cs, target.charset());
     }
@@ -83,7 +83,7 @@ class ParallelReaderTest {
     void charsetUTF8() throws IOException {
         Path path = dir.resolve("utf8" + ".txt");
         Charset cs = StandardCharsets.UTF_8;
-        Files.write(path, "abcあいう".getBytes(cs));
+        Files.write(path, "abcあいうえお".getBytes(cs));
         var target = new ParallelReader(path, null, CharsetMatches.defaults());
         assertEquals(cs, target.charset());
     }

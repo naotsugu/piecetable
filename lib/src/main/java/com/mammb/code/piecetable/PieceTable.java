@@ -22,6 +22,13 @@ import java.util.function.Function;
 
 /**
  * PieceTable.
+ * PieceTable is a data structure typically used to represent a text document
+ * while it is edited in a text editor.
+ * <p>
+ * Initially a reference to the whole of the original file is created, which represents the as yet unchanged file.
+ * Subsequent inserts and deletes replace a span by combinations of one, two, or three references to sections of
+ * either the original document or to a buffer holding inserted text.
+ * </p>
  *
  * <pre>
  *            PieceList pieces
