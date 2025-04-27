@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable.text;
+package com.mammb.code.piecetable;
 
-import com.mammb.code.piecetable.CharsetMatch;
-import com.mammb.code.piecetable.RowEnding;
+import com.mammb.code.piecetable.text.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
