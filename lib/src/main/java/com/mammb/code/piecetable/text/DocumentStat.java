@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mammb.code.piecetable;
+package com.mammb.code.piecetable.text;
 
-import com.mammb.code.piecetable.text.Reader;
-import com.mammb.code.piecetable.text.SeqReader;
+import com.mammb.code.piecetable.CharsetMatch;
+import com.mammb.code.piecetable.RowEnding;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
