@@ -17,6 +17,7 @@ package com.mammb.code.piecetable;
 
 /**
  * Segment.
+ * Represents a fraction of the whole.
  * @author Naotsugu Kobayashi
  */
 public interface Segment {
