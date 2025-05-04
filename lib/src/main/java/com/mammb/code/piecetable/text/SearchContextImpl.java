@@ -40,7 +40,7 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     /** The around runnable. */
     private final Consumer<Runnable> aroundRun;
     /** The founds. */
-    private List<Found> founds = new ArrayList<>();
+    private final List<Found> founds = new ArrayList<>();
 
     /**
      * Constructor.

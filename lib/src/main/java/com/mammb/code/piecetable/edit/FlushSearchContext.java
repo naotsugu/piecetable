@@ -29,9 +29,16 @@ import java.util.function.Consumer;
  */
 public class FlushSearchContext implements SearchContext {
 
+    /** The search context. */
     private final SearchContext sc;
+    /** The flushable. */
     private final Flushable flushable;
 
+    /**
+     * Constructor.
+     * @param searchContext the search context
+     * @param flushable the flushable
+     */
     FlushSearchContext(SearchContext searchContext, Flushable flushable) {
         this.sc = searchContext;
         this.flushable = flushable;
