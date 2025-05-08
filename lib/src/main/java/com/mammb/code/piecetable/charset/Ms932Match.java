@@ -82,14 +82,16 @@ class Ms932Match implements CharsetMatch {
         } else if (hi == 0x86) {
             return true;
         } else if (hi == 0x87) {
-            return 0x76 <= lo && lo <= 0x7d || 0x9d <= lo;
+            return 0x5e == lo || 0x76 <= lo && lo <= 0x7d || 0x9d <= lo;
         } else if (hi == 0x88) {
-            return 0x40 <= lo && lo <= 0x9e || 0x9d <= lo;
+            return 0x40 <= lo && lo <= 0x9e;
         } else if (hi == 0x98) {
             return 0x73 <= lo && lo <= 0x9e;
         } else if (hi == 0xea) {
             return 0xa5 <= lo;
         } else if (hi == 0xeb) {
+            return true;
+        } else if (hi == 0xec) {
             return true;
         } else if (hi == 0xee) {
             return 0xed <= lo && lo <= 0xee;
