@@ -254,6 +254,13 @@ public interface TextEdit {
     void save(Path path);
 
     /**
+     * Writes the contents of a document to the specified path.
+     * This method is intended for backup path creation and other uses.
+     * @param path the specified path
+     */
+    void write(Path path);
+
+    /**
      * Get the {@link SearchContext}.
      * @return the {@link SearchContext}
      */

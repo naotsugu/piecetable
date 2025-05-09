@@ -240,6 +240,11 @@ public class DocumentImpl implements Document {
     }
 
     @Override
+    public void write(Path path) {
+        pt.write(path);
+    }
+
+    @Override
     public SearchContext search() {
         var source = new SearchSourceImpl(pt, index, charset, bom.length);
         var search = new SearchContextImpl(source, r -> {

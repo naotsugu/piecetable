@@ -503,6 +503,12 @@ public class TextEditImpl implements TextEdit, Flushable {
     }
 
     @Override
+    public void write(Path path) {
+        flush();
+        doc.write(path);
+    }
+
+    @Override
     public SearchContext search() {
         return new FlushSearchContext(doc.search(), this);
     }
