@@ -96,6 +96,12 @@ public interface PieceTable {
     void save(Path path);
 
     /**
+     * Writes the contents of the PieceTable to the specified path.
+     * @param path the specified path
+     */
+    void write(Path path);
+
+    /**
      * Reads the contents into the specified byte buffer callback.
      * Provides access to content in an efficient manner via byte buffers.
      * {@snippet :

@@ -238,6 +238,26 @@ public class PieceTableImpl implements PieceTable {
     }
 
     @Override
+    public void write(Path path) {
+
+        try (FileChannel channel = FileChannel.open(path,
+            StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+
+            ByteBuffer buf = ByteBuffer.allocateDirect(
+                Math.toIntExact(Math.min(length, 1024 * 64)));
+
+            long size = 0;
+            for (Piece piece : pieces) {
+                size += piece.writeTo(channel, buf);
+            }
+            channel.truncate(size);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void read(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback) {
         var bb = ByteBuffer.allocateDirect(1024 * 512);
         long len = 0;
@@ -288,29 +308,6 @@ public class PieceTableImpl implements PieceTable {
             bytes.add(piece.bytes());
         }
         return bytes.get();
-    }
-
-    /**
-     * Writes the contents of the PieceTable to the specified path.
-     * @param path the specified path
-     */
-    private void write(Path path) {
-
-        try (FileChannel channel = FileChannel.open(path,
-            StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-
-            ByteBuffer buf = ByteBuffer.allocateDirect(
-                Math.toIntExact(Math.min(length, 1024 * 64)));
-
-            long size = 0;
-            for (Piece piece : pieces) {
-                size += piece.writeTo(channel, buf);
-            }
-            channel.truncate(size);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private PiecePoint at(long pos) {
