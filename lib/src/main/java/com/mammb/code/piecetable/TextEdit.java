@@ -285,15 +285,6 @@ public interface TextEdit {
 
     /**
      * Create a new {@link TextEdit}.
-     * @param document the Document
-     * @return a new {@link TextEdit}
-     */
-    static TextEdit of(Document document) {
-        return new TextEditImpl(document);
-    }
-
-    /**
-     * Create a new {@link TextEdit}.
      * @param path the path of the file to read
      * @param listener the progress listener
      * @return a new {@link TextEdit}
