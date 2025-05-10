@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,17 +53,18 @@ public class PieceTableImpl implements PieceTable {
     /**
      * Constructor.
      * @param path the source path
+     * @param appendBuffer the append buffer
      * @param initial the initial piece
      */
-    PieceTableImpl(Path path, Piece initial) {
-        sourcePath = path;
-        appendBuffer = AppendBuffer.of();
-        pieces = new ArrayList<>();
-        indices = new TreeMap<>();
-        length = 0;
+    PieceTableImpl(Path path, AppendBuffer appendBuffer, Piece initial) {
+        this.sourcePath = path;
+        this.appendBuffer = appendBuffer;
+        this.pieces = new ArrayList<>();
+        this.indices = new TreeMap<>();
+        this.length = 0;
         if (initial != null) {
-            pieces.add(initial);
-            length = initial.length();
+            this.pieces.add(initial);
+            this.length = initial.length();
         }
     }
 
@@ -72,7 +73,7 @@ public class PieceTableImpl implements PieceTable {
      * @return a new {@code PieceTable}
      */
     public static PieceTableImpl of() {
-        return new PieceTableImpl(null, null);
+        return new PieceTableImpl(null, AppendBuffer.of(), null);
     }
 
     /**
@@ -82,7 +83,17 @@ public class PieceTableImpl implements PieceTable {
      */
     public static PieceTableImpl of(Path path) {
         var cb = ChannelBuffer.of(path);
-        return new PieceTableImpl(path, new Piece(cb, 0, cb.length()));
+        return new PieceTableImpl(path, AppendBuffer.of(), new Piece(cb, 0, cb.length()));
+    }
+
+    /**
+     * Create a new {@code PieceTable}.
+     * @param bytes the initial byte array
+     * @return a new {@code PieceTable}
+     */
+    public static PieceTableImpl of(byte[] bytes) {
+        var buffer = AppendBuffer.of(bytes);
+        return new PieceTableImpl(null, buffer, new Piece(buffer, 0, bytes.length));
     }
 
     @Override

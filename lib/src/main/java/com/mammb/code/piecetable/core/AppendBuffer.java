@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.mammb.code.piecetable.core;
-
-import java.nio.ByteBuffer;
 
 /**
  * Appendable buffer.
@@ -39,42 +37,16 @@ public interface AppendBuffer extends Buffer {
      * @return a new appendable buffer
      */
     static AppendBuffer of() {
+        return new ByteArrayBuffer();
+    }
 
-        return new AppendBuffer() {
-
-            private final ByteArray elements = ByteArray.of();
-
-            @Override
-            public void append(byte[] bytes) {
-                elements.add(bytes);
-            }
-
-            @Override
-            public void clear() {
-                elements.clear();
-            }
-
-            @Override
-            public byte get(long index) {
-                return elements.get(Math.toIntExact(index));
-            }
-
-            @Override
-            public byte[] bytes(long rawStart, long rawEnd) {
-                return elements.get(Math.toIntExact(rawStart), Math.toIntExact(rawEnd));
-            }
-
-            @Override
-            public long length() {
-                return elements.length();
-            }
-
-            @Override
-            public long read(long offset, long length, ByteBuffer buffer) {
-                return elements.read(Math.toIntExact(offset), Math.toIntExact(length), buffer);
-            }
-
-        };
+    /**
+     * Create a new appendable buffer.
+     * @param bytes the byte array
+     * @return a new appendable buffer
+     */
+    static AppendBuffer of(byte[] bytes) {
+        return new ByteArrayBuffer(bytes);
     }
 
 }

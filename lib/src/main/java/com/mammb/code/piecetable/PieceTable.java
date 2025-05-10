@@ -145,4 +145,13 @@ public interface PieceTable {
         return PieceTableImpl.of(path);
     }
 
+    /**
+     * Get the default implementation of the piece table by the initial byte array.
+     * @param bytes the initial byte array
+     * @return the piece table
+     */
+    static PieceTable of(byte[] bytes) {
+        return PieceTableImpl.of(bytes);
+    }
+
 }
