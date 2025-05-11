@@ -146,7 +146,7 @@ public interface PieceTable {
     }
 
     /**
-     * Get the default implementation of the piece table by the initial byte array.
+     * Get the default implementation of the piece table from the specified byte array.
      * @param bytes the initial byte array
      * @return the piece table
      */

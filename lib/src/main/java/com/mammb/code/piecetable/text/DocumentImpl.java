@@ -90,12 +90,21 @@ public class DocumentImpl implements Document {
     }
 
     /**
-     * Create a new {@link Document}.
+     * Create a new {@link Document} from the specified path.
      * @param path the {@link Path} of the document
      * @return a new {@link Document}
      */
     public static DocumentImpl of(Path path) {
         return new DocumentImpl(PieceTable.of(path), path, Reader.of(path));
+    }
+
+    /**
+     * Create a Reader from the specified byte array.
+     * @param bytes the specified byte array
+     * @return a new {@link Document}
+     */
+    public static DocumentImpl of(byte[] bytes) {
+        return new DocumentImpl(PieceTable.of(bytes), null, Reader.of(bytes));
     }
 
     /**

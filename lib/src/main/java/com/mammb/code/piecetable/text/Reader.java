@@ -59,6 +59,15 @@ public interface Reader extends DocumentStat {
     }
 
     /**
+     * Create a new {@link Reader} from the specified byte array.
+     * @param bytes the byte array
+     * @return a new {@link Reader}.
+     */
+    static Reader of(byte[] bytes) {
+        return new BytesReader(bytes, CharsetMatches.defaults());
+    }
+
+    /**
      * Create a new {@link Reader}.
      * @param path the path to be read
      * @param listener the progress listener

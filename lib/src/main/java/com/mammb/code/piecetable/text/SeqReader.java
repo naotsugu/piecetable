@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -48,7 +46,7 @@ public class SeqReader implements Reader {
     /** The byte length read. */
     private long length = 0;
     /** The CharsetMatches. */
-    private final List<CharsetMatch> matches = new ArrayList<>();
+    private final List<CharsetMatch> matches;
     /** The count of carriage return. */
     private int crCount = 0;
     /** The count of line feed. */
@@ -67,15 +65,12 @@ public class SeqReader implements Reader {
             Consumer<Segment> progressListener,
             CharsetMatch... matches) {
         this.progressListener = progressListener;
-        this.matches.addAll(Arrays.asList(matches));
+        this.matches = List.of(matches);
         this.index = RowIndex.of();
         read(path, rowPrefLimit);
     }
 
-    /**
-     * Get the {@link RowIndex}.
-     * @return the {@link RowIndex}
-     */
+    @Override
     public RowIndex index() {
         return index;
     }
