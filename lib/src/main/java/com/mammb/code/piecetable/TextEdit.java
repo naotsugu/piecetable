@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -291,6 +291,15 @@ public interface TextEdit {
      */
     static TextEdit of(Path path, Consumer<Segment> listener) {
         return new TextEditImpl(Document.of(path, listener));
+    }
+
+    /**
+     * Create a new {@link TextEdit} from the specified byte array.
+     * @param bytes the specified byte array
+     * @return a new {@link TextEdit}
+     */
+    static TextEdit of(byte[] bytes) {
+        return new TextEditImpl(Document.of(bytes));
     }
 
     /**

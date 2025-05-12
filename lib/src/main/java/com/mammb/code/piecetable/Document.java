@@ -239,4 +239,13 @@ public interface Document {
         return DocumentImpl.of(path, charsetMatches);
     }
 
+    /**
+     * Create a new {@link Document} from the specified byte array.
+     * @param bytes the specified byte array
+     * @return a new {@link Document}
+     */
+    static Document of(byte[] bytes) {
+        return DocumentImpl.of(bytes);
+    }
+
 }
