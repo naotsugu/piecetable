@@ -52,45 +52,38 @@ public interface Reader extends DocumentStat {
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
+     * @param matches the {@link CharsetMatch} used in reading the target file
      * @return a new {@link Reader}.
      */
-    static Reader of(Path path) {
-        return new SeqReader(path, -1, null, CharsetMatches.defaults());
+    static Reader of(Path path, CharsetMatch... matches) {
+        return new SeqReader(path, -1, null, defaultIfEmpty(matches));
     }
 
     /**
      * Create a new {@link Reader} from the specified byte array.
      * @param bytes the byte array
+     * @param matches the {@link CharsetMatch} used in reading the target bytes
      * @return a new {@link Reader}.
      */
-    static Reader of(byte[] bytes) {
-        return new BytesReader(bytes, CharsetMatches.defaults());
+    static Reader of(byte[] bytes, CharsetMatch... matches) {
+        return new BytesReader(bytes, defaultIfEmpty(matches));
     }
 
     /**
      * Create a new {@link Reader}.
      * @param path the path to be read
      * @param listener the progress listener
+     * @param matches the {@link CharsetMatch} used in reading the target file
      * @return a new {@link Reader}.
      */
-    static Reader of(Path path, Consumer<Segment> listener) {
+    static Reader of(Path path, Consumer<Segment> listener, CharsetMatch... matches) {
         try {
             return Files.size(path) >= ParallelReader.CHUNK_SIZE
-                ? new ParallelReader(path, listener, CharsetMatches.defaults())
-                : new SeqReader(path, -1, listener, CharsetMatches.defaults());
+                ? new ParallelReader(path, listener, defaultIfEmpty(matches))
+                : new SeqReader(path, -1, listener, defaultIfEmpty(matches));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Create a new {@link Reader}.
-     * @param path the path to be read
-     * @param charset the character set of the file to be read
-     * @return a new {@link Reader}.
-     */
-    static Reader of(Path path, Charset charset) {
-        return new SeqReader(path, -1, null, CharsetMatch.of(charset));
     }
 
     /**
@@ -101,8 +94,13 @@ public interface Reader extends DocumentStat {
      * @return a new {@link Reader}.
      */
     static Reader of(Path path, int rowLimit, CharsetMatch... matches) {
-        return new SeqReader(path, rowLimit, null,
-            (matches == null || matches.length == 0) ? CharsetMatches.defaults() : matches);
+        return new SeqReader(path, rowLimit, null, defaultIfEmpty(matches));
+    }
+
+    private static CharsetMatch[] defaultIfEmpty(CharsetMatch... matches) {
+        return (matches == null || matches.length == 0)
+            ? CharsetMatches.defaults()
+            : matches;
     }
 
 }

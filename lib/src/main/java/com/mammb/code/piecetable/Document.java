@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,35 +203,6 @@ public interface Document {
     /**
      * Create a new {@link Document}.
      * @param path the path of the file to read
-     * @return a new {@link Document}
-     */
-    static Document of(Path path) {
-        return DocumentImpl.of(path);
-    }
-
-    /**
-     * Create a new {@link Document}.
-     * @param path the path of the file to read
-     * @param charset the charset
-     * @return a new {@link Document}
-     */
-    static Document of(Path path, Charset charset) {
-        return DocumentImpl.of(path, charset);
-    }
-
-    /**
-     * Create a new {@link Document}.
-     * @param path the {@link Path} of the document
-     * @param listener the progress listener
-     * @return a new {@link Document}
-     */
-    static Document of(Path path, Consumer<Segment> listener) {
-        return DocumentImpl.of(path, listener);
-    }
-
-    /**
-     * Create a new {@link Document}.
-     * @param path the path of the file to read
      * @param charsetMatches the charset matches
      * @return a new {@link Document}
      */
@@ -242,10 +213,22 @@ public interface Document {
     /**
      * Create a new {@link Document} from the specified byte array.
      * @param bytes the specified byte array
+     * @param charsetMatches the charset matches
      * @return a new {@link Document}
      */
-    static Document of(byte[] bytes) {
-        return DocumentImpl.of(bytes);
+    static Document of(byte[] bytes, CharsetMatch... charsetMatches) {
+        return DocumentImpl.of(bytes, charsetMatches);
+    }
+
+    /**
+     * Create a new {@link Document}.
+     * @param path the {@link Path} of the document
+     * @param listener the progress listener
+     * @param charsetMatches the charset matches
+     * @return a new {@link Document}
+     */
+    static Document of(Path path, Consumer<Segment> listener, CharsetMatch... charsetMatches) {
+        return DocumentImpl.of(path, listener, charsetMatches);
     }
 
 }

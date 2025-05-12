@@ -92,49 +92,32 @@ public class DocumentImpl implements Document {
     /**
      * Create a new {@link Document} from the specified path.
      * @param path the {@link Path} of the document
+     * @param charsetMatches the {@link CharsetMatch}
      * @return a new {@link Document}
      */
-    public static DocumentImpl of(Path path) {
-        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path));
+    public static DocumentImpl of(Path path, CharsetMatch... charsetMatches) {
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, charsetMatches));
     }
 
     /**
      * Create a Reader from the specified byte array.
      * @param bytes the specified byte array
-     * @return a new {@link Document}
-     */
-    public static DocumentImpl of(byte[] bytes) {
-        return new DocumentImpl(PieceTable.of(bytes), null, Reader.of(bytes));
-    }
-
-    /**
-     * Create a new {@link Document}.
-     * @param path the {@link Path} of the document
-     * @param progressListener the progress listener
-     * @return a new {@link Document}
-     */
-    public static DocumentImpl of(Path path, Consumer<Segment> progressListener) {
-        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, progressListener));
-    }
-
-    /**
-     * Create a new {@link Document}.
-     * @param path the {@link Path} of the document
-     * @param charset the {@link Charset} of the document
-     * @return a new {@link Document}
-     */
-    public static DocumentImpl of(Path path, Charset charset) {
-        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, charset));
-    }
-
-    /**
-     * Create a new {@link Document}.
-     * @param path the {@link Path} of the document
      * @param charsetMatches the {@link CharsetMatch}
      * @return a new {@link Document}
      */
-    public static DocumentImpl of(Path path, CharsetMatch... charsetMatches) {
-        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, -1, charsetMatches));
+    public static DocumentImpl of(byte[] bytes, CharsetMatch... charsetMatches) {
+        return new DocumentImpl(PieceTable.of(bytes), null, Reader.of(bytes, charsetMatches));
+    }
+
+    /**
+     * Create a new {@link Document}.
+     * @param path the {@link Path} of the document
+     * @param listener the progress listener
+     * @param charsetMatches the {@link CharsetMatch}
+     * @return a new {@link Document}
+     */
+    public static DocumentImpl of(Path path, Consumer<Segment> listener, CharsetMatch... charsetMatches) {
+        return new DocumentImpl(PieceTable.of(path), path, Reader.of(path, listener, charsetMatches));
     }
 
     @Override
