@@ -32,7 +32,6 @@ public interface CharsetMatch {
      */
     Result put(byte[] bytes);
 
-
     /**
      * Create a fixed charset {@link CharsetMatch}.
      * @param charset the charset

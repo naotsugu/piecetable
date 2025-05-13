@@ -202,6 +202,10 @@ public interface Document {
 
     /**
      * Create a new {@link Document}.
+     * To specify charset, use the following.
+     * {@snippet :
+     * var doc = Document.of(path, CharsetMatch.of(StandardCharsets.UTF_8));
+     * }
      * @param path the path of the file to read
      * @param charsetMatches the charset matches
      * @return a new {@link Document}
