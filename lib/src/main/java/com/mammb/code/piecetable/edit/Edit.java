@@ -22,8 +22,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * The edit.
- *
+ * Represents an Edit operation within a document.
+ * This is a sealed interface with concrete implementations for different types of edits:
+ * Insert (Ins), Delete (Del), and Composite edits (Cmp).
  * <pre>
  *  delete
  * ==============================================

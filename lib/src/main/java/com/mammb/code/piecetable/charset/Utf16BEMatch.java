@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 
 import static java.lang.System.Logger.Level.DEBUG;
 
-
 /**
  * The Utf16BEMatch class implements the CharsetMatch interface and detects
  * whether a given byte array corresponds to the UTF-16BE character set.

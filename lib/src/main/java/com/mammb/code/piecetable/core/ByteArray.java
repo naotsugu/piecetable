@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-
 /**
  * A dynamic byte array implementation that allows for growth and provides
  * convenient methods for managing byte data.
@@ -34,14 +33,14 @@ public class ByteArray implements Serializable {
     /** The byte array. */
     private byte[] bytes;
 
-    /** The length of array. */
+    /** The length of an array. */
     private int length;
 
 
     /**
      * Create a new {@code ByteArray}.
      * @param bytes the source byte array
-     * @param length the length of array
+     * @param length the length of an array
      */
     private ByteArray(byte[] bytes, int length) {
         this.bytes = bytes;
@@ -69,7 +68,7 @@ public class ByteArray implements Serializable {
 
 
     /**
-     * Add byte value to this array.
+     * Add a byte value to this array.
      * @param value byte value to be added
      */
     public void add(byte value) {
@@ -81,7 +80,7 @@ public class ByteArray implements Serializable {
 
 
     /**
-     * Add byte array to this array.
+     * Add a byte array to this array.
      * @param values byte array to be added
      */
     public void add(byte[] values) {
@@ -108,8 +107,8 @@ public class ByteArray implements Serializable {
 
 
     /**
-     * Get the copies of byte array.
-     * @return the copies of byte array
+     * Get the copies of a byte array.
+     * @return the copies of a byte array
      */
     public byte[] get() {
         return Arrays.copyOf(bytes, length);
@@ -117,7 +116,7 @@ public class ByteArray implements Serializable {
 
 
     /**
-     * Get copies the specified range of this array.
+     * Get copies of the specified range of this array.
      * @param from the initial index of the range to be copied, inclusive
      * @param to the final index of the range to be copied, exclusive
      * @return a new array containing the specified range from the original array
@@ -140,8 +139,8 @@ public class ByteArray implements Serializable {
 
 
     /**
-     * Get the length of byte array.
-     * @return the length of byte array
+     * Get the length of a byte array.
+     * @return the length of a byte array
      */
     public int length() {
         return length;
@@ -149,8 +148,8 @@ public class ByteArray implements Serializable {
 
 
     /**
-     * Get the capacity of byte array.
-     * @return the capacity of byte array
+     * Get the capacity of a byte array.
+     * @return the capacity of a byte array
      */
     public int capacity() {
         return bytes.length;
@@ -217,4 +216,5 @@ public class ByteArray implements Serializable {
             return Math.max(minLength, softMaxArrayLength);
         }
     }
+
 }

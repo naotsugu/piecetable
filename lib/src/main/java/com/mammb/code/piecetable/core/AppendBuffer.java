@@ -15,7 +15,6 @@
  */
 package com.mammb.code.piecetable.core;
 
-
 /**
  * Represents a buffer that allows appending additional byte arrays to it.
  * Provides functionality to add data, clear the buffer, and create new instances

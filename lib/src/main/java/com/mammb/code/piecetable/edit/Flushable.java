@@ -15,7 +15,6 @@
  */
 package com.mammb.code.piecetable.edit;
 
-
 /**
  * Represents a mechanism for flushing data or clearing internal state.
  * Classes implementing this interface provide the ability to persist

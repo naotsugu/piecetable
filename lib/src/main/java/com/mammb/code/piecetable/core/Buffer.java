@@ -20,17 +20,17 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 
-
 /**
  * Represents a buffer interface for working with a sequence of bytes.
- * Provides functionality for accessing, reading, and writing bytes to and from the underlying buffer.
+ * Provides functionality for accessing, reading, and writing bytes to
+ * and from the underlying buffer.
  * @author Naotsugu Kobayashi
  */
 public interface Buffer {
 
     /**
      * Gets the byte at the specified index.
-     * @param index the index of the buffers bytes
+     * @param index the index of the buffer bytes
      * @return the byte at the specified index of this buffer
      */
     byte get(long index);
@@ -67,11 +67,11 @@ public interface Buffer {
     }
 
     /**
-     * Write this buffer values to the specified channel.
+     * Write this buffer value to the specified channel.
      * @param channel the byte channel
      * @param buf the buffer used for writing
-     * @param offset the code point based offset
-     * @param length the code point based length
+     * @param offset the code-point-based offset
+     * @param length the code-point-based length
      * @return the written Length
      * @throws IOException if some other I/O error occurs
      */
@@ -102,7 +102,7 @@ public interface Buffer {
 
         return new Buffer() {
 
-            /** The elements of buffer. */
+            /** The elements of the buffer. */
             private final byte[] elements = bytes;
 
             @Override

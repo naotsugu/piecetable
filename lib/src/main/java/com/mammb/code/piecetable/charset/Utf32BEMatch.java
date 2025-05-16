@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 
 import static java.lang.System.Logger.Level.DEBUG;
 
-
 /**
  * Utf32BEMatch is an implementation of the CharsetMatch interface, designed to estimate
  * the character set of input byte arrays using the UTF-32BE charset. It assesses the validity
