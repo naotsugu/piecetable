@@ -26,7 +26,12 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 /**
- * The reader.
+ * Interface defining a reader for text-based content.
+ * Extends the {@link DocumentStat} interface to also provide
+ * document statistics such as charset and line-ending counts.
+ * The {@code Reader} interface is responsible for reading content
+ * from various sources such as files or byte arrays and allows
+ * access to its row index and encoding details.
  * @author Naotsugu Kobayashi
  */
 public interface Reader extends DocumentStat {

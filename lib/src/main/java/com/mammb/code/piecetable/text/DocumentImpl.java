@@ -29,7 +29,9 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
- * The document implementation.
+ * Implementation of the {@link Document} interface for operations on textual data.
+ * This class provides methods to create, modify, query, and persist document content.
+ * It is backed by a {@link PieceTable} to enable efficient text manipulations.
  * @author Naotsugu Kobayashi
  */
 public class DocumentImpl implements Document {

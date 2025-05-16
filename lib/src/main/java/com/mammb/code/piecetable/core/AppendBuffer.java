@@ -15,8 +15,11 @@
  */
 package com.mammb.code.piecetable.core;
 
+
 /**
- * Appendable buffer.
+ * Represents a buffer that allows appending additional byte arrays to it.
+ * Provides functionality to add data, clear the buffer, and create new instances
+ * of the buffer.
  * @author Naotsugu Kobayashi
  */
 public interface AppendBuffer extends Buffer {

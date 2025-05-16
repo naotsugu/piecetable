@@ -20,7 +20,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
 /**
- * A piece consists of three param.
+ * Represents a piece of data within a buffer, specifying a starting index and a length.
+ * This class provides functionality to access parts of the buffer, split the piece,
+ * retrieve its bytes, and read or write its contents.
  * @param target which buffer
  * @param bufIndex start index in the buffer
  * @param length length in the buffer

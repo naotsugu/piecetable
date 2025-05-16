@@ -15,8 +15,12 @@
  */
 package com.mammb.code.piecetable.edit;
 
+
 /**
- * Flushable.
+ * Represents a mechanism for flushing data or clearing internal state.
+ * Classes implementing this interface provide the ability to persist
+ * or finalize pending changes, ensuring that the internal state and
+ * resources are synchronized or cleaned up appropriately.
  * @author Naotsugu Kobayashi
  */
 public interface Flushable {

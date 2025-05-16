@@ -23,9 +23,11 @@ import java.util.function.Consumer;
 /**
  * The document.
  * Provides an abstraction for the document to be edited.
- * The document manipulation by line number and column number.
+ *
+ * Represents the contract for a {@code Document} that provides various functionalities
+ * needed for handling, editing, and managing textual and binary content using rows and columns.
  * @author Naotsugu Kobayashi
- */
+ * */
 public interface Document {
 
     /**

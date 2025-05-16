@@ -22,7 +22,11 @@ import java.nio.charset.Charset;
 import java.util.function.Function;
 
 /**
- * The serial source implementation.
+ * Implementation of the {@link SearchSource} interface providing the ability
+ * to retrieve and interact with document content using a {@link PieceTable}
+ * structure and a {@link RowIndex} for row and column mapping. This implementation
+ * supports character encodings with specific {@link Charset} and accounts for
+ * byte order marks (BOM) when calculating offsets and lengths.
  * @author Naotsugu Kobayashi
  */
 public class SearchSourceImpl implements SearchSource {

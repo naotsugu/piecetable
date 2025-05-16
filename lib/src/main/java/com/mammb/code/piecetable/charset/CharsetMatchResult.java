@@ -20,7 +20,9 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
- * The result of charset match.
+ * The result of the charset match.
+ * Represents the result of a character set match, providing details such as the matched
+ * charset, confidence level, and whether the result is vague.
  * @author Naotsugu Kobayashi
  */
 public class CharsetMatchResult implements CharsetMatch.Result {
@@ -33,6 +35,7 @@ public class CharsetMatchResult implements CharsetMatch.Result {
     private int miss = 0;
     /** The vague. */
     private boolean vague = true;
+
 
     CharsetMatchResult(Charset charset) {
         this.charset = Objects.requireNonNull(charset);

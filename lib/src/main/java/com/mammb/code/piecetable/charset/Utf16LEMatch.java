@@ -21,7 +21,10 @@ import java.nio.charset.StandardCharsets;
 import static java.lang.System.Logger.Level.DEBUG;
 
 /**
- * The utf-16LE {@link CharsetMatch}.
+ * An implementation of the {@link CharsetMatch} interface for detecting the UTF-16LE character set.
+ * This class processes byte arrays to evaluate the likelihood of the UTF-16LE encoding and
+ * adjusts a confidence level based on specific criteria.
+ * It uses a {@link CharsetMatchResult} to store and update the match results.
  * @author Naotsugu Kobayashi
  */
 class Utf16LEMatch implements CharsetMatch {

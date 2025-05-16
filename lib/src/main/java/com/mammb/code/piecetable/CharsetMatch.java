@@ -20,7 +20,9 @@ import java.util.Comparator;
 
 /**
  * The charset match.
- * Estimates the character set from a given byte array.
+ * Represents a contract to analyze a byte array and produce a result that estimates
+ * the character encoding of the input data. Commonly used to detect or validate a specific
+ * character set.
  * @author Naotsugu Kobayashi
  */
 public interface CharsetMatch {

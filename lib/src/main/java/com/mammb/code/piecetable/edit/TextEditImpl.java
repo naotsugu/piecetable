@@ -38,7 +38,14 @@ import static com.mammb.code.piecetable.edit.Texts.*;
 import static com.mammb.code.piecetable.edit.Texts.splitRowBreak;
 
 /**
- * The {@link TextEdit} implementation.
+ * Implementation of the {@link TextEdit} interface,
+ * providing text editing functionalities with support for undo and redo operations.
+ * This class manages operations such as insertion, deletion, replacement,
+ * backspacing, and text retrieval in a document.
+ *
+ * It maintains the editing state using deques for undo and redo stacks,
+ * as well as a dry buffer for temporary changes. The {@code doc} field holds
+ * the source document being edited.
  * @author Naotsugu Kobayashi
  */
 public class TextEditImpl implements TextEdit, Flushable {

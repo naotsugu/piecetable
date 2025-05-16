@@ -19,18 +19,28 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The founds in chunk.
- * @param founds the found list
- * @param chunk the chunk
+ * Represents a collection of found items in a specific data chunk.
+ * This record associates a list of {@link Found} objects with a {@link Chunk}.
+ *
+ * @param founds the list of found items identified within the chunk
+ * @param chunk the chunk of data where the found items are located
  * @author Naotsugu Kobayashi
  */
 public record FoundsInChunk(List<Found> founds, Chunk chunk) {
 
+    /**
+     * Reverses the order of the {@code founds} list contained within this {@code FoundsInChunk}.
+     * @return the current {@code FoundsInChunk} instance with the reversed order of found items
+     */
     FoundsInChunk reverse() {
         Collections.reverse(founds);
         return this;
     }
 
+    /**
+     * Gets whether this founds in chunk is empty or not.
+     * @return {@code true} if this founds in chunk is empty
+     */
     boolean hasFounds() {
         return !founds.isEmpty();
     }

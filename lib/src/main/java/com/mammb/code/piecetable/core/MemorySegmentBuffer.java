@@ -27,7 +27,16 @@ import java.nio.channels.FileLock;
 import java.nio.file.Path;
 
 /**
- * Memory segment buffer.
+ * The {@code MemorySegmentBuffer} class provides a memory-mapped implementation
+ * of the {@link Buffer} interface. It allows efficient access to a sequence of bytes
+ * directly from a file or memory segment, providing methods for reading data from
+ * this buffer.
+ *
+ * This class uses memory segments for accessing and manipulating bytes, and performs
+ * operations such as retrieving individual bytes, slices of byte arrays, and reading
+ * bytes into buffers. The memory segment is backed by a file and is mapped in a
+ * read-only mode. The class also implements {@link Closeable} to ensure proper
+ * release of resources when the buffer is no longer in use.
  * @author Naotsugu Kobayashi
  */
 public class MemorySegmentBuffer implements Buffer, Closeable {

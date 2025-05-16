@@ -19,8 +19,11 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+
 /**
- * Growable byte array.
+ * A dynamic byte array implementation that allows for growth and provides
+ * convenient methods for managing byte data.
+ * This class is mutable and not thread-safe.
  * @author Naotsugu Kobayashi
  */
 public class ByteArray implements Serializable {

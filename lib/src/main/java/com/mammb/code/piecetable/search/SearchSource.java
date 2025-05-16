@@ -20,7 +20,9 @@ import java.nio.charset.Charset;
 import java.util.function.Function;
 
 /**
- * The search source.
+ * Interface representing a source of searchable content. This source provides
+ * methods to retrieve content information and manipulate content based on its
+ * byte representation rather than its in-memory Java representation.
  * @author Naotsugu Kobayashi
  */
 public interface SearchSource {

@@ -16,7 +16,8 @@
 package com.mammb.code.piecetable.text;
 
 /**
- * The offset sync.
+ * Interface representing offset synchronization operations for data modification.
+ * Provides methods to synchronize insertions and deletions at specified byte offsets.
  * @author Naotsugu Kobayashi
  */
 interface OffsetSync {

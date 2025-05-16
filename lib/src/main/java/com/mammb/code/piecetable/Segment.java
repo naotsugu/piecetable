@@ -18,6 +18,8 @@ package com.mammb.code.piecetable;
 /**
  * Segment.
  * Represents a fraction of the whole.
+ * The fractional part is represented by a {@code long} value
+ * and the whole part is represented by a {@code long} value.
  * @author Naotsugu Kobayashi
  */
 public interface Segment {

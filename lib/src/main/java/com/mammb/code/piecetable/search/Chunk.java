@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The chunk.
+ * Represents a chunk of data within a specified range and its parent range.
+ * A {@code Chunk} is defined with start and end positions for both its own range
+ * and its parent range.
  * @param from the from position
  * @param to the to position
  * @param parentFrom the parent from

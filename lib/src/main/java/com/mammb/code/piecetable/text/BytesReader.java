@@ -24,7 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Reader.
+ * A reader implementation for processing an array of bytes. This class reads the given
+ * byte array, determines the character encoding, and computes line ending counts
+ * while keeping track of the content's row index.
  * @author Naotsugu Kobayashi
  */
 public class BytesReader implements Reader {

@@ -16,7 +16,8 @@
 package com.mammb.code.piecetable;
 
 /**
- * RowEnding.
+ * Enum representing different types of line endings used in text files
+ * and providing methods for unifying line endings and retrieving them in string format.
  * @author Naotsugu Kobayashi
  */
 public enum RowEnding {

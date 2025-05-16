@@ -21,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import static java.lang.System.Logger.Level.DEBUG;
 
 /**
- * The utf-8 {@link CharsetMatch}.
+ * The Utf8Match class implements the CharsetMatch interface to analyze and estimate
+ * if a given byte array matches the UTF-8 character set. It calculates confidence levels
+ * based on the structure and sequence of bytes in the provided array.
  * @author Naotsugu Kobayashi
  */
 class Utf8Match implements CharsetMatch {

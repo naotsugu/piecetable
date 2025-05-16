@@ -32,7 +32,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Reader.
+ * A sequential file reader implementation of the {@link Reader} interface.
+ * This class is responsible for reading files or data streams line by line
+ * in a sequential manner, providing row index and document statistics. It
+ * supports character encoding detection and tracking line ending characters.
  * @author Naotsugu Kobayashi
  */
 public class SeqReader implements Reader {

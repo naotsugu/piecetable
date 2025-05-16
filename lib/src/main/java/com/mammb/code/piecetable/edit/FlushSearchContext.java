@@ -24,7 +24,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * FlushSearchContext.
+ * A wrapper for a {@link SearchContext} that integrates with a {@link Flushable} mechanism.
+ * This class delegates all {@link SearchContext} operations to the provided search context
+ * instance and ensures that the associated flushable is flushed when founds are accessed.
  * @author Naotsugu Kobayashi
  */
 public class FlushSearchContext implements SearchContext {

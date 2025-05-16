@@ -25,7 +25,11 @@ import java.nio.channels.FileLock;
 import java.nio.file.Path;
 
 /**
- * Memory mapped buffer.
+ * Represents a buffer that uses memory-mapped files for efficiently reading large files.
+ * The class implements the {@link Buffer} and {@link Closeable} interfaces, providing
+ * methods to access, read, and manage a sequence of bytes from the underlying mapped file.
+ * The buffer divides the file into chunks, with each chunk being memory-mapped
+ * for optimized access within the specified chunk size.
  * @author Naotsugu Kobayashi
  */
 public class MappedBuffer implements Buffer, Closeable {

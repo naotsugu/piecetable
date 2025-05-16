@@ -20,8 +20,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 
+
 /**
- * The buffer
+ * Represents a buffer interface for working with a sequence of bytes.
+ * Provides functionality for accessing, reading, and writing bytes to and from the underlying buffer.
  * @author Naotsugu Kobayashi
  */
 public interface Buffer {

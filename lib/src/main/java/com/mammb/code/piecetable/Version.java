@@ -16,7 +16,9 @@
 package com.mammb.code.piecetable;
 
 /**
- * The version.
+ * Represents a version interface that contains a single version value.
+ * The version value is a predefined constant and is primarily used
+ * to represent the versioning information across the system or library.
  * @author Naotsugu Kobayashi
  */
 public interface Version {

@@ -18,7 +18,9 @@ package com.mammb.code.piecetable.core;
 import java.nio.ByteBuffer;
 
 /**
- * Appendable byte array buffer.
+ * A buffer class that provides functionality for appending byte arrays, clearing data,
+ * and retrieving byte data. Built using an underlying {@code ByteArray} structure,
+ * this class is mutable and not thread-safe.
  * @author Naotsugu Kobayashi
  */
 class ByteArrayBuffer implements AppendBuffer {

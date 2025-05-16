@@ -27,7 +27,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The pattern search.
+ * The {@code PatternSearch} class provides an implementation of the {@link Search} interface
+ * using pattern matching to find occurrences of a specified pattern within a given
+ * {@link SearchSource}. It is capable of performing forward and backward searches,
+ * as well as searching within a specific range.
  * @author Naotsugu Kobayashi
  */
 class PatternSearch implements Search {

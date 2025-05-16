@@ -21,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import static java.lang.System.Logger.Level.DEBUG;
 
 /**
- * The utf-32LE {@link CharsetMatch}.
+ * An implementation of {@link CharsetMatch} that matches the UTF-32 Little Endian (UTF-32LE) character set.
+ * This class analyzes byte arrays to determine if they correspond to the UTF-32LE encoding
+ * and adjusts the confidence level based on the validity of the character data.
  * @author Naotsugu Kobayashi
  */
 public class Utf32LEMatch implements CharsetMatch {

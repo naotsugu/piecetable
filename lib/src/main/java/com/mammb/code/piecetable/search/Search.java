@@ -21,7 +21,9 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
- * The search.
+ * Provides an interface for searching patterns within a text-based data source.
+ * Enables various search operations such as finding all occurrences,
+ * searching forward or backward, and performing case-sensitive or insensitive searches.
  * @author Naotsugu Kobayashi
  */
 public interface Search {

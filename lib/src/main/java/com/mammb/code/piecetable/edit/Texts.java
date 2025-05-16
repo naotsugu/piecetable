@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The text utility.
+ * Utility class for processing and manipulating text.
  * @author Naotsugu Kobayashi
  */
 class Texts {

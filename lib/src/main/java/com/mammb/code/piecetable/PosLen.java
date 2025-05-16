@@ -16,10 +16,13 @@
 package com.mammb.code.piecetable;
 
 /**
- * The position length record.
- * @param row the number of row(zero origin)
+ * A record representing a position and length.
+ * The row and col represent the start position, and len specifies the length.
+ *
+ * @param row the number of row (zero origin)
  * @param col the byte position on the row
  * @param len the byte length on UTF-16
+ * @author Naotsugu Kobayashi
  */
 public record PosLen(int row, int col, int len) {
 

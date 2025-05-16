@@ -23,7 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
- * The naive search.
+ * NaiveSearch is a straightforward implementation of the Search interface.
+ * It provides methods to search for patterns within a specified range
+ * of documents using a specified source.
  * Bypass String instantiation by comparing them as a byte array.
  * @author Naotsugu Kobayashi
  */

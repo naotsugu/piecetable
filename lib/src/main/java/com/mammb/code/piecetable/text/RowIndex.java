@@ -19,6 +19,10 @@ import java.util.Arrays;
 
 /**
  * The RowIndex.
+ * This class represents a data structure that manages and tracks the row index
+ * with detailed support for operations like adding, inserting, deleting, and
+ * calculating lengths within rows. It also supports caching to optimize access to row data.
+ *
  * Holds the byte length of each row as an index.
  * <pre>
  *     |0|1|2|3|4|5|

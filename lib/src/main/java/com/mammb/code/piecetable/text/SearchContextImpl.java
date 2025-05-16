@@ -30,7 +30,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * The search context implementation.
+ * Implementation of the {@link SearchContext} and {@link OffsetSync} interfaces.
+ * Provides search context management, search operations, and offset synchronization
+ * for handling text-based searches and modifications.
  * @author Naotsugu Kobayashi
  */
 public class SearchContextImpl implements SearchContext, OffsetSync {

@@ -16,10 +16,12 @@
 package com.mammb.code.piecetable.search;
 
 /**
- * The found.
- * @param offset the offset
- * @param len the byte length on UTF-16
- * @param rawLen the raw byte length
+ * Represents a structure containing information about a found item in a
+ * searchable sequence with its offset and length details.
+ *
+ * @param offset the starting position of the found item
+ * @param len the logical length of the found item
+ * @param rawLen the raw length including additional formatting or padding
  * @author Naotsugu Kobayashi
  */
 public record Found(long offset, int len, int rawLen) implements Comparable<Found> {

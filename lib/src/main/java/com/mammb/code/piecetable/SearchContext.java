@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 /**
  * The search context.
+ * Interface for search contexts that support pattern-based search operations.
  * @author Naotsugu Kobayashi
  */
 public interface SearchContext {

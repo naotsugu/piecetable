@@ -20,7 +20,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
- * The document statistics.
+ * Interface defining document statistics for text-based files or content.
+ * Provides methods to access information such as character encoding, line-ending counts,
+ * byte order marks, and estimated row terminators.
  * @author Naotsugu Kobayashi
  */
 public interface DocumentStat {

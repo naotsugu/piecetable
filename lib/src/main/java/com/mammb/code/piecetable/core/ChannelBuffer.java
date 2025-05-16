@@ -27,7 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * ByteChannel buffer.
+ * A {@code ChannelBuffer} provides a mechanism to buffer bytes from a {@link SeekableByteChannel}.
+ * It implements the {@link Buffer} interface to allow reading bytes, extracting ranges of bytes,
+ * and interacting with the underlying channel efficiently.
+ * This class is also {@link Closeable}, enabling proper resource management.
  * @author Naotsugu Kobayashi
  */
 public class ChannelBuffer implements Buffer, Closeable {

@@ -24,7 +24,9 @@ import java.util.function.Function;
 
 /**
  * The text edit.
- * Provides an abstraction of text editing.
+ * Provides an abstraction for the text edit to be edited.
+ * Represents the contract for a {@code TextEdit} that provides various functionalities
+ * needed for handling, editing, and managing textual and binary content using rows and columns.
  * @author Naotsugu Kobayashi
  */
 public interface TextEdit {

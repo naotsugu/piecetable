@@ -20,7 +20,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * Bom utility.
+ * The Bom interface provides constants for representing Byte Order Marks (BOM)
+ * and utility methods to extract and interpret BOM data.
+ * BOM is used to indicate the character encoding in text streams.
  * @author Naotsugu Kobayashi
  */
 public interface Bom {

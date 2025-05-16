@@ -19,7 +19,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * Growable int array.
+ * A dynamically resizable array of integers, providing utility methods for adding, retrieving,
+ * and managing integers in an array-like structure. The array expands its capacity as needed
+ * to accommodate additional elements.
+ * This class is suitable for scenarios where a fixed-size array is too inflexible and frequent
+ * resizing is needed.
  * @author Naotsugu Kobayashi
  */
 public class IntArray implements Serializable {

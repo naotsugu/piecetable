@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The {@link CharsetMatch} utilities.
+ * The CharsetMatches interface provides utilities to handle character set identification
+ * and estimation using predefined or custom CharsetMatch implementations.
+ * It offers methods to retrieve predefined character set matches, estimate character sets
+ * from byte arrays, and create custom implementations for charset matching.
  * @author Naotsugu Kobayashi
  */
 public interface CharsetMatches {

@@ -34,7 +34,9 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
- * The PieceTable implementation.
+ * Implementation of the Piece Table data structure for efficient text editing operations.
+ * The Piece Table allows for efficient insert, delete, and read operations by maintaining
+ * references to original and modified data without directly modifying the underlying storage.
  * @author Naotsugu Kobayashi
  */
 public class PieceTableImpl implements PieceTable {
