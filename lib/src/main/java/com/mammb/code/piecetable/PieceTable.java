@@ -25,7 +25,7 @@ import java.util.function.Function;
  * PieceTable is a data structure typically used to represent a text document
  * while it is edited in a text editor.
  * <p>
- * Initially a reference to the whole of the original file is created, which represents the as yet unchanged file.
+ * Initially, a reference to the whole of the original file is created, which represents the as yet unchanged file.
  * Subsequent inserts and deletes replace a span by combinations of one, two, or three references to sections of
  * either the original document or to a buffer holding inserted text.
  * </p>
@@ -103,7 +103,7 @@ public interface PieceTable {
 
     /**
      * Reads the contents into the specified byte buffer callback.
-     * Provides access to content in an efficient manner via byte buffers.
+     * Provides access to content efficiently via byte buffers.
      * {@snippet :
      * pieceTable.read(0, -1, byteBuffer -> {
      *     byteBuffer.flip();

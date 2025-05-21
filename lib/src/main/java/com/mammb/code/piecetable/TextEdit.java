@@ -73,7 +73,7 @@ public interface TextEdit {
     List<Pos> delete(List<Pos> posList);
 
     /**
-     * Backspace delete the text from this {@code TextEdit}.
+     * Backspace deletes the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @return the new position
@@ -81,7 +81,7 @@ public interface TextEdit {
     Pos backspace(int row, int col);
 
     /**
-     * Backspace delete the text from this {@code TextEdit}.
+     * Backspace deletes the text from this {@code TextEdit}.
      * @param row the number of row(zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @param len the byte length to be deleted
@@ -90,7 +90,7 @@ public interface TextEdit {
     Pos backspace(int row, int col, int len);
 
     /**
-     * Backspace delete the multi text from this {@code TextEdit}.
+     * Backspace deletes the multi text from this {@code TextEdit}.
      * @param posList the position list
      * @return the new position
      */
@@ -108,7 +108,7 @@ public interface TextEdit {
 
     /**
      * Replace the multi text from this {@code TextEdit}.
-     * @param requests the replace requests
+     * @param requests the replacement requests
      * @return the new position
      */
     List<Range> replace(List<Replace> requests);
@@ -219,9 +219,9 @@ public interface TextEdit {
     int rows();
 
     /**
-     * Get the bytes length of this document holds.
+     * Get the byte length of this document holds.
      * Not the javas UTF-16 encoded memory size.
-     * @return the bytes length of this document holds
+     * @return the byte length of this document holds
      */
     long rawSize();
 
@@ -326,11 +326,11 @@ public interface TextEdit {
     record Replace(Pos markPos, Pos caretPos, Convert convert) implements Comparable<Replace> {
 
         /**
-         * Create a new replace request.
+         * Create a new replacement request.
          * @param caretPos the start point(caret point)
          * @param markPos the end point(marked point)
          * @param text the text to be replaced
-         * @return a new replace request
+         * @return a new replacement request
          */
         public static Replace of(Pos markPos, Pos caretPos, String text) {
             return new Replace(markPos, caretPos, _ -> text);
