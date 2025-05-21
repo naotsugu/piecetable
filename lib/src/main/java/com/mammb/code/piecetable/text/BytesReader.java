@@ -104,7 +104,8 @@ public class BytesReader implements Reader {
             if (b == '\r') crCount++;
             else if (b == '\n') lfCount++;
         }
-
+        index.add(bytes);
+        index.buildStCache();
     }
 
 }
