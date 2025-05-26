@@ -263,6 +263,11 @@ public interface TextEdit {
     void write(Path path);
 
     /**
+     * Closes the current {@code TextEdit} instance and releases any system resources associated with it.
+     */
+    void close();
+
+    /**
      * Get the {@link SearchContext}.
      * @return the {@link SearchContext}
      */

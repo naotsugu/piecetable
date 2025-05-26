@@ -26,6 +26,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -68,7 +69,7 @@ public class DocumentImpl implements Document {
      * @param reader the {@link SeqReader}
      */
     DocumentImpl(PieceTable pt, Path path, Reader reader) {
-        this.pt = pt;
+        this.pt = Objects.requireNonNull(pt);
         this.path = path;
         if (reader == null) {
             this.index = RowIndex.of();
@@ -236,6 +237,11 @@ public class DocumentImpl implements Document {
     @Override
     public void write(Path path) {
         pt.write(path);
+    }
+
+    @Override
+    public void close() {
+        pt.close();
     }
 
     @Override

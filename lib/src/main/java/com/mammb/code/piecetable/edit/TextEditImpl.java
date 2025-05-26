@@ -516,6 +516,11 @@ public class TextEditImpl implements TextEdit, Flushable {
     }
 
     @Override
+    public void close() {
+        doc.close();
+    }
+
+    @Override
     public SearchContext search() {
         return new FlushSearchContext(doc.search(), this);
     }

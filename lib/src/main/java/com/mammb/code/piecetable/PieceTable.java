@@ -102,6 +102,12 @@ public interface PieceTable {
     void write(Path path);
 
     /**
+     * Closes the current {@code PieceTable} instance and releases any resources
+     * associated with it.
+     */
+    void close();
+
+    /**
      * Reads the contents into the specified byte buffer callback.
      * Provides access to content efficiently via byte buffers.
      * {@snippet :

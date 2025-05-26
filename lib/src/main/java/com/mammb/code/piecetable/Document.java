@@ -189,6 +189,11 @@ public interface Document {
     void write(Path path);
 
     /**
+     * Closes the document and releases any associated resources.
+     */
+    void close();
+
+    /**
      * Get the {@link SearchContext}.
      * @return the {@link SearchContext}
      */

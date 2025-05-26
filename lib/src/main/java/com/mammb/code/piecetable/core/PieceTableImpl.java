@@ -207,11 +207,7 @@ public class PieceTableImpl implements PieceTable {
 
                 Path tmp = Files.createTempFile(sourcePath.getParent(), sourcePath.getFileName().toString(), null);
                 write(tmp);
-                for (Piece piece : pieces) {
-                    if (piece.target() instanceof Closeable closeable) {
-                        closeable.close();
-                    }
-                }
+                close();
 
                 // we don't use `Files.copy(tmp, sourcePath, ...);`
                 // because the icon position on the OS changes
@@ -228,11 +224,7 @@ public class PieceTableImpl implements PieceTable {
                 Files.delete(tmp);
             } else {
                 write(path);
-                for (Piece piece : pieces) {
-                    if (piece.target() instanceof Closeable closeable) {
-                        closeable.close();
-                    }
-                }
+                close();
                 sourcePath = path;
             }
 
@@ -268,6 +260,21 @@ public class PieceTableImpl implements PieceTable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void close() {
+        pieces.stream()
+            .map(Piece::target)
+            .filter(Closeable.class::isInstance)
+            .map(Closeable.class::cast)
+            .distinct().forEach(closeable -> {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
     @Override
