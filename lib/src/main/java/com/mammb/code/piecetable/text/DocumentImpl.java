@@ -22,6 +22,7 @@ import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.SearchContext;
 import com.mammb.code.piecetable.Segment;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -65,7 +66,7 @@ public class DocumentImpl implements Document {
     /**
      * Constructor.
      * @param pt the {@link PieceTable}
-     * @param path the {@link Path} of document
+     * @param path the {@link Path} of a document
      * @param reader the {@link SeqReader}
      */
     DocumentImpl(PieceTable pt, Path path, Reader reader) {
@@ -126,43 +127,41 @@ public class DocumentImpl implements Document {
     @Override
     public void insert(int row, int col, CharSequence cs) {
         if (readonly) return;
-        col = getText(row).toString().substring(0, col).getBytes(charset).length;
-        insert(row, col, cs.toString().getBytes(charset));
+        insert(row, asRawCol(row, col), cs.toString().getBytes(charset));
     }
 
     @Override
     public void delete(int row, int col, CharSequence cs) {
         if (readonly) return;
-        col = getText(row).toString().substring(0, col).getBytes(charset).length;
-        delete(row, col, cs.toString().getBytes(charset).length);
+        delete(row, asRawCol(row, col), cs.toString().getBytes(charset).length);
     }
 
     @Override
     public CharSequence getText(int row) {
-        return new String(get(row), charset);
+        return charset.decode(ByteBuffer.wrap(get(row)));
     }
 
     @Override
-    public void insert(int row, int col, byte[] bytes) {
+    public void insert(int row, int rawCol, byte[] bytes) {
         if (readonly) return;
-        long offset = index.offset(row, col);
+        long offset = index.offset(row, rawCol);
         pt.insert(offset + bom.length, bytes);
-        index.insert(row, col, bytes);
+        index.insert(row, rawCol, bytes);
         if (offsetSync != null) offsetSync.insert(offset, bytes.length);
     }
 
     @Override
-    public void delete(int row, int col, int rawLen) {
+    public void delete(int row, int rawCol, int rawLen) {
         if (readonly) return;
-        long offset = index.offset(row, col);
+        long offset = index.offset(row, rawCol);
         pt.delete(offset + bom.length, rawLen);
-        index.delete(row, col, rawLen);
+        index.delete(row, rawCol, rawLen);
         if (offsetSync != null) offsetSync.delete(offset, rawLen);
     }
 
     @Override
-    public byte[] get(int row, int col, int rawLen) {
-        return pt.get(index.offset(row, col) + bom.length, rawLen);
+    public byte[] get(int row, int rawCol, int rawLen) {
+        return pt.get(index.offset(row, rawCol) + bom.length, rawLen);
     }
 
     @Override
@@ -174,7 +173,7 @@ public class DocumentImpl implements Document {
 
     @Override
     public CharSequence getText(int row, int rawCol, int rawLen) {
-        return new String(get(row, rawCol, rawLen), charset);
+        return charset.decode(ByteBuffer.wrap(get(row, rawCol, rawLen)));
     }
 
     @Override
@@ -199,13 +198,14 @@ public class DocumentImpl implements Document {
 
     @Override
     public long serial(int row, int col) {
-        return index.offset(row, col);
+        return index.offset(row, asRawCol(row, col));
     }
 
     @Override
     public Pos pos(long serial) {
         int[] ret = index.pos(serial);
-        return new Pos(ret[0], ret[1]);
+        var cb = charset.decode(ByteBuffer.wrap(get(ret[0], 0, ret[1])));
+        return new Pos(ret[0], cb.length());
     }
 
     @Override
@@ -258,6 +258,12 @@ public class DocumentImpl implements Document {
         });
         offsetSync = search;
         return search;
+    }
+
+    private int asRawCol(int row, int col) {
+        var cb = charset.decode(ByteBuffer.wrap(get(row)));
+        var bb = charset.encode(cb.subSequence(0, Math.min(col, cb.length())));
+        return bb.limit();
     }
 
 }

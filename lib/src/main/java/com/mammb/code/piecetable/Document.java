@@ -134,17 +134,6 @@ public interface Document {
     long serial(int row, int col);
 
     /**
-     * Get the serial position.
-     * Represents the byte position from the beginning of the file.
-     * This position does not include bom.
-     * @param pos the specified pos
-     * @return the serial position
-     */
-    default long serial(Pos pos) {
-        return serial(pos.row(), pos.col());
-    }
-
-    /**
      * Get the position from the specified serial.
      * @param serial the serial position
      * @return the row-col position

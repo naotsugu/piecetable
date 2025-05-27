@@ -33,10 +33,13 @@ public class SearchSourceImpl implements SearchSource {
 
     /** The {@link PieceTable}. */
     private final PieceTable pt;
+
     /** The {@link RowIndex}. */
     private final RowIndex index;
+
     /** The {@link Charset} of Document. */
     private final Charset charset;
+
     /** The byte order mark length. */
     private final int bom;
 
@@ -59,12 +62,16 @@ public class SearchSourceImpl implements SearchSource {
 
     @Override
     public long offset(int row, int col) {
-        return index.offset(row, col);
+        return index.offset(row, asRawCol(row, col));
     }
 
     @Override
     public int[] pos(long offset) {
-        return index.pos(offset);
+        int[] ret = index.pos(offset);
+        byte[] bytes = pt.get(index.offset(ret[0], 0) + bom, ret[1]);
+        var cb = charset.decode(ByteBuffer.wrap(bytes));
+        ret[1] = cb.length();
+        return ret;
     }
 
     @Override
@@ -85,6 +92,17 @@ public class SearchSourceImpl implements SearchSource {
     @Override
     public void bufferRead(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback) {
         pt.read(offset + bom, limitLength, traverseCallback);
+    }
+
+    private int asRawCol(int row, int col) {
+
+        long serial = index.get(row);
+        int len = Math.toIntExact(index.get(row + 1) - serial);
+        byte[] bytes = pt.get(serial + bom, len);
+
+        var cb = charset.decode(ByteBuffer.wrap(bytes));
+        var bb = charset.encode(cb.subSequence(0, Math.min(col, cb.length())));
+        return bb.limit();
     }
 
 }

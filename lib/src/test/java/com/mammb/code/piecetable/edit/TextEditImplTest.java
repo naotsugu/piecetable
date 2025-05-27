@@ -269,13 +269,13 @@ class TextEditImplTest {
         te.testDryApply(e);
         assertEquals("1abc", te.getDryBuffer().get(0));
         assertEquals("1abc", te.getText(0));
-        assertEquals("abc", te.getDoc().getText(0));
+        assertEquals("abc", te.getDoc().getText(0).toString());
 
         e = new Ins(new Pos(0, 0), new Pos(0, 1), "2");
         te.testDryApply(e);
         assertEquals("21abc", te.getDryBuffer().get(0));
         assertEquals("21abc", te.getText(0));
-        assertEquals("abc", te.getDoc().getText(0));
+        assertEquals("abc", te.getDoc().getText(0).toString());
 
     }
 
@@ -289,13 +289,13 @@ class TextEditImplTest {
         te.testDryApply(e);
         assertEquals("bc", te.getDryBuffer().get(0));
         assertEquals("bc", te.getText(0));
-        assertEquals("abc", te.getDoc().getText(0));
+        assertEquals("abc", te.getDoc().getText(0).toString());
 
         e = new Del(new Pos(0, 0), new Pos(0, 0), "b");
         te.testDryApply(e);
         assertEquals("c", te.getDryBuffer().get(0));
         assertEquals("c", te.getText(0));
-        assertEquals("abc", te.getDoc().getText(0));
+        assertEquals("abc", te.getDoc().getText(0).toString());
 
     }
 

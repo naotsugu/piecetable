@@ -38,20 +38,20 @@ class DocumentImplTest {
 
         var doc = DocumentImpl.of();
         assertEquals(1, doc.rows());
-        assertEquals("", doc.getText(0));
+        assertEquals("", doc.getText(0).toString());
 
         doc.insert(0, 0, "a");
         assertEquals(1, doc.rows());
-        assertEquals("a", doc.getText(0));
+        assertEquals("a", doc.getText(0).toString());
 
         doc.delete(0, 0, 1);
         assertEquals(1, doc.rows());
-        assertEquals("", doc.getText(0));
+        assertEquals("", doc.getText(0).toString());
 
         doc.insert(0, 0, "a\n");
         assertEquals(2, doc.rows());
-        assertEquals("a\n", doc.getText(0));
-        assertEquals("", doc.getText(1));
+        assertEquals("a\n", doc.getText(0).toString());
+        assertEquals("", doc.getText(1).toString());
     }
 
     @Test
@@ -59,8 +59,8 @@ class DocumentImplTest {
         var doc = DocumentImpl.of();
         doc.insert(0, 0, "ab\ncd");
         doc.delete(1, 1, 1);
-        assertEquals("ab\n", doc.getText(0));
-        assertEquals("c", doc.getText(1));
+        assertEquals("ab\n", doc.getText(0).toString());
+        assertEquals("c", doc.getText(1).toString());
     }
 
     @Test
@@ -75,11 +75,11 @@ class DocumentImplTest {
         var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
         assertEquals(4, doc.rows());
 
-        assertEquals("b\n", doc.getText(1));
+        assertEquals("b\n", doc.getText(1).toString());
         doc.delete(1, 0, 1);
-        assertEquals("\n", doc.getText(1));
+        assertEquals("\n", doc.getText(1).toString());
         doc.insert(1, 0, "b");
-        assertEquals("b\n", doc.getText(1));
+        assertEquals("b\n", doc.getText(1).toString());
     }
 
     @Test
@@ -94,24 +94,24 @@ class DocumentImplTest {
         var doc = new DocumentImpl(PieceTable.of(file), file, Reader.of(file));
         assertEquals(4, doc.rows());
 
-        assertEquals("あいう\n", doc.getText(0));
-        assertEquals("えお\n", doc.getText(1));
-        assertEquals("Ω𠀋\n", doc.getText(2));
+        assertEquals("あいう\n", doc.getText(0).toString());
+        assertEquals("えお\n", doc.getText(1).toString());
+        assertEquals("Ω𠀋\n", doc.getText(2).toString());
 
         // あ:2byte on UTF-16  1char  3byte on UTF-8
         doc.insert(0, 2, "アイウ");
-        assertEquals("あいアイウう\n", doc.getText(0));
+        assertEquals("あいアイウう\n", doc.getText(0).toString());
 
         doc.delete(0, 2, "アイウ");
-        assertEquals("あいう\n", doc.getText(0));
+        assertEquals("あいう\n", doc.getText(0).toString());
 
         // Ω:2byte on UTF-16  1char
         // 𠀋:4byte on UTF-16 2char
         doc.insert(2, 3, "アイウ");
-        assertEquals("Ω𠀋アイウ\n", doc.getText(2));
+        assertEquals("Ω𠀋アイウ\n", doc.getText(2).toString());
 
         doc.delete(2, 3, "アイウ");
-        assertEquals("Ω𠀋\n", doc.getText(2));
+        assertEquals("Ω𠀋\n", doc.getText(2).toString());
     }
 
 
@@ -126,13 +126,13 @@ class DocumentImplTest {
         assertEquals(4, doc.rows());
 
         doc.insert(0, 0, "0");
-        assertEquals("0a\n", doc.getText(0));
+        assertEquals("0a\n", doc.getText(0).toString());
 
         doc.insert(1, 0, "1");
-        assertEquals("1bc\n", doc.getText(1));
+        assertEquals("1bc\n", doc.getText(1).toString());
 
         doc.insert(2, 0, "2");
-        assertEquals("2def\n", doc.getText(2));
+        assertEquals("2def\n", doc.getText(2).toString());
     }
 
 

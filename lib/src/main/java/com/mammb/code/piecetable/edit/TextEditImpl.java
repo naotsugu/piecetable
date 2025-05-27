@@ -324,7 +324,7 @@ public class TextEditImpl implements TextEdit, Flushable {
                 Edit.Del del = deleteEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.addAll(List.of(del, ins));
-                long serial = doc.serial(rep.caretPos());
+                long serial = doc.serial(rep.caretPos().row(), rep.caretPos().col());
                 serials.addFirst(new long[] { serial + dstByteLen, serial });
                 shifts.addFirst(dstByteLen - delText.getBytes(doc.charset()).length);
             } else if (direction < 0) {
@@ -335,19 +335,19 @@ public class TextEditImpl implements TextEdit, Flushable {
                 Edit.Del bs  = backspaceEdit(row, col, delText, occurredOn);
                 Edit.Ins ins = insertEdit(bs.to().row(), bs.to().col(), dst, occurredOn);
                 unit.addAll(List.of(bs, ins));
-                long serial = doc.serial(rep.markPos());
+                long serial = doc.serial(rep.markPos().row(), rep.markPos().col());
                 serials.addFirst(new long[] { serial, serial + dstByteLen });
                 shifts.addFirst(dstByteLen - delText.getBytes(doc.charset()).length);
             } else if (dst != null && !dst.isEmpty()) {
                 // insert only
                 Edit.Ins ins = insertEdit(row, col, dst, occurredOn);
                 unit.add(ins);
-                long serial = doc.serial(rep.caretPos()) + dstByteLen;
+                long serial = doc.serial(rep.caretPos().row(), rep.caretPos().col()) + dstByteLen;
                 serials.addFirst(new long[] { serial });
                 shifts.addFirst(dstByteLen);
             } else {
                 // no operation
-                long serial = doc.serial(rep.caretPos());
+                long serial = doc.serial(rep.caretPos().row(), rep.caretPos().col());
                 serials.addFirst(new long[] { serial });
                 shifts.addFirst(0);
             }

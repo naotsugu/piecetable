@@ -37,8 +37,8 @@ class DocumentTest {
         var doc = Document.of(path);
         doc.insert(1, 2, "\nef");
 
-        assertEquals("ab\n", doc.getText(0));
-        assertEquals("d", doc.getText(1, 1, 1));
+        assertEquals("ab\n", doc.getText(0).toString());
+        assertEquals("d", doc.getText(1, 1, 1).toString());
 
     }
 
@@ -51,8 +51,8 @@ class DocumentTest {
         var doc = Document.of(path);
         doc.insert(1, 2, "\nef");
 
-        assertEquals("ab\n", doc.getText(0));
-        assertEquals("d", doc.getText(1, 1, 1));
+        assertEquals("ab\n", doc.getText(0).toString());
+        assertEquals("d", doc.getText(1, 1, 1).toString());
 
     }
 
@@ -61,15 +61,15 @@ class DocumentTest {
 
         var doc = Document.of();
         int row = 0;
-        assertEquals("", doc.getText(row));
+        assertEquals("", doc.getText(row).toString());
 
         doc.insert(row, 0, "a large text");
         doc.insert(row, 8, "span of ");
         doc.delete(row, 1, 6);
-        assertEquals("a span of text", doc.getText(row));
+        assertEquals("a span of text", doc.getText(row).toString());
 
         doc.delete(row, 0, 14);
-        assertEquals("", doc.getText(row));
+        assertEquals("", doc.getText(row).toString());
 
     }
 
