@@ -61,7 +61,7 @@ public class SearchSourceImpl implements SearchSource {
     }
 
     @Override
-    public long offset(int row, int col) {
+    public long serial(int row, int col) {
         return index.offset(row, asRawCol(row, col));
     }
 
@@ -103,6 +103,7 @@ public class SearchSourceImpl implements SearchSource {
         var cb = charset.decode(ByteBuffer.wrap(bytes));
         var bb = charset.encode(cb.subSequence(0, Math.min(col, cb.length())));
         return bb.limit();
+
     }
 
 }

@@ -50,7 +50,7 @@ public class SeqReader implements Reader {
     private long length = 0;
     /** The CharsetMatches. */
     private final List<CharsetMatch> matches;
-    /** The count of carriage return. */
+    /** The count of the carriage return. */
     private int crCount = 0;
     /** The count of line feed. */
     private int lfCount = 0;
@@ -108,7 +108,7 @@ public class SeqReader implements Reader {
 
     /**
      * Read the file at the specified path.
-     * @param path the path of file to be reade
+     * @param path the path of a file to be reade
      * @param rowPrefLimit the limit on the number of rows to read from the file,
      * if -1 is specified, there is no limit.
      */

@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ChannelBuffer implements Buffer, Closeable {
 
-    /** The size of buffer. */
+    /** The size of the buffer. */
     static final short PREF_BUF_SIZE = 1024 * 8;
 
     /** The empty byte array. */
@@ -44,13 +44,13 @@ public class ChannelBuffer implements Buffer, Closeable {
     /** The source channel. */
     private final SeekableByteChannel ch;
 
-    /** The current size of entity to which this channel is connected. */
+    /** The current size of the entity to which this channel is connected. */
     private final long length;
 
     /** The byte buffer. */
     private byte[] buffer;
 
-    /** The offset of buffer. */
+    /** The offset of the buffer. */
     private long offset;
 
 
@@ -147,8 +147,8 @@ public class ChannelBuffer implements Buffer, Closeable {
 
     /**
      * Fill buffer.
-     * @param from start position of channel
-     * @param to end position of channel
+     * @param from start position of a channel
+     * @param to end position of a channel
      */
     private void fillBuffer(long from, long to) {
         try {

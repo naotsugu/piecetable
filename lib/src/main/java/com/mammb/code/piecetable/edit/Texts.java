@@ -103,7 +103,7 @@ class Texts {
      *
      * @param text the text
      * @param count the count
-     * @return the leftmost count characters of a text
+     * @return on the leftmost count characters of a text
      */
     static String left(String text, int count) {
         if (count <= 0) return "";

@@ -45,8 +45,8 @@ class NaiveSearch implements Search {
     @Override
     public List<Found> all(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
         if (cs == null || cs.isEmpty()) return List.of();
-        long from = source.offset(fromRow, fromCol);
-        long to = source.offset(toRow, toCol);
+        long from = source.serial(fromRow, fromCol);
+        long to = source.serial(toRow, toCol);
         int size = Math.toIntExact(to - from);
         return Chunk.of(from, to, size).stream()
             .map(c -> search(c, cs))

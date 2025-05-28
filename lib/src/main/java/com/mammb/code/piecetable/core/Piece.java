@@ -41,7 +41,7 @@ public record Piece(Buffer target, long bufIndex, long length) {
 
     /**
      * Split this piece at the specified offset.
-     * @param offset the split position in ths piece
+     * @param offset the split position in the piece
      * @return the split pieces
      */
     public Piece[] split(long offset) {

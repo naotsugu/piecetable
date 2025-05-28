@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 /**
- * ParallelReader is a multi-threaded implementation of the {@link Reader} interface for reading large files.
+ * ParallelReader is a multithreaded implementation of the {@link Reader} interface for reading large files.
  * It reads data in parallel chunks to efficiently handle large file processing while maintaining file structure and statistics.
  * @author Naotsugu Kobayashi
  */
@@ -55,7 +55,7 @@ public class ParallelReader implements Reader {
     private long length = 0;
     /** The CharsetMatches. */
     private final List<CharsetMatch> matches = new ArrayList<>();
-    /** The count of carriage return. */
+    /** The count of the carriage return. */
     private int crCount = 0;
     /** The count of line feed. */
     private int lfCount = 0;

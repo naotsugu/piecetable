@@ -96,7 +96,7 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
     }
 
     static List<Chunk> of(SearchSource source, int fromRow, int fromCol, int toRow, int toCol, int size) {
-        return of(source.offset(fromRow, fromCol), source.offset(toRow, toCol), size);
+        return of(source.serial(fromRow, fromCol), source.serial(toRow, toCol), size);
     }
 
     static List<Chunk> of(final long from, final long to, int size) {
@@ -112,7 +112,7 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
 
     static List<Chunk> of(SearchSource source, int fromRow, int fromCol, int size) {
         List<Chunk> chunks = new ArrayList<>();
-        long from = source.offset(fromRow, fromCol);
+        long from = source.serial(fromRow, fromCol);
         long parentFrom = from;
         long parentTo = source.length();
         while (true) {
@@ -126,7 +126,7 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
 
     static List<Chunk> backwardOf(SearchSource source, int fromRow, int fromCol, int size) {
         List<Chunk> chunks = new ArrayList<>();
-        long from = source.offset(fromRow, fromCol);
+        long from = source.serial(fromRow, fromCol);
         long parentFrom = from;
         while (true) {
             long to = source.rowCeilOffset(from - size);

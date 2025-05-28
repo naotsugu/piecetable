@@ -41,7 +41,7 @@ public class BytesReader implements Reader {
     private long length = 0;
     /** The CharsetMatches. */
     private final List<CharsetMatch> matches;
-    /** The count of carriage return. */
+    /** The count of the carriage return. */
     private int crCount = 0;
     /** The count of line feed. */
     private int lfCount = 0;

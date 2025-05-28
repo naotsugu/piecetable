@@ -90,7 +90,7 @@ class SearchTest {
             @Override public long length() {
                 return pt.length();
             }
-            @Override public long offset(int row, int col) {
+            @Override public long serial(int row, int col) {
                 return index.offset(row, col);
             }
             @Override public int[] pos(long offset) {

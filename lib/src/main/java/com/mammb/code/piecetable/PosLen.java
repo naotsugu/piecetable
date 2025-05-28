@@ -19,7 +19,7 @@ package com.mammb.code.piecetable;
  * A record representing a position and length.
  * The row and col represent the start position, and len specifies the length.
  *
- * @param row the number of row (zero origin)
+ * @param row the number of rows (zero origin)
  * @param col the byte position on the row
  * @param len the byte length on UTF-16
  * @author Naotsugu Kobayashi

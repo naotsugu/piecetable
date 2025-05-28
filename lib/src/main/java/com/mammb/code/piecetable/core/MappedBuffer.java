@@ -38,7 +38,7 @@ public class MappedBuffer implements Buffer, Closeable {
     private final int chunkSize = 1_073_741_824;
     /** The mapped byte buffers. */
     private MappedByteBuffer[] maps;
-    /** The current size of entity to which this channel is connected. */
+    /** The current size of the entity to which this channel is connected. */
     private long length;
 
     /**

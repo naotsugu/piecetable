@@ -67,8 +67,8 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
         if (founds.isEmpty())
             return Optional.empty();
 
-        long offset = source.offset(pos.row(), pos.col());
-        int index = Collections.binarySearch(founds, new Found(offset, 0, 0));
+        long serial = source.serial(pos.row(), pos.col());
+        int index = Collections.binarySearch(founds, new Found(serial, 0, 0));
         index = (index >= 0) ? index : ~index;
         return switch (direction) {
             case FORWARD -> (index < founds.size()) ? Optional.of(toPosLen(founds.get(index))) : Optional.empty();

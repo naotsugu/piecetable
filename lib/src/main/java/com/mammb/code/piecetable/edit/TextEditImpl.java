@@ -43,7 +43,7 @@ import static com.mammb.code.piecetable.edit.Texts.splitRowBreak;
  * This class manages operations such as insertion, deletion, replacement,
  * backspacing, and text retrieval in a document.
  *
- * It maintains the editing state using deques for undo and redo stacks,
+ * It maintains the editing state using deque for undo and redo stacks,
  * as well as a dry buffer for temporary changes. The {@code doc} field holds
  * the source document being edited.
  * @author Naotsugu Kobayashi

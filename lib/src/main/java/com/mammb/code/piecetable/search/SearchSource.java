@@ -34,9 +34,9 @@ public interface SearchSource {
     Charset charset();
 
     /**
-     * Get the bytes length of this document holds.
+     * Get the byte length of this document holds.
      * Not the javas UTF-16 encoded memory size.
-     * @return the bytes length of this document holds
+     * @return the byte length of this document holds
      */
     long length();
 
@@ -48,7 +48,7 @@ public interface SearchSource {
      * @param col the specified position in a row
      * @return the serial position
      */
-    long offset(int row, int col);
+    long serial(int row, int col);
 
     /**
      * Get the row-col position.

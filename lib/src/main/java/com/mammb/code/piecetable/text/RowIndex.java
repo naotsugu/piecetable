@@ -42,17 +42,17 @@ public class RowIndex {
     /** The length of row lengths array. */
     private int length;
 
-    /** The sub-total cache. */
+    /** The subtotal cache. */
     private long[] stCache;
-    /** The sub-total cache length. */
+    /** The subtotal cache length. */
     private int cacheLength;
-    /** The sub-total cache interval. */
+    /** The subtotal cache interval. */
     private final int cacheInterval;
 
 
     /**
      * Create a new {@code RowIndex}.
-     * @param cacheInterval the sub-total cache interval
+     * @param cacheInterval the subtotal cache interval
      * @param prefRows the pref row size
      */
     private RowIndex(int cacheInterval, int prefRows) {
@@ -83,7 +83,7 @@ public class RowIndex {
 
     /**
      * Create a new {@link RowIndex}.
-     * @param cacheInterval the sub-total cache interval
+     * @param cacheInterval the subtotal cache interval
      * @param prefRows the pref row size
      * @return a new {@link RowIndex}
      */
@@ -129,7 +129,7 @@ public class RowIndex {
     }
 
     /**
-     * Build sub-total cache.
+     * Build subtotal cache.
      */
     public void buildStCache() {
         long st = 0;
@@ -412,7 +412,7 @@ public class RowIndex {
     }
 
     /**
-     * Grow this sub-total cache array.
+     * Grow this subtotal cache array.
      * @param minCapacity the growth capacity
      * @return the grown long array
      */
@@ -437,8 +437,8 @@ public class RowIndex {
     }
 
     /**
-     * Gets the sub-total cache array.
-     * @return the sub-total cache array
+     * Gets the subtotal cache array.
+     * @return the subtotal cache array
      */
     long[] stCache() {
         return Arrays.copyOf(stCache, cacheLength);

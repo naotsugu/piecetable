@@ -57,8 +57,8 @@ public interface Document {
      * Usually use {@link Document#insert(int, int, CharSequence)}.
      * Inserts the byte array into this {@code Document}.
      * @param row the number of row(zero origin)
-     * @param rawCol the byte position on the row where the char sequence is to be inserted(The value must be encoded in the appropriate Charset)
-     * @param bytes the byte array is to be inserted(The value must be encoded in the appropriate Charset)
+     * @param rawCol the byte position on the row where the char sequence is to be inserted (The value must be encoded in the appropriate Charset)
+     * @param bytes the byte array is to be inserted (The value must be encoded in the appropriate Charset)
      */
     void insert(int row, int rawCol, byte[] bytes);
 
@@ -66,8 +66,8 @@ public interface Document {
      * Usually use {@link Document#delete(int, int, CharSequence)}.
      * Delete the characters from this {@code Document}.
      * @param row the number of row(zero origin)
-     * @param rawCol the byte position on the row where the char sequence to be deleted(The value must be encoded in the appropriate Charset)
-     * @param rawLen the byte length to be deleted(The value must be encoded in the appropriate Charset)
+     * @param rawCol the byte position on the row where the char sequence to be deleted (The value must be encoded in the appropriate Charset)
+     * @param rawLen the byte length to be deleted (The value must be encoded in the appropriate Charset)
      */
     void delete(int row, int rawCol, int rawLen);
 
@@ -75,8 +75,8 @@ public interface Document {
      * Usually use {@link Document#get(int)}.
      * Gets the byte array at the specified position.
      * @param row the number of row(zero origin)
-     * @param rawCol the byte position on the row(The value must be encoded in the appropriate Charset)
-     * @param rawLen the byte length(The value must be encoded in the appropriate Charset)
+     * @param rawCol the byte position on the row (The value must be encoded in the appropriate Charset)
+     * @param rawLen the byte length (The value must be encoded in the appropriate Charset)
      * @return the byte array
      */
     byte[] get(int row, int rawCol, int rawLen);
@@ -92,8 +92,8 @@ public interface Document {
      * Usually use {@link Document#getText(int)}.
      * Gets the char sequence at the specified position.
      * @param row the number of row(zero origin)
-     * @param rawCol the byte position on the row(The value must be encoded in the appropriate Charset)
-     * @param rawLen the byte length(The value must be encoded in the appropriate Charset)
+     * @param rawCol the byte position on the row (The value must be encoded in the appropriate Charset)
+     * @param rawLen the byte length (The value must be encoded in the appropriate Charset)
      * @return the char sequence
      */
     CharSequence getText(int row, int rawCol, int rawLen);
@@ -117,9 +117,9 @@ public interface Document {
     int rows();
 
     /**
-     * Get the bytes length of this document holds.
+     * Get the byte length of this document holds.
      * Not the javas UTF-16 encoded memory size.
-     * @return the bytes length of this document holds
+     * @return the byte length of this document holds
      */
     long rawSize();
 

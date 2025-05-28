@@ -183,7 +183,7 @@ sealed interface Edit {
     /**
      * Merge the edit.
      * @param that the edit
-     * @return Merged edit. {@code Optional.empty()} if can not merge
+     * @return Merged edit. {@code Optional.empty()} if cannot merge
      */
     default Optional<Edit> merge(Edit that) {
         return switch (this) {

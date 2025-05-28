@@ -44,7 +44,7 @@ public interface Buffer {
     byte[] bytes(long startIndex, long endIndex);
 
     /**
-     * Get the length of buffer.
+     * Get the length of the buffer.
      * @return the count of bytes
      */
     long length();

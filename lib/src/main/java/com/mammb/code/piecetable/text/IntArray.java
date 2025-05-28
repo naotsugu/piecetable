@@ -34,14 +34,14 @@ public class IntArray implements Serializable {
     /** The int array. */
     private int[] ints;
 
-    /** The length of array. */
+    /** The length of an array. */
     private int length;
 
 
     /**
      * Create a new {@code IntArray}.
      * @param ints the source int array
-     * @param length the length of array
+     * @param length the length of an array
      */
     private IntArray(int[] ints, int length) {
         this.ints = ints;
@@ -91,7 +91,7 @@ public class IntArray implements Serializable {
 
 
     /**
-     * Add int array to this array.
+     * Add an int array to this array.
      * @param values byte array to be added
      */
     public void add(int[] values) {
@@ -114,8 +114,8 @@ public class IntArray implements Serializable {
 
 
     /**
-     * Get the copies of int array.
-     * @return the copies of int array
+     * Get the copies of an int array.
+     * @return the copies of an int array
      */
     public int[] get() {
         return Arrays.copyOf(ints, length);
@@ -132,8 +132,8 @@ public class IntArray implements Serializable {
 
 
     /**
-     * Get the length of int array.
-     * @return the length of int array
+     * Get the length of an int array.
+     * @return the length of an int array
      */
     public int length() {
         return length;
@@ -141,8 +141,8 @@ public class IntArray implements Serializable {
 
 
     /**
-     * Get the capacity of int array.
-     * @return the capacity of int array
+     * Get the capacity of an int array.
+     * @return the capacity of an int array
      */
     public int capacity() {
         return ints.length;
