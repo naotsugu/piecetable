@@ -18,12 +18,12 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.text.DocumentImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.function.Consumer;
 
 /**
  * The document.
  * Provides an abstraction for the document to be edited.
- *
  * Represents the contract for a {@code Document} that provides various functionalities
  * needed for handling, editing, and managing textual and binary content using rows and columns.
  * @author Naotsugu Kobayashi
@@ -118,7 +118,7 @@ public interface Document {
 
     /**
      * Get the byte length of this document holds.
-     * Not the javas UTF-16 encoded memory size.
+     * Not the java's UTF-16 encoded memory size.
      * @return the byte length of this document holds
      */
     long rawSize();
@@ -160,9 +160,16 @@ public interface Document {
 
     /**
      * Get the path.
-     * @return the path
+     * @return the path, otherwise, otherwise {@code null} if the original file does not exist
      */
     Path path();
+
+    /**
+     * Retrieves the last modified time of the source file.
+     * @return the last modified time as a {@code FileTime} object,
+     * otherwise {@code null} if the original file does not exist
+     */
+    FileTime lastModifiedTime();
 
     /**
      * Save this document.

@@ -22,12 +22,16 @@ import com.mammb.code.piecetable.Pos;
 import com.mammb.code.piecetable.RowEnding;
 import com.mammb.code.piecetable.SearchContext;
 import com.mammb.code.piecetable.Segment;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -226,6 +230,19 @@ public class DocumentImpl implements Document {
     @Override
     public Path path() {
         return path;
+    }
+
+    @Override
+    public FileTime lastModifiedTime() {
+        Path p = path;
+        if (p != null) {
+            try {
+                return Files.getLastModifiedTime(p);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
     }
 
     @Override

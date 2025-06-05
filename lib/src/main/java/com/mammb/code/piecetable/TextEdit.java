@@ -18,6 +18,7 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -245,9 +246,16 @@ public interface TextEdit {
 
     /**
      * Get the path.
-     * @return the path
+     * @return the path, otherwise, otherwise {@code null} if the original file does not exist
      */
     Path path();
+
+    /**
+     * Retrieves the last modified time of the source file.
+     * @return the last modified time as a {@code FileTime} object,
+     * otherwise {@code null} if the original file does not exist
+     */
+    FileTime lastModifiedTime();
 
     /**
      * Save this document.

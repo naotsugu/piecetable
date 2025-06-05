@@ -23,6 +23,7 @@ import com.mammb.code.piecetable.SearchContext;
 import com.mammb.code.piecetable.TextEdit;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,7 +43,6 @@ import static com.mammb.code.piecetable.edit.Texts.splitRowBreak;
  * providing text editing functionalities with support for undo and redo operations.
  * This class manages operations such as insertion, deletion, replacement,
  * backspacing, and text retrieval in a document.
- *
  * It maintains the editing state using deque for undo and redo stacks,
  * as well as a dry buffer for temporary changes. The {@code doc} field holds
  * the source document being edited.
@@ -501,6 +501,11 @@ public class TextEditImpl implements TextEdit, Flushable {
     @Override
     public Path path() {
         return doc.path();
+    }
+
+    @Override
+    public FileTime lastModifiedTime() {
+        return doc.lastModifiedTime();
     }
 
     @Override
