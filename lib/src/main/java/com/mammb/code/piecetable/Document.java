@@ -165,13 +165,6 @@ public interface Document {
     Path path();
 
     /**
-     * Retrieves the last modified time of the source file.
-     * @return the last modified time as a {@code FileTime} object,
-     * otherwise {@code null} if the original file does not exist
-     */
-    FileTime lastModifiedTime();
-
-    /**
      * Save this document.
      * @param path the path
      */

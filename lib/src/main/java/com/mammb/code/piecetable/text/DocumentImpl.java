@@ -233,19 +233,6 @@ public class DocumentImpl implements Document {
     }
 
     @Override
-    public FileTime lastModifiedTime() {
-        Path p = path;
-        if (p != null) {
-            try {
-                return Files.getLastModifiedTime(p);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
-    }
-
-    @Override
     public void save(Path path) {
         pt.save(path);
         this.path = path;

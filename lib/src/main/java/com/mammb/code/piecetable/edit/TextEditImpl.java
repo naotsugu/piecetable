@@ -504,11 +504,6 @@ public class TextEditImpl implements TextEdit, Flushable {
     }
 
     @Override
-    public FileTime lastModifiedTime() {
-        return doc.lastModifiedTime();
-    }
-
-    @Override
     public void save(Path path) {
         flush();
         doc.save(path);
