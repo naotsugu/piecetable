@@ -36,6 +36,21 @@ public enum RowEnding {
     public static final RowEnding platform = platform();
 
     /**
+     * Creates a RowEnding instance based on the provided string representation of a line ending.
+     * @param str the string representation of the line ending, such as "\n", "LF", "lf", "\r", "CR", "cr", "\r\n", "CRLF", "crlf", or "CrLf"
+     * @return the corresponding RowEnding instance
+     * @throws IllegalArgumentException if the provided string does not match a valid line ending
+     */
+    public static RowEnding of(String str) {
+        return switch (str) {
+            case "\n", "LF", "lf" -> LF;
+            case "\r", "CR", "cr" -> CR;
+            case "\r\n", "CRLF", "crlf", "CrLf" -> CRLF;
+            default -> throw new IllegalArgumentException(String.format("'%s' is not a valid line ending", str));
+        };
+    }
+
+    /**
      * Unify line ending.
      *
      * @param cs unify string
