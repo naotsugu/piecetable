@@ -18,7 +18,6 @@ package com.mammb.code.piecetable;
 import com.mammb.code.piecetable.edit.TextEditImpl;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -285,10 +284,11 @@ public interface TextEdit {
     /**
      * Create a new {@link TextEdit}.
      * @param path the path of the file to read
+     * @param charsetMatches the charset matches
      * @return a new {@link TextEdit}
      */
-    static TextEdit of(Path path) {
-        return new TextEditImpl(Document.of(path));
+    static TextEdit of(Path path, CharsetMatch... charsetMatches) {
+        return new TextEditImpl(Document.of(path, charsetMatches));
     }
 
     /**
