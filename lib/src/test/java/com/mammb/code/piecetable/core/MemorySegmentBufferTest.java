@@ -21,7 +21,6 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +34,7 @@ class MemorySegmentBufferTest {
     void get(@TempDir Path tempDir) throws Exception {
 
         var path = tempDir.resolve("test_get.txt");
-        Files.write(path, List.of("a", "b"));
+        Files.writeString(path, "a\nb\n");
 
         try (var cb = MemorySegmentBuffer.of(path)) {
             assertEquals(4, cb.length());
@@ -50,8 +49,7 @@ class MemorySegmentBufferTest {
     void bytes(@TempDir Path tempDir) throws Exception {
 
         var path = tempDir.resolve("test_bytes.txt");
-        Files.write(path, List.of(
-            "a".repeat(100), "b"));
+        Files.writeString(path, "a".repeat(100) + "\nb\n");
 
         try (var cb = MemorySegmentBuffer.of(path)) {
             long i = 100;
@@ -67,7 +65,7 @@ class MemorySegmentBufferTest {
     void read(@TempDir Path tempDir) throws Exception {
 
         var path = tempDir.resolve("test_read.txt");
-        Files.write(path, List.of("0123"));
+        Files.writeString(path, "0123\n");
         var bb = ByteBuffer.allocate(2);
 
         try (var cb = MemorySegmentBuffer.of(path)) {

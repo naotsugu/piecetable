@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +34,7 @@ class ChannelBufferTest {
     void get(@TempDir Path tempDir) throws Exception {
 
         var path = tempDir.resolve("test_get.txt");
-        Files.write(path, List.of("a", "b"));
+        Files.writeString(path, "a\nb\n");
 
         try (var cb = ChannelBuffer.of(path)) {
             assertEquals(4, cb.length());
@@ -50,8 +49,7 @@ class ChannelBufferTest {
     void bytes(@TempDir Path tempDir) throws Exception {
 
         var path = tempDir.resolve("test_bytes.txt");
-        Files.write(path, List.of(
-            "a".repeat(ChannelBuffer.PREF_BUF_SIZE), "b"));
+        Files.writeString(path, "a".repeat(ChannelBuffer.PREF_BUF_SIZE) + "\nb\n");
 
         try (var cb = ChannelBuffer.of(path)) {
             long i = ChannelBuffer.PREF_BUF_SIZE;
@@ -67,7 +65,7 @@ class ChannelBufferTest {
     void read(@TempDir Path tempDir) throws Exception {
 
         var path = tempDir.resolve("test_read.txt");
-        Files.write(path, List.of("0123"));
+        Files.writeString(path, "0123\n");
         var bb = ByteBuffer.allocate(2);
 
         try (var cb = ChannelBuffer.of(path)) {
