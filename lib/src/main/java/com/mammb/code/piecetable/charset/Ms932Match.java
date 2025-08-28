@@ -65,7 +65,10 @@ class Ms932Match implements CharsetMatch {
                     if (isInvalid(b, s)) {
                         result.decreasesConfidence();
                     } else {
-                        result.increasesConfidence();
+                        if (b < 0x98 || b == 0x98 && s < 0x9f) {
+                            // smaller than the JIS second-level standard
+                            result.increasesConfidence();
+                        }
                     }
                 } else {
                     result.decreasesConfidence();
