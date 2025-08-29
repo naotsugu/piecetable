@@ -33,7 +33,7 @@ public interface TextEdit {
 
     /**
      * Inserts the text into this {@code TextEdit}.
-     * @param row the number of row(zero origin)
+     * @param row the number of rows (zero origin)
      * @param col the byte position on the row where the text is to be inserted
      * @param text the char sequence is to be inserted
      * @return the new position
@@ -50,7 +50,7 @@ public interface TextEdit {
 
     /**
      * Delete the text from this {@code TextEdit}.
-     * @param row the number of row(zero origin)
+     * @param row the number of rows (zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @return the deleted text
      */
@@ -58,7 +58,7 @@ public interface TextEdit {
 
     /**
      * Delete the text from this {@code TextEdit}.
-     * @param row the number of row(zero origin)
+     * @param row the number of rows (zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @param len the byte length to be deleted
      * @return the deleted text
@@ -74,7 +74,7 @@ public interface TextEdit {
 
     /**
      * Backspace deletes the text from this {@code TextEdit}.
-     * @param row the number of row(zero origin)
+     * @param row the number of rows (zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @return the new position
      */
@@ -82,7 +82,7 @@ public interface TextEdit {
 
     /**
      * Backspace deletes the text from this {@code TextEdit}.
-     * @param row the number of row(zero origin)
+     * @param row the number of rows (zero origin)
      * @param col the byte position on the row where the text to be deleted
      * @param len the byte length to be deleted
      * @return the new position
@@ -98,7 +98,7 @@ public interface TextEdit {
 
     /**
      * Replace the text from this {@code TextEdit}.
-     * @param row the number of row(zero origin)
+     * @param row the number of rows (zero origin)
      * @param col the byte position on the row where the text to be replaced
      * @param len the byte length to be replaced
      * @param text the char sequence is to be inserted
@@ -161,7 +161,7 @@ public interface TextEdit {
 
     /**
      * Gets the text at the specified row.
-     * @param row the number of row(zero origin)
+     * @param row the number of rows (zero origin)
      * @return the text of the specified row
      */
     String getText(int row);
@@ -325,16 +325,16 @@ public interface TextEdit {
 
     /**
      * The replace request.
-     * @param markPos the end point(marked point)
-     * @param caretPos the start point(caret point)
+     * @param markPos the end point (marked point)
+     * @param caretPos the start point (caret point)
      * @param convert the convert
      */
     record Replace(Pos markPos, Pos caretPos, Convert convert) implements Comparable<Replace> {
 
         /**
          * Create a new replacement request.
-         * @param caretPos the start point(caret point)
-         * @param markPos the end point(marked point)
+         * @param caretPos the start point (caret point)
+         * @param markPos the end point (marked point)
          * @param text the text to be replaced
          * @return a new replacement request
          */
