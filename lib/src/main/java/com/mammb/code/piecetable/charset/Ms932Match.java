@@ -23,16 +23,16 @@ import static java.lang.System.Logger.Level.DEBUG;
 /**
  * This class implements the {@link CharsetMatch} interface to estimate the validity of the
  * MS932 (Shift-JIS for Windows) charset encoding for a given byte array.
- *
+ * <p>
  * The class analyzes the input bytes to determine whether the bytes conform to the
  * expected pattern of MS932 encoded data. The result is represented through a confidence
  * score, which reflects the likelihood of the input conforming to the MS932 encoding.
- *
+ * <p>
  * The confidence level is adjusted based on the analysis of individual bytes and pairs
  * of bytes. Invalid byte sequences or characters reduce the confidence, while valid sequences
  * enhance it. Certain patterns and ranges of characters are identified as invalid, and these
  * are implemented in the {@link #isInvalid(int, int)} method.
- *
+ * <p>
  * Internal confidence adjustments work in conjunction with the {@link CharsetMatchResult}
  * class, which manages the state of confidence, miss counts, and other properties related
  * to charset matching.

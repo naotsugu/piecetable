@@ -52,7 +52,7 @@ Add dependencies.
 
 ```kotlin
 dependencies {
-    implementation("com.mammb:piecetable:0.5.13")
+    implementation("com.mammb:piecetable:0.5.14")
 }
 ```
 
@@ -144,5 +144,5 @@ cd examples/fx-editor
 
 ## Sample applications using this library
 
-* [min-editor](https://github.com/naotsugu/min-editor)(current version is used)
+* [min-editor](https://github.com/naotsugu/min-editor)
 
