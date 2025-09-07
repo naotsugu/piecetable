@@ -41,7 +41,7 @@ git push origin v0.5.14
 ## Maven publish
 
 ```shell
-./gradlew publish
+./gradlew publishAndReleaseToMavenCentral
 ```
 
 [repository manager](https://oss.sonatype.org/)

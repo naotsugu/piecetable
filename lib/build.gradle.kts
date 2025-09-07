@@ -1,7 +1,6 @@
 plugins {
     `java-library`
-    `maven-publish`
-    signing
+    id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
 repositories {
@@ -25,8 +24,6 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(23))
     }
-    withSourcesJar()
-    withJavadocJar()
 }
 
 version = "0.5.14"
@@ -40,67 +37,37 @@ tasks.jar {
     }
 }
 
-val ossrhToken: String? by project
-val ossrhTokenPassword: String? by project
-
-publishing {
-    publications {
-        register<MavenPublication>("mavenJava") {
-            artifactId = "piecetable"
-            from(components["java"])
-            versionMapping {
-                usage("java-api") {
-                    fromResolutionOf("runtimeClasspath")
-                }
-                usage("java-runtime") {
-                    fromResolutionResult()
-                }
-            }
-            pom {
-                name.set("piecetable")
-                description.set("Java implementation of PieceTable data structure.")
-                url.set("https://github.com/naotsugu/piecetable")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("naotsugu")
-                        name.set("Naotsugu Kobayashi")
-                        email.set("naotsugukobayashi@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set("git@github.com:naotsugu/piecetable.git")
-                    developerConnection.set("git@github.com:naotsugu/piecetable.git")
-                    url.set("https://github.com/naotsugu/piecetable")
-                }
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates(group.toString(), name, version.toString())
+    configure(com.vanniktech.maven.publish.JavaLibrary(
+        javadocJar = com.vanniktech.maven.publish.JavadocJar.Javadoc(),
+        sourcesJar = true,
+    ))
+    pom {
+        name.set("piecetable")
+        description.set("Java implementation of PieceTable data structure.")
+        inceptionYear.set("2024")
+        url.set("https://github.com/naotsugu/piecetable")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-    }
-    repositories {
-        maven {
-            name = "MavenCentral"
-            val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
-            val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots")
-            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-            credentials {
-                username = ossrhToken
-                password = ossrhTokenPassword
+        developers {
+            developer {
+                id.set("naotsugu")
+                name.set("Naotsugu Kobayashi")
+                url.set("https://github.com/naotsugu/")
             }
         }
-    }
-}
-
-signing {
-    sign(publishing.publications["mavenJava"])
-}
-
-tasks.javadoc {
-    if (JavaVersion.current().isJava9Compatible) {
-        (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+        scm {
+            url.set("https://github.com/naotsugu/piecetable/")
+            connection.set("scm:git:git://github.com/naotsugu/piecetable.git")
+            developerConnection.set("scm:git:ssh://git@github.com/naotsugu/piecetable.git")
+        }
     }
 }
