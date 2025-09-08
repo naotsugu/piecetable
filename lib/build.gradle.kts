@@ -40,7 +40,7 @@ tasks.jar {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates(group.toString(), name, version.toString())
+    coordinates(group.toString(), base.archivesName.get(), version.toString())
     configure(com.vanniktech.maven.publish.JavaLibrary(
         javadocJar = com.vanniktech.maven.publish.JavadocJar.Javadoc(),
         sourcesJar = true,
