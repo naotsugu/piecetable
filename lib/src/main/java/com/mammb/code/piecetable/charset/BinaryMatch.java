@@ -35,9 +35,13 @@ public class BinaryMatch implements CharsetMatch {
 
     /** The logger. */
     private static final System.Logger log = System.getLogger(BinaryMatch.class.getName());
-
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(new BinaryCharset());
+
+    public BinaryMatch() {
+        // set a handicap
+        result.decreasesConfidence(3);
+    }
 
     @Override
     public Result put(byte[] bytes) {
