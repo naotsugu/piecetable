@@ -35,7 +35,8 @@ public interface CharsetMatches {
      * @return a new default {@link CharsetMatch} array
      */
     static CharsetMatch[] defaults() {
-        return new CharsetMatch[] { utf8(), ms932(),
+        return new CharsetMatch[] {
+            utf8(), ms932(), new BinaryMatch(),
             new Utf16BEMatch(), new Utf16LEMatch() };
     }
 
@@ -44,7 +45,8 @@ public interface CharsetMatches {
      * @return the {@link CharsetMatch} array
      */
     static CharsetMatch[] all() {
-        return new CharsetMatch[] { utf8(), ms932(),
+        return new CharsetMatch[] {
+            utf8(), ms932(), new BinaryMatch(),
             new Utf16BEMatch(), new Utf16LEMatch(),
             new Utf32BEMatch(), new Utf32LEMatch() };
     }
