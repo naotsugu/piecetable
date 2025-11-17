@@ -41,6 +41,9 @@ import java.util.function.Function;
  */
 public class PieceTableImpl implements PieceTable {
 
+    /** The logger. */
+    private static final System.Logger log = System.getLogger(PieceTableImpl.class.getName());
+
     /** The source path. */
     private Path sourcePath;
     /** The Append buffer. */
@@ -51,6 +54,11 @@ public class PieceTableImpl implements PieceTable {
     private final TreeMap<Long, PiecePoint> indices;
     /** The total byte length of the piece table. */
     private long length;
+
+    /** The mod count. */
+    private long modCount;
+    /** The gc interval. */
+    private int gcInterval;
 
     /**
      * Constructor.
@@ -64,6 +72,11 @@ public class PieceTableImpl implements PieceTable {
         this.pieces = new ArrayList<>();
         this.indices = new TreeMap<>();
         this.length = 0;
+        this.modCount = 0;
+        this.gcInterval = 0;
+        try {
+            this.gcInterval = Integer.parseInt(System.getProperty("com.mammb.code.piecetable.core.gcInterval"));
+        } catch (Exception ignore) {}
         if (initial != null) {
             this.pieces.add(initial);
             this.length = initial.length();
@@ -134,6 +147,8 @@ public class PieceTableImpl implements PieceTable {
 
         }
         length += bytes.length;
+        modCount++;
+        if (gcInterval > 0 && gcInterval <= modCount && modCount % gcInterval == 0) gc();
     }
 
     @Override
@@ -168,6 +183,8 @@ public class PieceTableImpl implements PieceTable {
         }
 
         length -= len;
+        modCount++;
+        if (gcInterval > 0 && gcInterval <= modCount && modCount % gcInterval == 0) gc();
     }
 
     @Override
@@ -239,7 +256,7 @@ public class PieceTableImpl implements PieceTable {
         var cb = ChannelBuffer.of(path);
         pieces.add(new Piece(cb, 0, cb.length()));
         length = cb.length();
-
+        modCount = 0;
     }
 
     @Override
@@ -366,7 +383,10 @@ public class PieceTableImpl implements PieceTable {
     public void gc() {
         List<Piece> dest = new ArrayList<>(pieces.size());
         Piece prev = null;
+        long pos = 0;
+        long dirtyPos = -1;
         for (Piece piece : pieces) {
+            pos += piece.length();
             if (prev == null) {
                 prev = piece;
                 continue;
@@ -377,6 +397,9 @@ public class PieceTableImpl implements PieceTable {
                     prev.target(),
                     prev.bufIndex(),
                     prev.length() + piece.length());
+                if (dirtyPos < 0) {
+                    dirtyPos = pos - prev.length();
+                }
             } else {
                 dest.add(prev);
                 prev = piece;
@@ -385,9 +408,17 @@ public class PieceTableImpl implements PieceTable {
         if (prev != null) {
             dest.add(prev);
         }
+
+        log.log(System.Logger.Level.INFO, "gc: {0} -> {1}", pieces.size(), dest.size());
+        if (pieces.size() == dest.size()) {
+            return;
+        }
         pieces.clear();
         pieces.addAll(dest);
-        indices.clear();
+        if (dirtyPos >= 0) {
+            indices.tailMap(dirtyPos).clear();
+        }
+
     }
 
     private PiecePoint fillToIndices(long pos, long piecePosition, int tableIndex) {
