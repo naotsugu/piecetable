@@ -51,11 +51,11 @@ public class PieceTableImpl implements PieceTable {
     /** The pieces. */
     private final List<Piece> pieces;
     /** The index of pieces. */
-    private final TreeMap<Long, PiecePoint> indices;
+    private final TreeMap<Long, PiecePoint> pointsCache;
     /** The total byte length of the piece table. */
     private long length;
 
-    /** The mod count. */
+    /** The mod count for gc. */
     private long modCount;
     /** The gc interval. */
     private int gcInterval;
@@ -70,7 +70,7 @@ public class PieceTableImpl implements PieceTable {
         this.sourcePath = path;
         this.appendBuffer = appendBuffer;
         this.pieces = new ArrayList<>();
-        this.indices = new TreeMap<>();
+        this.pointsCache = new TreeMap<>();
         this.length = 0;
         this.modCount = 0;
         this.gcInterval = 0;
@@ -135,7 +135,7 @@ public class PieceTableImpl implements PieceTable {
 
             // add to the boundary position
             pieces.add(point.tableIndex, newPiece);
-            indices.tailMap(point.position).clear();
+            pointsCache.tailMap(point.position).clear();
 
         } else {
 
@@ -143,7 +143,7 @@ public class PieceTableImpl implements PieceTable {
             Piece[] splits = point.piece.split(pos - point.position());
             pieces.remove(point.tableIndex);
             pieces.addAll(point.tableIndex, List.of(splits[0], newPiece, splits[1]));
-            indices.tailMap(point.position).clear();
+            pointsCache.tailMap(point.position).clear();
 
         }
         length += bytes.length;
@@ -171,7 +171,7 @@ public class PieceTableImpl implements PieceTable {
 
         // disable indices
         PiecePoint from = range[0];
-        indices.tailMap(from.position).clear();
+        pointsCache.tailMap(from.position).clear();
 
         // derive the split pieces
         PiecePoint to = range[range.length - 1];
@@ -251,7 +251,7 @@ public class PieceTableImpl implements PieceTable {
 
         pieces.clear();
         appendBuffer.clear();
-        indices.clear();
+        pointsCache.clear();
 
         var cb = ChannelBuffer.of(path);
         pieces.add(new Piece(cb, 0, cb.length()));
@@ -351,15 +351,15 @@ public class PieceTableImpl implements PieceTable {
         // 0  |x|x|x|  length:3
         // 3  |x|x|    length:2
         // 5  |x|x|    length:2
-        PiecePoint piecePoint = Optional.ofNullable(indices.floorEntry(pos))
+        PiecePoint piecePoint = Optional.ofNullable(pointsCache.floorEntry(pos))
                     .map(Map.Entry::getValue).orElse(null);
         if (piecePoint == null) {
-            return fillToIndices(pos, 0L, 0);
+            return fillPointsCacheTo(pos, 0L, 0);
         } else {
             if (piecePoint.contains(pos)) {
                 return piecePoint;
             } else {
-                return fillToIndices(pos,
+                return fillPointsCacheTo(pos,
                     piecePoint.endPosition(),
                     piecePoint.tableIndex() + 1);
             }
@@ -416,16 +416,23 @@ public class PieceTableImpl implements PieceTable {
         pieces.clear();
         pieces.addAll(dest);
         if (dirtyPos >= 0) {
-            indices.tailMap(dirtyPos).clear();
+            pointsCache.tailMap(dirtyPos).clear();
         }
 
     }
 
-    private PiecePoint fillToIndices(long pos, long piecePosition, int tableIndex) {
+    /**
+     * Fill the point cache up to the specified position.
+     * @param pos the specified position (in bytes)
+     * @param piecePosition the start position
+     * @param tableIndex the start table index
+     * @return PiecePoint
+     */
+    private PiecePoint fillPointsCacheTo(long pos, long piecePosition, int tableIndex) {
         for (int i = tableIndex; i < pieces.size(); i++) {
             var piece = pieces.get(i);
             var piecePoint = new PiecePoint(piecePosition, i, piece);
-            indices.put(piecePoint.position, piecePoint);
+            pointsCache.put(piecePoint.position, piecePoint);
             if (piecePoint.contains(pos)) {
                 return piecePoint;
             }
@@ -434,6 +441,21 @@ public class PieceTableImpl implements PieceTable {
         return null;
     }
 
+    /**
+     * Position representation of pieces.
+     * <pre>
+     *            ------------  <--- PiecePoint(0,  0, piece[0])
+     *  Piece[0] | length:8 |
+     *            ------------  <--- PiecePoint(8,  1, piece[1])
+     *  Piece[1] | length:4 |
+     *            ------------  <--- PiecePoint(12, 2, piece[2])
+     *  Piece[2] | length:3 |
+     *            ------------
+     * </pre>
+     * @param position the position from the start to the target piece (in bytes)
+     * @param tableIndex the index of the target piece within the piece table
+     * @param piece the target piece
+     */
     record PiecePoint(Long position, int tableIndex, Piece piece) {
         // excludes
         public long endPosition() {
