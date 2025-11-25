@@ -290,6 +290,15 @@ public class RowIndex {
     }
 
     /**
+     * Get the row length.
+     * @param row the specified row
+     * @return the row length
+     */
+    public int rowLength(int row) {
+        return (row >= length) ? 0 : rowLengths[row];
+    }
+
+    /**
      * Get the serial position.
      * Length of BOM is excluded.
      * @param row the specified row
