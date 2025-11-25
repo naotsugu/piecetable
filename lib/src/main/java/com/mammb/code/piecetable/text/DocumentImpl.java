@@ -264,6 +264,32 @@ public class DocumentImpl implements Document {
         return search;
     }
 
+    /**
+     * Get the length of bytes from the beginning of the row.
+     * to the specified column number based on the given row number and column number.
+     * <pre>
+     *                           | a     | b     | あ       | 𠀋           |
+     *                           --------------------------------------------
+     *  codepoint                | 61    | 62    | 12,354   | 131,083     |
+     *  UTF-8                    | 61    | 62    | E3 81 82 | f0 a0 80 8b |
+     *  UTF-16                   | 00 61 | 00 62 | 30 42    | d8 40 dc 0b |
+     *  ---------------------------------------------------------------------
+     *  length in codepoints     0       1       2          3             4
+     *  length in java(utf-16)   0       1       2          3      4      5
+     *  ---------------------------------------------------------------------
+     *  bytes length in UTF-8    0       1       2          5             9
+     *  bytes length in UTF-16   0       2       4          6            10
+     *
+     *
+     *                 | a | b | あ | 𠀋 |   : UTF-8
+     *  asRawCol(_, 3)              ^       -> return 5
+     *  asRawCol(_, 5)                  ^   -> return 9
+     * </pre>
+     *
+     * @param row the specified row
+     * @param col the specified column (character length in java, not a code points)
+     * @return the length of bytes from the beginning of the row
+     */
     private int asRawCol(int row, int col) {
         var cb = charset.decode(ByteBuffer.wrap(get(row)));
         var bb = charset.encode(cb.subSequence(0, Math.min(col, cb.length())));
