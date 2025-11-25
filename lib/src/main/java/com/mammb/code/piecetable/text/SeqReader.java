@@ -99,14 +99,6 @@ public class SeqReader implements Reader {
     }
 
     /**
-     * Gets the row lengths array.
-     * @return the row lengths array
-     */
-    public int[] rowLengths() {
-        return index.rowLengths();
-    }
-
-    /**
      * Read the file at the specified path.
      * @param path the path of a file to be reade
      * @param rowPrefLimit the limit on the number of rows to read from the file,
