@@ -171,7 +171,7 @@ public class DocumentImpl implements Document {
     @Override
     public byte[] get(int row) {
         long serial = index.get(row);
-        int len = Math.toIntExact(index.get(row + 1) - serial);
+        int len = index.rowLength(row);
         return pt.get(serial + bom.length, len);
     }
 
@@ -202,7 +202,8 @@ public class DocumentImpl implements Document {
 
     @Override
     public long serial(int row, int col) {
-        return index.offset(row, asRawCol(row, col));
+        int rawCol = asRawCol(row, col);
+        return index.offset(row, rawCol);
     }
 
     @Override
