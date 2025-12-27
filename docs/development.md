@@ -44,5 +44,6 @@ git push origin v0.6.0
 ./gradlew publishAndReleaseToMavenCentral
 ```
 
-[repository manager](https://oss.sonatype.org/)
+[Central Portal](https://central.sonatype.com)
+
 
