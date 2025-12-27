@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
 repositories {
@@ -26,7 +26,7 @@ java {
     }
 }
 
-version = "0.5.14"
+version = "0.6.0"
 group = "com.mammb"
 base.archivesName.set("piecetable")
 
@@ -48,7 +48,7 @@ mavenPublishing {
     pom {
         name.set("piecetable")
         description.set("Java implementation of PieceTable data structure.")
-        inceptionYear.set("2024")
+        inceptionYear.set("2025")
         url.set("https://github.com/naotsugu/piecetable")
         licenses {
             license {
