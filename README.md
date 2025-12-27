@@ -142,6 +142,8 @@ cd examples/fx-editor
 
 ![screenshot-example](docs/images/screenshot-1.png)
 
+This example is merely a simple demonstration. For more practical applications, please refer to the following.
+
 ## Sample applications using this library
 
 * [min-editor](https://github.com/naotsugu/min-editor)
