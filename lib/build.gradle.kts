@@ -26,7 +26,7 @@ java {
     }
 }
 
-version = "0.6.0"
+version = "0.6.1"
 group = "com.mammb"
 base.archivesName.set("piecetable")
 
