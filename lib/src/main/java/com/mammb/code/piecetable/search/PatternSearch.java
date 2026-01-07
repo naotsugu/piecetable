@@ -17,6 +17,7 @@ package com.mammb.code.piecetable.search;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.regex.Pattern;
 class PatternSearch implements Search {
 
     /** The default chunk size. */
-    static final int DEFAULT_CHUNK_SIZE = 1024 * 256;
+    static final int DEFAULT_CHUNK_SIZE = 1024 * 512;
 
     /** The serial document. */
     private final SearchSource source;
@@ -124,28 +125,31 @@ class PatternSearch implements Search {
 
         if (Thread.interrupted()) throw new RuntimeException("interrupted");
 
-        List<Found> founds = new ArrayList<>();
+        final List<Found> founds = new ArrayList<>();
+        final Charset charset = source.charset();
 
         ByteBuffer bb = pool.poll();
         if (bb == null) {
             bb = ByteBuffer.allocateDirect(DEFAULT_CHUNK_SIZE);
         }
 
-        source.bufferRead(chunk.from(), chunk.length(), bb);
+        synchronized (this) {
+            source.bufferRead(chunk.from(), chunk.length(), bb);
+        }
         bb.flip();
-        CharBuffer cb = source.charset().decode(bb);
+        CharBuffer cb = charset.decode(bb);
         bb.clear();
         pool.offer(bb);
 
         int n = 0;
         int pos = 0;
-        Matcher matcher = pattern.matcher(cb);
+        final Matcher matcher = pattern.matcher(cb);
         while (matcher.find()) {
             if (Thread.interrupted()) throw new RuntimeException("interrupted");
-            pos += source.charset().encode(cb.slice(n, matcher.start() - n)).limit();
+            pos += charset.encode(cb.slice(n, matcher.start() - n)).limit();
             n = matcher.start();
             var str = matcher.group();
-            var found = new Found(chunk.from() + pos, str.length(), str.getBytes(source.charset()).length);
+            var found = new Found(chunk.from() + pos, str.length(), str.getBytes(charset).length);
             founds.add(found);
         }
 
