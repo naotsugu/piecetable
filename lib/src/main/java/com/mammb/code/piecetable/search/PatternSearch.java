@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 class PatternSearch implements Search {
 
     /** The default chunk size. */
-    static final int DEFAULT_CHUNK_SIZE = 1024 * 512;
+    static final int DEFAULT_CHUNK_SIZE = 1024 * 256;
 
     /** The serial document. */
     private final SearchSource source;
@@ -51,6 +51,7 @@ class PatternSearch implements Search {
     /**
      * Constructor.
      * @param source the source
+     * @param matchFlags the match flags
      */
     PatternSearch(SearchSource source, int matchFlags) {
         this.source = source;
@@ -59,8 +60,11 @@ class PatternSearch implements Search {
 
     @Override
     public List<Found> all(CharSequence cs, int fromRow, int fromCol, int toRow, int toCol) {
+
         if (cs == null || cs.isEmpty()) return List.of();
+
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+
         return Chunk.of(source, fromRow, fromCol, toRow, toCol, DEFAULT_CHUNK_SIZE).stream()
             .map(c -> search(c, pattern))
             .map(FoundsInChunk::founds)
@@ -70,8 +74,11 @@ class PatternSearch implements Search {
 
     @Override
     public Optional<Found> nextOne(CharSequence cs, int fromRow, int fromCol) {
+
         if (cs == null || cs.isEmpty()) return Optional.empty();
+
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+
         return Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
             .parallel()
             .map(c -> search(c, pattern))
@@ -83,8 +90,11 @@ class PatternSearch implements Search {
 
     @Override
     public Optional<Found> previousOne(CharSequence cs, int fromRow, int fromCol) {
+
         if (cs == null || cs.isEmpty()) return Optional.empty();
+
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
+
         return Chunk.backwardOf(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
             .parallel()
             .map(c -> search(c, pattern))
@@ -98,6 +108,7 @@ class PatternSearch implements Search {
     public void forward(CharSequence cs, int fromRow, int fromCol, Consumer<FoundsInChunk> listener) {
 
         if (cs == null || cs.isEmpty()) return;
+
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
         Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
@@ -129,8 +140,13 @@ class PatternSearch implements Search {
         final Charset charset = source.charset();
 
         ByteBuffer bb = pool.poll();
+
         if (bb == null) {
-            bb = ByteBuffer.allocateDirect(DEFAULT_CHUNK_SIZE);
+            bb = ByteBuffer.allocateDirect(
+                Math.max(DEFAULT_CHUNK_SIZE, Math.toIntExact(chunk.length())));
+        } else if (bb.remaining() < chunk.length()) {
+            pool.offer(bb);
+            bb = ByteBuffer.allocateDirect(Math.toIntExact(chunk.length()));
         }
 
         synchronized (this) {

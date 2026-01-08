@@ -117,6 +117,9 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
         long parentTo = source.length();
         while (true) {
             long to = source.rowFloorOffset(from + size);
+            if (from >= to) {
+                to = source.rowCeilOffset(from + size);
+            }
             chunks.add(new Chunk(from, to, parentFrom, parentTo));
             if (to >= parentTo) break;
             from = to;
@@ -130,6 +133,9 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
         long parentFrom = from;
         while (true) {
             long to = source.rowCeilOffset(from - size);
+            if (to >= from) {
+                to = source.rowFloorOffset(from - size);
+            }
             chunks.add(new Chunk(to, from, 0, parentFrom));
             if (to == 0) break;
             from = to;
