@@ -49,6 +49,9 @@ public class RowIndex {
     /** The subtotal cache interval. */
     private final int cacheInterval;
 
+    /** The little endian padding. */
+    private final int lePad = 0;
+
 
     /**
      * Create a new {@code RowIndex}.
@@ -382,7 +385,7 @@ public class RowIndex {
      * @param bytes the specified byte array
      * @return line-by-line byte length
      */
-    static int[] rows(byte[] bytes) {
+    int[] rows(byte[] bytes) {
 
         if (bytes == null || bytes.length == 0) {
             return new int[0];
@@ -395,6 +398,7 @@ public class RowIndex {
             byte aByte = bytes[i];
             n++;
             if (aByte == '\n') {
+                i += lePad;
                 intArray.add(n);
                 n = 0;
             }
