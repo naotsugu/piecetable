@@ -391,7 +391,8 @@ public class RowIndex {
         IntArray intArray = IntArray.of();
 
         int n = 0;
-        for (byte aByte : bytes) {
+        for (int i = 0; i < bytes.length; i++) {
+            byte aByte = bytes[i];
             n++;
             if (aByte == '\n') {
                 intArray.add(n);
