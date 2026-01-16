@@ -15,6 +15,8 @@
  */
 package com.mammb.code.piecetable.text;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -50,21 +52,26 @@ public class RowIndex {
     private final int cacheInterval;
 
     /** The little endian padding. */
-    private final int lePad = 0;
-
+    private final int lePad;
 
     /**
      * Create a new {@code RowIndex}.
      * @param cacheInterval the subtotal cache interval
      * @param prefRows the pref row size
+     * @param charset the charset
      */
-    private RowIndex(int cacheInterval, int prefRows) {
-        rowLengths = new int[Math.max(1, prefRows)];
-        length = 1;
+    private RowIndex(int cacheInterval, int prefRows, Charset charset) {
+        this.rowLengths = new int[Math.max(1, prefRows)];
+        this.length = 1;
 
-        stCache = new long[Math.max(1, prefRows / cacheInterval)];
-        cacheLength = 1;
+        this.stCache = new long[Math.max(1, prefRows / cacheInterval)];
+        this.cacheLength = 1;
         this.cacheInterval = cacheInterval;
+
+        // UTF16 LE    \r\n: 0D 00 0A 00                \n: 0A 00
+        // UTF32 LE    \r\n: 0D 00 00 00 0A 00 00 00    \n: 0A 00 00 00
+        this.lePad = StandardCharsets.UTF_16LE.equals(charset) ? 1
+                   : StandardCharsets.UTF_32LE.equals(charset) ? 3 : 0;
     }
 
     /**
@@ -72,26 +79,27 @@ public class RowIndex {
      * @return a new {@link RowIndex}
      */
     public static RowIndex of() {
-        return new RowIndex(100, 0);
+        return new RowIndex(100, 0, StandardCharsets.UTF_8);
     }
 
     /**
-     * Create a new {@link RowIndex}.
-     * @param prefRows the pref row size
-     * @return a new {@link RowIndex}
+     * Creates a new {@link RowIndex} with the specified {@link Charset}.
+     * @param charset the charset to be used in creating the {@link RowIndex}
+     * @return a new {@link RowIndex} instance
      */
-    public static RowIndex of(int prefRows) {
-        return new RowIndex(100, prefRows);
+    public static RowIndex of(Charset charset) {
+        return new RowIndex(100, 0, charset);
     }
 
     /**
      * Create a new {@link RowIndex}.
      * @param cacheInterval the subtotal cache interval
      * @param prefRows the pref row size
+     * @param charset the charset to be used in creating the {@link RowIndex}
      * @return a new {@link RowIndex}
      */
-    static RowIndex of(int cacheInterval, int prefRows) {
-        return new RowIndex(cacheInterval, prefRows);
+    static RowIndex of(int cacheInterval, int prefRows, Charset charset) {
+        return new RowIndex(cacheInterval, prefRows, charset);
     }
 
     /**
@@ -399,7 +407,7 @@ public class RowIndex {
             n++;
             if (aByte == '\n') {
                 i += lePad;
-                intArray.add(n);
+                intArray.add(n + lePad);
                 n = 0;
             }
         }
