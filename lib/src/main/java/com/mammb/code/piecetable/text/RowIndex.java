@@ -25,7 +25,7 @@ import static java.nio.charset.StandardCharsets.*;
  * This class represents a data structure that manages and tracks the row index
  * with detailed support for operations like adding, inserting, deleting, and
  * calculating lengths within rows. It also supports caching to optimize access to row data.
- *
+ * <p>
  * Holds the byte length of each row as an index.
  * <pre>
  *     |0|1|2|3|4|5|
@@ -42,7 +42,7 @@ public class RowIndex {
 
     /** The row lengths. */
     private int[] rowLengths;
-    /** The length of row lengths array. */
+    /** The length of a row lengths array. */
     private int length;
 
     /** The subtotal cache. */
@@ -106,12 +106,17 @@ public class RowIndex {
     }
 
     /**
-     * Adds the specified byte array to the index.
-     * @param bytes the specified byte array to be added
+     * Adds the processed rows obtained from a byte array to the index and returns the second array
+     * from the processed result.
+     * @param bytes the byte array to be processed into rows, where each line is separated
+     *              based on the encoding (e.g., CR, LF, or CRLF)
+     * @return an array of integers representing the second subarray of the processed byte array,
+     *         typically containing counts related to line break characters
      */
-    void add(byte[] bytes) {
-        int[] rows = rows(bytes);
-        add(rows);
+    int[] add(byte[] bytes) {
+        int[][] rets = rows(bytes);
+        add(rets[0]);
+        return rets[1];
     }
 
     /**
@@ -200,7 +205,7 @@ public class RowIndex {
      */
     public void insert(int row, int col, byte[] bytes) {
 
-        int[] rows = rows(bytes);
+        int[] rows = rows(bytes)[0];
         if (rows.length == 0) {
             return;
         }
@@ -392,38 +397,53 @@ public class RowIndex {
     }
 
     /**
-     * Converts the specified byte array to line-by-line byte length.
-     * @param bytes the specified byte array
-     * @return line-by-line byte length
+     * Processes the given byte array to determine the byte lengths of lines and counts of
+     * carriage return (CR) and line feed (LF) characters.
+     * @param bytes the byte array to be analyzed, where each line is separated
+     *              by CR, LF, or CRLF depending on the encoding
+     * @return a two-dimensional array of integers, where the first sub-array contains the
+     *         byte lengths of each line, and the second sub-array contains the counts of
+     *         CR and LF characters
      */
-    int[] rows(byte[] bytes) {
+    int[][] rows(byte[] bytes) {
+
+        int crCount = 0, lfCount = 0;
 
         if (bytes == null || bytes.length == 0) {
-            return new int[0];
+            return new int[][] { {}, {crCount, lfCount} };
         }
 
         IntArray intArray = IntArray.of();
         int n = 0;
 
         if (byteWidth == 1) {
+
             for (byte aByte : bytes) {
                 n++;
-                if (aByte == '\n') {
+                if (aByte == '\r') {
+                    crCount++;
+                } else if (aByte == '\n') {
+                    lfCount++;
                     intArray.add(n);
                     n = 0;
                 }
             }
             intArray.add(n);
+
         } else if (byteWidth == 2) {
             // UTF-16 like
             for (int i = 0; i < bytes.length; i += 2) {
                 byte aByte1 = bytes[i];
                 byte aByte2 = bytes[i + 1];
                 n += 2;
-                if ((aByte1 == '\n' && aByte2 == 0) ||
+                // UTF16 LE  \r\n: 0D 00 0A 00    \n: 0A 00
+                // UTF16 BE  \r\n: 00 0D 00 0A    \n: 00 0A
+                if ((aByte1 == '\r' && aByte2 == 0) ||
+                    (aByte1 == 0 && aByte2 == '\r')) {
+                    crCount++;
+                } else if ((aByte1 == '\n' && aByte2 == 0) ||
                     (aByte1 == 0 && aByte2 == '\n')) {
-                    // UTF16 LE  \r\n: 0D 00 0A 00    \n: 0A 00
-                    // UTF16 BE  \r\n: 00 0D 00 0A    \n: 00 0A
+                    lfCount++;
                     intArray.add(n);
                     n = 0;
                 }
@@ -438,20 +458,25 @@ public class RowIndex {
                 byte aByte3 = bytes[i + 2];
                 byte aByte4 = bytes[i + 3];
                 n += 4;
-                if ((aByte1 == '\n' && aByte2 == 0 && aByte3 == 0 && aByte4 == 0) ||
+                // UTF32 LE  \r\n: 0D 00 00 00 0A 00 00 00    \n: 0A 00 00 00
+                // UTF32 BE  \r\n: 00 00 00 0D 00 00 00 0A    \n: 00 00 00 0A
+                if ((aByte1 == '\r' && aByte2 == 0 && aByte3 == 0 && aByte4 == 0) ||
+                    (aByte1 == 0 && aByte2 == 0 && aByte3 == 0 && aByte4 == '\r')) {
+                    crCount++;
+                } else if ((aByte1 == '\n' && aByte2 == 0 && aByte3 == 0 && aByte4 == 0) ||
                     (aByte1 == 0 && aByte2 == 0 && aByte3 == 0 && aByte4 == '\n')) {
-                    // UTF32 LE  \r\n: 0D 00 00 00 0A 00 00 00    \n: 0A 00 00 00
-                    // UTF32 BE  \r\n: 00 00 00 0D 00 00 00 0A    \n: 00 00 00 0A
+                    lfCount++;
                     intArray.add(n);
                     n = 0;
                 }
             }
             intArray.add(n);
+
         } else {
             throw new IllegalStateException("Unsupported byte width: " + byteWidth);
         }
 
-        return intArray.get();
+        return new int[][] { intArray.get(), {crCount, lfCount} };
     }
 
 

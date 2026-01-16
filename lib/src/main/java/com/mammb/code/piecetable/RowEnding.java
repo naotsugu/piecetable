@@ -78,7 +78,7 @@ public enum RowEnding {
     }
 
     /**
-     * Estimates the RowEnding symbols from the given number of symbols count.
+     * Estimates the RowEnding symbols from the given number of symbols counts.
      *
      * @param crCount the count of carriage return
      * @param lfCount the count of line feed

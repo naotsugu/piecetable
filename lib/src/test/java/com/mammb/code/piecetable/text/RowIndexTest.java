@@ -302,34 +302,34 @@ class RowIndexTest {
     void lines() {
 
         var rowIndex = RowIndex.of();
-        int[] ret = rowIndex.rows("".getBytes());
+        int[] ret = rowIndex.rows("".getBytes())[0];
         assertEquals(0, ret.length);
 
-        ret = rowIndex.rows("a".getBytes());
+        ret = rowIndex.rows("a".getBytes())[0];
         assertEquals(1, ret.length);
         assertEquals(1, ret[0]);
 
-        ret = rowIndex.rows("ab".getBytes());
+        ret = rowIndex.rows("ab".getBytes())[0];
         assertEquals(1, ret.length);
         assertEquals(2, ret[0]);
 
-        ret = rowIndex.rows("ab\n".getBytes());
+        ret = rowIndex.rows("ab\n".getBytes())[0];
         assertEquals(2, ret.length);
         assertEquals(3, ret[0]);
         assertEquals(0, ret[1]);
 
-        ret = rowIndex.rows("\n".getBytes());
+        ret = rowIndex.rows("\n".getBytes())[0];
         assertEquals(2, ret.length);
         assertEquals(1, ret[0]);
         assertEquals(0, ret[1]);
 
-        ret = rowIndex.rows("\n\n".getBytes());
+        ret = rowIndex.rows("\n\n".getBytes())[0];
         assertEquals(3, ret.length);
         assertEquals(1, ret[0]);
         assertEquals(1, ret[1]);
         assertEquals(0, ret[2]);
 
-        ret = rowIndex.rows("abc\r\nde\r\nf".getBytes());
+        ret = rowIndex.rows("abc\r\nde\r\nf".getBytes())[0];
         assertEquals(3, ret.length);
         assertEquals(5, ret[0]);
         assertEquals(4, ret[1]);

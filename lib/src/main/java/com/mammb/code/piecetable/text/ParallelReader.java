@@ -117,7 +117,8 @@ public class ParallelReader implements Reader {
             length = channel.size();
             MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, length, arena);
 
-            IntStream.rangeClosed(0, Math.toIntExact(length / CHUNK_SIZE)).parallel()
+            int end = Math.toIntExact(length / CHUNK_SIZE);
+            IntStream.rangeClosed(0, end).parallel()
                 .mapToObj(i -> chunkReadOf(i, CHUNK_SIZE, seg))
                 .forEachOrdered(this::aggregate);
 

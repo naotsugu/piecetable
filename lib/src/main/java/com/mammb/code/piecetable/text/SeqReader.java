@@ -69,8 +69,7 @@ public class SeqReader implements Reader {
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches = List.of(matches);
-        this.index = RowIndex.of();
-        read(path, rowPrefLimit);
+        this.index = read(path, rowPrefLimit);
     }
 
     @Override
@@ -104,15 +103,15 @@ public class SeqReader implements Reader {
      * @param rowPrefLimit the limit on the number of rows to read from the file,
      * if -1 is specified, there is no limit.
      */
-    void read(Path path, int rowPrefLimit) {
+    RowIndex read(Path path, int rowPrefLimit) {
 
-        if (path == null || !Files.exists(path)) return;
+        if (path == null || !Files.exists(path)) return RowIndex.of();
 
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             long size = channel.size();
             if (size <= 0) {
-                return;
+                return RowIndex.of();
             }
 
             int cap = 1024 * 64;
@@ -121,7 +120,7 @@ public class SeqReader implements Reader {
                 : ByteBuffer.allocateDirect(cap);
 
             byte[] bytes = new byte[buf.capacity()];
-
+            RowIndex rowIndex = null;
             for (;;) {
 
                 if (Thread.interrupted())
@@ -139,20 +138,21 @@ public class SeqReader implements Reader {
                     bom = Bom.extract(read);
                     if (bom.length > 0) {
                         charset = Bom.toCharset(bom);
+                        rowIndex = RowIndex.of(charset);
                         // exclude BOM
                         read = Arrays.copyOfRange(read, bom.length, read.length);
                     }
                 }
                 if (charset == null) {
-                    charset = CharsetMatches.estimate(read, matches).orElse(null);
-                }
-                length += read.length;
-                for (byte b : read) {
-                    if (b == '\r') crCount++;
-                    else if (b == '\n') lfCount++;
+                    charset = CharsetMatches.estimate(read, matches).orElse(StandardCharsets.UTF_8);
+                    rowIndex = RowIndex.of(charset);
                 }
 
-                index.add(read);
+                length += read.length;
+
+                int[] crlf = rowIndex.add(read);
+                crCount += crlf[0];
+                lfCount += crlf[1];
 
                 if (progressListener != null) {
                     progressListener.accept(Segment.of(read.length + bom.length, length));
@@ -163,7 +163,8 @@ public class SeqReader implements Reader {
                 }
             }
 
-            index.buildStCache();
+            rowIndex.buildStCache();
+            return rowIndex;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
