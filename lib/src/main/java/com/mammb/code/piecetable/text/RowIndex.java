@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 package com.mammb.code.piecetable.text;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import static java.nio.charset.StandardCharsets.*;
 
 /**
  * The RowIndex.
@@ -52,7 +53,9 @@ public class RowIndex {
     private final int cacheInterval;
 
     /** The little endian padding. */
-    private final int lePad;
+    private final Charset charset;
+    /** The byte width to reads. */
+    private final int byteWidth;
 
     /**
      * Create a new {@code RowIndex}.
@@ -68,10 +71,10 @@ public class RowIndex {
         this.cacheLength = 1;
         this.cacheInterval = cacheInterval;
 
-        // UTF16 LE    \r\n: 0D 00 0A 00                \n: 0A 00
-        // UTF32 LE    \r\n: 0D 00 00 00 0A 00 00 00    \n: 0A 00 00 00
-        this.lePad = StandardCharsets.UTF_16LE.equals(charset) ? 1
-                   : StandardCharsets.UTF_32LE.equals(charset) ? 3 : 0;
+        this.charset = (charset == null) ? UTF_8 : charset;
+        this.byteWidth = (UTF_16.equals(charset) || UTF_16BE.equals(charset) || UTF_16LE.equals(charset)) ? 2
+            : (UTF_32.equals(charset) || UTF_32BE.equals(charset) || UTF_32LE.equals(charset)) ? 4
+            : 1;
     }
 
     /**
@@ -79,7 +82,7 @@ public class RowIndex {
      * @return a new {@link RowIndex}
      */
     public static RowIndex of() {
-        return new RowIndex(100, 0, StandardCharsets.UTF_8);
+        return new RowIndex(100, 0, UTF_8);
     }
 
     /**
@@ -400,21 +403,57 @@ public class RowIndex {
         }
 
         IntArray intArray = IntArray.of();
-
         int n = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            byte aByte = bytes[i];
-            n++;
-            if (aByte == '\n') {
-                i += lePad;
-                intArray.add(n + lePad);
-                n = 0;
+
+        if (byteWidth == 1) {
+            for (byte aByte : bytes) {
+                n++;
+                if (aByte == '\n') {
+                    intArray.add(n);
+                    n = 0;
+                }
             }
+            intArray.add(n);
+        } else if (byteWidth == 2) {
+            // UTF-16 like
+            for (int i = 0; i < bytes.length; i += 2) {
+                byte aByte1 = bytes[i];
+                byte aByte2 = bytes[i + 1];
+                n += 2;
+                if ((aByte1 == '\n' && aByte2 == 0) ||
+                    (aByte1 == 0 && aByte2 == '\n')) {
+                    // UTF16 LE  \r\n: 0D 00 0A 00    \n: 0A 00
+                    // UTF16 BE  \r\n: 00 0D 00 0A    \n: 00 0A
+                    intArray.add(n);
+                    n = 0;
+                }
+            }
+            intArray.add(n);
+
+        } else if (byteWidth == 4) {
+            // UTF-32 like
+            for (int i = 0; i < bytes.length; i += 4) {
+                byte aByte1 = bytes[i];
+                byte aByte2 = bytes[i + 1];
+                byte aByte3 = bytes[i + 2];
+                byte aByte4 = bytes[i + 3];
+                n += 4;
+                if ((aByte1 == '\n' && aByte2 == 0 && aByte3 == 0 && aByte4 == 0) ||
+                    (aByte1 == 0 && aByte2 == 0 && aByte3 == 0 && aByte4 == '\n')) {
+                    // UTF32 LE  \r\n: 0D 00 00 00 0A 00 00 00    \n: 0A 00 00 00
+                    // UTF32 BE  \r\n: 00 00 00 0D 00 00 00 0A    \n: 00 00 00 0A
+                    intArray.add(n);
+                    n = 0;
+                }
+            }
+            intArray.add(n);
+        } else {
+            throw new IllegalStateException("Unsupported byte width: " + byteWidth);
         }
-        intArray.add(n);
 
         return intArray.get();
     }
+
 
     /**
      * Grow this lineLengths array.
