@@ -53,7 +53,7 @@ public class RowIndex {
     private final int cacheInterval;
 
     /** The byte width to reads. */
-    private final int byteWidth;
+    private final int byteUnits;
 
     /**
      * Create a new {@code RowIndex}.
@@ -69,7 +69,7 @@ public class RowIndex {
         this.cacheLength = 1;
         this.cacheInterval = cacheInterval;
 
-        this.byteWidth = (charset == null || UTF_8.equals(charset)) ? 1
+        this.byteUnits = (charset == null || UTF_8.equals(charset)) ? 1
             : (UTF_16.equals(charset) || UTF_16BE.equals(charset) || UTF_16LE.equals(charset)) ? 2
             : (UTF_32.equals(charset) || UTF_32BE.equals(charset) || UTF_32LE.equals(charset)) ? 4
             : 1;
@@ -405,16 +405,19 @@ public class RowIndex {
      */
     int[][] rows(byte[] bytes) {
 
-        int crCount = 0, lfCount = 0;
-
         if (bytes == null || bytes.length == 0) {
-            return new int[][] { {}, {crCount, lfCount} };
+            return new int[][] { {}, {0, 0} };
         }
-
         IntArray intArray = IntArray.of();
-        int n = 0;
+        int[] crlf = traversRow(bytes, intArray);
+        return new int[][] { intArray.get(), crlf };
+    }
 
-        if (byteWidth == 1) {
+    int[] traversRow(byte[] bytes, IntArray intArray) {
+
+        int crCount = 0, lfCount = 0, n = 0;
+
+        if (byteUnits == 1) {
 
             for (byte aByte : bytes) {
                 n++;
@@ -428,7 +431,7 @@ public class RowIndex {
             }
             intArray.add(n);
 
-        } else if (byteWidth == 2) {
+        } else if (byteUnits == 2) {
             // UTF-16 like
             for (int i = 0; i < bytes.length; i += 2) {
                 byte aByte1 = bytes[i];
@@ -448,7 +451,7 @@ public class RowIndex {
             }
             intArray.add(n);
 
-        } else if (byteWidth == 4) {
+        } else if (byteUnits == 4) {
             // UTF-32 like
             for (int i = 0; i < bytes.length; i += 4) {
                 byte aByte1 = bytes[i];
@@ -471,12 +474,11 @@ public class RowIndex {
             intArray.add(n);
 
         } else {
-            throw new IllegalStateException("Unsupported byte width: " + byteWidth);
+            throw new IllegalStateException("Unsupported byte width: " + byteUnits);
         }
 
-        return new int[][] { intArray.get(), {crCount, lfCount} };
+        return new int[] { crCount, lfCount };
     }
-
 
     /**
      * Grow this lineLengths array.

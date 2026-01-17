@@ -41,7 +41,7 @@ import java.util.function.Consumer;
 public class SeqReader implements Reader {
 
     /** The row index. */
-    private final RowIndex index;
+    private RowIndex index;
     /** The byte order mark. */
     private byte[] bom = new byte[0];
     /** The charset read. */
@@ -69,7 +69,7 @@ public class SeqReader implements Reader {
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches = List.of(matches);
-        this.index = read(path, rowPrefLimit);
+        read(path, rowPrefLimit);
     }
 
     @Override
@@ -103,15 +103,21 @@ public class SeqReader implements Reader {
      * @param rowPrefLimit the limit on the number of rows to read from the file,
      * if -1 is specified, there is no limit.
      */
-    RowIndex read(Path path, int rowPrefLimit) {
+    void read(Path path, int rowPrefLimit) {
 
-        if (path == null || !Files.exists(path)) return RowIndex.of();
+        if (path == null || !Files.exists(path)) {
+            charset = StandardCharsets.UTF_8;
+            index = RowIndex.of(charset);
+            return;
+        }
 
         try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
 
             long size = channel.size();
             if (size <= 0) {
-                return RowIndex.of();
+                charset = StandardCharsets.UTF_8;
+                index = RowIndex.of(charset);
+                return;
             }
 
             int cap = 1024 * 64;
@@ -120,8 +126,6 @@ public class SeqReader implements Reader {
                 : ByteBuffer.allocateDirect(cap);
 
             byte[] bytes = new byte[buf.capacity()];
-
-            RowIndex rowIndex = RowIndex.of();
 
             for (;;) {
 
@@ -135,21 +139,11 @@ public class SeqReader implements Reader {
                 byte[] read = asBytes(buf, n, bytes);
 
                 if (length == 0) {
-                    // charset detection
-                    bom = Bom.extract(read);
-                    if (bom.length > 0) {
-                        charset = Bom.toCharset(bom);
-                        // exclude BOM
-                        read = Arrays.copyOfRange(read, bom.length, read.length);
-                    } else {
-                        charset = CharsetMatches.estimate(read, matches).orElse(StandardCharsets.UTF_8);
-                    }
-                    rowIndex = RowIndex.of(charset);
+                    read = handleHeadChunk(read);
                 }
-
                 length += read.length;
 
-                int[] crlf = rowIndex.add(read);
+                int[] crlf = index.add(read);
                 crCount += crlf[0];
                 lfCount += crlf[1];
 
@@ -162,12 +156,24 @@ public class SeqReader implements Reader {
                 }
             }
 
-            rowIndex.buildStCache();
-            return rowIndex;
+            index.buildStCache();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private byte[] handleHeadChunk(byte[] bytes) {
+        bom = Bom.extract(bytes);
+        if (bom.length > 0) {
+            charset = Bom.toCharset(bom);
+            // exclude BOM
+            bytes = Arrays.copyOfRange(bytes, bom.length, bytes.length);
+        } else {
+            charset = CharsetMatches.estimate(bytes, matches).orElse(StandardCharsets.UTF_8);
+        }
+        index = RowIndex.of(charset);
+        return bytes;
     }
 
     private byte[] asBytes(ByteBuffer buf, int nRead, byte[] bytes) {

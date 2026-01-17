@@ -32,7 +32,7 @@ import java.util.List;
 public class BytesReader implements Reader {
 
     /** The row index. */
-    private final RowIndex index;
+    private RowIndex index;
     /** The byte order mark. */
     private byte[] bom = new byte[0];
     /** The charset read. */
@@ -53,7 +53,7 @@ public class BytesReader implements Reader {
      */
     BytesReader(byte[] bytes, CharsetMatch... matches) {
         this.matches = List.of(matches);
-        this.index = read(bytes);
+        read(bytes);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class BytesReader implements Reader {
      * Read the bytes.
      * @param bytes the bytes to be reade
      */
-    private RowIndex read(byte[] bytes) {
+    private void read(byte[] bytes) {
 
         if (length == 0) {
             // charset detection
@@ -101,14 +101,13 @@ public class BytesReader implements Reader {
 
         length += bytes.length;
 
-        RowIndex rowIndex = RowIndex.of(charset);
-        int[] crlf = rowIndex.add(bytes);
+        index = RowIndex.of(charset);
+        int[] crlf = index.add(bytes);
         crCount += crlf[0];
         lfCount += crlf[1];
 
-        rowIndex.buildStCache();
+        index.buildStCache();
 
-        return rowIndex;
     }
 
 }

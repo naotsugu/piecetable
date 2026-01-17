@@ -46,7 +46,7 @@ public class ParallelReader implements Reader {
     static final int CHUNK_SIZE = 1024 * 256;
 
     /** The row index. */
-    private final RowIndex index;
+    private RowIndex index;
     /** The byte order mark. */
     private byte[] bom = new byte[0];
     /** The charset read. */
@@ -75,7 +75,6 @@ public class ParallelReader implements Reader {
             CharsetMatch... matches) {
         this.progressListener = progressListener;
         this.matches.addAll(Arrays.asList(matches));
-        this.index = RowIndex.of();
         read(path);
     }
 
@@ -117,8 +116,10 @@ public class ParallelReader implements Reader {
             length = channel.size();
             MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, length, arena);
 
-            int end = Math.toIntExact(length / CHUNK_SIZE);
-            IntStream.rangeClosed(0, end).parallel()
+            var chunkRead = chunkReadOf(0, CHUNK_SIZE, seg);
+            aggregate(chunkRead);
+
+            IntStream.rangeClosed(1, Math.toIntExact(length / CHUNK_SIZE)).parallel()
                 .mapToObj(i -> chunkReadOf(i, CHUNK_SIZE, seg))
                 .forEachOrdered(this::aggregate);
 
@@ -156,30 +157,10 @@ public class ParallelReader implements Reader {
         if (chunkNo == 0) {
             bytes = handleHeadChunk(bytes);
         }
-        if (charset == null) {
-            synchronized (lock) {
-                if (charset == null) {
-                    charset = CharsetMatches.estimate(bytes, matches).orElse(null);
-                }
-            }
-        }
 
         IntArray rows = IntArray.of();
-        int crCount = 0;
-        int lfCount = 0;
-        int count = 0;
-        for (byte b : bytes) {
-            count++;
-            if (b == '\r') {
-                crCount++;
-            } else if (b == '\n') {
-                lfCount++;
-                rows.add(count);
-                count = 0;
-            }
-        }
-        rows.add(count);
-        return new ChunkRead(chunkNo, bytes.length, rows.get(), crCount, lfCount);
+        int[] crlf = index.traversRow(bytes, rows);
+        return new ChunkRead(chunkNo, bytes.length, rows.get(), crlf[0], crlf[1]);
     }
 
     private byte[] handleHeadChunk(byte[] bytes) {
@@ -188,7 +169,10 @@ public class ParallelReader implements Reader {
             charset = Bom.toCharset(bom);
             // exclude BOM
             bytes = Arrays.copyOfRange(bytes, bom.length, bytes.length);
+        } else {
+            charset = CharsetMatches.estimate(bytes, matches).orElse(StandardCharsets.UTF_8);
         }
+        index = RowIndex.of(charset);
         return bytes;
     }
 

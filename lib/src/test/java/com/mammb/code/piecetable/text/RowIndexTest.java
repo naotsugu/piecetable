@@ -434,10 +434,10 @@ class RowIndexTest {
     void pos1() {
         var index = RowIndex.of(3, 0, null);
         index.insert(0, 0, "abc".getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals(new int[]{0, 0}, index.pos(0));
-        assertArrayEquals(new int[]{0, 1}, index.pos(1));
-        assertArrayEquals(new int[]{0, 2}, index.pos(2));
-        assertArrayEquals(new int[]{0, 3}, index.pos(3));
+        assertArrayEquals(new int[] {0, 0}, index.pos(0));
+        assertArrayEquals(new int[] {0, 1}, index.pos(1));
+        assertArrayEquals(new int[] {0, 2}, index.pos(2));
+        assertArrayEquals(new int[] {0, 3}, index.pos(3));
     }
 
     @Test
@@ -445,30 +445,59 @@ class RowIndexTest {
         var index = RowIndex.of(3, 0, null);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));
 
-        assertArrayEquals(new int[]{0, 0}, index.pos(0));
-        assertArrayEquals(new int[]{0, 1}, index.pos(1));
+        assertArrayEquals(new int[] {0, 0}, index.pos(0));
+        assertArrayEquals(new int[] {0, 1}, index.pos(1));
 
-        assertArrayEquals(new int[]{1, 0}, index.pos(2));
-        assertArrayEquals(new int[]{1, 1}, index.pos(3));
-        assertArrayEquals(new int[]{1, 2}, index.pos(4));
+        assertArrayEquals(new int[] {1, 0}, index.pos(2));
+        assertArrayEquals(new int[] {1, 1}, index.pos(3));
+        assertArrayEquals(new int[] {1, 2}, index.pos(4));
 
-        assertArrayEquals(new int[]{2, 0}, index.pos(5));
-        assertArrayEquals(new int[]{2, 1}, index.pos(6));
-        assertArrayEquals(new int[]{2, 2}, index.pos(7));
-        assertArrayEquals(new int[]{2, 3}, index.pos(8));
+        assertArrayEquals(new int[] {2, 0}, index.pos(5));
+        assertArrayEquals(new int[] {2, 1}, index.pos(6));
+        assertArrayEquals(new int[] {2, 2}, index.pos(7));
+        assertArrayEquals(new int[] {2, 3}, index.pos(8));
 
-        assertArrayEquals(new int[]{3, 0}, index.pos(9));
-        assertArrayEquals(new int[]{3, 1}, index.pos(10));
-        assertArrayEquals(new int[]{3, 2}, index.pos(11));
-        assertArrayEquals(new int[]{3, 3}, index.pos(12));
-        assertArrayEquals(new int[]{3, 4}, index.pos(13));
+        assertArrayEquals(new int[] {3, 0}, index.pos(9));
+        assertArrayEquals(new int[] {3, 1}, index.pos(10));
+        assertArrayEquals(new int[] {3, 2}, index.pos(11));
+        assertArrayEquals(new int[] {3, 3}, index.pos(12));
+        assertArrayEquals(new int[] {3, 4}, index.pos(13));
 
-        assertArrayEquals(new int[]{4, 0}, index.pos(14));
-        assertArrayEquals(new int[]{4, 1}, index.pos(15));
-        assertArrayEquals(new int[]{4, 2}, index.pos(16));
-        assertArrayEquals(new int[]{4, 3}, index.pos(17));
-        assertArrayEquals(new int[]{4, 4}, index.pos(18));
-        assertArrayEquals(new int[]{4, 5}, index.pos(19));
+        assertArrayEquals(new int[] {4, 0}, index.pos(14));
+        assertArrayEquals(new int[] {4, 1}, index.pos(15));
+        assertArrayEquals(new int[] {4, 2}, index.pos(16));
+        assertArrayEquals(new int[] {4, 3}, index.pos(17));
+        assertArrayEquals(new int[] {4, 4}, index.pos(18));
+        assertArrayEquals(new int[] {4, 5}, index.pos(19));
+    }
+
+    @Test
+    void rows() {
+        var index = RowIndex.of(StandardCharsets.UTF_16BE);
+        var bytes = "ab\r\ncd\r\n".getBytes(StandardCharsets.UTF_16BE);
+        var ret = index.rows(bytes);
+        assertArrayEquals(new int[] {8, 8, 0}, ret[0]);
+        assertArrayEquals(new int[] {2, 2}, ret[1]);
+    }
+
+    @Test
+    void traversRowUtf16LE() {
+        var index = RowIndex.of(StandardCharsets.UTF_16LE);
+        var intArray = IntArray.of();
+        var bytes = "ab\r\ncd\r\n".getBytes(StandardCharsets.UTF_16LE);
+        var ret = index.traversRow(bytes, intArray);
+        assertArrayEquals(new int[] {2, 2}, ret);
+        assertArrayEquals(new int[] {8, 8, 0}, intArray.get());
+    }
+
+    @Test
+    void traversRowUtf32LE() {
+        var index = RowIndex.of(StandardCharsets.UTF_32LE);
+        var intArray = IntArray.of();
+        var bytes = "ab\r\ncd\r\n".getBytes(StandardCharsets.UTF_32LE);
+        var ret = index.traversRow(bytes, intArray);
+        assertArrayEquals(new int[] {2, 2}, ret);
+        assertArrayEquals(new int[] {16, 16, 0}, intArray.get());
     }
 
 }
