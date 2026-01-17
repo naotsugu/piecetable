@@ -38,6 +38,9 @@ public class BinaryMatch implements CharsetMatch {
     /** The result. */
     private final CharsetMatchResult result = new CharsetMatchResult(new BinaryCharset());
 
+    /**
+     * Constructor.
+     */
     public BinaryMatch() {
         // set a handicap
         result.decreasesConfidence(3);
