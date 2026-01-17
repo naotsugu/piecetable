@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,7 @@ public class BytesReader implements Reader {
      */
     BytesReader(byte[] bytes, CharsetMatch... matches) {
         this.matches = List.of(matches);
-        this.index = RowIndex.of();
-        read(bytes);
+        this.index = read(bytes);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class BytesReader implements Reader {
      * Read the bytes.
      * @param bytes the bytes to be reade
      */
-    void read(byte[] bytes) {
+    RowIndex read(byte[] bytes) {
 
         if (length == 0) {
             bom = Bom.extract(bytes);
@@ -99,13 +98,17 @@ public class BytesReader implements Reader {
         if (charset == null) {
             charset = CharsetMatches.estimate(bytes, matches).orElse(null);
         }
+
         length += bytes.length;
-        for (byte b : bytes) {
-            if (b == '\r') crCount++;
-            else if (b == '\n') lfCount++;
-        }
-        index.add(bytes);
-        index.buildStCache();
+
+        RowIndex rowIndex = RowIndex.of(charset);
+        int[] crlf = rowIndex.add(bytes);
+        crCount += crlf[0];
+        lfCount += crlf[1];
+
+        rowIndex.buildStCache();
+
+        return rowIndex;
     }
 
 }
