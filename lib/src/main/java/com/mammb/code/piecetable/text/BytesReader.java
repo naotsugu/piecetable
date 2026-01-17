@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A reader implementation for processing an array of bytes. This class reads the given
- * byte array, determines the character encoding, and computes line ending counts
- * while keeping track of the content's row index.
+ * A reader implementation for processing an array of bytes.
+ * This class reads the given byte array, determines the character encoding,
+ * and computes line ending counts while keeping track of the content's row index.
  * @author Naotsugu Kobayashi
  */
 public class BytesReader implements Reader {
@@ -85,18 +85,18 @@ public class BytesReader implements Reader {
      * Read the bytes.
      * @param bytes the bytes to be reade
      */
-    RowIndex read(byte[] bytes) {
+    private RowIndex read(byte[] bytes) {
 
         if (length == 0) {
+            // charset detection
             bom = Bom.extract(bytes);
             if (bom.length > 0) {
                 charset = Bom.toCharset(bom);
                 // exclude BOM
                 bytes = Arrays.copyOfRange(bytes, bom.length, bytes.length);
+            } else {
+                charset = CharsetMatches.estimate(bytes, matches).orElse(null);
             }
-        }
-        if (charset == null) {
-            charset = CharsetMatches.estimate(bytes, matches).orElse(null);
         }
 
         length += bytes.length;

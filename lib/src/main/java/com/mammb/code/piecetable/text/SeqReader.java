@@ -120,7 +120,9 @@ public class SeqReader implements Reader {
                 : ByteBuffer.allocateDirect(cap);
 
             byte[] bytes = new byte[buf.capacity()];
-            RowIndex rowIndex = null;
+
+            RowIndex rowIndex = RowIndex.of();
+
             for (;;) {
 
                 if (Thread.interrupted())
@@ -128,23 +130,20 @@ public class SeqReader implements Reader {
 
                 buf.clear();
                 int n = channel.read(buf);
-                if (n < 0) {
-                    break;
-                }
+                if (n < 0) break;
                 buf.flip();
                 byte[] read = asBytes(buf, n, bytes);
 
                 if (length == 0) {
+                    // charset detection
                     bom = Bom.extract(read);
                     if (bom.length > 0) {
                         charset = Bom.toCharset(bom);
-                        rowIndex = RowIndex.of(charset);
                         // exclude BOM
                         read = Arrays.copyOfRange(read, bom.length, read.length);
+                    } else {
+                        charset = CharsetMatches.estimate(read, matches).orElse(StandardCharsets.UTF_8);
                     }
-                }
-                if (charset == null) {
-                    charset = CharsetMatches.estimate(read, matches).orElse(StandardCharsets.UTF_8);
                     rowIndex = RowIndex.of(charset);
                 }
 

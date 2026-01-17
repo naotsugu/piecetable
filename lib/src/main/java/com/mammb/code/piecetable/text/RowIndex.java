@@ -52,8 +52,6 @@ public class RowIndex {
     /** The subtotal cache interval. */
     private final int cacheInterval;
 
-    /** The little endian padding. */
-    private final Charset charset;
     /** The byte width to reads. */
     private final int byteWidth;
 
@@ -71,8 +69,8 @@ public class RowIndex {
         this.cacheLength = 1;
         this.cacheInterval = cacheInterval;
 
-        this.charset = (charset == null) ? UTF_8 : charset;
-        this.byteWidth = (UTF_16.equals(charset) || UTF_16BE.equals(charset) || UTF_16LE.equals(charset)) ? 2
+        this.byteWidth = (charset == null || UTF_8.equals(charset)) ? 1
+            : (UTF_16.equals(charset) || UTF_16BE.equals(charset) || UTF_16LE.equals(charset)) ? 2
             : (UTF_32.equals(charset) || UTF_32BE.equals(charset) || UTF_32LE.equals(charset)) ? 4
             : 1;
     }
