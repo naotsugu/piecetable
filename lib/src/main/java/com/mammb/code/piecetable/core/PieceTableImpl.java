@@ -195,13 +195,13 @@ public class PieceTableImpl implements PieceTable {
         if (range.length == 0) return new byte[0];
 
         byte[] ret = new byte[len];
-        int start = Math.toIntExact(pos - range[0].position);
+        long start = pos - range[0].position;
         int destPos = 0;
 
         for (PiecePoint pp : range) {
             Piece piece = pp.piece();
-            int length = (piece.length() >= start + len) ? len : Math.toIntExact(piece.length()) - start;
-            byte[] bytes = piece.bytes(start, length);
+            long length = (piece.length() >= start + len) ? len : piece.length() - start;
+            byte[] bytes = piece.bytes(start, Math.toIntExact(length));
             System.arraycopy(bytes, 0, ret, destPos, bytes.length);
             start = 0;
             destPos += bytes.length;
