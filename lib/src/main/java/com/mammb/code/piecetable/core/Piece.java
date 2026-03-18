@@ -52,7 +52,7 @@ public record Piece(Buffer target, long bufIndex, long length) {
         if (offset == 0 || offset == length) {
             return new Piece[] { this };
         } else {
-            return new Piece[]{
+            return new Piece[] {
                 new Piece(target, bufIndex, offset),
                 new Piece(target, bufIndex + offset, length - offset)
             };

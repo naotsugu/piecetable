@@ -228,8 +228,10 @@ public class PieceTableImpl implements PieceTable {
 
                 // we don't use `Files.copy(tmp, sourcePath, ...);`
                 // because the icon position on the OS changes
-                try (FileChannel inCh = new FileInputStream(tmp.toFile()).getChannel();
-                     FileChannel outCh = new FileOutputStream(sourcePath.toFile()).getChannel()) {
+                try (var in = new FileInputStream(tmp.toFile());
+                     var out = new FileOutputStream(sourcePath.toFile());
+                     FileChannel inCh = in.getChannel();
+                     FileChannel outCh = out.getChannel()) {
                     long position = 0L;
                     long size = inCh.size();
                     while (position < size) {
