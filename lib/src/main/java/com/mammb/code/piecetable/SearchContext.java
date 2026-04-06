@@ -101,8 +101,8 @@ public interface SearchContext {
     void clear();
 
     /**
-     * Get the current founds.
-     * @return the current founds
+     * Get the current funds.
+     * @return the current funds
      */
     List<PosLen> founds();
 
@@ -113,7 +113,7 @@ public interface SearchContext {
     boolean hasFounds();
 
     /**
-     * Search next one.
+     * Search the next one.
      * @param spec the search specification
      * @param pos the base position
      * @param direction the direction

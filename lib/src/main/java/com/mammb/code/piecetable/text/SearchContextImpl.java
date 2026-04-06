@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.mammb.code.piecetable.search.Search;
 import com.mammb.code.piecetable.search.SearchSource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -64,8 +65,9 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
     @Override
     public Optional<PosLen> next(Pos pos, Direction direction) {
 
-        if (founds.isEmpty())
+        if (founds.isEmpty()) {
             return Optional.empty();
+        }
 
         long serial = source.serial(pos.row(), pos.col());
         int index = Collections.binarySearch(founds, new Found(serial, 0, 0));
@@ -119,15 +121,19 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
 
     private void shift(long offset, int len) {
 
-        int index = Collections.binarySearch(founds, new Found(offset, 0, 0));
+        int index = Collections.binarySearch(founds, new Found(offset, 0, 0),
+            (Found o1, Found o2) -> Long.compare(o1.offset() + (o1.isEmpty() ? 0 : o1.len() - 1), o2.offset()));
         index = (index >= 0) ? index : ~index;
-        if (index >= founds.size()) return;
+        if (index >= founds.size()) {
+            return;
+        }
 
-        long end = offset + Math.abs(len);
+        int lenAbs = Math.abs(len);
+        long end = offset + lenAbs - (lenAbs > 0 ? 1 : 0);
 
         List<Found> sub = founds.subList(index, founds.size());
         List<Found> shifted = sub.stream()
-            .filter(f -> offset >= f.offsetEnd() || f.offset() >= end)
+            .filter(f -> !(offset < f.offsetEnd() && f.offset() < end))
             .map(f -> new Found(f.offset() + len, f.len(), f.rawLen()))
             .toList();
         sub.clear();
@@ -165,5 +171,7 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
         var p = source.pos(found.offset());
         return new PosLen(p[0], p[1], found.len());
     }
-
+    public static Comparator<? super Found> boundaryComparator() {
+        return (Found o1, Found o2) -> Long.compare(o1.offset() + (o1.isEmpty() ? 0 : o1.len() - 1), o2.offset());
+    }
 }
