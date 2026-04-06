@@ -128,12 +128,9 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
             return;
         }
 
-        int lenAbs = Math.abs(len);
-        long end = offset + lenAbs - (lenAbs > 0 ? 1 : 0);
-
         List<Found> sub = founds.subList(index, founds.size());
         List<Found> shifted = sub.stream()
-            .filter(f -> !(offset < f.offsetEnd() && f.offset() < end))
+            .filter(f -> !(f.offset() < offset && offset <= f.offsetEnd()))
             .map(f -> new Found(f.offset() + len, f.len(), f.rawLen()))
             .toList();
         sub.clear();

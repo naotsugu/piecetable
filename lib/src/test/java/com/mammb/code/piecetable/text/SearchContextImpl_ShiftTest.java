@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * The test of {@link SearchContextImpl}.
  * @author Naotsugu Kobayashi
  */
-class SearchContextImplTest {
+class SearchContextImpl_ShiftTest {
 
     @Test
-    void insert() throws Exception {
+    void shift() throws Exception {
         SearchSource source = searchSource();
         var searchContext = new SearchContextImpl(source, Runnable::run);
 
@@ -52,6 +52,26 @@ class SearchContextImplTest {
         assertEquals(8, founds.get(1).offset());
         assertEquals(13, founds.get(2).offset());
 
+        searchContext.insert(8, 1);
+        // | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20|
+        //             |===========|           |===========|       |===========|
+        assertEquals(3, founds.get(0).offset());
+        assertEquals(9, founds.get(1).offset());
+        assertEquals(14, founds.get(2).offset());
+
+        searchContext.insert(12, 1);
+        // | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20|
+        //             |===========|           |===========|           |===========|
+        assertEquals(3, founds.get(0).offset());
+        assertEquals(9, founds.get(1).offset());
+        assertEquals(15, founds.get(2).offset());
+
+        searchContext.insert(10, 1);
+        // | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20|
+        //             |===========|                                       |===========|
+        assertEquals(3, founds.get(0).offset());
+        assertEquals(16, founds.get(1).offset());
+        assertEquals(2, founds.size());
     }
 
     SearchSource searchSource() {
