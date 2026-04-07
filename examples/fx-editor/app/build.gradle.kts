@@ -16,7 +16,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(23)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -33,7 +33,7 @@ tasks.named<Test>("test") {
 }
 
 javafx {
-    version = "22"
+    version = "25"
     modules("javafx.controls")
 }
 
