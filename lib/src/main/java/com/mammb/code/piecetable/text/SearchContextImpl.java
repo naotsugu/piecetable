@@ -168,7 +168,5 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
         var p = source.pos(found.offset());
         return new PosLen(p[0], p[1], found.len());
     }
-    public static Comparator<? super Found> boundaryComparator() {
-        return (Found o1, Found o2) -> Long.compare(o1.offset() + (o1.isEmpty() ? 0 : o1.len() - 1), o2.offset());
-    }
+
 }
