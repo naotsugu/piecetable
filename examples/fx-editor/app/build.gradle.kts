@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation(files("../../../lib/build/libs/piecetable-0.6.3.jar"))
+    implementation(files("../../../lib/build/libs/piecetable-0.6.4.jar"))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

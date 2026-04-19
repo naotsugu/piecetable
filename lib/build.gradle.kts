@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -29,7 +29,7 @@ java {
     }
 }
 
-version = "0.6.3"
+version = "0.6.4"
 group = "com.mammb"
 base.archivesName.set("piecetable")
 
