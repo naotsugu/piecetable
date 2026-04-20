@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Implementation of the {@link SearchContext} and {@link OffsetSync} interfaces.
@@ -128,9 +129,26 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
             return;
         }
 
+        // | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+        //         |===================|
+        //         f.offset()         f.offsetEnd()
+        //
+        // delete : (len < 0)
+        // +++++++++                    ++++++++++++
+        //         |                    |
+        //     offset + Math.abs(len)   offset
+        //
+        // insert : (len >= 0)
+        // +++++++++                    ++++++++++++
+        //         |                    |
+        //     offset                   offset
+        Predicate<Found> predicate = (len < 0)
+            ? f -> f.offset() >= (offset + Math.abs(len)) || offset > f.offsetEnd()
+            : f -> f.offset() >= offset || offset > f.offsetEnd();
+
         List<Found> sub = founds.subList(index, founds.size());
         List<Found> shifted = sub.stream()
-            .filter(f -> !(f.offset() < offset && offset <= f.offsetEnd()))
+            .filter(predicate)
             .map(f -> new Found(f.offset() + len, f.len(), f.rawLen()))
             .toList();
         sub.clear();
