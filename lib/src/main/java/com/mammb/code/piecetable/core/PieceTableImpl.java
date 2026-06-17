@@ -222,7 +222,11 @@ public class PieceTableImpl implements PieceTable {
                 Files.exists(path) &&
                 Objects.equals(sourcePath.toRealPath(), path.toRealPath())) {
 
-                Path tmp = Files.createTempFile(sourcePath.getParent(), sourcePath.getFileName().toString(), null);
+                Path dir = Files.isWritable(sourcePath.getParent())
+                    ? sourcePath.getParent()
+                    : Path.of(System.getProperty("java.io.tmpdir"));
+
+                Path tmp = Files.createTempFile(dir, sourcePath.getFileName().toString(), ".tmp~");
                 write(tmp);
                 close();
 
