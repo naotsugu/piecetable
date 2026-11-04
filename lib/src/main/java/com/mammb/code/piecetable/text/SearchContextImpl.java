@@ -58,8 +58,8 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
 
     @Override
     public void findAll(Spec spec, Consumer<Segment.Valued<List<PosLen>>> consumer) {
-        Search s = build(source, spec.patternCase());
-        aroundRun.accept(() -> s.forward(spec.pattern(), 0, 0, accept(consumer)));
+        Search search = build(source, spec.patternCase());
+        aroundRun.accept(() -> search.forward(spec.pattern(), 0, 0, accept(consumer)));
         Collections.sort(founds);
     }
 
@@ -81,12 +81,12 @@ public class SearchContextImpl implements SearchContext, OffsetSync {
 
     @Override
     public Optional<PosLen> findOne(Spec spec, Pos pos, Direction direction) {
-        Search s = build(source, spec.patternCase());
+        Search search = build(source, spec.patternCase());
         List<PosLen> list = new ArrayList<>();
         aroundRun.accept(() -> {
             Optional<Found> found = switch (direction) {
-                case FORWARD -> s.nextOne(spec.pattern(), pos.row(), pos.col());
-                case BACKWARD -> s.previousOne(spec.pattern(), pos.row(), pos.col());
+                case FORWARD -> search.nextOne(spec.pattern(), pos.row(), pos.col());
+                case BACKWARD -> search.previousOne(spec.pattern(), pos.row(), pos.col());
             };
             found.map(this::toPosLen).ifPresent(list::add);
         });

@@ -72,12 +72,40 @@ class SearchTest {
         var source = source(content(
             "a".repeat(10) + "bcd" + "e".repeat(10) + "\n" +
             "f".repeat(10) + "bcd"));
+        //                     |10                 |20
+        //  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+        // |a|a|a|a|a|a|a|a|a|a|b|c|d|e|e|e|e|e|e|e|e|e|e|n|   len:24
+        //             |30     |34
+        //  4 5 6 7 8 9 0 1 2 3 4 5 6
+        // |f|f|f|f|f|f|f|f|f|f|b|c|d|                          len:13
         var founds = Search.of(source).all("bc", 0, 0, 1, 13);
         assertEquals(2, founds.size());
         assertEquals(10, founds.getFirst().offset());
         assertEquals(2, founds.getFirst().len());
         assertEquals(34, founds.get(1).offset());
         assertEquals(2, founds.get(1).len());
+    }
+
+    @Test
+    void searchRangeMixedLineSeparator() {
+        var source = source(content(
+            "a".repeat(3) + "bcd" + "a".repeat(3) + "\n" +
+                "b".repeat(3) + "bcd" + "b".repeat(3) + "\r\n" +
+                "c".repeat(3) + "bcd" + "c".repeat(3)));
+        //  0 1 2 3 4 5 6 7 8 9
+        // |a|a|a|b|c|d|a|a|a|n|     len:10
+        //  0 1 2 3 4 5 6 7 8 9 0
+        // |b|b|b|b|c|d|b|b|b|r|n|   len:11
+        //  1 2 3 4 5 6 7 8 9
+        // |c|c|c|b|c|d|c|c|c|        len: 9
+        var founds = Search.of(source).all("bcd", 0, 0, 2, 9);
+        assertEquals(3, founds.size());
+        assertEquals(3, founds.getFirst().offset());
+        assertEquals(3, founds.getFirst().len());
+        assertEquals(13, founds.get(1).offset());
+        assertEquals(3, founds.get(1).len());
+        assertEquals(24, founds.get(2).offset());
+        assertEquals(3, founds.get(2).len());
     }
 
     private SearchSource source(Path path) {

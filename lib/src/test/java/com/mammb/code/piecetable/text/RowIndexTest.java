@@ -337,6 +337,24 @@ class RowIndexTest {
     }
 
     @Test
+    void linesMixed() {
+        var rowIndex = RowIndex.of();
+        int[] ret = rowIndex.rows("ab\r\ncd\nef\r\ngh".getBytes())[0];
+        assertEquals(4, ret.length);
+        assertEquals(4, ret[0]);
+        assertEquals(3, ret[1]);
+        assertEquals(4, ret[2]);
+        assertEquals(2, ret[3]);
+
+        ret = rowIndex.rows("ab\ncd\r\nef\ngh".getBytes())[0];
+        assertEquals(4, ret.length);
+        assertEquals(3, ret[0]);
+        assertEquals(4, ret[1]);
+        assertEquals(3, ret[2]);
+        assertEquals(2, ret[3]);
+    }
+
+    @Test
     void offset() {
         var index = RowIndex.of(3, 0, null);
         index.insert(0, 0, "a\nbb\nccc\ndddd\neeeee".getBytes(StandardCharsets.UTF_8));

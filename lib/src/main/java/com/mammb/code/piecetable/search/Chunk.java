@@ -102,11 +102,10 @@ public record Chunk(long from, long to, long parentFrom, long parentTo) {
     static List<Chunk> of(final long from, final long to, int size) {
         long offset = from;
         List<Chunk> chunks = new ArrayList<>();
-        while (true) {
+        do {
             chunks.add(new Chunk(offset, Math.min(offset + size, to), from, to));
             offset += size;
-            if (offset >= to) break;
-        }
+        } while (offset < to);
         return chunks;
     }
 
