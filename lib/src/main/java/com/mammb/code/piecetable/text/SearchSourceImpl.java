@@ -19,6 +19,9 @@ import com.mammb.code.piecetable.PieceTable;
 import com.mammb.code.piecetable.search.SearchSource;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -44,9 +47,16 @@ public class SearchSourceImpl implements SearchSource {
     private final int bom;
 
     SearchSourceImpl(PieceTable pt, RowIndex index, Charset charset, int bom) {
-        this.pt = pt;
-        this.index = index;
-        this.charset = charset;
+        // charset.decode() includes a BOM in its output
+        if (Objects.equals(charset, StandardCharsets.UTF_16)) {
+            throw new UnsupportedCharsetException("Unsupported charset. use UTF_16LE or UTF_16BE");
+        }
+        if (Objects.equals(charset, StandardCharsets.UTF_32)) {
+            throw new UnsupportedCharsetException("Unsupported charset. use UTF_32LE or UTF_32BE");
+        }
+        this.pt = Objects.requireNonNull(pt);
+        this.index = Objects.requireNonNull(index);
+        this.charset = Objects.requireNonNull(charset);
         this.bom = bom;
     }
 
@@ -61,12 +71,12 @@ public class SearchSourceImpl implements SearchSource {
     }
 
     @Override
-    public long serial(int row, int col) {
+    public synchronized long serial(int row, int col) {
         return index.offset(row, asRawCol(row, col));
     }
 
     @Override
-    public int[] pos(long offset) {
+    public synchronized int[] pos(long offset) {
         int[] ret = index.pos(offset);
         byte[] bytes = pt.get(index.offset(ret[0], 0) + bom, ret[1]);
         var cb = charset.decode(ByteBuffer.wrap(bytes));
@@ -75,22 +85,22 @@ public class SearchSourceImpl implements SearchSource {
     }
 
     @Override
-    public long rowFloorOffset(long offset) {
+    public synchronized long rowFloorOffset(long offset) {
         return index.rowFloorOffset(offset);
     }
 
     @Override
-    public long rowCeilOffset(long offset) {
+    public synchronized long rowCeilOffset(long offset) {
         return index.rowCeilOffset(offset);
     }
 
     @Override
-    public long bufferRead(long offset, long length, ByteBuffer bb) {
+    public synchronized long bufferRead(long offset, long length, ByteBuffer bb) {
         return pt.read(offset + bom, length, bb);
     }
 
     @Override
-    public void bufferRead(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback) {
+    public synchronized void bufferRead(long offset, long limitLength, Function<ByteBuffer, Boolean> traverseCallback) {
         pt.read(offset + bom, limitLength, traverseCallback);
     }
 

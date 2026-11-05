@@ -149,9 +149,7 @@ class PatternSearch implements Search {
             bb = ByteBuffer.allocateDirect(Math.toIntExact(chunk.length()));
         }
 
-        synchronized (this) {
-            source.bufferRead(chunk.from(), chunk.length(), bb);
-        }
+        source.bufferRead(chunk.from(), chunk.length(), bb);
         bb.flip();
         CharBuffer cb = charset.decode(bb);
         bb.clear();
