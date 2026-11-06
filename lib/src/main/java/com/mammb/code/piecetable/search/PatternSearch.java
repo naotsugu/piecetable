@@ -65,11 +65,15 @@ class PatternSearch implements Search {
 
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
-        return Chunk.of(source, fromRow, fromCol, toRow, toCol, DEFAULT_CHUNK_SIZE).stream()
+        var founds = Chunk.of(source, fromRow, fromCol, toRow, toCol, DEFAULT_CHUNK_SIZE).stream()
             .map(c -> search(c, pattern))
             .map(FoundsInChunk::founds)
             .flatMap(Collection::stream)
             .toList();
+
+        pool.removeIf(buffer -> !buffer.isDirect());
+
+        return founds;
     }
 
     @Override
@@ -79,13 +83,17 @@ class PatternSearch implements Search {
 
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
-        return Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
+        var found = Chunk.of(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
             .parallel()
             .map(c -> search(c, pattern))
             .filter(FoundsInChunk::hasFounds)
             .findFirst()
             .map(FoundsInChunk::founds)
             .map(List::getFirst);
+
+        pool.removeIf(buffer -> !buffer.isDirect());
+
+        return found;
     }
 
     @Override
@@ -95,13 +103,17 @@ class PatternSearch implements Search {
 
         Pattern pattern = Pattern.compile(cs.toString(), matchFlags);
 
-        return Chunk.backwardOf(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
+        var found = Chunk.backwardOf(source, fromRow, fromCol, DEFAULT_CHUNK_SIZE).stream()
             .parallel()
             .map(c -> search(c, pattern))
             .filter(FoundsInChunk::hasFounds)
             .findFirst()
             .map(FoundsInChunk::founds)
             .map(List::getLast);
+
+        pool.removeIf(buffer -> !buffer.isDirect());
+
+        return found;
     }
 
     @Override
@@ -115,6 +127,8 @@ class PatternSearch implements Search {
             .parallel()
             .map(c -> search(c, pattern))
             .forEachOrdered(listener);
+
+        pool.removeIf(buffer -> !buffer.isDirect());
     }
 
     @Override
@@ -130,6 +144,7 @@ class PatternSearch implements Search {
             .map(FoundsInChunk::reverse)
             .forEachOrdered(listener);
 
+        pool.removeIf(buffer -> !buffer.isDirect());
     }
 
     private FoundsInChunk search(Chunk chunk, Pattern pattern) {
@@ -146,7 +161,8 @@ class PatternSearch implements Search {
                 Math.max(DEFAULT_CHUNK_SIZE, Math.toIntExact(chunk.length())));
         } else if (bb.remaining() < chunk.length()) {
             pool.offer(bb);
-            bb = ByteBuffer.allocateDirect(Math.toIntExact(chunk.length()));
+            // Use non-direct buffers for large allocations to be collected by GC later.
+            bb = ByteBuffer.allocate(Math.toIntExact(chunk.length()));
         }
 
         source.bufferRead(chunk.from(), chunk.length(), bb);
